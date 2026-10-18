@@ -34,8 +34,9 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - [x] 4. Les images des questions, dessinées dans le style de la suite.
 - [x] 5. Les diagnostics gardés : les 10 derniers, reprise d'un diagnostic pas fini, résumé pour le réparateur, carte de
       Mindset avec le dernier diagnostic.
-- [ ] 6. Relecture par Jordan (pannes « pour de faux ») et corrections.
-- [ ] 7. Première publication : Mindcare 0.1.0, puis Mindset qui la propose.
+- [ ] 6. Relecture par Jordan (pannes « pour de faux », dans Mindset) et corrections (0.1.x).
+- [x] 7. Première publication : Mindcare 0.1.0, puis Mindset qui la propose (Mindset 1.1.0, le 2026-10-18 : Jordan
+      préfère tout tester dans Mindset, la relecture se fait donc sur la version publiée).
 
 ## Pour les développeurs
 
