@@ -70,6 +70,80 @@
       </Style.Triggers>
     </Style>
 
+    <!-- Une réponse ou une panne à choisir : large, texte à gauche -->
+    <Style x:Key="BtnChoix" TargetType="Button" BasedOn="{StaticResource BtnSecondary}">
+      <Setter Property="FontSize" Value="15"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="Padding" Value="20,12"/>
+      <Setter Property="Margin" Value="0,10,0,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid x:Name="Root">
+              <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="16" Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+              </Border>
+              <Border x:Name="Shine" CornerRadius="16" IsHitTestVisible="False" Opacity="0">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#38FFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="0.65"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Shine" Property="Opacity" Value="1"/></Trigger>
+              <Trigger Property="IsPressed" Value="True"><Setter TargetName="Root" Property="Opacity" Value="0.85"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Barres de défilement fines et sombres -->
+    <Style x:Key="ScrollThumb" TargetType="Thumb">
+      <Setter Property="OverridesDefaultStyle" Value="True"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Thumb">
+            <Border x:Name="T" Background="#3A3350" CornerRadius="4"/>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="T" Property="Background" Value="#4A5468"/></Trigger>
+              <Trigger Property="IsDragging" Value="True"><Setter TargetName="T" Property="Background" Value="#00E5FF"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="ScrollPage" TargetType="RepeatButton">
+      <Setter Property="OverridesDefaultStyle" Value="True"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style TargetType="ScrollBar">
+      <Setter Property="OverridesDefaultStyle" Value="True"/>
+      <Setter Property="Width" Value="10"/>
+      <Setter Property="MinWidth" Value="10"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Border Background="Transparent" Padding="2">
+              <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True">
+                <Track.DecreaseRepeatButton><RepeatButton Style="{StaticResource ScrollPage}" Command="ScrollBar.PageUpCommand"/></Track.DecreaseRepeatButton>
+                <Track.Thumb><Thumb Style="{StaticResource ScrollThumb}" MinHeight="30"/></Track.Thumb>
+                <Track.IncreaseRepeatButton><RepeatButton Style="{StaticResource ScrollPage}" Command="ScrollBar.PageDownCommand"/></Track.IncreaseRepeatButton>
+              </Track>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
     <!-- Carte en verre -->
     <Style x:Key="Card" TargetType="Border">
       <Setter Property="Background" Value="{StaticResource CardBg}"/>
@@ -122,7 +196,7 @@
     </DockPanel>
 
     <!-- Contenu de l'appli : rempli par contenu.ps1 -->
-    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="32,8,20,20" Padding="0,0,12,0">
+    <ScrollViewer x:Name="Defilement" Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="32,8,20,20" Padding="0,0,12,0">
       <StackPanel x:Name="Contenu"/>
     </ScrollViewer>
   </Grid>

@@ -60,7 +60,56 @@ Write-Resultat 'carte vivante (etat.json)' $bon
 # 3. Une copie hors de Mindset : la fenêtre « s'utilise avec Mindset »
 Test-Capture 'blocage' @{ MINDCARE_TEST_BLOCAGE = '1' } | Out-Null
 
-# 4. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
+# 4. Les pannes (questions.json), sans fenêtre : le fichier, puis des parcours dont on connaît la bonne conclusion
+$AppDir = Join-Path $racine 'Mindcare\fichiers'
+. (Join-Path $AppDir 'modules\diagnostic.ps1')
+$pannes = Read-Pannes
+$pb = @(Test-Pannes $pannes ([IO.File]::ReadAllText($QuestionsFichier, [Text.Encoding]::UTF8)))
+Write-Resultat 'questions.json (aucune impasse, aucune boucle, rien d''inconnu)' (-not $pb) "($($pb -join ' ; '))"
+# Chaque cas : la panne, les choix (numéro de réponse, -1 pour « Je ne sais pas »), la cause attendue en premier
+# (vide : rien de clair), et les causes qui ne doivent pas apparaître du tout
+$cas = @(
+    @{ Nom = 'le cousin (PC fixe, coupé au bout de 5 min)'; Panne = 'extinction'; Choix = 1, 1, 0, 0, -1, 0, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    @{ Nom = 'odeur de brûlé'; Panne = 'extinction'; Choix = @(0); Premiere = 'danger' }
+    @{ Nom = 'tout en « Je ne sais pas »'; Panne = 'extinction'; Choix = -1, -1, -1, -1, -1, -1, -1, -1; Premiere = '' }
+    @{ Nom = 'portable qui lâche sur batterie'; Panne = 'extinction'; Choix = 1, 0, 0, 0, 3, 1, 2, -1, 3; Premiere = 'batterie'; Jamais = @('alimentation') }
+    @{ Nom = 'écran bleu après une mise à jour'; Panne = 'extinction'; Choix = 1, 1, 1, 3, 1, 2, 2, 0; Premiere = 'windows' }
+    @{ Nom = 'mise en veille'; Panne = 'extinction'; Choix = 1, 1, 3, 2, 1, 2, 2, 3; Premiere = 'veille' }
+    @{ Nom = 'la maison qui coupe aussi'; Panne = 'extinction'; Choix = 1, 1, 0, 3, 1, 2, 3, -1; Premiere = 'prise' }
+    @{ Nom = 'portable tombé par terre'; Panne = 'extinction'; Choix = 1, 0, 1, 0, -1, -1, 2, 2, 1; Premiere = 'materiel'; Jamais = @('alimentation') }
+    @{ Nom = 'PC fixe, coupure en jeu, ventilateurs muets'; Panne = 'extinction'; Choix = 1, 1, 0, 1, 2, 1, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+)
+foreach ($k in $cas) {
+    $p = Get-Panne $pannes $k.Panne
+    $e = Get-Parcours $p $k.Choix
+    $conc = @(Get-Conclusion $p $e)
+    $ids = @($conc | ForEach-Object { [string]$_.Cause.Id })
+    $premiere = if ($ids) { $ids[0] } else { '' }
+    $bon = -not $e.Question -and $premiere -eq $k.Premiere -and -not @($ids | Where-Object { $k.Jamais -contains $_ })
+    Write-Resultat "cas : $($k.Nom)" $bon "(fini : $(-not $e.Question), causes : $($ids -join ', '))"
+}
+# Des centaines de parcours tirés au hasard (toujours les mêmes) : chacun finit, sans cause écartée par une réponse
+$mauvais = @()
+$hasard = New-Object Random 42
+foreach ($p in $pannes.Pannes) {
+    for ($t = 0; $t -lt 500; $t++) {
+        $choix = @(); $e = Get-Parcours $p @()
+        while ($e.Question -and $choix.Count -lt 40) { $choix += ($hasard.Next(-1, $e.Question.Reponses.Count)); $e = Get-Parcours $p $choix }
+        $conc = @(Get-Conclusion $p $e)
+        $ecartee = @($conc | Where-Object { foreach ($s in $_.Cause.Sauf) { if ($e.Notes -contains $s) { $true } } })
+        if ($e.Question -or $ecartee -or $conc.Count -gt 3) { $mauvais += "$($p.Id):$($choix -join ',')" }
+    }
+}
+Write-Resultat 'parcours au hasard (500 par panne)' (-not $mauvais) "($($mauvais | Select-Object -First 3))"
+
+# 5. Les écrans du diagnostic : une question, une conclusion (celle du cousin), le danger
+Test-Capture 'question' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1' } | Out-Null
+$s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3' }
+Write-Resultat 'conclusion affichée (journal)' ((Get-Journal $s) -match 'Conclusion extinction : surchauffe') '(pas de conclusion « surchauffe » dans le journal)'
+Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_BAS = '1' } | Out-Null
+Test-Capture 'conclusion-danger' @{ MINDCARE_TEST_PARCOURS = 'extinction:0' } | Out-Null
+
+# 6. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
 function Test-Quitter([string]$Nom, [switch]$Programme) {
     $s = Start-Scenario $Nom @{ MINDCARE_TEST_DEMARRAGE = '1' } -Programme:$Programme
     $fin = (Get-Date).AddSeconds($Delai)
@@ -72,7 +121,7 @@ function Test-Quitter([string]$Nom, [switch]$Programme) {
     Write-Resultat $Nom ($parti -and (Get-Journal $s) -match 'Fermeture demandée par Mindset') $(if (-not $parti) { '(encore ouverte 8 s après la demande : Mindset la fermerait de force)' } else { '(pas de trace dans le journal)' })
 }
 Test-Quitter 'quitter (script)'
-# 5. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir)
+# 7. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir)
 if (Test-Path -LiteralPath $exe) { Test-Quitter 'quitter (programme)' -Programme } else { Write-Host "(pas de $exe : lance construire.ps1 pour tester le programme)" -ForegroundColor Yellow }
 
 if ($script:Ok) { Write-Host "`nTout est bon. Captures : $test" -ForegroundColor Green; exit 0 }

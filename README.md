@@ -9,15 +9,17 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
 
 ## Ce qu'elle sait faire (0.1.0)
 
-- (à compléter à chaque étape du plan)
+- Le diagnostic de la panne « Il s'éteint ou redémarre tout seul » : les questions une à une, avec « Je ne sais pas »
+  et « Retour », puis la conclusion (la cause la plus probable, ce qu'on peut faire soi-même, quand aller chez un
+  réparateur, les consignes de sécurité, et le rappel des réponses).
 
 ## Plan
 
 Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 
-- [ ] 1. Le squelette dans Mindset : appli vide en orange, affichée dans un onglet de Mindset, carte « Aucun diagnostic
+- [x] 1. Le squelette dans Mindset : appli vide en orange, affichée dans un onglet de Mindset, carte « Aucun diagnostic
       pour l'instant ».
-- [ ] 2. Une panne complète, « Il s'éteint tout seul » (le cas du cousin) : choix de la panne, questions une à une avec
+- [x] 2. Une panne complète, « Il s'éteint tout seul » (le cas du cousin) : choix de la panne, questions une à une avec
       « Je ne sais pas » et retour, conclusion (texte seulement).
 - [ ] 3. Les 4 autres pannes : rien ne s'allume, écran noir, écran bleu, très lent (conseils vérifiés sur des sources
       sérieuses ; un test parcourt chaque chemin, aucune impasse).
@@ -29,8 +31,11 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 
 ## Pour les développeurs
 
+- `Mindcare\fichiers\questions.json` : les pannes, leurs questions et leurs causes (le même fichier pour le futur
+  téléphone) ; chaque réponse donne des points à des causes, la conclusion les classe.
 - `Mindcare\fichiers\Mindcare.ps1` : le démarrage ; `modules\` : le code découpé par partie.
-  - `contenu.ps1` : **ce que fait l'appli** (c'est là qu'on travaille) ;
+  - `contenu.ps1` : **ce que fait l'appli** : les écrans du diagnostic ;
+  - `diagnostic.ps1` : le calcul de la conclusion (sans affichage) ;
   - `mindset.ps1`, `donnees.ps1`, `themes.ps1`, `interface.ps1`, `systeme.ps1`, `evenements.ps1` : la vie dans la suite
     (Mindset, données, thème, fenêtre, fermeture, carte vivante), déjà prêts.
 - `outils\tester.ps1` : les tests automatiques (hors de l'écran, données à part).

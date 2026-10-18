@@ -1,0 +1,221 @@
+{
+  "Version": 1,
+  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu.",
+  "Securite": [
+    "Avant de toucher au PC (grilles, câbles, intérieur), éteins-le et débranche-le.",
+    "N'ouvre jamais le bloc d'alimentation, même débranché : il garde de l'électricité dangereuse.",
+    "Pas d'aspirateur, pas d'eau, pas de chiffon mouillé sur ou dans le PC.",
+    "Odeur de brûlé, fumée, étincelles : débranche tout de suite et ne le rallume plus."
+  ],
+  "RienTrouve": {
+    "Titre": "Pas de cause claire",
+    "Pourquoi": "Avec ces réponses, Mindcare ne peut pas dire ce qui ne va pas.",
+    "Gestes": [
+      "La prochaine fois que la panne arrive, regarde bien ce qui se passe (l'écran, les voyants, le bruit, la chaleur), puis refais le diagnostic.",
+      "Tu peux aussi montrer ce résumé à un réparateur."
+    ]
+  },
+  "Pannes": [
+    {
+      "Id": "extinction",
+      "Titre": "Il s'éteint ou redémarre tout seul",
+      "Phrase": "Le PC marche, puis se coupe ou redémarre sans qu'on lui demande.",
+      "Debut": "danger",
+      "Questions": [
+        {
+          "Id": "danger",
+          "Texte": "Avant tout : as-tu senti une odeur de brûlé, vu de la fumée ou entendu un claquement venant du PC ?",
+          "Suite": "type",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "danger": 20 }, "Suite": "conclusion" },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "type",
+          "Texte": "Ton PC, c'est un ordinateur portable ou un PC fixe ?",
+          "Aide": "Un PC fixe, c'est une tour (une grande boîte) avec un écran à part.",
+          "Suite": "comment",
+          "Reponses": [
+            { "Texte": "Un portable", "Note": "portable", "Suite": "chargeur" },
+            { "Texte": "Un PC fixe", "Note": "fixe" }
+          ]
+        },
+        {
+          "Id": "chargeur",
+          "Texte": "Est-ce qu'il s'éteint aussi quand le chargeur est branché ?",
+          "Suite": "comment",
+          "Reponses": [
+            { "Texte": "Non, seulement quand il marche sur la batterie", "Points": { "batterie": 5 } },
+            { "Texte": "Oui, même avec le chargeur branché", "Points": { "surchauffe": 1 } },
+            { "Texte": "Il ne marche plus du tout sans le chargeur", "Points": { "batterie": 4 } }
+          ]
+        },
+        {
+          "Id": "comment",
+          "Texte": "Au moment où il s'arrête, que se passe-t-il ?",
+          "Aide": "Si ça va trop vite pour voir, réponds « Je ne sais pas ».",
+          "Suite": "quand",
+          "Reponses": [
+            { "Texte": "Tout s'éteint d'un coup, comme une coupure de courant", "Points": { "surchauffe": 2, "alimentation": 2, "prise": 1 } },
+            { "Texte": "Un écran bleu apparaît, puis il redémarre", "Points": { "windows": 5 } },
+            { "Texte": "Il redémarre tout seul, sans écran bleu", "Points": { "windows": 2, "alimentation": 2 } },
+            { "Texte": "L'écran devient noir, mais les voyants restent allumés et il se réveille quand on touche la souris", "Points": { "veille": 6 } }
+          ]
+        },
+        {
+          "Id": "quand",
+          "Texte": "Au bout de combien de temps ça arrive ?",
+          "Suite": "chaleur",
+          "Reponses": [
+            { "Texte": "Quelques minutes après l'allumage, même sans rien faire", "Points": { "surchauffe": 3, "alimentation": 1 } },
+            { "Texte": "Quand je lance un jeu, une vidéo ou un gros programme", "Points": { "surchauffe": 3, "alimentation": 2 } },
+            { "Texte": "Après un long moment sans toucher au PC", "Points": { "veille": 4 } },
+            { "Texte": "N'importe quand, sans raison", "Points": { "alimentation": 1, "prise": 2, "windows": 1 } }
+          ]
+        },
+        {
+          "Id": "chaleur",
+          "Texte": "Juste avant qu'il s'éteigne, est-il très chaud, ou ses ventilateurs soufflent-ils très fort ?",
+          "Aide": "Portable : le dessous ou le clavier brûle presque. PC fixe : l'air qui sort à l'arrière est chaud et ça fait beaucoup de bruit.",
+          "Suite": "poussiere",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "surchauffe": 4 } },
+            { "Texte": "Non, il reste frais et calme", "Points": { "alimentation": 1, "windows": 1 } },
+            { "Texte": "On n'entend plus du tout ses ventilateurs", "Points": { "surchauffe": 5 } }
+          ]
+        },
+        {
+          "Id": "poussiere",
+          "Texte": "Quand a-t-il été dépoussiéré pour la dernière fois ?",
+          "Aide": "Regarde les grilles d'aération (sur les côtés, à l'arrière ou en dessous) : on y voit souvent des moutons de poussière.",
+          "Suite": "prise",
+          "Reponses": [
+            { "Texte": "Jamais, ou il y a plus d'un an", "Points": { "surchauffe": 2 } },
+            { "Texte": "Je vois de la poussière dans les grilles", "Points": { "surchauffe": 3 } },
+            { "Texte": "Il est propre, il a été nettoyé récemment" }
+          ]
+        },
+        {
+          "Id": "prise",
+          "Texte": "Le PC, ou son chargeur, est-il branché sur une multiprise ?",
+          "Suite": "depuis",
+          "Reponses": [
+            { "Texte": "Oui, et je n'ai pas essayé autrement", "Points": { "prise": 1 } },
+            { "Texte": "Oui, mais il s'éteint aussi branché directement au mur", "Points": { "alimentation": 1 } },
+            { "Texte": "Non, il est branché directement au mur" },
+            { "Texte": "D'autres appareils de la maison s'éteignent aussi parfois en même temps", "Points": { "prise": 6 } }
+          ]
+        },
+        {
+          "Id": "depuis",
+          "Texte": "Depuis quand ça arrive ?",
+          "Suite": "conclusion",
+          "Reponses": [
+            { "Texte": "Depuis une mise à jour, un nouveau programme ou un nouveau pilote", "Points": { "windows": 4 } },
+            { "Texte": "Depuis un choc, une chute ou un liquide renversé", "Points": { "materiel": 8 } },
+            { "Texte": "Depuis que le PC a été ouvert, déplacé ou qu'une pièce a été changée", "Points": { "materiel": 5, "alimentation": 1 } },
+            { "Texte": "Ça a commencé petit à petit, sans raison", "Points": { "surchauffe": 1, "alimentation": 1 } }
+          ]
+        }
+      ],
+      "Causes": [
+        {
+          "Id": "danger",
+          "Titre": "Danger : une pièce a peut-être grillé",
+          "Urgent": true,
+          "Seule": true,
+          "Pourquoi": "Une odeur de brûlé, de la fumée ou un claquement veulent dire qu'une pièce a grillé ou est en train de griller. Continuer à s'en servir peut l'abîmer encore plus, ou être dangereux.",
+          "Gestes": [
+            "Éteins le PC et débranche-le tout de suite (pour un portable, débranche aussi le chargeur).",
+            "Ne le rallume plus.",
+            "S'il y a de la fumée ou des flammes, éloigne-toi et appelle les pompiers (le 18 ou le 112)."
+          ],
+          "Pro": "Apporte-le à un réparateur avant de le rallumer, et dis-lui ce que tu as senti, vu ou entendu."
+        },
+        {
+          "Id": "surchauffe",
+          "Titre": "Il chauffe trop",
+          "Pourquoi": "Quand le processeur (le cerveau du PC) devient trop chaud, le PC se coupe tout seul pour se protéger. Le plus souvent, c'est la poussière qui bouche les grilles, ou un ventilateur qui ne tourne plus. Ça arrive souvent au bout de quelques minutes, ou quand on lui demande beaucoup d'efforts, comme un jeu.",
+          "Gestes": [
+            "Éteins le PC et débranche-le (pour un portable, débranche le chargeur).",
+            "Vérifie que l'air circule : un portable se pose sur une table, jamais sur un lit, un coussin ou une couverture ; une tour ne doit pas être collée à un mur ni enfermée dans un meuble.",
+            "Souffle la poussière des grilles d'aération avec une bombe d'air sec, par petits coups, la bombe bien droite. N'utilise jamais d'aspirateur ni de chiffon mouillé.",
+            "PC fixe : tu peux aussi enlever le panneau de côté (PC débranché) et souffler la poussière sur les ventilateurs et sur le radiateur du processeur. Tiens chaque ventilateur avec un doigt pendant que tu souffles, pour qu'il ne tourne pas trop vite. Ne touche à rien d'autre.",
+            "Rallume-le et écoute : les ventilateurs doivent tourner. S'il s'éteint encore, note au bout de combien de temps."
+          ],
+          "Pro": "Si un ventilateur ne tourne plus, si le PC s'éteint encore après le nettoyage, ou s'il a plus de 5 ans : un réparateur peut changer le ventilateur ou remettre de la pâte thermique (la pâte qui aide le processeur à refroidir)."
+        },
+        {
+          "Id": "alimentation",
+          "Titre": "Le bloc d'alimentation fatigue",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "Le bloc d'alimentation est la boîte, à l'arrière de la tour, où se branche le câble électrique. Quand il s'use, il ne donne plus assez de courant, surtout quand le PC fait des efforts, et tout se coupe d'un coup.",
+          "Gestes": [
+            "Éteins le PC, puis vérifie que le câble électrique est bien enfoncé à l'arrière de la tour et dans la prise.",
+            "Essaie un autre câble électrique : celui d'un écran ou d'une imprimante est souvent le même.",
+            "S'il y a un petit interrupteur à l'arrière de la tour, vérifie qu'il est bien sur « I ».",
+            "N'ouvre jamais le bloc d'alimentation : même débranché, il garde de l'électricité dangereuse."
+          ],
+          "Pro": "Si les coupures continuent, un réparateur peut tester le bloc d'alimentation et le changer. C'est une réparation courante."
+        },
+        {
+          "Id": "batterie",
+          "Titre": "La batterie ou le chargeur",
+          "Sauf": [ "fixe" ],
+          "Pourquoi": "Une batterie usée peut annoncer qu'elle est encore chargée, puis se vider d'un coup : le portable s'éteint sans prévenir. Un chargeur abîmé peut aussi couper le courant par moments.",
+          "Gestes": [
+            "Utilise le chargeur d'origine du portable, bien enfoncé des deux côtés.",
+            "Regarde le câble du chargeur : s'il est plié, abîmé ou s'il chauffe beaucoup, ne l'utilise plus.",
+            "En attendant, garde le portable branché sur son chargeur pour t'en servir.",
+            "Si la batterie a gonflé (le portable ne tient plus à plat, ou le clavier se soulève), arrête de t'en servir et débranche-le : c'est dangereux."
+          ],
+          "Pro": "Une batterie usée se change ; sur beaucoup de portables, c'est un réparateur qui le fait. Si le portable s'éteint même avec un bon chargeur, fais-le vérifier."
+        },
+        {
+          "Id": "prise",
+          "Titre": "La prise électrique ou la multiprise",
+          "Pourquoi": "Une multiprise fatiguée, un faux contact ou une prise trop chargée peuvent couper le courant une fraction de seconde : c'est assez pour éteindre un PC fixe.",
+          "Gestes": [
+            "Branche le PC directement sur une prise murale, sans multiprise.",
+            "Essaie une autre prise de la maison, dans une autre pièce.",
+            "Si tu gardes une multiprise, essaies-en une autre, et n'y branche pas en même temps un radiateur, un four ou une machine à laver."
+          ],
+          "Pro": "Si d'autres appareils de la maison s'éteignent aussi, le problème vient de l'électricité de la maison : c'est le travail d'un électricien, pas d'un réparateur de PC."
+        },
+        {
+          "Id": "windows",
+          "Titre": "Un problème de Windows ou d'un pilote",
+          "Pourquoi": "Quand Windows rencontre une erreur grave, il affiche un écran bleu et redémarre. Ça vient souvent d'un pilote (le petit programme qui fait marcher une pièce, comme la carte graphique) ou d'une mise à jour qui s'est mal passée.",
+          "Gestes": [
+            "Si un écran bleu apparaît, prends-le en photo avec ton téléphone : le message aide beaucoup un réparateur.",
+            "Fais les mises à jour : menu Démarrer, Paramètres, Windows Update, puis « Rechercher des mises à jour ». Redémarre ensuite le PC.",
+            "Si le problème a commencé après l'installation d'un programme, désinstalle-le : menu Démarrer, Paramètres, puis Applications."
+          ],
+          "Pro": "Si les redémarrages continuent après les mises à jour, montre la photo de l'écran bleu à un réparateur."
+        },
+        {
+          "Id": "veille",
+          "Titre": "Il se met en veille (ce n'est pas une panne)",
+          "Pourquoi": "Pour économiser l'énergie, Windows éteint l'écran puis met le PC en veille quand on ne s'en sert pas. Les voyants restent allumés ou clignotent, et il se réveille quand on touche la souris ou le clavier.",
+          "Gestes": [
+            "Pour le réveiller : bouge la souris, appuie sur une touche, ou appuie brièvement sur le bouton d'allumage.",
+            "Pour changer le délai : menu Démarrer, Paramètres, Système, puis Alimentation (ou Alimentation et batterie). Choisis un délai plus long pour l'écran et pour la mise en veille."
+          ],
+          "Pro": "Rien à réparer. Si l'écran reste noir même quand tu touches la souris, refais un diagnostic avec la panne « L'écran reste noir »."
+        },
+        {
+          "Id": "materiel",
+          "Titre": "Une pièce abîmée ou mal remise",
+          "Pourquoi": "Après un choc, un liquide renversé ou une réparation, une pièce peut être abîmée, mal branchée ou mal fixée (par exemple le radiateur du processeur), et le PC se coupe.",
+          "Gestes": [
+            "Éteins le PC et débranche-le.",
+            "Après un liquide renversé : ne le rallume pas. Retourne un portable ouvert, clavier vers le bas, pour que le liquide s'écoule.",
+            "Si le PC a été ouvert récemment, la personne qui l'a ouvert peut vérifier que tout est bien rebranché et bien fixé."
+          ],
+          "Pro": "C'est le travail d'un réparateur : explique-lui ce qui s'est passé (le choc, le liquide, la pièce changée)."
+        }
+      ]
+    }
+  ]
+}
