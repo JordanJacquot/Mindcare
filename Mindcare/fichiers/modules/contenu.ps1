@@ -261,89 +261,165 @@ function Add-Etape($Parent, [int]$Numero, [string]$Statut, [string]$Titre, [stri
 }
 
 # ---------------------------------------------------------------------------
-# 3. La conclusion
+# 3. La conclusion : les pistes côte à côte (la plus probable d'abord), puis le test qui confirme celle qu'on choisit.
+#    Le détail (pourquoi, gestes, quand aller chez un réparateur) reste replié ; le résumé complet est pour le réparateur.
 # ---------------------------------------------------------------------------
 function Show-Conclusion($Etat) {
     $causes = @(Get-Conclusion $script:PanneEnCours $Etat)
     $liste = if ($causes) { ($causes | ForEach-Object { "$($_.Cause.Id) ($($_.Points))" }) -join ', ' } else { 'rien de clair' }
     Write-Log "Conclusion $($script:PanneEnCours.Id) : $liste (choix $($script:ChoixFaits -join ','))"
     Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true @($causes | ForEach-Object { $_.Cause.Id })
-    Clear-Contenu
-    $c = New-Card
-    Add-Texte $c "$($script:PanneEnCours.Titre) : la conclusion" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
-    if (-not $causes) {
-        $rien = $script:Pannes.RienTrouve
-        Add-Titre $c ([string]$rien.Titre)
-        Add-Texte $c ([string]$rien.Pourquoi) 14 '#A9A3C9' 'Normal' '0,8,0,0'
-        Add-Liste $c $rien.Gestes
-    } else {
-        $urgent = [bool]$causes[0].Cause.Urgent
-        Add-Texte $c $(if ($urgent) { 'Urgent' } else { 'Le plus probable' }) 13 $(if ($urgent) { '#FF5A6E' } else { '#A9A3C9' }) 'SemiBold'
-        Add-Cause $c $causes[0].Cause 'H1'
-    }
-    if ($script:PanneEnCours.Conseil) {
-        $bon = New-Card
-        Add-Texte $bon 'Bon à savoir' 18 '#FFFFFF' 'SemiBold'
-        Add-Texte $bon ([string]$script:PanneEnCours.Conseil) 14 '#EEEBF7' 'Normal' '0,8,0,0'
-    }
-    foreach ($autre in ($causes | Select-Object -Skip 1)) {
-        $c2 = New-Card
-        Add-Texte $c2 'Autre piste' 13 '#A9A3C9' 'SemiBold'
-        Add-Cause $c2 $autre.Cause 'H2'
-    }
-
-    $sec = New-Card
-    Add-Texte $sec 'Pour ta sécurité' 18 '#FFB547' 'SemiBold'
-    Add-Liste $sec $script:Pannes.Securite '!' '#FFB547'
-
-    $rp = New-Card
-    Add-Titre $rp 'Tes réponses' 'H2'
-    foreach ($e in $Etat.Resume) {
-        Add-Texte $rp $e.Question 13 '#A9A3C9' 'Normal' '0,10,0,0'
-        Add-Texte $rp $e.Reponse 14 '#EEEBF7' 'SemiBold'
-    }
-
-    # Pour le réparateur : le résumé (la panne, la conclusion, les réponses, le modèle du PC) en fichier ou à coller
-    $script:ResumeDe = @{ Panne = $script:PanneEnCours; Etat = $Etat; Causes = $causes }   # (le texte est fait au clic)
-    $rep = New-Card
-    Add-Titre $rep 'Pour le réparateur' 'H2'
-    Add-Texte $rep 'Garde un résumé de ce diagnostic (la panne, la conclusion, tes réponses et le modèle du PC) pour le montrer à un réparateur, ou pour l''envoyer à quelqu''un qui peut t''aider.' 14 '#A9A3C9' 'Normal' '0,6,0,0'
-    $rg = New-Rangee $rep
-    Add-Bouton $rg 'Enregistrer le résumé sur le Bureau' {
-        try { $f = Save-Resume (Get-ResumeEnCours); $ui.ResumeInfo.Text = "C'est fait : le fichier « $([IO.Path]::GetFileName($f)) » est sur le Bureau." }
-        catch { Write-Log "Résumé non enregistré : $_"; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être enregistré sur le Bureau. Essaie plutôt « Copier le résumé »." }
-    }
-    Add-Bouton $rg 'Copier le résumé' {
-        try { [System.Windows.Clipboard]::SetText((Get-ResumeEnCours)); $ui.ResumeInfo.Text = 'Le résumé est copié : tu peux le coller dans un message ou un e-mail.' }
-        catch { Write-Log "Résumé non copié : $_"; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être copié. Essaie plutôt de l'enregistrer sur le Bureau." }
-    }
-    $ui.ResumeInfo = New-Text '' 14 '#3DDC97'; $ui.ResumeInfo.Margin = '0,4,0,0'
-    [void]$rep.Children.Add($ui.ResumeInfo)
-
-    $rg = New-Rangee $rep
-    Add-Bouton $rg 'Nouveau diagnostic' { Show-Accueil } 'BtnPrimary'
-    Add-Bouton $rg 'Changer ma dernière réponse' { Undo-Choix }
+    $script:ResumeDe = @{ Panne = $script:PanneEnCours; Etat = $Etat; Causes = $causes }   # (le résumé est fait au clic)
+    $script:Choisie = 0; $script:DetailsOuverts = $false; $script:ReparateurOuvert = $false
+    if ($EnTest -and $env:MINDCARE_TEST_CHOISIE) { $script:Choisie = [int]$env:MINDCARE_TEST_CHOISIE; $script:DetailsOuverts = $true; $script:ReparateurOuvert = $true }
+    Show-ConclusionVue
 }
 
-function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Etat $script:ResumeDe.Causes }
+function Show-ConclusionVue {
+    $causes = @($script:ResumeDe.Causes)
+    Clear-Contenu
 
-# Une cause : son titre, pourquoi, ce qu'on peut faire soi-même, quand aller chez un réparateur, et parfois un bouton
-# vers le diagnostic d'une autre panne (VoirPanne)
-function Add-Cause($Parent, $Cause, [string]$Style) {
-    Add-Titre $Parent ([string]$Cause.Titre) $Style '0,2,0,0'
-    Add-Texte $Parent ([string]$Cause.Pourquoi) 14 '#A9A3C9' 'Normal' '0,8,0,0'
-    Add-Texte $Parent 'Ce que tu peux faire' 15 '#FFFFFF' 'SemiBold' '0,18,0,0'
-    Add-Liste $Parent $Cause.Gestes
-    Add-Texte $Parent 'Quand aller chez un réparateur' 15 '#FFFFFF' 'SemiBold' '0,18,0,0'
-    Add-Texte $Parent ([string]$Cause.Pro) 14 '#EEEBF7' 'Normal' '0,8,0,0'
+    # En haut : la panne, la phrase qui résume, et les boutons
+    $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,0,0,16'
+    [void]$ui.Contenu.Children.Add($haut)
+    $boutons = New-Object System.Windows.Controls.StackPanel; $boutons.Orientation = 'Horizontal'; $boutons.VerticalAlignment = 'Bottom'
+    [System.Windows.Controls.DockPanel]::SetDock($boutons, 'Right')
+    [void]$haut.Children.Add($boutons)
+    Add-Bouton $boutons 'Retour' { Undo-Choix }
+    Add-Bouton $boutons 'Pour le réparateur' { $script:ReparateurOuvert = -not $script:ReparateurOuvert; Show-ConclusionVue }
+    Add-Bouton $boutons 'Nouveau diagnostic' { Show-Accueil } 'BtnPrimary'
+    $titres = New-Object System.Windows.Controls.StackPanel
+    [void]$haut.Children.Add($titres)
+    Add-Texte $titres ([string]$script:PanneEnCours.Titre) 13 '#A9A3C9'
+    # (seules comptent les pistes vraiment possibles : au moins 60 % des points de la première)
+    $fortes = @($causes | Where-Object { $_.Points -ge 0.6 * $causes[0].Points }).Count
+    $phrase = if (-not $causes) { [string]$script:Pannes.RienTrouve.Titre }
+              elseif ($causes[0].Cause.Urgent) { 'Attention : arrête tout de suite' }
+              elseif ($fortes -le 1) { 'Une piste sort du lot' }
+              elseif ($fortes -eq 2) { 'Deux pistes sortent du lot' }
+              else { 'Trois pistes possibles' }
+    Add-Titre $titres $phrase 'H1' '0,4,0,0'
+
+    if ($script:ReparateurOuvert) { Add-Reparateur }
+
+    if (-not $causes) {
+        $c = New-Card
+        Add-Texte $c ([string]$script:Pannes.RienTrouve.Pourquoi) 15 '#C9C3DD'
+        Add-Liste $c $script:Pannes.RienTrouve.Gestes
+    } else {
+        # Les pistes côte à côte : une barre pour leur part, un clic pour voir comment vérifier
+        $total = 0; foreach ($x in $causes) { $total += $x.Points }
+        $g = New-Object System.Windows.Controls.Grid; $g.Margin = '0,0,0,18'
+        for ($n = 0; $n -lt $causes.Count; $n++) { [void]$g.ColumnDefinitions.Add((New-Object System.Windows.Controls.ColumnDefinition)) }
+        [void]$ui.Contenu.Children.Add($g)
+        for ($n = 0; $n -lt $causes.Count; $n++) { Add-Piste $g $n $causes[$n] ($causes[$n].Points / [double]$total) $causes[0].Points }
+
+        # La piste choisie : le test qui la confirme, et ce qu'on peut faire (replié)
+        $choisie = $causes[[math]::Min($script:Choisie, $causes.Count - 1)].Cause
+        Add-Verification $choisie
+    }
+
+    if ($script:PanneEnCours.Conseil) {
+        $bon = New-Object System.Windows.Controls.DockPanel; $bon.Margin = '4,0,0,10'
+        $i = New-Text 'i' 14 '#00E5FF' 'Bold'; $i.Width = 22; [System.Windows.Controls.DockPanel]::SetDock($i, 'Left'); [void]$bon.Children.Add($i)
+        [void]$bon.Children.Add((New-Text ([string]$script:PanneEnCours.Conseil) 14 '#C9C3DD'))
+        [void]$ui.Contenu.Children.Add($bon)
+    }
+    $sec = New-Object System.Windows.Controls.DockPanel; $sec.Margin = '4,0,0,8'
+    $pt = New-Text '!' 14 '#FFB547' 'Bold'; $pt.Width = 22; [System.Windows.Controls.DockPanel]::SetDock($pt, 'Left'); [void]$sec.Children.Add($pt)
+    [void]$sec.Children.Add((New-Text ([string]@($script:Pannes.Securite)[0] + ' ' + [string]@($script:Pannes.Securite)[1]) 14 '#FFB547'))
+    [void]$ui.Contenu.Children.Add($sec)
+}
+
+# Une piste : son niveau (la plus probable, possible aussi, moins probable), son nom, sa part, sa phrase
+function Add-Piste($Grille, [int]$Rang, $Piste, [double]$Part, [int]$PointsMax) {
+    $b = New-Object System.Windows.Controls.Border
+    $b.Style = $Window.FindResource('Card')
+    $b.Margin = $(if ($Rang -eq 0) { '0,0,0,0' } else { '16,0,0,0' })
+    $b.Cursor = 'Hand'; $b.Tag = $Rang; $b.ToolTip = 'Voir comment vérifier cette piste'
+    $choisie = ($Rang -eq [math]::Min($script:Choisie, $script:ResumeDe.Causes.Count - 1))
+    $urgent = [bool]$Piste.Cause.Urgent
+    if ($choisie) { $b.BorderBrush = Get-Brush $(if ($urgent) { '#FF5A6E' } else { '#00E5FF' }); $b.BorderThickness = 2 }
+    $b.Add_MouseLeftButtonUp({ param($s) $script:Choisie = [int]$s.Tag; $script:DetailsOuverts = $false; Show-ConclusionVue })
+    $sp = New-Object System.Windows.Controls.StackPanel
+    $b.Child = $sp
+    $niveau, $couleur = if ($urgent) { 'Urgent', '#FF5A6E' }
+                        elseif ($Rang -eq 0) { $(if ($script:ResumeDe.Causes.Count -gt 1) { 'La plus probable' } else { 'La piste' }), '#00E5FF' }
+                        elseif ($Piste.Points -ge 0.6 * $PointsMax) { 'Possible aussi', '#B04BFF' }
+                        else { 'Moins probable', '#6E6890' }
+    Add-Texte $sp $niveau.ToUpper() 12 $couleur 'Bold'
+    Add-Texte $sp ([string]$Piste.Cause.Titre) 18 '#FFFFFF' 'SemiBold' '0,6,0,10'
+    # La barre : la part de cette piste parmi celles proposées
+    $barre = New-Object System.Windows.Controls.Grid; $barre.Height = 8
+    foreach ($l in $Part, (1 - $Part)) { $cd = New-Object System.Windows.Controls.ColumnDefinition; $cd.Width = New-Object System.Windows.GridLength ([math]::Max(0.001, $l)), ([System.Windows.GridUnitType]::Star); [void]$barre.ColumnDefinitions.Add($cd) }
+    $fond = New-Object System.Windows.Controls.Border; $fond.CornerRadius = 4; $fond.Background = Get-Brush '#1AFFFFFF'
+    [System.Windows.Controls.Grid]::SetColumnSpan($fond, 2); [void]$barre.Children.Add($fond)
+    $plein = New-Object System.Windows.Controls.Border; $plein.CornerRadius = 4; $plein.Background = Get-Brush $couleur
+    [void]$barre.Children.Add($plein)
+    if ($script:ResumeDe.Causes.Count -gt 1) { [void]$sp.Children.Add($barre) }   # (une seule piste : pas de part à montrer)
+    Add-Texte $sp ([string]$Piste.Cause.Resume) 14 '#C9C3DD' 'Normal' '0,12,0,0'
+    [System.Windows.Controls.Grid]::SetColumn($b, $Rang)
+    [void]$Grille.Children.Add($b)
+}
+
+# Sous les pistes : comment vérifier celle qu'on a choisie (son test), puis ce qu'on peut faire, replié
+function Add-Verification($Cause) {
+    $c = New-Card
+    $test = $Cause.Test
+    if ($test) {
+        Add-Texte $c 'POUR VÉRIFIER' 12 '#00E5FF' 'Bold'
+        Add-Texte $c ([string]$test.Titre) 20 '#FFFFFF' 'SemiBold' '0,6,0,0'
+        Add-Liste $c $test.Etapes
+        Add-Texte $c ([string]$test.Si) 14 '#A9A3C9' 'Normal' '0,12,0,0'
+    } else {
+        # (le danger, ou une autre panne à faire : pas de test, ce qu'il faut faire tout de suite)
+        Add-Texte $c $(if ($Cause.Urgent) { 'À FAIRE TOUT DE SUITE' } else { 'CE QUE TU PEUX FAIRE' }) 12 $(if ($Cause.Urgent) { '#FF5A6E' } else { '#00E5FF' }) 'Bold'
+        Add-Texte $c ([string]$Cause.Pourquoi) 15 '#C9C3DD' 'Normal' '0,6,0,0'
+        Add-Liste $c $Cause.Gestes
+        Add-Texte $c ([string]$Cause.Pro) 14 '#A9A3C9' 'Normal' '0,12,0,0'
+    }
+    $rg = New-Rangee $c
+    if ($test) {
+        Add-Bouton $rg $(if ($script:DetailsOuverts) { 'Masquer le détail' } else { 'Ce que tu peux faire' }) { $script:DetailsOuverts = -not $script:DetailsOuverts; Show-ConclusionVue }
+    }
     $autre = if ($Cause.VoirPanne) { Get-Panne $script:Pannes ([string]$Cause.VoirPanne) } else { $null }
     if ($autre) {
         $b = New-Button "Faire le diagnostic « $($autre.Titre) »" 'BtnPrimary'
-        $b.HorizontalAlignment = 'Left'; $b.Margin = '0,16,0,0'; $b.Tag = [string]$autre.Id
+        $b.Margin = '0,0,10,8'; $b.Tag = [string]$autre.Id
         $b.Add_Click({ param($s) Start-Diagnostic ([string]$s.Tag) })
-        [void]$Parent.Children.Add($b)
+        [void]$rg.Children.Add($b)
+    }
+    if ($test -and $script:DetailsOuverts) {
+        $sep = New-Object System.Windows.Controls.Border; $sep.Height = 1; $sep.Background = Get-Brush '#1FFFFFFF'; $sep.Margin = '0,10,0,14'
+        [void]$c.Children.Add($sep)
+        Add-Texte $c 'Pourquoi' 15 '#FFFFFF' 'SemiBold'
+        Add-Texte $c ([string]$Cause.Pourquoi) 14 '#C9C3DD' 'Normal' '0,6,0,0'
+        Add-Texte $c 'Ce que tu peux faire' 15 '#FFFFFF' 'SemiBold' '0,16,0,0'
+        Add-Liste $c $Cause.Gestes
+        Add-Texte $c 'Quand aller chez un réparateur' 15 '#FFFFFF' 'SemiBold' '0,16,0,0'
+        Add-Texte $c ([string]$Cause.Pro) 14 '#C9C3DD' 'Normal' '0,6,0,0'
     }
 }
+
+# Pour le réparateur : le résumé (la panne, la conclusion, les réponses, le modèle du PC) en fichier ou à coller
+function Add-Reparateur {
+    $rep = New-Card
+    Add-Titre $rep 'Pour le réparateur' 'H2'
+    Add-Texte $rep 'Un résumé de ce diagnostic (la panne, la conclusion, tes réponses et le modèle du PC), à montrer à un réparateur ou à envoyer à quelqu''un qui peut t''aider.' 14 '#A9A3C9' 'Normal' '0,6,0,0'
+    $rg = New-Rangee $rep
+    Add-Bouton $rg 'Enregistrer le résumé sur le Bureau' {
+        try { $f = Save-Resume (Get-ResumeEnCours); $ui.ResumeInfo.Visibility = 'Visible'; $ui.ResumeInfo.Text = "C'est fait : le fichier « $([IO.Path]::GetFileName($f)) » est sur le Bureau." }
+        catch { Write-Log "Résumé non enregistré : $_"; $ui.ResumeInfo.Visibility = 'Visible'; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être enregistré sur le Bureau. Essaie plutôt « Copier le résumé »." }
+    }
+    Add-Bouton $rg 'Copier le résumé' {
+        try { [System.Windows.Clipboard]::SetText((Get-ResumeEnCours)); $ui.ResumeInfo.Visibility = 'Visible'; $ui.ResumeInfo.Text = 'Le résumé est copié : tu peux le coller dans un message ou un e-mail.' }
+        catch { Write-Log "Résumé non copié : $_"; $ui.ResumeInfo.Visibility = 'Visible'; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être copié. Essaie plutôt de l'enregistrer sur le Bureau." }
+    }
+    $ui.ResumeInfo = New-Text '' 14 '#3DDC97'; $ui.ResumeInfo.Visibility = 'Collapsed'
+    [void]$rep.Children.Add($ui.ResumeInfo)
+}
+
+function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Etat $script:ResumeDe.Causes }
 
 # À la fermeture : arrêter ce qui tourne (minuteries, travaux de fond), sinon rien ne doit rester ouvert
 function Stop-Contenu { }

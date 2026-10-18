@@ -160,6 +160,8 @@ Test-Capture 'question' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1' } | Out-Nul
 $s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3' }
 Write-Resultat 'conclusion affichée (journal)' ((Get-Journal $s) -match 'Conclusion extinction : surchauffe') '(pas de conclusion « surchauffe » dans le journal)'
 Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_BAS = '1' } | Out-Null
+Test-Capture 'conclusion-ram' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3' } | Out-Null
+Test-Capture 'conclusion-details' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3'; MINDCARE_TEST_CHOISIE = '1' } | Out-Null
 Test-Capture 'conclusion-danger' @{ MINDCARE_TEST_PARCOURS = 'extinction:0' } | Out-Null
 Test-Capture 'question-image' @{ MINDCARE_TEST_PARCOURS = 'rien:1,0,1,0' } | Out-Null
 Test-Capture 'question-image-crepuscule' @{ MINDCARE_TEST_PARCOURS = 'ecran-noir:1,0,1,1,1'; MINDCARE_THEME = 'crepuscule' } | Out-Null
