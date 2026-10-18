@@ -172,33 +172,92 @@ function Undo-Choix {
 function Show-Question($Etat) {
     $q = $Etat.Question
     Clear-Contenu
-    $c = New-Card
-    # En haut : la question (et son image à droite, s'il y en a une)
+    # Deux colonnes : les étapes à gauche, la question à droite
+    $g = New-Object System.Windows.Controls.Grid
+    foreach ($l in 270, 22, 0) {
+        $cd = New-Object System.Windows.Controls.ColumnDefinition
+        $cd.Width = if ($l) { New-Object System.Windows.GridLength $l } else { New-Object System.Windows.GridLength 1, ([System.Windows.GridUnitType]::Star) }
+        [void]$g.ColumnDefinitions.Add($cd)
+    }
+    [void]$ui.Contenu.Children.Add($g)
+
+    # À gauche : les étapes faites (un clic pour changer sa réponse), celle en cours, celles qui viennent sans doute
+    $gauche = New-CarteDans $g 0
+    Add-Texte $gauche ([string]$script:PanneEnCours.Titre).ToUpper() 12 '#6E6890' 'SemiBold' '0,0,0,16'
+    $n = 0
+    foreach ($e in $Etat.Resume) { Add-Etape $gauche ($n + 1) 'fait' $e.Court $e.Reponse $n; $n++ }
+    Add-Etape $gauche ($n + 1) 'encours' ([string]$q.Court) '' -1
+    $prochaines = @(Get-Prochaines $script:PanneEnCours $q)
+    $k = $n + 2
+    foreach ($p in $prochaines) { Add-Etape $gauche $k 'avenir' ([string]$p.Court) '' -1; $k++ }
+
+    # À droite : la question, son dessin, les réponses
+    $droite = New-CarteDans $g 2
     $haut = New-Object System.Windows.Controls.DockPanel
-    [void]$c.Children.Add($haut)
+    [void]$droite.Children.Add($haut)
     $image = $null
     if ($q.Image) {
         try { $image = ConvertFrom-Svg ([string]$q.Image) } catch { Write-Log "Image $($q.Image) illisible : $_" }
         if (-not $image) { Write-Log "Image $($q.Image) introuvable" }
     }
     if ($image) {
-        $image.Width = 240; $image.Height = 160; $image.Margin = '24,0,0,0'; $image.VerticalAlignment = 'Top'
+        $image.Width = 210; $image.Height = 140; $image.Margin = '20,0,0,0'; $image.VerticalAlignment = 'Top'
         [System.Windows.Controls.DockPanel]::SetDock($image, 'Right')
         [void]$haut.Children.Add($image)
     }
     $texte = New-Object System.Windows.Controls.StackPanel
     [void]$haut.Children.Add($texte)
-    Add-Texte $texte "$($script:PanneEnCours.Titre) : question $($script:ChoixFaits.Count + 1)" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
-    Add-Titre $texte ([string]$q.Texte) 'H2'
-    if ($q.Aide) { Add-Texte $texte ([string]$q.Aide) 14 '#A9A3C9' 'Normal' '0,6,0,0' }
+    $reste = if ($prochaines.Count) { "encore $($prochaines.Count) environ" } else { 'la dernière' }
+    Add-Texte $texte "Question $($n + 1), $reste" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
+    Add-Titre $texte ([string]$q.Texte) 'H1'
+    if ($q.Aide) { Add-Texte $texte ([string]$q.Aide) 14 '#A9A3C9' 'Normal' '0,8,0,0' }
+    $reponses = New-Object System.Windows.Controls.StackPanel; $reponses.Margin = '0,10,0,0'
+    [void]$droite.Children.Add($reponses)
     $i = 0
     foreach ($r in $q.Reponses) {
-        Add-ChoixBouton $c (New-Text ([string]$r.Texte) 15 '#F2EFFA') $i { param($s) Add-Choix ([int]$s.Tag) }
+        Add-ChoixBouton $reponses (New-Text ([string]$r.Texte) 15 '#F2EFFA') $i { param($s) Add-Choix ([int]$s.Tag) }
         $i++
     }
-    $rg = New-Rangee $c
-    Add-Bouton $rg 'Je ne sais pas' { Add-Choix -1 }
+    $rg = New-Rangee $droite
     Add-Bouton $rg 'Retour' { Undo-Choix }
+    Add-Bouton $rg 'Je ne sais pas' { Add-Choix -1 }
+}
+
+# Une carte en verre dans une colonne d'une grille (New-Card la pose dans la fenêtre) : renvoie son contenu
+function New-CarteDans($Grille, [int]$Colonne) {
+    $c = New-Object System.Windows.Controls.Border
+    $c.Style = $Window.FindResource('Card'); $c.VerticalAlignment = 'Top'
+    $sp = New-Object System.Windows.Controls.StackPanel
+    $c.Child = $sp
+    [System.Windows.Controls.Grid]::SetColumn($c, $Colonne)
+    [void]$Grille.Children.Add($c)
+    $sp
+}
+
+# Une étape dans la liste de gauche : faite (coche verte, un clic pour revenir changer sa réponse), en cours, à venir
+function Add-Etape($Parent, [int]$Numero, [string]$Statut, [string]$Titre, [string]$Detail, [int]$Index) {
+    $d = New-Object System.Windows.Controls.DockPanel
+    $d.Margin = '0,0,0,12'; $d.Background = [System.Windows.Media.Brushes]::Transparent
+    $rond = New-Object System.Windows.Controls.Border
+    $rond.Width = 24; $rond.Height = 24; $rond.CornerRadius = 12; $rond.Margin = '0,0,12,0'; $rond.VerticalAlignment = 'Top'
+    $chiffre = New-Text $(if ($Statut -eq 'fait') { [string][char]0x2713 } else { "$Numero" }) 12 '#6E6890' 'Bold'
+    $chiffre.HorizontalAlignment = 'Center'; $chiffre.VerticalAlignment = 'Center'
+    if ($Statut -eq 'fait') { $rond.Background = Get-Brush '#2E3DDC97'; $chiffre.Foreground = Get-Brush '#3DDC97' }
+    elseif ($Statut -eq 'encours') { $rond.Background = Get-Brush '#00E5FF'; $chiffre.Foreground = Get-Brush '#08060F' }
+    else { $rond.BorderBrush = Get-Brush '#3A3350'; $rond.BorderThickness = 1 }
+    $rond.Child = $chiffre
+    [System.Windows.Controls.DockPanel]::SetDock($rond, 'Left')
+    [void]$d.Children.Add($rond)
+    $t = New-Object System.Windows.Controls.StackPanel; $t.VerticalAlignment = 'Center'
+    $couleur = if ($Statut -eq 'fait') { '#EEEBF7' } elseif ($Statut -eq 'encours') { '#FFFFFF' } else { '#6E6890' }
+    [void]$t.Children.Add((New-Text $Titre 13 $couleur $(if ($Statut -eq 'encours') { 'SemiBold' } else { 'Normal' })))
+    if ($Detail) { $dt = New-Text $Detail 12 '#A9A3C9'; $dt.MaxHeight = 34; $dt.TextTrimming = 'CharacterEllipsis'; [void]$t.Children.Add($dt) }
+    [void]$d.Children.Add($t)
+    if ($Statut -eq 'fait') {
+        $d.Cursor = 'Hand'; $d.Tag = $Index; $d.ToolTip = 'Changer cette réponse'
+        $d.Add_MouseLeftButtonUp({ param($s) $script:ChoixFaits = @($script:ChoixFaits | Select-Object -First ([int]$s.Tag)); Show-Etape })
+    }
+    [void]$Parent.Children.Add($d)
 }
 
 # ---------------------------------------------------------------------------

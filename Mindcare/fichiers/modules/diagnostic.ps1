@@ -29,12 +29,25 @@ function Get-Parcours($Panne, [int[]]$Choix = @()) {
             if ($r.Points) { foreach ($pr in $r.Points.PSObject.Properties) { $points[$pr.Name] += [int]$pr.Value } }
             if ($r.Note) { $notes += [string]$r.Note }
         }
-        $resume += [pscustomobject]@{ Question = [string]$q.Texte; Reponse = $(if ($r) { [string]$r.Texte } else { 'Je ne sais pas' }) }
+        $resume += [pscustomobject]@{ Question = [string]$q.Texte; Court = [string]$q.Court; Reponse = $(if ($r) { [string]$r.Texte } else { 'Je ne sais pas' }) }
         $fait++
         $suite = Get-Suite $q $r
         $q = if ($suite -eq 'conclusion') { $null } else { Get-Question $Panne $suite }
     }
     [pscustomobject]@{ Question = $q; Choix = @($Choix | Select-Object -First $fait); Points = $points; Notes = $notes; Resume = $resume }
+}
+
+# Les questions qui viennent sans doute après celle-ci (en suivant la suite par défaut) : la liste des étapes à venir.
+# Une estimation : une réponse peut mener ailleurs.
+function Get-Prochaines($Panne, $Question) {
+    $vues = @{}; $q = $Question
+    while ($q) {
+        $suite = Get-Suite $q $null
+        if ($suite -eq 'conclusion' -or $vues[$suite]) { break }
+        $vues[$suite] = $true
+        $q = Get-Question $Panne $suite
+        if ($q) { $q }
+    }
 }
 
 # Les causes retenues, la plus probable d'abord (puis au plus 2 autres pistes d'au moins 2 points). À égalité, l'ordre
