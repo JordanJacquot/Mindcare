@@ -133,3 +133,19 @@ function Get-Indices {
 }
 
 function Stop-LectureJournaux { try { if ($script:JournauxTache) { $script:JournauxTache.PS.Stop(); $script:JournauxTache.PS.Dispose() } } catch {} }
+
+# Les barrettes de mémoire de ce PC (taille, marque, référence, emplacement), pour la réponse « mémoire » et le rapport :
+# lu une fois, sans droits administrateur. Tests : MINDCARE_TEST_BARRETTES (rien du vrai PC).
+function Get-Barrettes {
+    if ($EnTest) { return @($env:MINDCARE_TEST_BARRETTES -split '\|' | Where-Object { $_ }) }
+    if ($null -ne $script:Barrettes) { return $script:Barrettes }
+    $script:Barrettes = @()
+    try {
+        $script:Barrettes = @(Get-CimInstance Win32_PhysicalMemory -ErrorAction Stop | ForEach-Object {
+            $go = [math]::Round($_.Capacity / 1GB)
+            $ref = ("$(([string]$_.Manufacturer).Trim()) $(([string]$_.PartNumber).Trim())").Trim()
+            "$go Go$(if ($ref) { " $ref" })$(if ($_.DeviceLocator) { " ($(([string]$_.DeviceLocator).Trim()))" })"
+        })
+    } catch { Write-Log "Barrettes de mémoire illisibles : $_" }
+    $script:Barrettes
+}

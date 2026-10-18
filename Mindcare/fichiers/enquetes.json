@@ -1,0 +1,1275 @@
+{
+  "Version": 2,
+  "Explication": "Les enquêtes de Mindcare (le même fichier pour le PC et le téléphone). Une panne a des suspects et des étapes : des questions, des vérifications automatiques (Auto, ce que Windows a noté) et des tests à faire. Chaque réponse peut écarter des suspects (Ecarte), ne garder que certains (Garde) ou en confirmer un (Confirme, avec un Detail) ; elle peut aussi retenir un mot (Note : portable, fixe, cepc). Une étape n'est posée que si un de ses suspects (Pour) est encore là, et si ses conditions sont remplies (SiNote, SaufNote). L'enquête finit quand un suspect est confirmé, ou quand il n'y a plus d'étape : un seul suspect restant est la réponse (tout le reste est écarté), plusieurs restants vont au réparateur avec le rapport. Les suspects et les tests sont partagés entre les pannes (Ref). Sources : support Microsoft, Dell, HP, Lenovo. SansPreuve : la réponse n'apparaît pas dans « Comment on le sait ».",
+  "Securite": [
+    "Avant d'ouvrir le PC ou de toucher aux câbles, éteins-le et débranche-le.",
+    "N'ouvre jamais le bloc d'alimentation, même débranché : il garde de l'électricité dangereuse."
+  ],
+  "Familles": [
+    {
+      "Id": "allumage",
+      "Titre": "Allumage",
+      "Phrase": "Rien ne s'allume, des bips, il s'éteint aussitôt",
+      "Icone": "famille-allumage"
+    },
+    {
+      "Id": "demarrage",
+      "Titre": "Démarrage de Windows",
+      "Phrase": "Réparation en boucle, disque introuvable",
+      "Icone": "famille-demarrage"
+    },
+    {
+      "Id": "ecran",
+      "Titre": "Écran et image",
+      "Phrase": "Noir, pas de signal, clignote, des traits",
+      "Icone": "famille-ecran"
+    },
+    {
+      "Id": "plantages",
+      "Titre": "Plantages",
+      "Phrase": "Écran bleu, redémarre, se fige",
+      "Icone": "famille-plantages"
+    },
+    {
+      "Id": "lenteur",
+      "Titre": "Lenteur",
+      "Phrase": "Tout rame, démarrage long, jeux qui saccadent",
+      "Icone": "famille-lenteur"
+    },
+    {
+      "Id": "bruits",
+      "Titre": "Bruits et chaleur",
+      "Phrase": "Ventilateur fort, clics, chauffe, odeur",
+      "Icone": "famille-bruits"
+    },
+    {
+      "Id": "son",
+      "Titre": "Son",
+      "Phrase": "Plus de son, grésille, micro",
+      "Icone": "famille-son"
+    },
+    {
+      "Id": "internet",
+      "Titre": "Internet et Wi-Fi",
+      "Phrase": "Plus d'internet, Wi-Fi absent ou qui coupe",
+      "Icone": "famille-internet"
+    },
+    {
+      "Id": "peripheriques",
+      "Titre": "Clavier, souris et USB",
+      "Phrase": "Ne répond plus, clé non reconnue",
+      "Icone": "famille-peripheriques"
+    },
+    {
+      "Id": "batterie",
+      "Titre": "Batterie et charge",
+      "Phrase": "Ne charge plus, tient peu",
+      "Icone": "famille-batterie"
+    },
+    {
+      "Id": "virus",
+      "Titre": "Virus et pubs",
+      "Phrase": "Fenêtres bizarres, navigateur détourné",
+      "Icone": "famille-virus"
+    },
+    {
+      "Id": "fichiers",
+      "Titre": "Fichiers et disques",
+      "Phrase": "Disque plein, fichier perdu, disque externe",
+      "Icone": "famille-fichiers"
+    }
+  ],
+  "Suspects": {
+    "danger": {
+      "Titre": "Une pièce qui grille",
+      "Urgent": true,
+      "Trouve": "Danger : une pièce a peut-être grillé",
+      "Pourquoi": "Une odeur de brûlé, de la fumée ou un claquement veulent dire qu'une pièce a grillé ou est en train de griller.",
+      "AFaire": [
+        "Éteins le PC et débranche-le tout de suite (pour un portable, le chargeur aussi).",
+        "Ne le rallume plus.",
+        "S'il y a de la fumée ou des flammes, éloigne-toi et appelle les pompiers (le 18 ou le 112)."
+      ],
+      "Pro": "Apporte-le à un réparateur avant de le rallumer, et dis-lui ce que tu as senti, vu ou entendu."
+    },
+    "memoire": {
+      "Titre": "La mémoire (RAM)",
+      "Trouve": "Une barrette de mémoire (RAM) est abîmée",
+      "Pourquoi": "La mémoire, ce sont des barrettes qui aident le PC à travailler. Une barrette abîmée fait redémarrer, planter ou figer le PC au hasard, même sans rien faire.",
+      "AFaire": [
+        "PC fixe avec plusieurs barrettes : pour trouver la coupable, éteins et débranche le PC, enlève le panneau de côté, touche une partie métallique de la tour, puis enlève une barrette (écarte les petits clips à ses bouts). Sers-toi du PC quelques jours : s'il va bien, la barrette enlevée est la coupable ; sinon, remets-la et essaie avec une autre.",
+        "En attendant, le PC marche avec les barrettes qui vont bien, juste avec moins de mémoire.",
+        "Remplace la barrette abîmée par la même (Mindcare a noté sa référence dans le rapport)."
+      ],
+      "Pro": "Un réparateur peut changer la barrette : c'est une réparation simple et peu chère. Sur un portable, laisse-le faire."
+    },
+    "alimentation": {
+      "Titre": "Le bloc d'alimentation",
+      "Sauf": [
+        "portable"
+      ],
+      "Trouve": "Le bloc d'alimentation est en train de lâcher",
+      "Pourquoi": "Le bloc d'alimentation, c'est la boîte à l'arrière de la tour où se branche le câble électrique. Quand il s'use, il coupe le courant d'un coup, surtout quand le PC force.",
+      "AFaire": [
+        "Vérifie que le câble électrique est bien enfoncé à l'arrière de la tour.",
+        "N'ouvre jamais le bloc d'alimentation : même débranché, il garde de l'électricité dangereuse."
+      ],
+      "Pro": "Un réparateur le teste en quelques minutes et le change : c'est une réparation courante, tes fichiers ne sont pas touchés."
+    },
+    "surchauffe": {
+      "Titre": "La chaleur",
+      "Trouve": "Il chauffe trop",
+      "Pourquoi": "Trop chaud, le PC se coupe ou plante pour se protéger. Le plus souvent : la poussière qui bouche les grilles, ou un ventilateur qui ne tourne plus.",
+      "AFaire": [
+        "Dépoussière les grilles d'aération (et l'intérieur pour un PC fixe), PC éteint et débranché, avec une bombe d'air sec.",
+        "Un portable se pose sur une table, jamais sur un lit ou un coussin.",
+        "Si un ventilateur ne tourne plus, il faut le changer."
+      ],
+      "Pro": "Si un ventilateur ne tourne plus, ou si le PC chauffe encore après le nettoyage, un réparateur peut changer le ventilateur ou remettre de la pâte thermique."
+    },
+    "pilote": {
+      "Titre": "Un pilote de Windows",
+      "Trouve": "Un pilote de Windows fait planter le PC",
+      "Pourquoi": "Un pilote est le petit programme qui fait marcher une pièce (souvent la carte graphique). Abîmé ou trop vieux, il fait planter Windows.",
+      "AFaire": [
+        "Fais toutes les mises à jour, y compris les mises à jour facultatives : touche Windows, tape « Windows Update ».",
+        "Pour la carte graphique, la mise à jour vient aussi de son fabricant (NVIDIA, AMD ou Intel)."
+      ],
+      "Pro": "Si les plantages continuent, un réparateur peut réinstaller proprement les pilotes."
+    },
+    "majnuit": {
+      "Titre": "Les mises à jour de Windows",
+      "Trouve": "Ce sont les mises à jour de Windows (ce n'est pas une panne)",
+      "Pourquoi": "Après une mise à jour, Windows redémarre tout seul pour l'installer, souvent la nuit ou quand personne ne s'en sert.",
+      "AFaire": [
+        "Indique quand tu te sers du PC : touche Windows, tape « heures d'activité », puis règle-les. Windows ne redémarrera pas pendant ces heures."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "prise": {
+      "Titre": "La prise ou la multiprise",
+      "Trouve": "Le courant coupe : la prise, la multiprise ou l'électricité de la maison",
+      "Pourquoi": "Une multiprise fatiguée, un faux contact ou un circuit trop chargé coupent le courant une fraction de seconde : assez pour éteindre un PC fixe.",
+      "AFaire": [
+        "Branche le PC directement sur une prise murale, sans multiprise.",
+        "N'y branche pas en même temps un radiateur, un four ou une machine à laver."
+      ],
+      "Pro": "Si d'autres appareils s'éteignent aussi, c'est l'électricité de la maison : appelle un électricien."
+    },
+    "batterie": {
+      "Titre": "La batterie ou le chargeur",
+      "Sauf": [
+        "fixe"
+      ],
+      "Trouve": "La batterie (ou le chargeur) lâche",
+      "Pourquoi": "Une batterie usée annonce qu'il reste de la charge, puis se vide d'un coup. Un chargeur abîmé coupe le courant par moments.",
+      "AFaire": [
+        "En attendant, garde le portable branché sur son chargeur d'origine.",
+        "Si la batterie a gonflé (le portable ne tient plus à plat), arrête de t'en servir : c'est dangereux."
+      ],
+      "Pro": "Une batterie usée se change : sur beaucoup de portables, c'est un réparateur qui le fait."
+    },
+    "materiel": {
+      "Titre": "Une pièce abîmée",
+      "Trouve": "Une pièce a été abîmée (choc, liquide ou réparation)",
+      "Pourquoi": "Après un choc, un liquide renversé ou une réparation, une pièce peut être abîmée ou mal remise.",
+      "AFaire": [
+        "Après un liquide renversé : ne rallume pas le PC. Retourne un portable ouvert, clavier vers le bas.",
+        "Si le PC a été ouvert, la personne qui l'a ouvert peut vérifier que tout est bien rebranché."
+      ],
+      "Pro": "C'est le travail d'un réparateur : dis-lui ce qui s'est passé. Tes fichiers sont souvent récupérables."
+    },
+    "appareil": {
+      "Titre": "Un appareil branché",
+      "Trouve": "L'appareil branché depuis peu fait planter Windows",
+      "Pourquoi": "Un nouvel appareil, ou son pilote, peut faire planter Windows.",
+      "AFaire": [
+        "Ne te sers plus de cet appareil pour l'instant.",
+        "Cherche une mise à jour de son pilote chez son fabricant, ou dans Windows Update."
+      ],
+      "Pro": "Si le problème revient dès qu'il est branché, demande conseil au fabricant de l'appareil."
+    },
+    "programme": {
+      "Titre": "Un programme",
+      "Trouve": "Un programme installé fait planter Windows",
+      "Pourquoi": "Un programme mal fait ou qui ne s'entend pas avec Windows (souvent un deuxième antivirus) peut provoquer des plantages.",
+      "AFaire": [
+        "Laisse-le désinstallé, ou installe sa dernière version.",
+        "Un seul antivirus suffit : celui de Windows protège déjà le PC."
+      ],
+      "Pro": "Rien à réparer si tout va bien sans lui."
+    },
+    "leprogramme": {
+      "Titre": "Le programme lui-même",
+      "Trouve": "Le programme est abîmé ou pas à jour",
+      "Pourquoi": "Quand c'est toujours le même programme qui plante, c'est souvent lui : une version trop vieille, ou des fichiers abîmés.",
+      "AFaire": [
+        "Installe sa dernière version, ou désinstalle-le puis réinstalle-le.",
+        "Pour un jeu sur Steam ou un autre lanceur : utilise « Vérifier l'intégrité des fichiers »."
+      ],
+      "Pro": "Si ça continue, le site du programme ou du jeu a souvent une aide pour ce problème."
+    },
+    "disque": {
+      "Titre": "Le disque",
+      "Trouve": "Le disque est en train de s'user",
+      "Pourquoi": "Le disque garde Windows et tes fichiers. Quand il s'use, Windows n'arrive plus à lire ce dont il a besoin : il se fige, plante, et le disque peut lâcher d'un coup.",
+      "AFaire": [
+        "Sauvegarde tout de suite tes fichiers importants (photos, documents) sur une clé USB ou un disque externe."
+      ],
+      "Pro": "Un réparateur peut changer le disque et recopier tes fichiers sur le nouveau si c'est encore possible : n'attends pas."
+    },
+    "windowsabime": {
+      "Titre": "Windows lui-même",
+      "Trouve": "Windows est abîmé",
+      "Pourquoi": "Quand l'écran bleu revient à chaque démarrage, Windows a des fichiers abîmés et n'arrive plus à démarrer.",
+      "AFaire": [
+        "Sur l'écran « Réparation automatique », choisis « Redémarrer ».",
+        "Ne choisis jamais « Réinitialiser ce PC » sans aide : tu pourrais perdre tes fichiers."
+      ],
+      "Pro": "Un réparateur peut réparer Windows et, le plus souvent, récupérer tes fichiers."
+    },
+    "gpu": {
+      "Titre": "La carte graphique",
+      "Sauf": [
+        "portable"
+      ],
+      "Trouve": "La carte graphique est en train de lâcher",
+      "Pourquoi": "La carte graphique fabrique l'image et travaille dur en jeu. Quand elle s'use, les jeux plantent, et des traits ou des couleurs bizarres apparaissent.",
+      "AFaire": [
+        "Vérifie que ses câbles d'alimentation (dans la tour) sont bien enfoncés, PC éteint et débranché."
+      ],
+      "Pro": "Un réparateur peut tester la carte graphique et la changer."
+    }
+  },
+  "Tests": {
+    "danger": {
+      "Type": "question",
+      "Court": "Odeur de brûlé",
+      "Texte": "Avant tout : as-tu senti une odeur de brûlé, vu de la fumée ou entendu un claquement venant du PC ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "danger",
+          "Preuve": "Une odeur de brûlé, de la fumée ou un claquement"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "danger"
+          ],
+          "SansPreuve": true
+        }
+      ]
+    },
+    "cepc": {
+      "Type": "question",
+      "Court": "Sur ce PC ?",
+      "Texte": "Mindcare est-il ouvert sur le PC qui a le problème ?",
+      "Aide": "Si oui, Mindcare regarde tout de suite ce que Windows a noté (redémarrages, écrans bleus, erreurs du disque, tests...), sans rien modifier, et t'évite des questions.",
+      "Reponses": [
+        {
+          "Texte": "Oui, sur ce PC-là",
+          "Note": "cepc"
+        },
+        {
+          "Texte": "Non, sur un autre appareil"
+        }
+      ]
+    },
+    "type": {
+      "Type": "question",
+      "Court": "Portable ou fixe",
+      "Texte": "Ton PC, c'est un ordinateur portable ou un PC fixe ?",
+      "Aide": "Un PC fixe, c'est une tour (une grande boîte) avec un écran à part.",
+      "Reponses": [
+        {
+          "Texte": "Un portable",
+          "Note": "portable"
+        },
+        {
+          "Texte": "Un PC fixe",
+          "Note": "fixe"
+        }
+      ]
+    },
+    "choc": {
+      "Type": "question",
+      "Court": "Un choc ou une réparation",
+      "Texte": "Ça a commencé après un choc, un liquide renversé, ou après que le PC a été ouvert ?",
+      "Pour": [
+        "materiel"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "materiel",
+          "Preuve": "Ça a commencé après un choc, un liquide ou une réparation"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "materiel"
+          ],
+          "Preuve": "Pas de choc, de liquide ni de réparation"
+        }
+      ]
+    },
+    "auto-memtest-erreurs": {
+      "Type": "auto",
+      "Indice": "testmemoire-erreurs",
+      "Pour": [
+        "memoire"
+      ],
+      "SiVu": {
+        "Confirme": "memoire"
+      }
+    },
+    "auto-memtest-ok": {
+      "Type": "auto",
+      "Indice": "testmemoire-ok",
+      "Pour": [
+        "memoire"
+      ],
+      "SiVu": {
+        "Ecarte": [
+          "memoire"
+        ]
+      }
+    },
+    "auto-disque": {
+      "Type": "auto",
+      "Indice": "disque",
+      "Pour": [
+        "disque"
+      ],
+      "SiVu": {
+        "Confirme": "disque"
+      }
+    },
+    "chaleur": {
+      "Type": "question",
+      "Court": "La chaleur",
+      "Pour": [
+        "surchauffe"
+      ],
+      "Texte": "Juste avant le problème, le PC est-il très chaud, ou ses ventilateurs soufflent-ils très fort ?",
+      "Aide": "Portable : le dessous ou le clavier brûle presque. PC fixe : l'air qui sort à l'arrière est chaud et ça fait beaucoup de bruit.",
+      "Reponses": [
+        {
+          "Texte": "Oui, très chaud ou très bruyant"
+        },
+        {
+          "Texte": "Non, il reste frais et calme",
+          "Ecarte": [
+            "surchauffe"
+          ],
+          "Preuve": "Il reste frais et calme : pas la chaleur"
+        },
+        {
+          "Texte": "On n'entend plus du tout ses ventilateurs",
+          "Confirme": "surchauffe",
+          "Detail": "un ventilateur ne tourne plus",
+          "Preuve": "On n'entend plus les ventilateurs"
+        }
+      ]
+    },
+    "test-memoire": {
+      "Type": "test",
+      "Court": "Le test de la mémoire",
+      "Pour": [
+        "memoire"
+      ],
+      "Duree": "une dizaine de minutes",
+      "Texte": "Fais tester la mémoire par Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et tape « Diagnostic de mémoire Windows ».",
+        "Choisis « Redémarrer maintenant et rechercher les problèmes ».",
+        "Laisse faire une dizaine de minutes. Le résultat s'affiche au retour sur le Bureau, et Mindcare le lira aussi tout seul."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il a trouvé des erreurs",
+          "Confirme": "memoire",
+          "Preuve": "Le test de mémoire de Windows a trouvé des erreurs"
+        },
+        {
+          "Texte": "Aucune erreur",
+          "Ecarte": [
+            "memoire"
+          ],
+          "Preuve": "Le test de mémoire de Windows n'a trouvé aucune erreur"
+        }
+      ]
+    },
+    "test-nettoyage": {
+      "Type": "test",
+      "Court": "Le nettoyage",
+      "Pour": [
+        "surchauffe"
+      ],
+      "Duree": "un quart d'heure, puis une journée",
+      "Texte": "Dépoussière le PC, puis sers-t'en comme d'habitude",
+      "Image": "grille-poussiere",
+      "Gestes": [
+        "Éteins le PC et débranche-le.",
+        "Souffle la poussière des grilles d'aération avec une bombe d'air sec, par petits coups. PC fixe : enlève aussi le panneau de côté et souffle sur les ventilateurs, en les tenant d'un doigt.",
+        "Rallume-le et écoute : les ventilateurs doivent tourner. Puis sers-t'en une journée."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le problème a disparu",
+          "Confirme": "surchauffe",
+          "Detail": "la poussière",
+          "Preuve": "Après le nettoyage, le problème a disparu"
+        },
+        {
+          "Texte": "Le problème continue",
+          "Ecarte": [
+            "surchauffe"
+          ],
+          "Preuve": "Le nettoyage n'a rien changé"
+        },
+        {
+          "Texte": "Un ventilateur ne tourne pas",
+          "Confirme": "surchauffe",
+          "Detail": "un ventilateur ne tourne plus",
+          "Preuve": "Un ventilateur ne tourne plus"
+        }
+      ]
+    },
+    "test-pilote": {
+      "Type": "test",
+      "Court": "Les mises à jour",
+      "Pour": [
+        "pilote"
+      ],
+      "Duree": "une demi-heure, puis quelques jours",
+      "Texte": "Mets à jour Windows et ses pilotes",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Windows Update » et ouvre-le.",
+        "Clique sur « Rechercher des mises à jour », installe tout, y compris les mises à jour facultatives (ce sont souvent des pilotes).",
+        "Redémarre, puis sers-toi du PC quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le problème a disparu",
+          "Confirme": "pilote",
+          "Preuve": "Après les mises à jour, le problème a disparu"
+        },
+        {
+          "Texte": "Le problème continue",
+          "Ecarte": [
+            "pilote"
+          ],
+          "Preuve": "Les mises à jour n'ont rien changé"
+        }
+      ]
+    },
+    "test-multiprise": {
+      "Type": "test",
+      "Court": "Directement au mur",
+      "Pour": [
+        "prise"
+      ],
+      "Duree": "quelques jours",
+      "Texte": "Branche le PC directement sur une prise murale",
+      "Image": "prise-lampe",
+      "Gestes": [
+        "Enlève la multiprise : branche le PC sur une prise murale, si possible dans une autre pièce.",
+        "Sers-t'en comme d'habitude quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'éteint plus",
+          "Confirme": "prise",
+          "Detail": "la multiprise",
+          "Preuve": "Branché au mur, il ne s'éteint plus"
+        },
+        {
+          "Texte": "Il s'éteint encore",
+          "Ecarte": [
+            "prise"
+          ],
+          "Preuve": "Branché au mur, il s'éteint encore"
+        }
+      ]
+    },
+    "test-reinstaller": {
+      "Type": "test",
+      "Court": "Le programme à jour",
+      "Pour": [
+        "leprogramme"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Mets à jour ou réinstalle ce programme",
+      "Gestes": [
+        "Installe la dernière version du programme, ou désinstalle-le puis réinstalle-le.",
+        "Pour un jeu sur Steam ou un autre lanceur : « Vérifier l'intégrité des fichiers »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le problème a disparu",
+          "Confirme": "leprogramme",
+          "Preuve": "À jour, le programme ne pose plus de problème"
+        },
+        {
+          "Texte": "Le problème continue",
+          "Ecarte": [
+            "leprogramme"
+          ],
+          "Preuve": "Même à jour, le problème continue"
+        }
+      ]
+    }
+  },
+  "Pannes": [
+    {
+      "Id": "redemarre",
+      "Famille": "plantages",
+      "Titre": "Il redémarre tout seul",
+      "Phrase": "L'écran devient noir, puis le logo revient",
+      "Mots": [
+        "redémarre",
+        "redémarrer",
+        "redémarrage",
+        "reboot",
+        "relance",
+        "tout seul",
+        "boucle",
+        "noir puis logo",
+        "se rallume"
+      ],
+      "Suspects": [
+        "danger",
+        "majnuit",
+        "memoire",
+        "pilote",
+        "surchauffe",
+        "alimentation",
+        "materiel"
+      ],
+      "Etapes": [
+        {
+          "Ref": "danger"
+        },
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Id": "nuit",
+          "Type": "question",
+          "Court": "La nuit ?",
+          "Pour": [
+            "majnuit"
+          ],
+          "Texte": "Est-ce que ça arrive seulement quand personne ne se sert du PC (la nuit, pendant une absence) ?",
+          "Reponses": [
+            {
+              "Texte": "Oui, seulement quand personne ne s'en sert",
+              "Garde": [
+                "majnuit",
+                "memoire"
+              ]
+            },
+            {
+              "Texte": "Non, aussi pendant que je m'en sers",
+              "Ecarte": [
+                "majnuit"
+              ],
+              "Preuve": "Il redémarre aussi pendant qu'on s'en sert"
+            }
+          ]
+        },
+        {
+          "Id": "auto-maj",
+          "Type": "auto",
+          "Indice": "majredemarrage",
+          "Pour": [
+            "majnuit"
+          ],
+          "SiVu": {
+            "Confirme": "majnuit"
+          },
+          "SiNonVu": {
+            "Ecarte": [
+              "majnuit"
+            ]
+          }
+        },
+        {
+          "Id": "auto-bleu",
+          "Type": "auto",
+          "Indice": "ecransbleus",
+          "Pour": [
+            "alimentation"
+          ],
+          "SiVu": {
+            "Ecarte": [
+              "alimentation"
+            ]
+          }
+        },
+        {
+          "Id": "bleu",
+          "Type": "question",
+          "Court": "Un écran bleu ?",
+          "Pour": [
+            "pilote",
+            "alimentation"
+          ],
+          "Texte": "Juste avant le redémarrage, vois-tu un écran bleu avec un message ?",
+          "Image": "ecran-bleu",
+          "Reponses": [
+            {
+              "Texte": "Oui, un écran bleu",
+              "Ecarte": [
+                "alimentation"
+              ],
+              "Preuve": "Un écran bleu apparaît avant (une coupure de courant n'en fait pas)"
+            },
+            {
+              "Texte": "Non, l'écran devient noir d'un coup",
+              "Ecarte": [
+                "pilote"
+              ],
+              "Preuve": "Pas d'écran bleu : un pilote en ferait un"
+            }
+          ]
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "choc"
+        },
+        {
+          "Ref": "test-memoire"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "seteint",
+      "Famille": "plantages",
+      "Titre": "Il s'éteint d'un coup",
+      "Phrase": "Comme une coupure de courant, il faut le rallumer",
+      "Mots": [
+        "s'éteint",
+        "éteint",
+        "coupure",
+        "coupe",
+        "s'arrête",
+        "arrêt",
+        "plus de courant",
+        "brutalement",
+        "d'un coup"
+      ],
+      "Suspects": [
+        "danger",
+        "prise",
+        "batterie",
+        "surchauffe",
+        "alimentation",
+        "materiel"
+      ],
+      "Etapes": [
+        {
+          "Ref": "danger"
+        },
+        {
+          "Ref": "type"
+        },
+        {
+          "Id": "maison",
+          "Type": "question",
+          "Court": "La maison aussi ?",
+          "Pour": [
+            "prise"
+          ],
+          "Texte": "Quand il s'éteint, d'autres appareils de la maison s'éteignent-ils aussi, ou les lumières vacillent-elles ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Confirme": "prise",
+              "Detail": "l'électricité de la maison",
+              "Preuve": "D'autres appareils s'éteignent en même temps"
+            },
+            {
+              "Texte": "Non"
+            }
+          ]
+        },
+        {
+          "Id": "surbatterie",
+          "Type": "question",
+          "Court": "Sur batterie ?",
+          "Pour": [
+            "batterie"
+          ],
+          "SiNote": [
+            "portable"
+          ],
+          "Texte": "Est-ce qu'il s'éteint seulement quand il marche sur la batterie ?",
+          "Image": "portable-chargeur",
+          "Reponses": [
+            {
+              "Texte": "Oui, seulement sur batterie",
+              "Confirme": "batterie",
+              "Detail": "la batterie",
+              "Preuve": "Il ne s'éteint que sur batterie"
+            },
+            {
+              "Texte": "Non, même branché",
+              "Garde": [
+                "batterie",
+                "surchauffe",
+                "materiel",
+                "danger"
+              ]
+            }
+          ]
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "choc"
+        },
+        {
+          "Id": "multiprise",
+          "Type": "question",
+          "Court": "Une multiprise ?",
+          "Pour": [
+            "prise"
+          ],
+          "SaufNote": [
+            "portable"
+          ],
+          "Texte": "Le PC est-il branché sur une multiprise ?",
+          "Reponses": [
+            {
+              "Texte": "Oui"
+            },
+            {
+              "Texte": "Non, directement au mur",
+              "Ecarte": [
+                "prise"
+              ],
+              "Preuve": "Il est branché directement au mur"
+            }
+          ]
+        },
+        {
+          "Ref": "test-multiprise"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Id": "test-chargeur",
+          "Type": "test",
+          "Court": "Avec le chargeur",
+          "Pour": [
+            "batterie"
+          ],
+          "SiNote": [
+            "portable"
+          ],
+          "Duree": "une journée",
+          "Texte": "Sers-toi du portable toujours branché sur son chargeur d'origine",
+          "Gestes": [
+            "Branche le chargeur d'origine, bien enfoncé des deux côtés.",
+            "Sers-toi du portable une journée sans le débrancher."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il ne s'éteint plus",
+              "Confirme": "batterie",
+              "Detail": "la batterie",
+              "Preuve": "Branché en permanence, il ne s'éteint plus"
+            },
+            {
+              "Texte": "Il s'éteint encore",
+              "Confirme": "batterie",
+              "Detail": "le chargeur ou la prise de charge",
+              "Preuve": "Il s'éteint même branché"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "ecranbleu",
+      "Famille": "plantages",
+      "Titre": "Un écran bleu apparaît",
+      "Phrase": "Un message sur fond bleu, puis il redémarre",
+      "Mots": [
+        "écran bleu",
+        "bleu",
+        "bsod",
+        "message d'erreur",
+        "stop code",
+        "erreur critique",
+        "smiley triste",
+        "qr code"
+      ],
+      "Suspects": [
+        "windowsabime",
+        "appareil",
+        "programme",
+        "disque",
+        "memoire",
+        "pilote",
+        "surchauffe"
+      ],
+      "Etapes": [
+        {
+          "Id": "demarre",
+          "Type": "question",
+          "Court": "Windows démarre-t-il ?",
+          "Texte": "Est-ce que Windows arrive encore à démarrer ?",
+          "Image": "ecran-bleu",
+          "Reponses": [
+            {
+              "Texte": "Oui, l'écran bleu arrive de temps en temps",
+              "Ecarte": [
+                "windowsabime"
+              ],
+              "Preuve": "Windows démarre encore"
+            },
+            {
+              "Texte": "Non, l'écran bleu revient à chaque démarrage",
+              "Garde": [
+                "windowsabime",
+                "disque",
+                "memoire",
+                "appareil"
+              ],
+              "Preuve": "L'écran bleu revient à chaque démarrage"
+            }
+          ]
+        },
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Ref": "auto-disque"
+        },
+        {
+          "Id": "nouveau",
+          "Type": "question",
+          "Court": "Quelque chose de nouveau ?",
+          "Pour": [
+            "appareil",
+            "programme"
+          ],
+          "Texte": "Juste avant que ça commence, as-tu branché ou installé quelque chose de nouveau ?",
+          "Reponses": [
+            {
+              "Texte": "Un appareil (imprimante, clé, manette, casque...)",
+              "Ecarte": [
+                "programme"
+              ]
+            },
+            {
+              "Texte": "Un programme ou un jeu",
+              "Ecarte": [
+                "appareil"
+              ]
+            },
+            {
+              "Texte": "Une mise à jour de Windows",
+              "Ecarte": [
+                "appareil",
+                "programme"
+              ]
+            },
+            {
+              "Texte": "Rien de nouveau",
+              "Ecarte": [
+                "appareil",
+                "programme"
+              ],
+              "Preuve": "Rien de nouveau n'a été branché ni installé"
+            }
+          ]
+        },
+        {
+          "Id": "test-appareil",
+          "Type": "test",
+          "Court": "Sans l'appareil",
+          "Pour": [
+            "appareil"
+          ],
+          "Duree": "quelques jours",
+          "Texte": "Débranche l'appareil ajouté, puis sers-toi du PC",
+          "Gestes": [
+            "Éteins le PC et débranche l'appareil ajouté.",
+            "Rallume et sers-toi du PC comme d'habitude quelques jours."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Plus d'écran bleu",
+              "Confirme": "appareil",
+              "Preuve": "Sans l'appareil, plus d'écran bleu"
+            },
+            {
+              "Texte": "L'écran bleu revient",
+              "Ecarte": [
+                "appareil"
+              ],
+              "Preuve": "Même sans l'appareil, l'écran bleu revient"
+            }
+          ]
+        },
+        {
+          "Id": "test-programme",
+          "Type": "test",
+          "Court": "Sans le programme",
+          "Pour": [
+            "programme"
+          ],
+          "Duree": "quelques jours",
+          "Texte": "Désinstalle le programme ajouté, puis sers-toi du PC",
+          "Gestes": [
+            "Appuie sur la touche Windows du clavier, tape « Ajouter ou supprimer des programmes ».",
+            "Désinstalle le programme, redémarre, et sers-toi du PC quelques jours."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Plus d'écran bleu",
+              "Confirme": "programme",
+              "Preuve": "Sans le programme, plus d'écran bleu"
+            },
+            {
+              "Texte": "L'écran bleu revient",
+              "Ecarte": [
+                "programme"
+              ],
+              "Preuve": "Même sans le programme, l'écran bleu revient"
+            }
+          ]
+        },
+        {
+          "Id": "clics",
+          "Type": "question",
+          "Court": "Lenteurs ou clics",
+          "Pour": [
+            "disque"
+          ],
+          "Texte": "En dehors des écrans bleus, le PC est-il devenu très lent, ou entends-tu des petits clics ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Confirme": "disque",
+              "Preuve": "Très lent, ou des petits clics"
+            },
+            {
+              "Texte": "Non"
+            }
+          ]
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-memoire"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-nettoyage"
+        }
+      ]
+    },
+    {
+      "Id": "fige",
+      "Famille": "plantages",
+      "Titre": "Il se fige",
+      "Phrase": "Plus rien ne bouge, même la souris",
+      "Mots": [
+        "fige",
+        "figé",
+        "bloqué",
+        "bloque",
+        "freeze",
+        "gelé",
+        "ne répond plus",
+        "souris bloquée",
+        "plus rien ne bouge",
+        "immobile"
+      ],
+      "Suspects": [
+        "disque",
+        "memoire",
+        "surchauffe",
+        "pilote",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-disque"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Id": "meme",
+          "Type": "question",
+          "Court": "Le même programme ?",
+          "Pour": [
+            "leprogramme"
+          ],
+          "Texte": "Est-ce que ça arrive toujours avec le même programme ou le même jeu ?",
+          "Reponses": [
+            {
+              "Texte": "Oui, toujours le même",
+              "Garde": [
+                "leprogramme",
+                "pilote",
+                "memoire"
+              ]
+            },
+            {
+              "Texte": "Non, n'importe quand",
+              "Ecarte": [
+                "leprogramme"
+              ],
+              "Preuve": "Ça arrive n'importe quand, pas avec un seul programme"
+            }
+          ]
+        },
+        {
+          "Id": "clics",
+          "Type": "question",
+          "Court": "Des clics ?",
+          "Pour": [
+            "disque"
+          ],
+          "Texte": "Entends-tu des petits clics ou grattements, ou le PC met-il très longtemps à ouvrir un dossier ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Confirme": "disque",
+              "Preuve": "Des clics, ou des dossiers très longs à s'ouvrir"
+            },
+            {
+              "Texte": "Non"
+            }
+          ]
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-reinstaller"
+        },
+        {
+          "Ref": "test-memoire"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-nettoyage"
+        }
+      ]
+    },
+    {
+      "Id": "programme",
+      "Famille": "plantages",
+      "Titre": "Un programme ou un jeu plante",
+      "Phrase": "Il se ferme tout seul ou ne répond plus",
+      "Mots": [
+        "application",
+        "appli",
+        "logiciel",
+        "programme",
+        "se ferme",
+        "crash",
+        "ne répond pas",
+        "quitte tout seul",
+        "plante"
+      ],
+      "Suspects": [
+        "leprogramme",
+        "pilote",
+        "memoire"
+      ],
+      "Etapes": [
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Id": "plusieurs",
+          "Type": "question",
+          "Court": "Un seul programme ?",
+          "Texte": "Est-ce toujours le même programme qui plante ?",
+          "Reponses": [
+            {
+              "Texte": "Oui, un seul",
+              "Garde": [
+                "leprogramme",
+                "pilote"
+              ]
+            },
+            {
+              "Texte": "Non, plusieurs programmes plantent",
+              "Ecarte": [
+                "leprogramme"
+              ],
+              "Preuve": "Plusieurs programmes plantent : ce n'est pas l'un d'eux"
+            }
+          ]
+        },
+        {
+          "Ref": "test-reinstaller"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-memoire"
+        }
+      ]
+    },
+    {
+      "Id": "jeu",
+      "Famille": "plantages",
+      "Titre": "Ça plante seulement en jeu",
+      "Phrase": "Tout va bien, sauf quand le PC force",
+      "Mots": [
+        "jouer",
+        "joue",
+        "en jeu",
+        "gaming",
+        "fps",
+        "chauffe",
+        "carte graphique",
+        "saccade",
+        "lag",
+        "steam"
+      ],
+      "Suspects": [
+        "danger",
+        "surchauffe",
+        "alimentation",
+        "pilote",
+        "gpu",
+        "memoire"
+      ],
+      "Etapes": [
+        {
+          "Ref": "danger"
+        },
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Id": "quoi",
+          "Type": "question",
+          "Court": "Ce qui se passe",
+          "Texte": "Quand ça plante en jeu, que se passe-t-il ?",
+          "Reponses": [
+            {
+              "Texte": "Le jeu se ferme, Windows reste là",
+              "Ecarte": [
+                "alimentation"
+              ],
+              "Preuve": "Seul le jeu se ferme : le courant n'est pas coupé"
+            },
+            {
+              "Texte": "Tout le PC s'éteint ou redémarre",
+              "Ecarte": [
+                "pilote"
+              ],
+              "Preuve": "Tout le PC s'éteint : un pilote ne ferait pas ça"
+            },
+            {
+              "Texte": "L'écran devient noir quelques secondes, puis revient",
+              "Garde": [
+                "pilote",
+                "gpu",
+                "surchauffe"
+              ],
+              "Preuve": "L'écran noir qui revient : l'affichage redémarre"
+            },
+            {
+              "Texte": "Des traits ou des couleurs bizarres apparaissent",
+              "Garde": [
+                "gpu",
+                "surchauffe"
+              ],
+              "Preuve": "Des traits ou des couleurs bizarres : la carte graphique souffre"
+            }
+          ]
+        },
+        {
+          "Id": "auto-pilote",
+          "Type": "auto",
+          "Indice": "pilotegraphique",
+          "Pour": [
+            "pilote",
+            "gpu"
+          ],
+          "SiVu": {
+            "Ecarte": [
+              "alimentation"
+            ]
+          }
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-memoire"
+        }
+      ]
+    }
+  ]
+}

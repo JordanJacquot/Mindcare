@@ -73,6 +73,8 @@
     <!-- Une réponse ou une panne à choisir : large, texte à gauche -->
     <Style x:Key="BtnChoix" TargetType="Button" BasedOn="{StaticResource BtnSecondary}">
       <Setter Property="FontSize" Value="15"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="FontWeight" Value="Normal"/>
       <Setter Property="Padding" Value="20,12"/>
       <Setter Property="Margin" Value="0,10,0,0"/>
@@ -82,7 +84,7 @@
             <Grid x:Name="Root">
               <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                       BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="16" Padding="{TemplateBinding Padding}">
-                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
               </Border>
               <Border x:Name="Shine" CornerRadius="16" IsHitTestVisible="False" Opacity="0">
                 <Border.Background>

@@ -7,25 +7,25 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 Mindcare s'installe avec **[Mindset](https://github.com/JordanJacquot/Mindset/releases/latest)**, le portail de la suite :
 installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et l'affiche dans sa fenêtre.
 
-## Ce qu'elle sait faire (0.3.0)
+## Ce qu'elle sait faire (0.4.0)
 
-- Le diagnostic de 5 pannes : rien ne s'allume, l'écran reste noir, il s'éteint ou redémarre tout seul, écran bleu,
-  très lent.
-- Les questions une à une : les étapes à gauche (un clic sur une étape faite pour changer sa réponse), la question et
-  son dessin à droite, « Je ne sais pas » et « Retour ».
-- La conclusion : les pistes côte à côte (la plus probable d'abord, avec sa part), et pour celle qu'on choisit le test
-  qui la confirme (test de mémoire de Windows, historique de fiabilité, prise de l'écran...). Le détail reste replié.
-- Les causes matérielles courantes, dont la mémoire (RAM) et la carte graphique ; les conseils suivent les pages
-  d'aide de Microsoft, Dell et HP.
-- Ouverte sur le PC en panne, elle lit ce que Windows a noté ces 30 derniers jours (redémarrages brutaux, écrans
-  bleus et leur code, erreurs matérielles, résultat du test de mémoire, état du disque, place libre...), sans droits
-  administrateur et sans rien modifier, et s'en sert pour départager les pistes.
-- Les 10 derniers diagnostics gardés : en reprendre un pas fini (proposé en haut de l'accueil), revoir une conclusion.
-- Un résumé pour le réparateur (la panne, la conclusion, les réponses, le modèle du PC), enregistré sur le Bureau ou
-  copié pour l'envoyer.
-- Dans Mindset, la carte de Mindcare montre le dernier diagnostic ; le logo est un pouls animé.
+- Un catalogue de pannes rangé en 12 familles, et une recherche par mots (« il redémarre », « écran bleu »...) qui marche
+  sans internet. Première famille complète : Plantages (il redémarre tout seul, il s'éteint d'un coup, écran bleu, il
+  se fige, un programme plante, ça plante en jeu) ; les autres familles arrivent.
+- Une enquête par élimination : les suspects à gauche, barrés au fur et à mesure ; une question ou un test à la fois
+  (le test de mémoire de Windows, le nettoyage, les mises à jour, la multiprise...), jusqu'à une réponse nette
+  (« Trouvé : une barrette de mémoire est abîmée »), ou ce qui reste pour un réparateur, avec le rapport.
+- Ouverte sur le PC en panne, elle lit ce que Windows a noté (redémarrages brutaux, écrans bleus, test de mémoire,
+  disque...) et les barrettes de mémoire, sans droits administrateur et sans rien modifier.
+- Les 10 dernières enquêtes gardées (on reprend une enquête pas finie, par exemple après un test), un rapport pour le
+  réparateur (Bureau ou copie), la carte de Mindset avec la dernière réponse.
+- Tous les thèmes de la suite, thèmes perso compris, et un logo animé (un pouls).
 
 ## Plan
+
+- Refonte du 19 octobre 2026 (après la relecture de Jordan) : enquête par élimination, catalogue de 12 familles et
+  72 pannes (maquettes validées). Fait : le moteur, les écrans, la famille Plantages (0.4.0). Reste : les 11 autres
+  familles, une par une.
 
 Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 
@@ -46,11 +46,12 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 
 ## Pour les développeurs
 
-- `Mindcare\fichiers\questions.json` : les pannes, leurs questions et leurs causes (le même fichier pour le futur
-  téléphone) ; chaque réponse donne des points à des causes, la conclusion les classe.
+- `Mindcare\fichiers\enquetes.json` : les familles, les pannes, leurs suspects et leurs étapes (questions,
+  vérifications automatiques, tests), le même fichier pour le futur téléphone ; chaque réponse écarte, garde ou
+  confirme des suspects.
 - `Mindcare\fichiers\Mindcare.ps1` : le démarrage ; `modules\` : le code découpé par partie.
   - `contenu.ps1` : **ce que fait l'appli** : les écrans du diagnostic ;
-  - `diagnostic.ps1` : le calcul de la conclusion (sans affichage) ;
+  - `enquete.ps1` : le moteur des enquêtes (sans affichage) et la recherche par mots ;
   - `historique.ps1` : les diagnostics gardés (`diagnostics.json`), le résumé pour le réparateur, la carte de Mindset ;
   - `journaux.ps1` : ce que Windows a noté (lu en arrière-plan au démarrage) ;
   - `images.ps1` : les dessins de `fichiers\images\` (SVG simples, le même format servira au téléphone), dans le thème ;
