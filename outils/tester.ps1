@@ -72,20 +72,20 @@ Write-Resultat 'questions.json (aucune impasse, aucune boucle, rien d''inconnu)'
 $cas = @(
     # Cas réels de Jordan (octobre 2026) : son PC et celui de son cousin redémarraient tout seuls sur le Bureau au bout de
     # quelques minutes, sans chauffer ; c'était une barrette de mémoire abîmée sur les deux
-    @{ Nom = 'Jordan et son cousin (RAM abîmée)'; Panne = 'extinction'; Choix = 1, 1, 2, 0, 1, -1, 2, 3; Premiere = 'memoire'; Aussi = @('alimentation'); Jamais = @('batterie') }
-    @{ Nom = 'la même chose, sans savoir pour la chaleur'; Panne = 'extinction'; Choix = 1, 1, 2, 0, -1, 2, 2, -1; Premiere = 'memoire' }
-    @{ Nom = 'coupé au bout de 5 min, très poussiéreux'; Panne = 'extinction'; Choix = 1, 1, 0, 0, 0, 1, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
-    @{ Nom = 'redémarre la nuit'; Panne = 'extinction'; Choix = 1, 1, 2, 4, 1, 2, 2, 3; Premiere = 'majnuit' }
-    @{ Nom = 'depuis une barrette ajoutée'; Panne = 'extinction'; Choix = 1, 1, 2, 3, 1, 2, 2, 4; Premiere = 'memoire' }
+    @{ Nom = 'Jordan et son cousin (RAM abîmée)'; Panne = 'extinction'; Choix = 1, 1, 2, 0, 1, -1, 2, 3, 1; Premiere = 'memoire'; Aussi = @('alimentation'); Jamais = @('batterie') }
+    @{ Nom = 'la même chose, sans savoir pour la chaleur'; Panne = 'extinction'; Choix = 1, 1, 2, 0, -1, 2, 2, -1, 1; Premiere = 'memoire' }
+    @{ Nom = 'coupé au bout de 5 min, très poussiéreux'; Panne = 'extinction'; Choix = 1, 1, 0, 0, 0, 1, 2, 3, 1; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    @{ Nom = 'redémarre la nuit'; Panne = 'extinction'; Choix = 1, 1, 2, 4, 1, 2, 2, 3, 1; Premiere = 'majnuit' }
+    @{ Nom = 'depuis une barrette ajoutée'; Panne = 'extinction'; Choix = 1, 1, 2, 3, 1, 2, 2, 4, 1; Premiere = 'memoire' }
     @{ Nom = 'pas de signal, câble bien sur la carte graphique'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 1, 1, 1, 3; Premiere = 'cable'; Aussi = @('gpu') }
     @{ Nom = 'odeur de brûlé'; Panne = 'extinction'; Choix = @(0); Premiere = 'danger' }
-    @{ Nom = 'tout en « Je ne sais pas »'; Panne = 'extinction'; Choix = -1, -1, -1, -1, -1, -1, -1, -1; Premiere = '' }
-    @{ Nom = 'portable qui lâche sur batterie'; Panne = 'extinction'; Choix = 1, 0, 0, 0, 3, 1, 2, -1, 3; Premiere = 'batterie'; Jamais = @('alimentation') }
-    @{ Nom = 'écran bleu après une mise à jour'; Panne = 'extinction'; Choix = 1, 1, 1, 3, 1, 2, 2, 0; Premiere = 'windows' }
-    @{ Nom = 'mise en veille'; Panne = 'extinction'; Choix = 1, 1, 3, 2, 1, 2, 2, 3; Premiere = 'veille' }
-    @{ Nom = 'la maison qui coupe aussi'; Panne = 'extinction'; Choix = 1, 1, 0, 3, 1, 2, 3, -1; Premiere = 'prise' }
-    @{ Nom = 'portable tombé par terre'; Panne = 'extinction'; Choix = 1, 0, 1, 0, -1, -1, 2, 2, 1; Premiere = 'materiel'; Jamais = @('alimentation') }
-    @{ Nom = 'PC fixe, coupure en jeu, ventilateurs muets'; Panne = 'extinction'; Choix = 1, 1, 0, 1, 2, 1, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    @{ Nom = 'tout en « Je ne sais pas »'; Panne = 'extinction'; Choix = -1, -1, -1, -1, -1, -1, -1, -1, -1; Premiere = '' }
+    @{ Nom = 'portable qui lâche sur batterie'; Panne = 'extinction'; Choix = 1, 0, 0, 0, 3, 1, 2, -1, 3, 1; Premiere = 'batterie'; Jamais = @('alimentation') }
+    @{ Nom = 'écran bleu après une mise à jour'; Panne = 'extinction'; Choix = 1, 1, 1, 3, 1, 2, 2, 0, 1; Premiere = 'windows' }
+    @{ Nom = 'mise en veille'; Panne = 'extinction'; Choix = 1, 1, 3, 2, 1, 2, 2, 3, 1; Premiere = 'veille' }
+    @{ Nom = 'la maison qui coupe aussi'; Panne = 'extinction'; Choix = 1, 1, 0, 3, 1, 2, 3, -1, 1; Premiere = 'prise' }
+    @{ Nom = 'portable tombé par terre'; Panne = 'extinction'; Choix = 1, 0, 1, 0, -1, -1, 2, 2, 1, 1; Premiere = 'materiel'; Jamais = @('alimentation') }
+    @{ Nom = 'PC fixe, coupure en jeu, ventilateurs muets'; Panne = 'extinction'; Choix = 1, 1, 0, 1, 2, 1, 2, 3, 1; Premiere = 'surchauffe'; Jamais = @('batterie') }
     @{ Nom = 'portable sans voyant de charge'; Panne = 'rien'; Choix = 1, 0, 0, 1, 0, 2; Premiere = 'chargeur'; Jamais = @('alimentation', 'interrupteur') }
     @{ Nom = 'tour, interrupteur sur O'; Panne = 'rien'; Choix = 1, 0, 1, 0, 0, 1, 3; Premiere = 'interrupteur'; Jamais = @('chargeur') }
     @{ Nom = 'une lumière, mais écran noir'; Panne = 'rien'; Choix = 1, 1; Premiere = 'ecran' }
@@ -99,18 +99,18 @@ $cas = @(
     @{ Nom = 'portable, image devinée à la lampe'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 0, 0, 1, 3; Premiere = 'eclairage'; Jamais = @('cable', 'ecranalim', 'cablecarte') }
     @{ Nom = 'des bips au démarrage'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 2, 2, 0, 2; Premiere = 'memoire' }
     @{ Nom = 'portable tombé, plus d''image'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 0, 1, 1, 1; Premiere = 'materiel'; Jamais = @('cable') }
-    @{ Nom = 'nouvelle manette'; Panne = 'ecran-bleu'; Choix = 0, 0, 2, 1, 1, 2; Premiere = 'appareil' }
-    @{ Nom = 'écran bleu à chaque démarrage'; Panne = 'ecran-bleu'; Choix = 1, 3, 3, 1, 1, 2; Premiere = 'bloque' }
-    @{ Nom = 'écrans bleus depuis l''ouverture du PC'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 1, 0; Premiere = 'memoire' }
-    @{ Nom = 'disque qui fait des clics'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 0, 2; Premiere = 'disque' }
-    @{ Nom = 'jeu qui fait chauffer'; Panne = 'ecran-bleu'; Choix = 0, 3, 0, 0, 1, 2; Premiere = 'surchauffe' }
-    @{ Nom = 'écrans bleus après une mise à jour'; Panne = 'ecran-bleu'; Choix = 0, 2, 1, 1, 1, 2; Premiere = 'pilote' }
-    @{ Nom = 'jamais redémarré'; Panne = 'lent'; Choix = 3, 0, 1, 1, 1, 1, 1, 0, 1; Premiere = 'redemarrage' }
-    @{ Nom = 'pubs depuis un programme'; Panne = 'lent'; Choix = 2, 1, 0, 0, 1, 1, 1, 0, 1; Premiere = 'indesirables' }
-    @{ Nom = 'vieux PC à disque dur'; Panne = 'lent'; Choix = 0, 1, 1, 1, 1, 1, 0, 2, 1; Premiere = 'disquevieux' }
-    @{ Nom = 'disque plein'; Panne = 'lent'; Choix = 1, 1, 1, 1, 0, 1, 1, 0, 1; Premiere = 'disqueplein' }
-    @{ Nom = 'trop de pages ouvertes'; Panne = 'lent'; Choix = 1, 1, 2, 1, 1, 1, 1, 0, 1; Premiere = 'memoire' }
-    @{ Nom = 'mise à jour en cours'; Panne = 'lent'; Choix = 3, 1, -1, 1, 1, 1, 1, 0, 0; Premiere = 'maj' }
+    @{ Nom = 'nouvelle manette'; Panne = 'ecran-bleu'; Choix = 0, 0, 2, 1, 1, 2, 1; Premiere = 'appareil' }
+    @{ Nom = 'écran bleu à chaque démarrage'; Panne = 'ecran-bleu'; Choix = 1, 3, 3, 1, 1, 2, 1; Premiere = 'bloque' }
+    @{ Nom = 'écrans bleus depuis l''ouverture du PC'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 1, 0, 1; Premiere = 'memoire' }
+    @{ Nom = 'disque qui fait des clics'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 0, 2, 1; Premiere = 'disque' }
+    @{ Nom = 'jeu qui fait chauffer'; Panne = 'ecran-bleu'; Choix = 0, 3, 0, 0, 1, 2, 1; Premiere = 'surchauffe' }
+    @{ Nom = 'écrans bleus après une mise à jour'; Panne = 'ecran-bleu'; Choix = 0, 2, 1, 1, 1, 2, 1; Premiere = 'pilote' }
+    @{ Nom = 'jamais redémarré'; Panne = 'lent'; Choix = 3, 0, 1, 1, 1, 1, 1, 0, 1, 1; Premiere = 'redemarrage' }
+    @{ Nom = 'pubs depuis un programme'; Panne = 'lent'; Choix = 2, 1, 0, 0, 1, 1, 1, 0, 1, 1; Premiere = 'indesirables' }
+    @{ Nom = 'vieux PC à disque dur'; Panne = 'lent'; Choix = 0, 1, 1, 1, 1, 1, 0, 2, 1, 1; Premiere = 'disquevieux' }
+    @{ Nom = 'disque plein'; Panne = 'lent'; Choix = 1, 1, 1, 1, 0, 1, 1, 0, 1, 1; Premiere = 'disqueplein' }
+    @{ Nom = 'trop de pages ouvertes'; Panne = 'lent'; Choix = 1, 1, 2, 1, 1, 1, 1, 0, 1, 1; Premiere = 'memoire' }
+    @{ Nom = 'mise à jour en cours'; Panne = 'lent'; Choix = 3, 1, -1, 1, 1, 1, 1, 0, 0, 1; Premiere = 'maj' }
 )
 # Chaque panne a ses cas connus
 foreach ($p in $pannes.Pannes) { Write-Resultat "cas connus pour la panne $($p.Id)" (@($cas | Where-Object { $_.Panne -eq $p.Id }).Count -ge 3) }
@@ -155,19 +155,53 @@ foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') {
 }
 Write-Resultat "images des questions ($(@($citees | Select-Object -Unique).Count))" (-not $pbImages) "($($pbImages -join ' ; '))"
 
+# Les indices de Windows (journaux.ps1) : des indices inventés, pour savoir ce qu'ils changent
+$faux = @{
+    coupures = [pscustomobject]@{ Vu = $true; Texte = '2 redémarrages brutaux'; TexteOk = 'Aucun'; Affiche = $true }
+    'testmemoire-erreurs' = [pscustomobject]@{ Vu = $true; Texte = 'Le test de mémoire a trouvé des erreurs'; TexteOk = ''; Affiche = $true }
+    'testmemoire-ok' = [pscustomobject]@{ Vu = $false; Texte = ''; TexteOk = ''; Affiche = $true }
+    placelibre = [pscustomobject]@{ Vu = $true; Texte = 'Plus que 3 Go libres'; TexteOk = ''; Affiche = $true }
+    ecransbleus = [pscustomobject]@{ Vu = $false; Texte = ''; TexteOk = 'Aucun écran bleu'; Affiche = $true }
+    'bsod-pilote' = [pscustomobject]@{ Vu = $true; Texte = ''; TexteOk = ''; Affiche = $false }
+}
+$ext = Get-Panne $pannes 'extinction'
+$sans = @(Get-Conclusion $ext (Get-Parcours $ext @(1, 1, -1, -1, -1, -1, -1, -1, 0)))
+$avec = @(Get-Conclusion $ext (Get-Parcours $ext @(1, 1, -1, -1, -1, -1, -1, -1, 0) $faux))
+$ailleurs = Get-Parcours $ext @(1, 1, -1, -1, -1, -1, -1, -1, 1) $faux
+Write-Resultat 'indices : un test de mémoire raté désigne la mémoire' (-not $sans -and $avec -and $avec[0].Cause.Id -eq 'memoire') "(sans : $($sans.Count) piste ; avec : $(@($avec | ForEach-Object { $_.Cause.Id }) -join ', '))"
+Write-Resultat 'indices : ignorés si Mindcare est ouvert sur un autre appareil' (-not $ailleurs.Journal -and $ailleurs.Points['memoire'] -eq 0) "($($ailleurs.Points['memoire']) points pour la mémoire)"
+$e = Get-Parcours $ext @(1, 1, -1, -1, -1, -1, -1, -1, 0) $faux
+Write-Resultat 'indices : ce que Windows a noté est affiché (vu ou non)' ($e.Journal.Count -eq 3 -and @($e.Journal | Where-Object Vu).Count -eq 2) "($($e.Journal.Count) lignes)"
+$lent = Get-Panne $pannes 'lent'
+$c = @(Get-Conclusion $lent (Get-Parcours $lent @(-1, -1, -1, -1, -1, -1, -1, -1, -1, 0) $faux))
+Write-Resultat 'indices : un disque presque plein désigne la place' ($c -and $c[0].Cause.Id -eq 'disqueplein') "($(@($c | ForEach-Object { $_.Cause.Id }) -join ', '))"
+$bleu = Get-Panne $pannes 'ecran-bleu'
+$fauxBleu = @{ ecransbleus = $faux.ecransbleus; 'bsod-pilote' = $faux.'bsod-pilote' }   # (sans le test de mémoire raté, qui l'emporterait)
+$c = @(Get-Conclusion $bleu (Get-Parcours $bleu @(0, 3, -1, -1, -1, -1, 0) $fauxBleu))
+Write-Resultat "indices : le code d'un écran bleu désigne le pilote" ($c -and $c[0].Cause.Id -eq 'pilote') "($(@($c | ForEach-Object { $_.Cause.Id }) -join ', '))"
+# La vraie lecture, sur ce PC, en lecture seule (rien n'est modifié) : tous les indices, dans un temps raisonnable
+. (Join-Path $AppDir 'modules\journaux.ps1')
+$chrono = [Diagnostics.Stopwatch]::StartNew()
+$vrais = $null; try { $vrais = Get-IndicesWindows } catch { $erreurLecture = "$_" }
+$manquants = @($IndicesConnus | Where-Object { -not $vrais -or -not $vrais.ContainsKey($_) })
+Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed.TotalSeconds, 1)) s, lecture seule)" ($vrais -and -not $manquants -and $chrono.Elapsed.TotalSeconds -lt 20) "(manquants : $($manquants -join ', ') $erreurLecture)"
+
 # 5. Les écrans du diagnostic : une question, une conclusion (celle du cousin), le danger
 Test-Capture 'question' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1' } | Out-Null
-$s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3' }
+$s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3,1' }
 Write-Resultat 'conclusion affichée (journal)' ((Get-Journal $s) -match 'Conclusion extinction : surchauffe') '(pas de conclusion « surchauffe » dans le journal)'
-Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_BAS = '1' } | Out-Null
-Test-Capture 'conclusion-ram' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3' } | Out-Null
-Test-Capture 'conclusion-details' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3'; MINDCARE_TEST_CHOISIE = '1' } | Out-Null
+Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3,1'; MINDCARE_TEST_BAS = '1' } | Out-Null
+Test-Capture 'conclusion-ram' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3,1' } | Out-Null
+Test-Capture 'conclusion-details' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3,1'; MINDCARE_TEST_CHOISIE = '1' } | Out-Null
+$jx = '{"coupures":{"Vu":true,"Texte":"2 redémarrages brutaux ces 30 jours (le dernier le 16 octobre)"},"ecransbleus":{"Vu":false,"TexteOk":"Aucun écran bleu ces 30 jours"},"materiel":{"Vu":false,"TexteOk":"Aucune erreur matérielle grave"},"freinage":{"Vu":false,"TexteOk":"Processeur jamais freiné ces 30 jours"}}'
+$s = Test-Capture 'conclusion-journaux' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,2,0,1,-1,2,3,0'; MINDCARE_TEST_JOURNAUX = $jx }
+Write-Resultat 'conclusion avec les indices de Windows (journal)' ((Get-Journal $s) -match 'Conclusion extinction : memoire') '(pas de conclusion « memoire » dans le journal)'
 Test-Capture 'conclusion-danger' @{ MINDCARE_TEST_PARCOURS = 'extinction:0' } | Out-Null
 Test-Capture 'question-image' @{ MINDCARE_TEST_PARCOURS = 'rien:1,0,1,0' } | Out-Null
 Test-Capture 'question-image-crepuscule' @{ MINDCARE_TEST_PARCOURS = 'ecran-noir:1,0,1,1,1'; MINDCARE_THEME = 'crepuscule' } | Out-Null
 Test-Capture 'images' @{ MINDCARE_TEST_GALERIE = '1' } | Out-Null
 Test-Capture 'conclusion-renvoi' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
-Test-Capture 'conclusion-bon-a-savoir' @{ MINDCARE_TEST_PARCOURS = 'ecran-bleu:0,0,2,1,1,2' } | Out-Null
+Test-Capture 'conclusion-bon-a-savoir' @{ MINDCARE_TEST_PARCOURS = 'ecran-bleu:0,0,2,1,1,2,1' } | Out-Null
 
 # 6. Les diagnostics gardés : 10 au plus, le dernier en tête, la carte de Mindset, le résumé, la reprise
 $hist = Join-Path $test 'donnees-historique'
@@ -177,7 +211,7 @@ $vieux = @(for ($i = 1; $i -le 10; $i++) { [ordered]@{ Id = "vieux-$i"; Panne = 
 [IO.File]::WriteAllText((Join-Path $hist 'diagnostics.json'), (ConvertTo-Json -InputObject ([ordered]@{ Version = 1; Diagnostics = $vieux }) -Depth 5), (New-Object Text.UTF8Encoding($false)))
 function Read-Etat { try { [IO.File]::ReadAllText((Join-Path $hist 'etat.json'), [Text.Encoding]::UTF8) | ConvertFrom-Json } catch { $null } }
 function Read-Gardes { try { @(([IO.File]::ReadAllText((Join-Path $hist 'diagnostics.json'), [Text.Encoding]::UTF8) | ConvertFrom-Json).Diagnostics) } catch { @() } }
-$s = Test-Capture 'historique-conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_RESUME = '1' } -Dossier 'historique'
+$s = Test-Capture 'historique-conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3,1'; MINDCARE_TEST_RESUME = '1' } -Dossier 'historique'
 $g = Read-Gardes; $et = Read-Etat
 Write-Resultat 'diagnostic fini gardé (le plus récent en tête, 10 au plus)' ($g.Count -eq 10 -and $g[0].Panne -eq 'extinction' -and $g[0].Fini -and @($g[0].Causes)[0] -eq 'surchauffe' -and $g[1].Id -eq 'vieux-1') "($($g.Count) gardés, en tête : $($g[0].Panne))"
 Write-Resultat 'carte de Mindset : dernier diagnostic' ($et -and @($et.Lignes)[0].Texte -eq "Il s'éteint ou redémarre tout seul : Il chauffe trop" -and @($et.Lignes)[0].Etat -eq 'attention' -and @($et.Lignes | Where-Object { $_.Texte.Length -gt 80 }).Count -eq 0) "($(@($et.Lignes)[0].Texte))"

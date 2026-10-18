@@ -77,6 +77,10 @@ function Get-ResumeTexte($Panne, $Etat, $Causes) {
         $l.Add("Cause la plus probable : $($Causes[0].Cause.Titre)")
         foreach ($a in ($Causes | Select-Object -Skip 1)) { $l.Add("Autre piste : $($a.Cause.Titre)") }
     } else { $l.Add("Conclusion : $($script:Pannes.RienTrouve.Titre)") }
+    if ($Etat.Journal) {
+        $l.Add(''); $l.Add('Ce que Windows a noté sur ce PC (30 derniers jours) :')
+        foreach ($j in $Etat.Journal) { $l.Add("- $($j.Texte)") }
+    }
     $l.Add(''); $l.Add('Les réponses :')
     foreach ($e in $Etat.Resume) { $l.Add("- $($e.Question)"); $l.Add("  $($e.Reponse)") }
     $l.Add(''); $l.Add("Fait avec Mindcare $AppVersion.")

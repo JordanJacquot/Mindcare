@@ -16,9 +16,14 @@ function Get-Question($Panne, [string]$Id) { foreach ($q in $Panne.Questions) { 
 # Où mène une réponse ($null : « Je ne sais pas ») : la sienne si elle en a une, sinon celle de la question
 function Get-Suite($Question, $Reponse) { if ($Reponse -and $Reponse.Suite) { [string]$Reponse.Suite } else { [string]$Question.Suite } }
 
+# Les indices que Mindcare sait lire dans les journaux de Windows (journaux.ps1), cités par « Journaux » dans questions.json
+$IndicesConnus = 'coupures', 'ecransbleus', 'bsod-memoire', 'bsod-pilote', 'bsod-disque', 'bsod-materiel', 'materiel',
+                 'testmemoire-erreurs', 'testmemoire-ok', 'disque', 'pilotegraphique', 'majredemarrage', 'freinage', 'placelibre', 'allume'
+
 # Rejoue un parcours : la question où on en est ($null une fois à la conclusion), les points de chaque cause, les mots
-# retenus (portable, fixe) et le résumé (chaque question et sa réponse)
-function Get-Parcours($Panne, [int[]]$Choix = @()) {
+# retenus (portable, fixe), le résumé (chaque question et sa réponse) et, si Mindcare est ouvert sur le PC en panne
+# (réponse « cepc ») et qu'on lui donne les indices de Windows, ce qu'ils disent (Journal) et leurs points
+function Get-Parcours($Panne, [int[]]$Choix = @(), $Indices = $null) {
     $points = @{}; foreach ($c in $Panne.Causes) { $points[[string]$c.Id] = 0 }
     $notes = @(); $resume = @(); $fait = 0
     $q = Get-Question $Panne $Panne.Debut
@@ -34,7 +39,21 @@ function Get-Parcours($Panne, [int[]]$Choix = @()) {
         $suite = Get-Suite $q $r
         $q = if ($suite -eq 'conclusion') { $null } else { Get-Question $Panne $suite }
     }
-    [pscustomobject]@{ Question = $q; Choix = @($Choix | Select-Object -First $fait); Points = $points; Notes = $notes; Resume = $resume }
+    $journal = @()
+    if ($Indices -and -not $q -and $notes -contains 'cepc' -and $Panne.Journaux) {
+        $vus = @{}
+        foreach ($regle in $Panne.Journaux) {
+            $ind = $Indices[[string]$regle.Indice]
+            if (-not $ind) { continue }
+            if ($ind.Vu -and $regle.Points) { foreach ($pr in $regle.Points.PSObject.Properties) { $points[$pr.Name] += [int]$pr.Value } }
+            if ($ind.Affiche -and -not $vus[[string]$regle.Indice]) {
+                $vus[[string]$regle.Indice] = $true
+                $t = if ($ind.Vu) { $ind.Texte } else { $ind.TexteOk }
+                if ($t) { $journal += [pscustomobject]@{ Texte = [string]$t; Vu = [bool]$ind.Vu } }
+            }
+        }
+    }
+    [pscustomobject]@{ Question = $q; Choix = @($Choix | Select-Object -First $fait); Points = $points; Notes = $notes; Resume = $resume; Journal = $journal }
 }
 
 # Les questions qui viennent sans doute après celle-ci (en suivant la suite par défaut) : la liste des étapes à venir.
@@ -106,6 +125,12 @@ function Test-Pannes($Donnees, [string]$Texte = '') {
             $suites[[string]$q.Id] = @($s | Where-Object { $_ -ne 'conclusion' -and $ids -contains $_ } | Select-Object -Unique)
         }
         foreach ($c in $causes) { if (-not $atteintes[$c]) { $pb += "$nom : la cause $c n'est jamais donnée par une réponse" } }
+        # Les indices de Windows : connus, vers des causes qui existent, et une question qui dit si on est sur ce PC
+        foreach ($regle in $p.Journaux) {
+            if ($IndicesConnus -notcontains [string]$regle.Indice) { $pb += "$nom : indice de Windows inconnu « $($regle.Indice) »" }
+            if ($regle.Points) { foreach ($pr in $regle.Points.PSObject.Properties) { if ($causes -notcontains $pr.Name) { $pb += "$nom, indice $($regle.Indice) : cause inconnue « $($pr.Name) »" } } }
+        }
+        if ($p.Journaux -and -not @($p.Questions | ForEach-Object { $_.Reponses } | Where-Object { $_.Note -eq 'cepc' })) { $pb += "$nom : des indices de Windows, mais aucune question « sur ce PC ? »" }
         # Parcours de toutes les questions depuis la première : jamais posée, ou boucle
         $etat = @{}   # 1 : en cours, 2 : fini
         $script:BouclePannes = $false

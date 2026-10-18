@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu. VoirPanne : un bouton pour passer au diagnostic d'une autre panne. Conseil : un encadré « Bon à savoir » dans la conclusion. Image : un dessin (images/<nom>.svg) à côté de la question. Sources des conseils : support Microsoft (écrans bleus, écrans noirs, performances), Dell et HP (PC qui ne s'allume pas, écran sans image). Court : le nom d'une question dans la liste des étapes. Resume : une phrase sur une cause (les cartes de la conclusion). Test : ce qui confirme une cause (Titre, Etapes, Si).",
+  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu. VoirPanne : un bouton pour passer au diagnostic d'une autre panne. Conseil : un encadré « Bon à savoir » dans la conclusion. Image : un dessin (images/<nom>.svg) à côté de la question. Sources des conseils : support Microsoft (écrans bleus, écrans noirs, performances), Dell et HP (PC qui ne s'allume pas, écran sans image). Court : le nom d'une question dans la liste des étapes. Resume : une phrase sur une cause (les cartes de la conclusion). Test : ce qui confirme une cause (Titre, Etapes, Si). Journaux : ce que Windows a noté sur ce PC (des indices lus par Mindcare, seulement si la réponse « cepc » a été donnée) ; chaque indice vu donne des points à des causes.",
   "Securite": [
     "Avant de toucher au PC (grilles, câbles, intérieur), éteins-le et débranche-le.",
     "N'ouvre jamais le bloc d'alimentation, même débranché : il garde de l'électricité dangereuse.",
@@ -1076,7 +1076,7 @@
           "Id": "depuis",
           "Court": "Depuis quand",
           "Texte": "Depuis quand ça arrive ?",
-          "Suite": "conclusion",
+          "Suite": "cepc",
           "Reponses": [
             {
               "Texte": "Depuis une mise à jour, un nouveau programme ou un nouveau pilote",
@@ -1110,6 +1110,22 @@
               "Points": {
                 "memoire": 7
               }
+            }
+          ]
+        },
+        {
+          "Id": "cepc",
+          "Court": "Sur ce PC ?",
+          "Texte": "Dernière question : Mindcare est-il ouvert sur le PC en panne ?",
+          "Aide": "Si oui, Mindcare regarde ce que Windows a noté ces 30 derniers jours (les redémarrages brutaux, les écrans bleus, les erreurs du disque...), sans rien modifier.",
+          "Suite": "conclusion",
+          "Reponses": [
+            {
+              "Texte": "Oui, sur ce PC-là",
+              "Note": "cepc"
+            },
+            {
+              "Texte": "Non, sur un autre appareil"
             }
           ]
         }
@@ -1321,6 +1337,66 @@
             "Si": "Sinon, c'est le travail d'un réparateur."
           }
         }
+      ],
+      "Journaux": [
+        {
+          "Indice": "coupures",
+          "Points": {
+            "memoire": 1,
+            "alimentation": 2,
+            "surchauffe": 1
+          }
+        },
+        {
+          "Indice": "ecransbleus",
+          "Points": {
+            "windows": 3,
+            "memoire": 1
+          }
+        },
+        {
+          "Indice": "bsod-memoire",
+          "Points": {
+            "memoire": 4
+          }
+        },
+        {
+          "Indice": "materiel",
+          "Points": {
+            "memoire": 3,
+            "materiel": 2
+          }
+        },
+        {
+          "Indice": "testmemoire-erreurs",
+          "Points": {
+            "memoire": 12
+          }
+        },
+        {
+          "Indice": "testmemoire-ok",
+          "Points": {
+            "memoire": -3
+          }
+        },
+        {
+          "Indice": "majredemarrage",
+          "Points": {
+            "majnuit": 5
+          }
+        },
+        {
+          "Indice": "freinage",
+          "Points": {
+            "surchauffe": 3
+          }
+        },
+        {
+          "Indice": "pilotegraphique",
+          "Points": {
+            "windows": 2
+          }
+        }
       ]
     },
     {
@@ -1455,7 +1531,7 @@
           "Id": "ouvert",
           "Court": "Autre chose",
           "Texte": "S'est-il passé autre chose ces derniers temps ?",
-          "Suite": "conclusion",
+          "Suite": "cepc",
           "Reponses": [
             {
               "Texte": "Le PC a été ouvert, ou une pièce a été ajoutée ou changée",
@@ -1472,6 +1548,22 @@
             },
             {
               "Texte": "Rien de spécial"
+            }
+          ]
+        },
+        {
+          "Id": "cepc",
+          "Court": "Sur ce PC ?",
+          "Texte": "Dernière question : Mindcare est-il ouvert sur le PC en panne ?",
+          "Aide": "Si oui, Mindcare regarde ce que Windows a noté ces 30 derniers jours (les redémarrages brutaux, les écrans bleus, les erreurs du disque...), sans rien modifier.",
+          "Suite": "conclusion",
+          "Reponses": [
+            {
+              "Texte": "Oui, sur ce PC-là",
+              "Note": "cepc"
+            },
+            {
+              "Texte": "Non, sur un autre appareil"
             }
           ]
         }
@@ -1616,6 +1708,74 @@
               "Redémarre. Si « Réparation automatique » apparaît, choisis « Redémarrer »."
             ],
             "Si": "S'il démarre, rebranche les appareils un par un pour trouver le fautif."
+          }
+        }
+      ],
+      "Journaux": [
+        {
+          "Indice": "ecransbleus",
+          "Points": {}
+        },
+        {
+          "Indice": "bsod-memoire",
+          "Points": {
+            "memoire": 5
+          }
+        },
+        {
+          "Indice": "bsod-pilote",
+          "Points": {
+            "pilote": 5
+          }
+        },
+        {
+          "Indice": "bsod-disque",
+          "Points": {
+            "disque": 5
+          }
+        },
+        {
+          "Indice": "bsod-materiel",
+          "Points": {
+            "surchauffe": 2,
+            "memoire": 2
+          }
+        },
+        {
+          "Indice": "materiel",
+          "Points": {
+            "memoire": 2,
+            "surchauffe": 2
+          }
+        },
+        {
+          "Indice": "testmemoire-erreurs",
+          "Points": {
+            "memoire": 12
+          }
+        },
+        {
+          "Indice": "testmemoire-ok",
+          "Points": {
+            "memoire": -3
+          }
+        },
+        {
+          "Indice": "disque",
+          "Points": {
+            "disque": 6
+          }
+        },
+        {
+          "Indice": "pilotegraphique",
+          "Points": {
+            "pilote": 3
+          }
+        },
+        {
+          "Indice": "freinage",
+          "Points": {
+            "surchauffe": 3
           }
         }
       ]
@@ -1820,7 +1980,7 @@
           "Court": "Les mises à jour",
           "Image": "mise-a-jour",
           "Texte": "Vois-tu un message ou une petite icône de mise à jour de Windows en cours ?",
-          "Suite": "conclusion",
+          "Suite": "cepc",
           "Reponses": [
             {
               "Texte": "Oui",
@@ -1830,6 +1990,22 @@
             },
             {
               "Texte": "Non"
+            }
+          ]
+        },
+        {
+          "Id": "cepc",
+          "Court": "Sur ce PC ?",
+          "Texte": "Dernière question : Mindcare est-il ouvert sur le PC en panne ?",
+          "Aide": "Si oui, Mindcare regarde ce que Windows a noté ces 30 derniers jours (les redémarrages brutaux, les écrans bleus, les erreurs du disque...), sans rien modifier.",
+          "Suite": "conclusion",
+          "Reponses": [
+            {
+              "Texte": "Oui, sur ce PC-là",
+              "Note": "cepc"
+            },
+            {
+              "Texte": "Non, sur un autre appareil"
             }
           ]
         }
@@ -2011,6 +2187,32 @@
               "Regarde la ligne « Mémoire physique installée (RAM) »."
             ],
             "Si": "Moins de 8 Go, c'est peu aujourd'hui. Un réparateur peut dire si un SSD ou de la mémoire suffirait."
+          }
+        }
+      ],
+      "Journaux": [
+        {
+          "Indice": "allume",
+          "Points": {
+            "redemarrage": 5
+          }
+        },
+        {
+          "Indice": "placelibre",
+          "Points": {
+            "disqueplein": 6
+          }
+        },
+        {
+          "Indice": "disque",
+          "Points": {
+            "disquevieux": 5
+          }
+        },
+        {
+          "Indice": "freinage",
+          "Points": {
+            "surchauffe": 3
           }
         }
       ]

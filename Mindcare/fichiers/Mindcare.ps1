@@ -56,7 +56,7 @@ if (-not $EnTest) {
 # ---------------------------------------------------------------------------
 # Chargement des modules (dossier « modules » à côté de ce fichier)
 # ---------------------------------------------------------------------------
-$modules = 'donnees', 'themes', 'interface', 'systeme', 'diagnostic', 'images', 'historique', 'contenu', 'evenements'
+$modules = 'donnees', 'themes', 'interface', 'systeme', 'diagnostic', 'images', 'journaux', 'historique', 'contenu', 'evenements'
 $manquants = @(@('natif.cs', 'interface.xaml') + @($modules | ForEach-Object { "$_.ps1" }) | Where-Object { -not (Test-Path -LiteralPath (Join-Path $ModulesDir $_)) })
 if ($manquants) {
     [System.Windows.MessageBox]::Show("Des fichiers de $AppNom sont manquants :`n`n$($manquants -join ', ')`n`nRéinstalle $AppNom depuis Mindset.", $AppNom, 'OK', 'Error') | Out-Null

@@ -11,6 +11,7 @@ $script:DiagId       = $null   # le diagnostic en cours, tel qu'il est gardé (h
 function Initialize-Contenu {
     try { $script:Pannes = Read-Pannes } catch { Write-Log "Questions illisibles ($QuestionsFichier) : $_" }
     Read-Historique
+    Start-LectureJournaux   # (ce que Windows a noté, lu en arrière-plan pour la conclusion)
     if ($EnTest -and $env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered({ $ui.Defilement.ScrollToEnd() }) }   # (tests : capture du bas)
     # Tests : reprendre le dernier diagnostic gardé
     if ($EnTest -and $env:MINDCARE_TEST_REPRENDRE -and $script:Historique.Count -and $script:Pannes) { Open-Diagnostic ([string]$script:Historique[0].Id); return }
@@ -265,6 +266,8 @@ function Add-Etape($Parent, [int]$Numero, [string]$Statut, [string]$Titre, [stri
 #    Le détail (pourquoi, gestes, quand aller chez un réparateur) reste replié ; le résumé complet est pour le réparateur.
 # ---------------------------------------------------------------------------
 function Show-Conclusion($Etat) {
+    # Ouvert sur le PC en panne : ce que Windows a noté compte aussi (journaux.ps1)
+    if ($Etat.Notes -contains 'cepc' -and $script:PanneEnCours.Journaux) { $Etat = Get-Parcours $script:PanneEnCours $script:ChoixFaits (Get-Indices) }
     $causes = @(Get-Conclusion $script:PanneEnCours $Etat)
     $liste = if ($causes) { ($causes | ForEach-Object { "$($_.Cause.Id) ($($_.Points))" }) -join ', ' } else { 'rien de clair' }
     Write-Log "Conclusion $($script:PanneEnCours.Id) : $liste (choix $($script:ChoixFaits -join ','))"
@@ -314,6 +317,9 @@ function Show-ConclusionVue {
         [void]$ui.Contenu.Children.Add($g)
         for ($n = 0; $n -lt $causes.Count; $n++) { Add-Piste $g $n $causes[$n] ($causes[$n].Points / [double]$total) $causes[0].Points }
 
+        # Ce que Windows a noté sur ce PC (si Mindcare y est ouvert)
+        if ($script:ResumeDe.Etat.Journal) { Add-Journal $script:ResumeDe.Etat.Journal }
+
         # La piste choisie : le test qui la confirme, et ce qu'on peut faire (replié)
         $choisie = $causes[[math]::Min($script:Choisie, $causes.Count - 1)].Cause
         Add-Verification $choisie
@@ -329,6 +335,22 @@ function Show-ConclusionVue {
     $pt = New-Text '!' 14 '#FFB547' 'Bold'; $pt.Width = 22; [System.Windows.Controls.DockPanel]::SetDock($pt, 'Left'); [void]$sec.Children.Add($pt)
     [void]$sec.Children.Add((New-Text ([string]@($script:Pannes.Securite)[0] + ' ' + [string]@($script:Pannes.Securite)[1]) 14 '#FFB547'))
     [void]$ui.Contenu.Children.Add($sec)
+}
+
+# Ce que Windows a noté : un point orange pour ce qui a été vu, vert pour ce qui va bien
+function Add-Journal($Lignes) {
+    $c = New-Card
+    Add-Texte $c 'CE QUE WINDOWS A NOTÉ SUR CE PC' 12 '#00E5FF' 'Bold' '0,0,0,6'
+    $w = New-Object System.Windows.Controls.WrapPanel
+    [void]$c.Children.Add($w)
+    foreach ($l in $Lignes) {
+        $d = New-Object System.Windows.Controls.DockPanel; $d.Width = 460; $d.Margin = '0,6,12,0'
+        $point = New-Object System.Windows.Shapes.Ellipse; $point.Width = 9; $point.Height = 9; $point.Margin = '0,6,10,0'; $point.VerticalAlignment = 'Top'
+        $point.Fill = Get-Brush $(if ($l.Vu) { '#FFB547' } else { '#3DDC97' })
+        [System.Windows.Controls.DockPanel]::SetDock($point, 'Left'); [void]$d.Children.Add($point)
+        [void]$d.Children.Add((New-Text $l.Texte 14 $(if ($l.Vu) { '#FFFFFF' } else { '#A9A3C9' })))
+        [void]$w.Children.Add($d)
+    }
 }
 
 # Une piste : son niveau (la plus probable, possible aussi, moins probable), son nom, sa part, sa phrase
@@ -422,4 +444,4 @@ function Add-Reparateur {
 function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Etat $script:ResumeDe.Causes }
 
 # À la fermeture : arrêter ce qui tourne (minuteries, travaux de fond), sinon rien ne doit rester ouvert
-function Stop-Contenu { }
+function Stop-Contenu { Stop-LectureJournaux }
