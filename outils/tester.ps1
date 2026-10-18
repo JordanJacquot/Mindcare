@@ -68,9 +68,16 @@ $pannes = Read-Pannes
 $pb = @(Test-Pannes $pannes ([IO.File]::ReadAllText($QuestionsFichier, [Text.Encoding]::UTF8)))
 Write-Resultat 'questions.json (aucune impasse, aucune boucle, rien d''inconnu)' (-not $pb) "($($pb -join ' ; '))"
 # Chaque cas : la panne, les choix (numéro de réponse, -1 pour « Je ne sais pas »), la cause attendue en premier
-# (vide : rien de clair), et les causes qui ne doivent pas apparaître du tout
+# (vide : rien de clair), les causes qui doivent aussi être proposées, et celles qui ne doivent pas apparaître du tout
 $cas = @(
-    @{ Nom = 'le cousin (PC fixe, coupé au bout de 5 min)'; Panne = 'extinction'; Choix = 1, 1, 0, 0, -1, 0, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    # Cas réels de Jordan (octobre 2026) : son PC et celui de son cousin redémarraient tout seuls sur le Bureau au bout de
+    # quelques minutes, sans chauffer ; c'était une barrette de mémoire abîmée sur les deux
+    @{ Nom = 'Jordan et son cousin (RAM abîmée)'; Panne = 'extinction'; Choix = 1, 1, 2, 0, 1, -1, 2, 3; Premiere = 'memoire'; Aussi = @('alimentation'); Jamais = @('batterie') }
+    @{ Nom = 'la même chose, sans savoir pour la chaleur'; Panne = 'extinction'; Choix = 1, 1, 2, 0, -1, 2, 2, -1; Premiere = 'memoire' }
+    @{ Nom = 'coupé au bout de 5 min, très poussiéreux'; Panne = 'extinction'; Choix = 1, 1, 0, 0, 0, 1, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    @{ Nom = 'redémarre la nuit'; Panne = 'extinction'; Choix = 1, 1, 2, 4, 1, 2, 2, 3; Premiere = 'majnuit' }
+    @{ Nom = 'depuis une barrette ajoutée'; Panne = 'extinction'; Choix = 1, 1, 2, 3, 1, 2, 2, 4; Premiere = 'memoire' }
+    @{ Nom = 'pas de signal, câble bien sur la carte graphique'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 1, 1, 1, 3; Premiere = 'cable'; Aussi = @('gpu') }
     @{ Nom = 'odeur de brûlé'; Panne = 'extinction'; Choix = @(0); Premiere = 'danger' }
     @{ Nom = 'tout en « Je ne sais pas »'; Panne = 'extinction'; Choix = -1, -1, -1, -1, -1, -1, -1, -1; Premiere = '' }
     @{ Nom = 'portable qui lâche sur batterie'; Panne = 'extinction'; Choix = 1, 0, 0, 0, 3, 1, 2, -1, 3; Premiere = 'batterie'; Jamais = @('alimentation') }
@@ -113,7 +120,7 @@ foreach ($k in $cas) {
     $conc = @(Get-Conclusion $p $e)
     $ids = @($conc | ForEach-Object { [string]$_.Cause.Id })
     $premiere = if ($ids) { $ids[0] } else { '' }
-    $bon = -not $e.Question -and $premiere -eq $k.Premiere -and -not @($ids | Where-Object { $k.Jamais -contains $_ })
+    $bon = -not $e.Question -and $premiere -eq $k.Premiere -and -not @($ids | Where-Object { $k.Jamais -contains $_ }) -and -not @($k.Aussi | Where-Object { $_ -and $ids -notcontains $_ })
     Write-Resultat "cas : $($k.Nom)" $bon "(fini : $(-not $e.Question), causes : $($ids -join ', '))"
 }
 # Des centaines de parcours tirés au hasard (toujours les mêmes) : chacun finit, sans cause écartée par une réponse

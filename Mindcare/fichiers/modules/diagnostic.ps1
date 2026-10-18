@@ -69,7 +69,8 @@ function Test-Pannes($Donnees, [string]$Texte = '') {
         if ($idsPannes -contains $p.Id) { $pb += "$nom : en double" }; $idsPannes += $p.Id
         $causes = @(foreach ($c in $p.Causes) { [string]$c.Id })
         foreach ($c in $p.Causes) {
-            if (-not $c.Titre -or -not $c.Pourquoi -or -not $c.Gestes -or -not $c.Pro) { $pb += "$nom, cause $($c.Id) : Titre, Pourquoi, Gestes ou Pro manquant" }
+            if (-not $c.Titre -or -not $c.Resume -or -not $c.Pourquoi -or -not $c.Gestes -or -not $c.Pro) { $pb += "$nom, cause $($c.Id) : Titre, Resume, Pourquoi, Gestes ou Pro manquant" }
+            if (-not $c.Seule -and -not ($c.Test.Titre -and $c.Test.Etapes -and $c.Test.Si)) { $pb += "$nom, cause $($c.Id) : pas de test qui la confirme (Test : Titre, Etapes, Si)" }
             if ($c.VoirPanne) { $voir += [pscustomobject]@{ Ou = "$nom, cause $($c.Id)"; Vers = [string]$c.VoirPanne; Depuis = [string]$p.Id } }
         }
         $ids = @(foreach ($q in $p.Questions) { [string]$q.Id })
@@ -78,7 +79,7 @@ function Test-Pannes($Donnees, [string]$Texte = '') {
         $suites = @{}; $atteintes = @{}
         foreach ($q in $p.Questions) {
             $ou = "$nom, question $($q.Id)"
-            if (-not $q.Texte) { $pb += "$ou : pas de texte" }
+            if (-not $q.Texte -or -not $q.Court) { $pb += "$ou : pas de texte, ou pas de nom court" }
             if ($q.Reponses.Count -lt 2) { $pb += "$ou : moins de 2 réponses" }
             $s = @(Get-Suite $q $null)
             foreach ($r in $q.Reponses) {
