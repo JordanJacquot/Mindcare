@@ -1,0 +1,129 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mindcare" Width="1100" Height="760" MinWidth="900" MinHeight="620"
+        WindowStartupLocation="CenterScreen" Background="#09080F"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="15" Foreground="#EEEBF7">
+  <!-- Le titre de la fenêtre doit rester exactement le nom de l'appli : c'est ainsi que Mindset la trouve pour l'afficher
+       dans son onglet. Une autre fenêtre de l'appli (question, chargement) prend un autre titre ou un propriétaire. -->
+  <!-- Toutes les couleurs sont celles du thème Néon : themes.ps1 les traduit dans le thème de la suite au chargement. -->
+  <Window.Resources>
+    <LinearGradientBrush x:Key="CardBg" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#17FFFFFF" Offset="0"/><GradientStop Color="#08FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CardBorder" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#40FFFFFF" Offset="0"/><GradientStop Color="#0AFFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="AccentBg" StartPoint="0,0" EndPoint="1,0">
+      <GradientStop Color="#00E5FF" Offset="0"/><GradientStop Color="#B04BFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Boutons pilule de la suite -->
+    <Style x:Key="BtnPrimary" TargetType="Button">
+      <Setter Property="Background" Value="{StaticResource AccentBg}"/>
+      <Setter Property="Foreground" Value="#08060F"/>
+      <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Padding" Value="18,9"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid x:Name="Root">
+              <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="19" Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <Border x:Name="Shine" CornerRadius="19" IsHitTestVisible="False" Opacity="0">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#38FFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="0.65"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Shine" Property="Opacity" Value="1"/></Trigger>
+              <Trigger Property="IsPressed" Value="True"><Setter TargetName="Root" Property="Opacity" Value="0.85"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Root" Property="Opacity" Value="0.4"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#00E5FF" BlurRadius="22" ShadowDepth="0" Opacity="0.6"/></Setter.Value></Setter>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="BtnSecondary" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+      <Setter Property="Background" Value="#16FFFFFF"/>
+      <Setter Property="Foreground" Value="#F2EFFA"/>
+      <Setter Property="BorderBrush" Value="#26FFFFFF"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="BorderBrush" Value="#8000E5FF"/>
+          <Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#00E5FF" BlurRadius="16" ShadowDepth="0" Opacity="0.3"/></Setter.Value></Setter>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Carte en verre -->
+    <Style x:Key="Card" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource CardBg}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource CardBorder}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="22"/>
+      <Setter Property="Padding" Value="24,20"/>
+      <Setter Property="Margin" Value="0,0,0,18"/>
+    </Style>
+    <Style x:Key="H1" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI"/>
+      <Setter Property="FontSize" Value="26"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="#FFFFFF"/>
+    </Style>
+    <Style x:Key="H2" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI"/>
+      <Setter Property="FontSize" Value="18"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="#FFFFFF"/>
+    </Style>
+    <Style x:Key="Texte2" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="14"/><Setter Property="Foreground" Value="#A9A3C9"/><Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+  </Window.Resources>
+
+  <Grid x:Name="Racine">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Fond : nuit violette et trois lueurs (cyan en haut à gauche, violet au centre, magenta en bas à droite) -->
+    <Grid Grid.RowSpan="2" IsHitTestVisible="False">
+      <Rectangle><Rectangle.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0C0920" Offset="0"/><GradientStop Color="#06050F" Offset="1"/></LinearGradientBrush></Rectangle.Fill></Rectangle>
+      <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.12,0.05" GradientOrigin="0.12,0.05" RadiusX="0.5" RadiusY="0.55"><GradientStop Color="#4400E5FF" Offset="0"/><GradientStop Color="#0000E5FF" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
+      <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.6,0.35" GradientOrigin="0.6,0.35" RadiusX="0.45" RadiusY="0.45"><GradientStop Color="#267A3CFF" Offset="0"/><GradientStop Color="#007A3CFF" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
+      <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.92,0.9" GradientOrigin="0.92,0.9" RadiusX="0.5" RadiusY="0.55"><GradientStop Color="#44FF2EB5" Offset="0"/><GradientStop Color="#00FF2EB5" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
+    </Grid>
+
+    <!-- En-tête : le logo (anneau néon et lettre), le nom, la phrase -->
+    <DockPanel Grid.Row="0" Margin="32,26,32,10">
+      <Grid Width="52" Height="52" DockPanel.Dock="Left" VerticalAlignment="Center">
+        <Ellipse StrokeThickness="3.5">
+          <Ellipse.Stroke><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#00E5FF" Offset="0"/><GradientStop Color="#B04BFF" Offset="0.5"/><GradientStop Color="#FF2EB5" Offset="1"/></LinearGradientBrush></Ellipse.Stroke>
+          <Ellipse.Effect><DropShadowEffect Color="#B04BFF" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></Ellipse.Effect>
+        </Ellipse>
+        <TextBlock Text="M" FontSize="24" FontWeight="Black" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Grid>
+      <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+        <TextBlock Text="Mindcare" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" FontFamily="Segoe UI Variable Display, Segoe UI"/>
+        <TextBlock x:Name="Phrase" Text="Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples." FontSize="14" Foreground="#A6A1BC" Margin="1,0,0,0"/>
+      </StackPanel>
+    </DockPanel>
+
+    <!-- Contenu de l'appli : rempli par contenu.ps1 -->
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="32,8,20,20" Padding="0,0,12,0">
+      <StackPanel x:Name="Contenu"/>
+    </ScrollViewer>
+  </Grid>
+</Window>
