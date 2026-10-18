@@ -129,12 +129,33 @@ foreach ($p in $pannes.Pannes) {
 }
 Write-Resultat 'parcours au hasard (500 par panne)' (-not $mauvais) "($($mauvais | Select-Object -First 3))"
 
+# Les images : chaque image citée existe, se dessine et n'utilise que ce que images.ps1 comprend ; chaque fichier sert
+Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
+function Get-Brush([string]$Hex) { [System.Windows.Media.BrushConverter]::new().ConvertFromString($Hex) }   # (thème Néon)
+. (Join-Path $AppDir 'modules\images.ps1')
+$citees = @(); $pbImages = @()
+foreach ($p in $pannes.Pannes) { foreach ($q in $p.Questions) { if ($q.Image) {
+    $citees += [string]$q.Image
+    try { $v = ConvertFrom-Svg ([string]$q.Image); if (-not $v) { $pbImages += "$($q.Image) introuvable" } elseif ($v.Child.Children.Count -lt 3) { $pbImages += "$($q.Image) presque vide" } }
+    catch { $pbImages += "$($q.Image) : $($_.Exception.Message)" }
+} } }
+foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') {
+    if ($citees -notcontains $f.BaseName) { $pbImages += "$($f.Name) ne sert à aucune question" }
+    foreach ($m in [regex]::Matches([IO.File]::ReadAllText($f.FullName), '<([A-Za-z]+)')) {
+        if ('svg', 'g', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'path', 'text' -notcontains $m.Groups[1].Value) { $pbImages += "$($f.Name) : <$($m.Groups[1].Value)> pas compris" }
+    }
+}
+Write-Resultat "images des questions ($(@($citees | Select-Object -Unique).Count))" (-not $pbImages) "($($pbImages -join ' ; '))"
+
 # 5. Les écrans du diagnostic : une question, une conclusion (celle du cousin), le danger
 Test-Capture 'question' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1' } | Out-Null
 $s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3' }
 Write-Resultat 'conclusion affichée (journal)' ((Get-Journal $s) -match 'Conclusion extinction : surchauffe') '(pas de conclusion « surchauffe » dans le journal)'
 Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_BAS = '1' } | Out-Null
 Test-Capture 'conclusion-danger' @{ MINDCARE_TEST_PARCOURS = 'extinction:0' } | Out-Null
+Test-Capture 'question-image' @{ MINDCARE_TEST_PARCOURS = 'rien:1,0,1,0' } | Out-Null
+Test-Capture 'question-image-crepuscule' @{ MINDCARE_TEST_PARCOURS = 'ecran-noir:1,0,1,1,1'; MINDCARE_THEME = 'crepuscule' } | Out-Null
+Test-Capture 'images' @{ MINDCARE_TEST_GALERIE = '1' } | Out-Null
 Test-Capture 'conclusion-renvoi' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
 Test-Capture 'conclusion-bon-a-savoir' @{ MINDCARE_TEST_PARCOURS = 'ecran-bleu:0,0,2,1,1,2' } | Out-Null
 

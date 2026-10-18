@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <rect x="80" y="12" width="76" height="136" rx="9" fill="#1B1638" stroke="#00E5FF" stroke-width="3"/>
+  <circle cx="118" cy="38" r="12" fill="none" stroke="#FF2EB5" stroke-width="2.5"/>
+  <path d="M113,33 A7,7 0 1 0 123,33" fill="none" stroke="#FF2EB5" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="118" y1="29" x2="118" y2="37" stroke="#FF2EB5" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="118" cy="62" r="4" fill="#3DDC97"/>
+  <g stroke="#3DDC97" stroke-width="2" stroke-linecap="round">
+    <line x1="106" y1="62" x2="100" y2="62"/><line x1="130" y1="62" x2="136" y2="62"/>
+    <line x1="110" y1="54" x2="106" y2="50"/><line x1="126" y1="54" x2="130" y2="50"/>
+  </g>
+  <circle cx="118" cy="108" r="24" fill="#0C0920" stroke="#B04BFF" stroke-width="2.5"/>
+  <g fill="#B04BFF" fill-opacity="0.8">
+    <path d="M118,108 C112,96 116,88 124,88 C126,96 122,102 118,108 Z"/>
+    <path d="M118,108 C130,102 138,106 138,114 C130,116 124,112 118,108 Z"/>
+    <path d="M118,108 C124,120 120,128 112,128 C110,120 114,114 118,108 Z"/>
+    <path d="M118,108 C106,114 98,110 98,102 C106,100 112,104 118,108 Z"/>
+  </g>
+  <circle cx="118" cy="108" r="4" fill="#EEEBF7"/>
+  <g fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round">
+    <path d="M168,92 A18,18 0 0 1 168,124"/><path d="M178,84 A28,28 0 0 1 178,132"/>
+    <path d="M68,92 A18,18 0 0 0 68,124"/><path d="M58,84 A28,28 0 0 0 58,132"/>
+  </g>
+</svg>

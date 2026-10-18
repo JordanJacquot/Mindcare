@@ -8,6 +8,16 @@ $script:ChoixFaits   = @()     # les choix faits jusqu'ici (voir diagnostic.ps1)
 
 function Initialize-Contenu {
     try { $script:Pannes = Read-Pannes } catch { Write-Log "Questions illisibles ($QuestionsFichier) : $_" }
+    # Tests : toutes les images sur une planche, pour les relire d'un coup d'œil
+    if ($EnTest -and $env:MINDCARE_TEST_GALERIE) {
+        $g = New-Object System.Windows.Controls.WrapPanel
+        foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') {
+            $v = ConvertFrom-Svg $f.BaseName; $v.Width = 180; $v.Height = 120; $v.Margin = '0,0,12,12'
+            [void]$g.Children.Add($v)
+        }
+        [void]$ui.Contenu.Children.Add($g)
+        return
+    }
     # Tests : un parcours tout fait, « extinction » ou « extinction:0,1,-1 » (outils\tester.ps1)
     if ($EnTest -and $env:MINDCARE_TEST_PARCOURS -and $script:Pannes) {
         $id, $suite = $env:MINDCARE_TEST_PARCOURS -split ':', 2
@@ -113,9 +123,24 @@ function Show-Question($Etat) {
     $q = $Etat.Question
     Clear-Contenu
     $c = New-Card
-    Add-Texte $c "$($script:PanneEnCours.Titre) : question $($script:ChoixFaits.Count + 1)" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
-    Add-Titre $c ([string]$q.Texte) 'H2'
-    if ($q.Aide) { Add-Texte $c ([string]$q.Aide) 14 '#A9A3C9' 'Normal' '0,6,0,0' }
+    # En haut : la question (et son image à droite, s'il y en a une)
+    $haut = New-Object System.Windows.Controls.DockPanel
+    [void]$c.Children.Add($haut)
+    $image = $null
+    if ($q.Image) {
+        try { $image = ConvertFrom-Svg ([string]$q.Image) } catch { Write-Log "Image $($q.Image) illisible : $_" }
+        if (-not $image) { Write-Log "Image $($q.Image) introuvable" }
+    }
+    if ($image) {
+        $image.Width = 240; $image.Height = 160; $image.Margin = '24,0,0,0'; $image.VerticalAlignment = 'Top'
+        [System.Windows.Controls.DockPanel]::SetDock($image, 'Right')
+        [void]$haut.Children.Add($image)
+    }
+    $texte = New-Object System.Windows.Controls.StackPanel
+    [void]$haut.Children.Add($texte)
+    Add-Texte $texte "$($script:PanneEnCours.Titre) : question $($script:ChoixFaits.Count + 1)" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
+    Add-Titre $texte ([string]$q.Texte) 'H2'
+    if ($q.Aide) { Add-Texte $texte ([string]$q.Aide) 14 '#A9A3C9' 'Normal' '0,6,0,0' }
     $i = 0
     foreach ($r in $q.Reponses) {
         Add-ChoixBouton $c (New-Text ([string]$r.Texte) 15 '#F2EFFA') $i { param($s) Add-Choix ([int]$s.Tag) }

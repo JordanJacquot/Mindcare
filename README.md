@@ -14,6 +14,8 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
   probable, ce qu'on peut faire soi-même, quand aller chez un réparateur, les consignes de sécurité, et le rappel des
   réponses. Quand la vraie panne est une autre, un bouton passe directement à son diagnostic.
 - Les conseils suivent les pages d'aide de Microsoft, Dell et HP.
+- Des dessins à côté des questions où ils aident (l'interrupteur de la tour, les prises de l'écran, la lampe sur
+  l'écran du portable...), dans les couleurs du thème de la suite.
 
 ## Plan
 
@@ -25,7 +27,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
       « Je ne sais pas » et retour, conclusion (texte seulement).
 - [x] 3. Les 4 autres pannes : rien ne s'allume, écran noir, écran bleu, très lent (conseils vérifiés sur des sources
       sérieuses ; un test parcourt chaque chemin, aucune impasse).
-- [ ] 4. Les images des questions, dessinées dans le style de la suite.
+- [x] 4. Les images des questions, dessinées dans le style de la suite.
 - [ ] 5. Les diagnostics gardés : les 10 derniers, reprise d'un diagnostic pas fini, résumé pour le réparateur, carte de
       Mindset avec le dernier diagnostic.
 - [ ] 6. Relecture par Jordan (pannes « pour de faux ») et corrections.
@@ -38,6 +40,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - `Mindcare\fichiers\Mindcare.ps1` : le démarrage ; `modules\` : le code découpé par partie.
   - `contenu.ps1` : **ce que fait l'appli** : les écrans du diagnostic ;
   - `diagnostic.ps1` : le calcul de la conclusion (sans affichage) ;
+  - `images.ps1` : les dessins de `fichiers\images\` (SVG simples, le même format servira au téléphone), dans le thème ;
   - `mindset.ps1`, `donnees.ps1`, `themes.ps1`, `interface.ps1`, `systeme.ps1`, `evenements.ps1` : la vie dans la suite
     (Mindset, données, thème, fenêtre, fermeture, carte vivante), déjà prêts.
 - `outils\tester.ps1` : les tests automatiques (hors de l'écran, données à part).

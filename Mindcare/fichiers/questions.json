@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu. VoirPanne : un bouton pour passer au diagnostic d'une autre panne. Conseil : un encadré « Bon à savoir » dans la conclusion. Sources des conseils : support Microsoft (écrans bleus, écrans noirs, performances), Dell et HP (PC qui ne s'allume pas, écran sans image).",
+  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu. VoirPanne : un bouton pour passer au diagnostic d'une autre panne. Conseil : un encadré « Bon à savoir » dans la conclusion. Image : un dessin (images/<nom>.svg) à côté de la question. Sources des conseils : support Microsoft (écrans bleus, écrans noirs, performances), Dell et HP (PC qui ne s'allume pas, écran sans image).",
   "Securite": [
     "Avant de toucher au PC (grilles, câbles, intérieur), éteins-le et débranche-le.",
     "N'ouvre jamais le bloc d'alimentation, même débranché : il garde de l'électricité dangereuse.",
@@ -33,6 +33,7 @@
         },
         {
           "Id": "signe",
+          "Image": "tour-voyant",
           "Texte": "Appuie sur le bouton d'allumage en regardant et en écoutant bien. Que se passe-t-il ?",
           "Aide": "Regarde le PC lui-même, pas seulement l'écran : un petit voyant, un bruit de ventilateur.",
           "Suite": "type",
@@ -54,6 +55,7 @@
         },
         {
           "Id": "chargeur",
+          "Image": "portable-chargeur",
           "Texte": "Quand le chargeur est branché, un petit voyant s'allume-t-il, sur le portable ou sur le chargeur ?",
           "Suite": "decharge",
           "Reponses": [
@@ -64,6 +66,7 @@
         },
         {
           "Id": "prise",
+          "Image": "prise-lampe",
           "Texte": "Si tu branches une lampe ou un chargeur de téléphone sur la même prise que le PC, est-ce que ça marche ?",
           "Suite": "interrupteur",
           "Reponses": [
@@ -73,6 +76,7 @@
         },
         {
           "Id": "interrupteur",
+          "Image": "interrupteur",
           "Texte": "À l'arrière de la tour, près du câble électrique, il y a souvent un petit interrupteur marqué « I » et « O ». Sur quelle position est-il ?",
           "Suite": "decharge",
           "Reponses": [
@@ -83,6 +87,7 @@
         },
         {
           "Id": "decharge",
+          "Image": "bouton-15s",
           "Texte": "As-tu déjà essayé ceci : tout débrancher, appuyer 15 à 20 secondes sur le bouton d'allumage, puis tout rebrancher et rallumer ?",
           "Aide": "Ce geste vide le PC de l'électricité qui lui reste ; il suffit parfois à le débloquer.",
           "Suite": "avant",
@@ -247,6 +252,7 @@
         },
         {
           "Id": "voyant",
+          "Image": "ecran-signal",
           "Texte": "Regarde l'écran : sa petite lumière (sur le bord ou en dessous) est-elle allumée ? Un message apparaît-il ?",
           "Suite": "branchement",
           "Reponses": [
@@ -257,6 +263,7 @@
         },
         {
           "Id": "branchement",
+          "Image": "branchement",
           "Texte": "Derrière la tour, où est branché le câble qui va à l'écran ?",
           "Aide": "Regarde s'il y a deux endroits où on pourrait le brancher : un en haut, près des prises USB, et un autre plus bas, sur une plaque à part (la carte graphique).",
           "Suite": "bips",
@@ -268,6 +275,7 @@
         },
         {
           "Id": "lampe",
+          "Image": "lampe",
           "Texte": "Dans une pièce sombre, éclaire l'écran de très près avec la lampe d'un téléphone. Devines-tu une image très sombre ?",
           "Suite": "bips",
           "Reponses": [
@@ -485,6 +493,7 @@
         },
         {
           "Id": "poussiere",
+          "Image": "grille-poussiere",
           "Texte": "Quand a-t-il été dépoussiéré pour la dernière fois ?",
           "Aide": "Regarde les grilles d'aération (sur les côtés, à l'arrière ou en dessous) : on y voit souvent des moutons de poussière.",
           "Suite": "prise",
@@ -627,6 +636,7 @@
       "Questions": [
         {
           "Id": "demarre",
+          "Image": "ecran-bleu",
           "Texte": "Est-ce que Windows arrive encore à démarrer ?",
           "Suite": "nouveau",
           "Reponses": [
@@ -782,6 +792,7 @@
         },
         {
           "Id": "redemarre",
+          "Image": "redemarrer",
           "Texte": "Quand l'as-tu redémarré pour la dernière fois ?",
           "Aide": "Redémarrer, c'est : menu Démarrer, bouton d'alimentation, puis « Redémarrer ». Fermer le couvercle ou choisir « Arrêter » ne compte pas.",
           "Suite": "moment",
@@ -812,6 +823,7 @@
         },
         {
           "Id": "place",
+          "Image": "stockage",
           "Texte": "Reste-t-il de la place sur le disque ?",
           "Aide": "Pour le voir : appuie sur la touche Windows du clavier, tape « Stockage », ouvre les paramètres de stockage et regarde la barre du disque.",
           "Suite": "chaleur",
@@ -851,6 +863,7 @@
         },
         {
           "Id": "maj",
+          "Image": "mise-a-jour",
           "Texte": "Vois-tu un message ou une petite icône de mise à jour de Windows en cours ?",
           "Suite": "conclusion",
           "Reponses": [

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <rect x="20" y="30" width="200" height="100" rx="12" fill="#1B1638" stroke="#00E5FF" stroke-width="2"/>
+  <text x="36" y="60" font-size="15" font-weight="bold" fill="#EEEBF7">Disque (C:)</text>
+  <rect x="36" y="74" width="168" height="16" rx="8" fill="#0C0920" stroke="#6E6890" stroke-width="1.5"/>
+  <rect x="36" y="74" width="158" height="16" rx="8" fill="#FF5A6E"/>
+  <text x="36" y="114" font-size="12" fill="#A9A3C9">3 Go libres sur 237 Go</text>
+</svg>
