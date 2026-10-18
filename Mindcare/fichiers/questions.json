@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu.",
+  "Explication": "Les pannes de Mindcare : le même fichier pour le PC et le téléphone. Chaque réponse donne des points à des causes ; la conclusion classe les causes par points. Suite : la question suivante (son Id) ou « conclusion ». Note : un mot retenu (portable, fixe) ; une cause avec Sauf est écartée si ce mot a été retenu. VoirPanne : un bouton pour passer au diagnostic d'une autre panne. Conseil : un encadré « Bon à savoir » dans la conclusion. Sources des conseils : support Microsoft (écrans bleus, écrans noirs, performances), Dell et HP (PC qui ne s'allume pas, écran sans image).",
   "Securite": [
     "Avant de toucher au PC (grilles, câbles, intérieur), éteins-le et débranche-le.",
     "N'ouvre jamais le bloc d'alimentation, même débranché : il garde de l'électricité dangereuse.",
@@ -16,6 +16,404 @@
     ]
   },
   "Pannes": [
+    {
+      "Id": "rien",
+      "Titre": "Rien ne s'allume",
+      "Phrase": "On appuie sur le bouton : aucune lumière, aucun bruit, rien ne se passe.",
+      "Debut": "danger",
+      "Questions": [
+        {
+          "Id": "danger",
+          "Texte": "Avant tout : as-tu senti une odeur de brûlé, vu de la fumée ou entendu un claquement venant du PC ?",
+          "Suite": "signe",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "danger": 20 }, "Suite": "conclusion" },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "signe",
+          "Texte": "Appuie sur le bouton d'allumage en regardant et en écoutant bien. Que se passe-t-il ?",
+          "Aide": "Regarde le PC lui-même, pas seulement l'écran : un petit voyant, un bruit de ventilateur.",
+          "Suite": "type",
+          "Reponses": [
+            { "Texte": "Absolument rien : aucune lumière, aucun bruit" },
+            { "Texte": "Une lumière s'allume ou un ventilateur tourne, mais l'écran reste noir", "Points": { "ecran": 20 }, "Suite": "conclusion" },
+            { "Texte": "Une lumière ou un ventilateur démarre une seconde, puis tout s'arrête", "Points": { "alimentation": 3, "chargeur": 2, "materiel": 2 } }
+          ]
+        },
+        {
+          "Id": "type",
+          "Texte": "Ton PC, c'est un ordinateur portable ou un PC fixe ?",
+          "Aide": "Un PC fixe, c'est une tour (une grande boîte) avec un écran à part.",
+          "Suite": "decharge",
+          "Reponses": [
+            { "Texte": "Un portable", "Note": "portable", "Suite": "chargeur" },
+            { "Texte": "Un PC fixe", "Note": "fixe", "Suite": "prise" }
+          ]
+        },
+        {
+          "Id": "chargeur",
+          "Texte": "Quand le chargeur est branché, un petit voyant s'allume-t-il, sur le portable ou sur le chargeur ?",
+          "Suite": "decharge",
+          "Reponses": [
+            { "Texte": "Oui, un voyant s'allume", "Points": { "residuelle": 2, "materiel": 1 } },
+            { "Texte": "Non, aucun voyant", "Points": { "chargeur": 4, "courant": 2 } },
+            { "Texte": "Ni le portable ni le chargeur n'ont de voyant" }
+          ]
+        },
+        {
+          "Id": "prise",
+          "Texte": "Si tu branches une lampe ou un chargeur de téléphone sur la même prise que le PC, est-ce que ça marche ?",
+          "Suite": "interrupteur",
+          "Reponses": [
+            { "Texte": "Oui, la prise marche", "Points": { "alimentation": 1 } },
+            { "Texte": "Non, rien ne marche sur cette prise", "Points": { "courant": 8 } }
+          ]
+        },
+        {
+          "Id": "interrupteur",
+          "Texte": "À l'arrière de la tour, près du câble électrique, il y a souvent un petit interrupteur marqué « I » et « O ». Sur quelle position est-il ?",
+          "Suite": "decharge",
+          "Reponses": [
+            { "Texte": "Sur « O »", "Points": { "interrupteur": 12 } },
+            { "Texte": "Sur « I »", "Points": { "alimentation": 2 } },
+            { "Texte": "Il n'y a pas d'interrupteur" }
+          ]
+        },
+        {
+          "Id": "decharge",
+          "Texte": "As-tu déjà essayé ceci : tout débrancher, appuyer 15 à 20 secondes sur le bouton d'allumage, puis tout rebrancher et rallumer ?",
+          "Aide": "Ce geste vide le PC de l'électricité qui lui reste ; il suffit parfois à le débloquer.",
+          "Suite": "avant",
+          "Reponses": [
+            { "Texte": "Oui, et ça n'a rien changé", "Points": { "alimentation": 2, "chargeur": 1, "materiel": 2 } },
+            { "Texte": "Non, pas encore", "Points": { "residuelle": 4 } }
+          ]
+        },
+        {
+          "Id": "avant",
+          "Texte": "S'est-il passé quelque chose juste avant la panne ?",
+          "Suite": "conclusion",
+          "Reponses": [
+            { "Texte": "Un orage ou une coupure de courant", "Points": { "alimentation": 3, "materiel": 2, "residuelle": 1 } },
+            { "Texte": "Un choc, une chute ou un liquide renversé", "Points": { "materiel": 8 } },
+            { "Texte": "Il était resté longtemps sans servir", "Points": { "chargeur": 3, "residuelle": 1 } },
+            { "Texte": "Rien de spécial" }
+          ]
+        }
+      ],
+      "Causes": [
+        {
+          "Id": "danger",
+          "Titre": "Danger : une pièce a peut-être grillé",
+          "Urgent": true,
+          "Seule": true,
+          "Pourquoi": "Une odeur de brûlé, de la fumée ou un claquement veulent dire qu'une pièce a grillé ou est en train de griller. Essayer de le rallumer peut l'abîmer encore plus, ou être dangereux.",
+          "Gestes": [
+            "Débranche le PC tout de suite (pour un portable, débranche aussi le chargeur).",
+            "N'essaie plus de le rallumer.",
+            "S'il y a de la fumée ou des flammes, éloigne-toi et appelle les pompiers (le 18 ou le 112)."
+          ],
+          "Pro": "Apporte-le à un réparateur avant d'essayer de le rallumer, et dis-lui ce que tu as senti, vu ou entendu."
+        },
+        {
+          "Id": "ecran",
+          "Titre": "Il s'allume : c'est l'écran qui reste noir",
+          "Seule": true,
+          "VoirPanne": "ecran-noir",
+          "Pourquoi": "Si une lumière s'allume ou qu'un ventilateur tourne, le PC reçoit bien du courant. Le problème vient plutôt de l'image : c'est une autre panne, avec ses propres questions.",
+          "Gestes": [
+            "Fais le diagnostic « Il s'allume, mais l'écran reste noir » avec le bouton ci-dessous."
+          ],
+          "Pro": "Ce diagnostic te dira quand aller chez un réparateur."
+        },
+        {
+          "Id": "residuelle",
+          "Titre": "Il est bloqué : il faut le vider de son électricité",
+          "Pourquoi": "Après une coupure, une mise en veille ratée ou un orage, un PC peut rester bloqué et ne plus réagir au bouton. Le vider de l'électricité qui lui reste suffit souvent à le débloquer (c'est ce que conseillent Dell et HP).",
+          "Gestes": [
+            "Débranche le câble électrique (ou le chargeur). Si la batterie du portable s'enlève facilement, enlève-la aussi.",
+            "Débranche aussi tout ce qui est branché dessus : clés USB, disque, imprimante, manette.",
+            "Appuie sur le bouton d'allumage et garde le doigt dessus 15 à 20 secondes.",
+            "Remets la batterie, rebranche seulement le câble électrique (ou le chargeur), puis rallume."
+          ],
+          "Pro": "Si rien ne change, refais le diagnostic en répondant que tu as déjà essayé : Mindcare cherchera plus loin."
+        },
+        {
+          "Id": "courant",
+          "Titre": "Le courant n'arrive pas jusqu'au PC",
+          "Pourquoi": "Une prise qui ne marche pas, une multiprise éteinte ou un câble mal enfoncé, et le PC ne reçoit rien du tout.",
+          "Gestes": [
+            "Vérifie que le câble électrique est bien enfoncé des deux côtés : dans la prise et dans le PC (ou dans le bloc du chargeur).",
+            "Si le PC est branché sur une multiprise, vérifie que son interrupteur est allumé, ou branche le PC directement sur une prise murale.",
+            "Essaie une autre prise, après avoir vérifié avec une lampe qu'elle marche.",
+            "Essaie un autre câble électrique : pour un PC fixe, celui d'un écran ou d'une imprimante est souvent le même."
+          ],
+          "Pro": "Si plusieurs prises de la maison ne marchent pas, regarde le tableau électrique, ou appelle un électricien."
+        },
+        {
+          "Id": "interrupteur",
+          "Titre": "L'interrupteur à l'arrière de la tour est éteint",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "Beaucoup de tours ont un petit interrupteur à l'arrière, près du câble électrique. Sur « O », le PC ne reçoit pas de courant, même branché.",
+          "Gestes": [
+            "Mets l'interrupteur sur « I ».",
+            "Appuie ensuite sur le bouton d'allumage, à l'avant de la tour."
+          ],
+          "Pro": "Si le PC ne s'allume toujours pas, refais le diagnostic : Mindcare cherchera plus loin."
+        },
+        {
+          "Id": "chargeur",
+          "Titre": "Le chargeur ou la batterie",
+          "Sauf": [ "fixe" ],
+          "Pourquoi": "Un chargeur abîmé ne donne plus de courant, et une batterie complètement vide peut mettre un moment avant d'accepter de se recharger.",
+          "Gestes": [
+            "Vérifie que le chargeur est bien enfoncé partout : dans la prise, dans le portable, et entre le bloc du chargeur et son câble.",
+            "Laisse le portable branché au moins 30 minutes, puis essaie de l'allumer.",
+            "Si quelqu'un a un chargeur identique (même marque, même embout), essaie avec le sien.",
+            "Si le câble est abîmé, ou si la batterie a gonflé (le portable ne tient plus à plat), ne t'en sers plus."
+          ],
+          "Pro": "Si le portable ne s'allume avec aucun chargeur, un réparateur peut tester le chargeur, la batterie et la prise de charge du portable."
+        },
+        {
+          "Id": "alimentation",
+          "Titre": "Le bloc d'alimentation est en panne",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "Le bloc d'alimentation, c'est la boîte à l'arrière de la tour où se branche le câble électrique : il donne le courant à tout le PC. S'il lâche, plus rien ne s'allume. Ça arrive avec l'âge, ou après un orage.",
+          "Gestes": [
+            "Fais d'abord le geste qui vide le PC de son électricité : tout débrancher, appuyer 15 à 20 secondes sur le bouton d'allumage, puis rebrancher.",
+            "Essaie un autre câble électrique et une autre prise.",
+            "N'ouvre jamais le bloc d'alimentation : même débranché, il garde de l'électricité dangereuse."
+          ],
+          "Pro": "Un réparateur peut tester le bloc d'alimentation et le changer. C'est une réparation courante, et tes fichiers ne sont pas touchés."
+        },
+        {
+          "Id": "materiel",
+          "Titre": "Une pièce abîmée à l'intérieur",
+          "Pourquoi": "Après un choc, un liquide renversé ou un orage, une pièce comme la carte mère (la grande carte où tout est branché) peut être abîmée.",
+          "Gestes": [
+            "Débranche le PC et n'insiste pas.",
+            "Après un liquide renversé : n'essaie pas de le rallumer. Retourne un portable ouvert, clavier vers le bas, pour que le liquide s'écoule."
+          ],
+          "Pro": "C'est le travail d'un réparateur : dis-lui ce qui s'est passé. Tes fichiers sont souvent récupérables, même si le PC ne s'allume plus."
+        }
+      ]
+    },
+    {
+      "Id": "ecran-noir",
+      "Titre": "Il s'allume, mais l'écran reste noir",
+      "Phrase": "On entend le PC ou on voit ses lumières, mais rien ne s'affiche.",
+      "Debut": "danger",
+      "Questions": [
+        {
+          "Id": "danger",
+          "Texte": "Avant tout : as-tu senti une odeur de brûlé, vu de la fumée ou entendu un claquement venant du PC ou de l'écran ?",
+          "Suite": "quoi",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "danger": 20 }, "Suite": "conclusion" },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "quoi",
+          "Texte": "Que vois-tu exactement sur l'écran ?",
+          "Suite": "reveil",
+          "Reponses": [
+            { "Texte": "Rien du tout dès l'allumage, même pas le logo de la marque", "Points": { "memoire": 2, "ecranalim": 2, "cable": 2 } },
+            { "Texte": "Le logo de la marque ou de Windows apparaît, puis l'écran devient noir", "Points": { "pilote": 5 } },
+            { "Texte": "L'écran est noir, mais je vois la petite flèche de la souris", "Points": { "pilote": 7 } },
+            { "Texte": "L'image était là, puis l'écran est devenu noir pendant que je m'en servais", "Points": { "veille": 3, "pilote": 2 } }
+          ]
+        },
+        {
+          "Id": "reveil",
+          "Texte": "Si tu bouges la souris ou appuies sur une touche du clavier, l'image revient-elle ?",
+          "Suite": "type",
+          "Reponses": [
+            { "Texte": "Oui, l'image revient", "Points": { "veille": 12 }, "Suite": "conclusion" },
+            { "Texte": "Non, toujours rien" }
+          ]
+        },
+        {
+          "Id": "type",
+          "Texte": "Ton PC, c'est un ordinateur portable ou un PC fixe ?",
+          "Aide": "Un PC fixe, c'est une tour (une grande boîte) avec un écran à part.",
+          "Suite": "bips",
+          "Reponses": [
+            { "Texte": "Un portable", "Note": "portable", "Suite": "lampe" },
+            { "Texte": "Un PC fixe", "Note": "fixe", "Suite": "voyant" }
+          ]
+        },
+        {
+          "Id": "voyant",
+          "Texte": "Regarde l'écran : sa petite lumière (sur le bord ou en dessous) est-elle allumée ? Un message apparaît-il ?",
+          "Suite": "branchement",
+          "Reponses": [
+            { "Texte": "Sa lumière est éteinte", "Points": { "ecranalim": 7 } },
+            { "Texte": "Un message apparaît, comme « Pas de signal » ou « No signal »", "Points": { "cable": 5, "cablecarte": 3 } },
+            { "Texte": "Sa lumière est allumée ou clignote, sans message", "Points": { "cable": 3, "cablecarte": 1 } }
+          ]
+        },
+        {
+          "Id": "branchement",
+          "Texte": "Derrière la tour, où est branché le câble qui va à l'écran ?",
+          "Aide": "Regarde s'il y a deux endroits où on pourrait le brancher : un en haut, près des prises USB, et un autre plus bas, sur une plaque à part (la carte graphique).",
+          "Suite": "bips",
+          "Reponses": [
+            { "Texte": "En haut, près des prises USB, alors qu'il y a d'autres prises plus bas", "Points": { "cablecarte": 9 } },
+            { "Texte": "Plus bas, sur la plaque à part", "Points": { "cable": 1 } },
+            { "Texte": "Il n'y a qu'un seul endroit possible", "Points": { "cable": 1 } }
+          ]
+        },
+        {
+          "Id": "lampe",
+          "Texte": "Dans une pièce sombre, éclaire l'écran de très près avec la lampe d'un téléphone. Devines-tu une image très sombre ?",
+          "Suite": "bips",
+          "Reponses": [
+            { "Texte": "Oui, je devine une image", "Points": { "eclairage": 8 } },
+            { "Texte": "Non, rien du tout", "Points": { "ecranportable": 3, "memoire": 1 } }
+          ]
+        },
+        {
+          "Id": "bips",
+          "Texte": "Au démarrage, le PC fait-il des bips, ou une de ses lumières clignote-t-elle plusieurs fois de suite ?",
+          "Aide": "Compte les bips ou les clignotements : c'est un code que le PC donne au réparateur.",
+          "Suite": "avant",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "memoire": 6 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "avant",
+          "Texte": "S'est-il passé quelque chose juste avant la panne ?",
+          "Suite": "conclusion",
+          "Reponses": [
+            { "Texte": "Une mise à jour, ou un nouveau programme", "Points": { "pilote": 4 } },
+            { "Texte": "Un choc, une chute ou un liquide renversé", "Points": { "materiel": 8, "ecranportable": 2 } },
+            { "Texte": "Le PC a été ouvert ou déplacé, ou une pièce a été ajoutée", "Points": { "memoire": 3, "cable": 2, "cablecarte": 2 } },
+            { "Texte": "Rien de spécial" }
+          ]
+        }
+      ],
+      "Causes": [
+        {
+          "Id": "danger",
+          "Titre": "Danger : une pièce a peut-être grillé",
+          "Urgent": true,
+          "Seule": true,
+          "Pourquoi": "Une odeur de brûlé, de la fumée ou un claquement veulent dire qu'une pièce a grillé ou est en train de griller. Continuer à s'en servir peut l'abîmer encore plus, ou être dangereux.",
+          "Gestes": [
+            "Éteins le PC et l'écran, et débranche-les tout de suite.",
+            "Ne les rallume plus.",
+            "S'il y a de la fumée ou des flammes, éloigne-toi et appelle les pompiers (le 18 ou le 112)."
+          ],
+          "Pro": "Apporte-les à un réparateur avant de les rallumer, et dis-lui ce que tu as senti, vu ou entendu."
+        },
+        {
+          "Id": "veille",
+          "Titre": "Il dormait (ce n'est pas une panne)",
+          "Pourquoi": "Pour économiser l'énergie, Windows éteint l'écran puis met le PC en veille quand on ne s'en sert pas. Il se réveille quand on touche la souris ou le clavier.",
+          "Gestes": [
+            "Pour le réveiller : bouge la souris, appuie sur une touche, ou appuie brièvement sur le bouton d'allumage.",
+            "Pour qu'il s'endorme moins vite : appuie sur la touche Windows du clavier, tape « veille », ouvre les paramètres d'alimentation et de mise en veille, puis choisis des délais plus longs."
+          ],
+          "Pro": "Rien à réparer."
+        },
+        {
+          "Id": "ecranalim",
+          "Titre": "L'écran lui-même est éteint ou débranché",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "Sur un PC fixe, l'écran a son propre bouton et son propre câble électrique. S'il est éteint, rien ne s'affiche, même si le PC marche.",
+          "Gestes": [
+            "Appuie sur le bouton d'allumage de l'écran (souvent en dessous du bord, ou sur le côté).",
+            "Vérifie que le câble électrique de l'écran est bien enfoncé, dans l'écran et dans la prise.",
+            "Essaie une autre prise, ou un autre câble électrique."
+          ],
+          "Pro": "Si la lumière de l'écran reste éteinte avec une prise qui marche, c'est l'écran qui est en panne : un réparateur peut le vérifier."
+        },
+        {
+          "Id": "cable",
+          "Titre": "Le câble de l'image, ou le réglage de l'écran",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "« Pas de signal » veut dire que l'écran marche, mais ne reçoit pas l'image du PC : câble mal enfoncé ou abîmé, ou écran réglé sur la mauvaise entrée.",
+          "Gestes": [
+            "Débranche le câble qui relie l'écran à la tour, des deux côtés, puis rebranche-le bien à fond.",
+            "Sur l'écran, cherche un bouton « Input » ou « Source » et appuie dessus plusieurs fois, en attendant quelques secondes à chaque fois.",
+            "Si tu as un autre câble du même genre (HDMI par exemple), essaie avec lui.",
+            "Si tu peux, branche l'écran sur un autre PC, ou une télé sur ton PC : tu sauras si c'est l'écran ou le PC."
+          ],
+          "Pro": "Si l'écran marche ailleurs mais pas avec ton PC, le problème vient du PC (souvent la carte graphique) : un réparateur peut le vérifier."
+        },
+        {
+          "Id": "cablecarte",
+          "Titre": "Le câble de l'écran est branché au mauvais endroit",
+          "Sauf": [ "portable" ],
+          "Pourquoi": "Beaucoup de PC fixes ont deux endroits pour brancher l'écran : en haut, près des prises USB, et plus bas, sur la carte graphique. Quand il y a une carte graphique, seule sa prise à elle donne l'image.",
+          "Gestes": [
+            "Éteins le PC.",
+            "Débranche le câble de l'écran de la prise du haut, et branche-le sur une prise de la plaque du bas (la carte graphique).",
+            "Rallume le PC."
+          ],
+          "Pro": "Si l'image ne revient toujours pas, un réparateur peut vérifier la carte graphique."
+        },
+        {
+          "Id": "pilote",
+          "Titre": "L'affichage de Windows s'est bloqué",
+          "Pourquoi": "Si le logo ou la flèche de la souris apparaît, le PC marche : c'est l'affichage de Windows qui s'est bloqué, souvent à cause d'un pilote (le petit programme qui fait marcher la carte graphique) ou d'une mise à jour.",
+          "Gestes": [
+            "Appuie en même temps sur la touche Windows, Ctrl, Maj et B. Un bip ou un clignotement veut dire que l'affichage a redémarré.",
+            "Appuie en même temps sur la touche Windows et P, puis sur Entrée : l'image était peut-être envoyée vers un autre écran. Recommence jusqu'à 4 fois, en attendant quelques secondes à chaque fois.",
+            "Si rien ne change, appuie en même temps sur Ctrl, Alt et Suppr : si un écran de choix apparaît, clique sur le bouton d'alimentation en bas à droite, puis « Redémarrer ».",
+            "Quand l'image revient, fais les mises à jour : appuie sur la touche Windows, tape « Windows Update », ouvre-le, puis « Rechercher des mises à jour »."
+          ],
+          "Pro": "Si l'écran devient noir après le logo à chaque démarrage, un réparateur peut réparer Windows, le plus souvent en gardant tes fichiers."
+        },
+        {
+          "Id": "eclairage",
+          "Titre": "La lumière de l'écran du portable",
+          "Sauf": [ "fixe" ],
+          "Pourquoi": "Si tu devines une image sombre à la lampe, le portable marche : c'est la lumière de l'écran qui est au minimum, ou en panne.",
+          "Gestes": [
+            "Augmente la luminosité : cherche sur le clavier une touche avec un petit soleil, et appuie dessus plusieurs fois (parfois en gardant la touche Fn enfoncée).",
+            "Branche le portable sur son chargeur : certains baissent l'écran quand la batterie est presque vide."
+          ],
+          "Pro": "Si l'image reste très sombre, la lumière de l'écran est en panne : un réparateur peut changer l'écran. Tes fichiers ne sont pas touchés."
+        },
+        {
+          "Id": "ecranportable",
+          "Titre": "L'écran du portable ou son câble",
+          "Sauf": [ "fixe" ],
+          "Pourquoi": "Si aucune image n'apparaît, même à la lampe, l'écran du portable ou le câble qui le relie au reste peut être abîmé, surtout après un choc, ou à force d'ouvrir et de fermer le portable.",
+          "Gestes": [
+            "Si tu as une télé ou un écran avec une prise HDMI, branche le portable dessus. Si l'image apparaît là, c'est l'écran du portable qui est en panne, et tes fichiers sont intacts.",
+            "Ouvre et ferme doucement l'écran : si l'image apparaît par moments, c'est probablement son câble."
+          ],
+          "Pro": "Un réparateur peut changer l'écran ou son câble. En attendant, tu peux te servir du portable branché sur une télé ou un écran."
+        },
+        {
+          "Id": "memoire",
+          "Titre": "La mémoire, ou une pièce mal en place",
+          "Pourquoi": "Quand le PC fait des bips ou clignote au démarrage sans rien afficher, il signale souvent un souci avec la mémoire (des barrettes qui l'aident à travailler) ou une autre pièce : il refuse de démarrer.",
+          "Gestes": [
+            "Compte les bips ou les clignotements (par exemple 3 longs puis 2 courts), et note-les : c'est un code.",
+            "Note aussi la marque et le modèle du PC (souvent écrits sous le portable, ou derrière la tour)."
+          ],
+          "Pro": "C'est le travail d'un réparateur : donne-lui le code et le modèle du PC. Il saura quelle pièce remettre en place ou changer."
+        },
+        {
+          "Id": "materiel",
+          "Titre": "Une pièce abîmée",
+          "Pourquoi": "Après un choc ou un liquide renversé, l'écran, la carte graphique ou la carte mère (la grande carte où tout est branché) peut être abîmé.",
+          "Gestes": [
+            "Éteins le PC et débranche-le.",
+            "Après un liquide renversé : ne le rallume pas. Retourne un portable ouvert, clavier vers le bas, pour que le liquide s'écoule."
+          ],
+          "Pro": "C'est le travail d'un réparateur : dis-lui ce qui s'est passé. Tes fichiers sont souvent récupérables."
+        }
+      ]
+    },
     {
       "Id": "extinction",
       "Titre": "Il s'éteint ou redémarre tout seul",
@@ -186,23 +584,26 @@
         {
           "Id": "windows",
           "Titre": "Un problème de Windows ou d'un pilote",
+          "VoirPanne": "ecran-bleu",
           "Pourquoi": "Quand Windows rencontre une erreur grave, il affiche un écran bleu et redémarre. Ça vient souvent d'un pilote (le petit programme qui fait marcher une pièce, comme la carte graphique) ou d'une mise à jour qui s'est mal passée.",
           "Gestes": [
             "Si un écran bleu apparaît, prends-le en photo avec ton téléphone : le message aide beaucoup un réparateur.",
-            "Fais les mises à jour : menu Démarrer, Paramètres, Windows Update, puis « Rechercher des mises à jour ». Redémarre ensuite le PC.",
-            "Si le problème a commencé après l'installation d'un programme, désinstalle-le : menu Démarrer, Paramètres, puis Applications."
+            "Fais les mises à jour : appuie sur la touche Windows du clavier, tape « Windows Update », ouvre-le, puis « Rechercher des mises à jour ». Redémarre ensuite le PC.",
+            "Si le problème a commencé après l'installation d'un programme, désinstalle-le : touche Windows, tape « Ajouter ou supprimer des programmes », choisis le programme, puis « Désinstaller ».",
+            "Le diagnostic « Un écran bleu apparaît » va plus loin : bouton ci-dessous."
           ],
           "Pro": "Si les redémarrages continuent après les mises à jour, montre la photo de l'écran bleu à un réparateur."
         },
         {
           "Id": "veille",
           "Titre": "Il se met en veille (ce n'est pas une panne)",
+          "VoirPanne": "ecran-noir",
           "Pourquoi": "Pour économiser l'énergie, Windows éteint l'écran puis met le PC en veille quand on ne s'en sert pas. Les voyants restent allumés ou clignotent, et il se réveille quand on touche la souris ou le clavier.",
           "Gestes": [
             "Pour le réveiller : bouge la souris, appuie sur une touche, ou appuie brièvement sur le bouton d'allumage.",
-            "Pour changer le délai : menu Démarrer, Paramètres, Système, puis Alimentation (ou Alimentation et batterie). Choisis un délai plus long pour l'écran et pour la mise en veille."
+            "Pour qu'il s'endorme moins vite : appuie sur la touche Windows du clavier, tape « veille », ouvre les paramètres d'alimentation et de mise en veille, puis choisis des délais plus longs."
           ],
-          "Pro": "Rien à réparer. Si l'écran reste noir même quand tu touches la souris, refais un diagnostic avec la panne « L'écran reste noir »."
+          "Pro": "Rien à réparer. Si l'écran reste noir même quand tu touches la souris, fais plutôt le diagnostic « Il s'allume, mais l'écran reste noir » : bouton ci-dessous."
         },
         {
           "Id": "materiel",
@@ -214,6 +615,349 @@
             "Si le PC a été ouvert récemment, la personne qui l'a ouvert peut vérifier que tout est bien rebranché et bien fixé."
           ],
           "Pro": "C'est le travail d'un réparateur : explique-lui ce qui s'est passé (le choc, le liquide, la pièce changée)."
+        }
+      ]
+    },
+    {
+      "Id": "ecran-bleu",
+      "Titre": "Un écran bleu apparaît",
+      "Phrase": "Un écran bleu avec un message s'affiche, puis le PC redémarre.",
+      "Conseil": "Dès qu'un écran bleu apparaît, prends-le en photo avec ton téléphone. Le message en bas (par exemple « CRITICAL_PROCESS_DIED ») et le QR code aident beaucoup un réparateur.",
+      "Debut": "demarre",
+      "Questions": [
+        {
+          "Id": "demarre",
+          "Texte": "Est-ce que Windows arrive encore à démarrer ?",
+          "Suite": "nouveau",
+          "Reponses": [
+            { "Texte": "Oui, l'écran bleu arrive de temps en temps", "Points": { "pilote": 1 } },
+            { "Texte": "Non, l'écran bleu revient à chaque démarrage", "Points": { "bloque": 7 } }
+          ]
+        },
+        {
+          "Id": "nouveau",
+          "Texte": "Juste avant que ça commence, as-tu branché ou installé quelque chose de nouveau ?",
+          "Suite": "quand",
+          "Reponses": [
+            { "Texte": "Un appareil (imprimante, clé USB, manette, disque, casque...)", "Points": { "appareil": 6 } },
+            { "Texte": "Un programme ou un jeu", "Points": { "programme": 6 } },
+            { "Texte": "Une mise à jour de Windows", "Points": { "pilote": 5 } },
+            { "Texte": "Rien de nouveau" }
+          ]
+        },
+        {
+          "Id": "quand",
+          "Texte": "À quel moment arrive l'écran bleu ?",
+          "Suite": "chaleur",
+          "Reponses": [
+            { "Texte": "Pendant un jeu ou un gros programme", "Points": { "pilote": 3, "surchauffe": 2, "memoire": 1 } },
+            { "Texte": "N'importe quand, même sans rien faire", "Points": { "memoire": 2, "disque": 2 } },
+            { "Texte": "Toujours avec le même programme ou le même appareil", "Points": { "programme": 3, "appareil": 3 } },
+            { "Texte": "Au démarrage, avant d'arriver au Bureau", "Points": { "bloque": 3, "disque": 2 } }
+          ]
+        },
+        {
+          "Id": "chaleur",
+          "Texte": "Juste avant l'écran bleu, le PC est-il très chaud, ou ses ventilateurs soufflent-ils très fort ?",
+          "Suite": "lent",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "surchauffe": 5 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "lent",
+          "Texte": "En dehors des écrans bleus, le PC est-il devenu très lent, ou fait-il des petits bruits de clic ?",
+          "Suite": "ouvert",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "disque": 5 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "ouvert",
+          "Texte": "S'est-il passé autre chose ces derniers temps ?",
+          "Suite": "conclusion",
+          "Reponses": [
+            { "Texte": "Le PC a été ouvert, ou une pièce a été ajoutée ou changée", "Points": { "memoire": 6 } },
+            { "Texte": "Un choc ou une chute", "Points": { "disque": 4, "memoire": 1 } },
+            { "Texte": "Rien de spécial" }
+          ]
+        }
+      ],
+      "Causes": [
+        {
+          "Id": "appareil",
+          "Titre": "Un appareil branché depuis peu",
+          "Pourquoi": "Un nouvel appareil, ou son pilote (le petit programme qui le fait marcher), peut faire planter Windows. C'est la première chose que Microsoft conseille de vérifier.",
+          "Gestes": [
+            "Éteins le PC et débranche l'appareil ajouté : garde seulement l'écran, le clavier et la souris.",
+            "Rallume le PC et sers-t'en comme d'habitude : si l'écran bleu ne revient plus, c'était cet appareil.",
+            "Fais ensuite les mises à jour (touche Windows, tape « Windows Update », puis « Rechercher des mises à jour »), et rebranche l'appareil."
+          ],
+          "Pro": "Si l'écran bleu revient dès que l'appareil est branché, ne t'en sers plus et demande conseil à un réparateur, ou au fabricant de l'appareil."
+        },
+        {
+          "Id": "programme",
+          "Titre": "Un programme ou un jeu installé depuis peu",
+          "Pourquoi": "Un programme mal fait, ou qui ne s'entend pas avec Windows, peut provoquer des écrans bleus. Deux antivirus installés en même temps se gênent souvent.",
+          "Gestes": [
+            "Désinstalle-le : appuie sur la touche Windows du clavier, tape « Ajouter ou supprimer des programmes », choisis le programme, puis « Désinstaller ».",
+            "Redémarre le PC.",
+            "Un seul antivirus suffit : celui de Windows (Sécurité Windows) protège déjà le PC."
+          ],
+          "Pro": "Si l'écran bleu revient même sans ce programme, montre la photo du message à un réparateur."
+        },
+        {
+          "Id": "pilote",
+          "Titre": "Une mise à jour ou un pilote",
+          "Pourquoi": "Beaucoup d'écrans bleus viennent d'un pilote (le petit programme qui fait marcher une pièce, comme la carte graphique) ou d'une mise à jour qui s'est mal passée. Microsoft conseille d'abord de tout mettre à jour.",
+          "Gestes": [
+            "Appuie sur la touche Windows du clavier, tape « Windows Update », ouvre-le, puis « Rechercher des mises à jour ». Installe tout, y compris les mises à jour facultatives (ce sont souvent des pilotes), puis redémarre.",
+            "Si les écrans bleus ont commencé juste après une mise à jour, Windows permet de l'enlever : dans Windows Update, ouvre « Historique des mises à jour », puis « Désinstaller des mises à jour »."
+          ],
+          "Pro": "Si les écrans bleus continuent après les mises à jour, montre la photo du message à un réparateur."
+        },
+        {
+          "Id": "memoire",
+          "Titre": "La mémoire de l'ordinateur",
+          "Pourquoi": "La mémoire (des barrettes qui aident le PC à travailler) peut s'abîmer, ou être mal enfoncée, surtout après qu'on a ouvert le PC. Windows plante alors au hasard.",
+          "Gestes": [
+            "Windows sait la tester : appuie sur la touche Windows du clavier, tape « Diagnostic de mémoire Windows », ouvre-le, puis choisis « Redémarrer maintenant et rechercher les problèmes ».",
+            "Le test dure plusieurs minutes. Le résultat s'affiche après le redémarrage, en bas à droite de l'écran."
+          ],
+          "Pro": "Si le test trouve des erreurs, ou si le PC a été ouvert récemment, un réparateur peut remettre en place ou changer la mémoire."
+        },
+        {
+          "Id": "disque",
+          "Titre": "Le disque, où tout est rangé",
+          "Pourquoi": "Le disque garde Windows et tes fichiers. Quand il s'use, Windows n'arrive plus à lire ce dont il a besoin : lenteurs, petits clics, puis écrans bleus.",
+          "Gestes": [
+            "Sauvegarde tout de suite tes fichiers importants (photos, documents) sur une clé USB ou un disque externe : un disque qui s'use peut lâcher d'un coup.",
+            "Vérifie qu'il reste de la place : touche Windows, tape « Stockage », ouvre les paramètres de stockage et regarde la barre du disque. S'il est presque plein, supprime ce dont tu n'as plus besoin."
+          ],
+          "Pro": "Un réparateur peut tester le disque et le changer, en recopiant tes fichiers sur le nouveau si c'est encore possible : n'attends pas trop."
+        },
+        {
+          "Id": "surchauffe",
+          "Titre": "Il chauffe trop",
+          "VoirPanne": "extinction",
+          "Pourquoi": "Quand il a trop chaud, le PC peut planter. Le plus souvent, c'est la poussière qui bouche les grilles, ou un ventilateur qui ne tourne plus.",
+          "Gestes": [
+            "Vérifie que l'air circule : un portable se pose sur une table, jamais sur un lit ou un coussin ; une tour ne doit pas être collée à un mur.",
+            "Souffle la poussière des grilles d'aération avec une bombe d'air sec, PC éteint et débranché.",
+            "Le diagnostic « Il s'éteint ou redémarre tout seul » explique le nettoyage en détail : bouton ci-dessous."
+          ],
+          "Pro": "Si un ventilateur ne tourne plus, ou si les écrans bleus continuent après le nettoyage, un réparateur peut le vérifier."
+        },
+        {
+          "Id": "bloque",
+          "Titre": "Windows n'arrive plus à démarrer",
+          "Pourquoi": "Quand l'écran bleu revient à chaque démarrage, Windows est abîmé, ou une pièce l'empêche de démarrer. Après plusieurs échecs, Windows propose souvent tout seul de se réparer.",
+          "Gestes": [
+            "Débranche tout ce qui n'est pas indispensable (clés USB, disques, imprimante, manette), puis redémarre.",
+            "Si l'écran « Réparation automatique » apparaît, choisis « Redémarrer ». Sur l'écran « Choisir une option », choisis « Continuer ».",
+            "Ne choisis jamais « Réinitialiser ce PC » sans l'aide d'un réparateur : tu pourrais perdre tes fichiers."
+          ],
+          "Pro": "Un réparateur peut réparer Windows et, le plus souvent, récupérer tes fichiers. Montre-lui la photo de l'écran bleu."
+        }
+      ]
+    },
+    {
+      "Id": "lent",
+      "Titre": "Il est très lent",
+      "Phrase": "Tout met longtemps à s'ouvrir, il rame ou se fige.",
+      "Debut": "depuis",
+      "Questions": [
+        {
+          "Id": "depuis",
+          "Texte": "Depuis quand est-il lent ?",
+          "Suite": "redemarre",
+          "Reponses": [
+            { "Texte": "Depuis toujours, ou petit à petit depuis des années", "Points": { "age": 3, "disquevieux": 2, "demarrage": 2 } },
+            { "Texte": "Depuis quelques jours ou quelques semaines", "Points": { "indesirables": 2, "disqueplein": 2, "maj": 2 } },
+            { "Texte": "Depuis l'installation d'un programme", "Points": { "indesirables": 4, "demarrage": 3 } },
+            { "Texte": "Seulement aujourd'hui", "Points": { "maj": 3, "redemarrage": 2 } }
+          ]
+        },
+        {
+          "Id": "redemarre",
+          "Texte": "Quand l'as-tu redémarré pour la dernière fois ?",
+          "Aide": "Redémarrer, c'est : menu Démarrer, bouton d'alimentation, puis « Redémarrer ». Fermer le couvercle ou choisir « Arrêter » ne compte pas.",
+          "Suite": "moment",
+          "Reponses": [
+            { "Texte": "Il y a plus d'une semaine, ou je ne m'en souviens pas", "Points": { "redemarrage": 4 } },
+            { "Texte": "Aujourd'hui ou hier" }
+          ]
+        },
+        {
+          "Id": "moment",
+          "Texte": "Quand est-il le plus lent ?",
+          "Suite": "pubs",
+          "Reponses": [
+            { "Texte": "Surtout au démarrage, avant de pouvoir s'en servir", "Points": { "demarrage": 4, "disquevieux": 2 } },
+            { "Texte": "Tout le temps, même pour ouvrir un dossier", "Points": { "disquevieux": 3, "disqueplein": 2, "age": 2 } },
+            { "Texte": "Quand j'ouvre beaucoup de pages internet ou de programmes", "Points": { "memoire": 5 } },
+            { "Texte": "Pendant un jeu ou une vidéo", "Points": { "surchauffe": 2, "age": 2 } }
+          ]
+        },
+        {
+          "Id": "pubs",
+          "Texte": "Vois-tu des publicités ou des fenêtres bizarres, ou ta page d'accueil internet a-t-elle changé toute seule ?",
+          "Suite": "place",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "indesirables": 6 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "place",
+          "Texte": "Reste-t-il de la place sur le disque ?",
+          "Aide": "Pour le voir : appuie sur la touche Windows du clavier, tape « Stockage », ouvre les paramètres de stockage et regarde la barre du disque.",
+          "Suite": "chaleur",
+          "Reponses": [
+            { "Texte": "Non, la barre est presque pleine, ou Windows dit qu'il manque de place", "Points": { "disqueplein": 7 } },
+            { "Texte": "Oui, il reste de la place" }
+          ]
+        },
+        {
+          "Id": "chaleur",
+          "Texte": "Est-il très chaud, ou ses ventilateurs soufflent-ils très fort ?",
+          "Suite": "bruit",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "surchauffe": 4 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "bruit",
+          "Texte": "Entends-tu des petits grattements ou des clics venant du PC ?",
+          "Suite": "age",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "disquevieux": 5 } },
+            { "Texte": "Non" }
+          ]
+        },
+        {
+          "Id": "age",
+          "Texte": "Quel âge a le PC, à peu près ?",
+          "Aide": "Pas besoin d'être précis : quand l'as-tu acheté ou reçu ?",
+          "Suite": "maj",
+          "Reponses": [
+            { "Texte": "Moins de 4 ans" },
+            { "Texte": "Entre 4 et 8 ans", "Points": { "age": 2, "disquevieux": 1 } },
+            { "Texte": "Plus de 8 ans", "Points": { "age": 4, "disquevieux": 2 } }
+          ]
+        },
+        {
+          "Id": "maj",
+          "Texte": "Vois-tu un message ou une petite icône de mise à jour de Windows en cours ?",
+          "Suite": "conclusion",
+          "Reponses": [
+            { "Texte": "Oui", "Points": { "maj": 6 } },
+            { "Texte": "Non" }
+          ]
+        }
+      ],
+      "Causes": [
+        {
+          "Id": "redemarrage",
+          "Titre": "Il a besoin d'un vrai redémarrage",
+          "Pourquoi": "Avec le temps, des programmes restent ouverts en arrière-plan et la mémoire se remplit. Sur beaucoup de PC, « Arrêter » ne remet pas tout à zéro : seul « Redémarrer » le fait. C'est aussi ce que conseille Microsoft.",
+          "Gestes": [
+            "Enregistre ton travail et ferme tes programmes.",
+            "Menu Démarrer, bouton d'alimentation, puis « Redémarrer ».",
+            "Prends l'habitude de le redémarrer au moins une fois par semaine."
+          ],
+          "Pro": "Pas besoin de réparateur. Si c'est toujours lent après le redémarrage, refais le diagnostic."
+        },
+        {
+          "Id": "demarrage",
+          "Titre": "Trop de programmes se lancent au démarrage",
+          "Pourquoi": "Beaucoup de programmes s'ajoutent tout seuls au démarrage de Windows. Ils tournent ensuite en permanence et ralentissent tout, surtout au début.",
+          "Gestes": [
+            "Appuie en même temps sur Ctrl, Maj et Échap : le Gestionnaire des tâches s'ouvre.",
+            "Va dans « Applications de démarrage » (ou l'onglet « Démarrage »).",
+            "Pour chaque programme dont tu ne te sers pas tous les jours, clique dessus avec le bouton droit, puis « Désactiver ». Dans le doute, laisse-le.",
+            "Redémarre le PC."
+          ],
+          "Pro": "Pas besoin de réparateur : c'est un réglage. Si c'est toujours lent après, refais le diagnostic."
+        },
+        {
+          "Id": "disqueplein",
+          "Titre": "Le disque est presque plein",
+          "Pourquoi": "Windows a besoin de place libre pour travailler. Quand le disque est presque plein, tout ralentit.",
+          "Gestes": [
+            "Appuie sur la touche Windows du clavier, tape « Stockage », puis ouvre les paramètres de stockage.",
+            "Clique sur « Fichiers temporaires », coche ce que tu veux enlever (attention au dossier Téléchargements si tu y gardes des choses), puis « Supprimer les fichiers ».",
+            "Active l'« Assistant Stockage » : Windows fera le ménage tout seul de temps en temps.",
+            "Désinstalle les programmes et les jeux dont tu ne te sers plus (touche Windows, tape « Ajouter ou supprimer des programmes »), et vide la corbeille."
+          ],
+          "Pro": "Si le disque est vraiment trop petit, un réparateur peut en mettre un plus grand, en gardant tes fichiers."
+        },
+        {
+          "Id": "disquevieux",
+          "Titre": "Le disque est lent ou s'use",
+          "Pourquoi": "Beaucoup de PC de plus de quelques années ont un disque dur à plateaux, bien plus lent que les disques récents (les SSD). Un disque qui gratte ou fait des clics est en train de s'user.",
+          "Gestes": [
+            "Sauvegarde tes fichiers importants (photos, documents) sur une clé USB ou un disque externe, surtout s'il fait des bruits.",
+            "Pour savoir quel disque a le PC : touche Windows, tape « Défragmenter et optimiser les lecteurs », ouvre-le. La colonne « Type de média » dit « Disque dur » (plus lent) ou « Disque SSD ».",
+            "Dans la même fenêtre, choisis le disque puis « Optimiser »."
+          ],
+          "Pro": "Remplacer un vieux disque dur par un SSD est souvent ce qui accélère le plus un vieux PC : un réparateur peut le faire en gardant Windows et tes fichiers. S'il fait des clics, n'attends pas."
+        },
+        {
+          "Id": "memoire",
+          "Titre": "Trop de choses ouvertes en même temps",
+          "Pourquoi": "Chaque page internet et chaque programme ouvert prend de la mémoire. Quand elle est pleine, le PC ralentit beaucoup.",
+          "Gestes": [
+            "Ferme les programmes et les pages internet dont tu ne te sers pas.",
+            "Pour voir ce qui prend le plus de mémoire : appuie en même temps sur Ctrl, Maj et Échap, puis regarde la colonne « Mémoire ».",
+            "Garde moins de pages internet ouvertes en même temps."
+          ],
+          "Pro": "Si le PC rame même avec peu de choses ouvertes, un réparateur peut ajouter de la mémoire, si le PC le permet."
+        },
+        {
+          "Id": "indesirables",
+          "Titre": "Des programmes indésirables",
+          "Pourquoi": "Des programmes installés sans le vouloir (souvent en même temps qu'un autre) peuvent afficher des publicités et ralentir le PC.",
+          "Gestes": [
+            "Lance une analyse : appuie sur la touche Windows du clavier, tape « Sécurité Windows », ouvre « Protection contre les virus et menaces », puis « Analyse rapide ».",
+            "Désinstalle les programmes que tu ne connais pas ou que tu n'as pas voulus : touche Windows, tape « Ajouter ou supprimer des programmes ». Dans le doute, demande avant d'enlever.",
+            "N'installe pas de « nettoyeur » ou d'« accélérateur » trouvé sur internet : ils font souvent partie du problème."
+          ],
+          "Pro": "Si l'analyse trouve des menaces qu'elle ne peut pas enlever, ou si les publicités reviennent, un réparateur peut nettoyer le PC."
+        },
+        {
+          "Id": "maj",
+          "Titre": "Une mise à jour est en cours",
+          "Pourquoi": "Pendant une grosse mise à jour, Windows télécharge et installe en arrière-plan : le PC est plus lent pendant un moment.",
+          "Gestes": [
+            "Laisse le PC allumé et branché jusqu'à la fin.",
+            "Redémarre-le quand Windows le demande."
+          ],
+          "Pro": "Rien à réparer. Si c'est toujours lent le lendemain, refais le diagnostic."
+        },
+        {
+          "Id": "surchauffe",
+          "Titre": "Il chauffe trop",
+          "VoirPanne": "extinction",
+          "Pourquoi": "Quand il a trop chaud, le PC ralentit exprès pour refroidir. Le plus souvent, c'est la poussière qui bouche les grilles.",
+          "Gestes": [
+            "Vérifie que l'air circule : un portable se pose sur une table, jamais sur un lit ou un coussin ; une tour ne doit pas être collée à un mur.",
+            "Souffle la poussière des grilles d'aération avec une bombe d'air sec, PC éteint et débranché.",
+            "Le diagnostic « Il s'éteint ou redémarre tout seul » explique le nettoyage en détail : bouton ci-dessous."
+          ],
+          "Pro": "Si un ventilateur ne tourne plus, ou s'il chauffe encore après le nettoyage, un réparateur peut le vérifier."
+        },
+        {
+          "Id": "age",
+          "Titre": "Le PC commence à être vieux",
+          "Pourquoi": "Les programmes et les sites internet demandent de plus en plus. Un PC de plusieurs années peut ne plus suivre, même en bon état : Microsoft le dit lui-même, les vieux PC gagnent peu avec les réglages.",
+          "Gestes": [
+            "Fais d'abord les gestes simples : le redémarrer, faire de la place sur le disque, fermer ce qui ne sert pas."
+          ],
+          "Pro": "Un réparateur peut te dire si un nouveau disque (un SSD) ou plus de mémoire suffirait, ou s'il vaut mieux changer de PC."
         }
       ]
     }

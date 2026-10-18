@@ -55,13 +55,14 @@ function Get-Conclusion($Panne, $Parcours) {
 }
 
 # Ce qui ne va pas dans le fichier des pannes (une liste vide : tout est bon) : textes manquants, question ou cause
-# inconnue, question jamais posée, boucle (on tournerait en rond), cause jamais atteinte, tiret long
+# inconnue, question jamais posée, boucle (on tournerait en rond), cause jamais atteinte, renvoi vers une panne
+# inconnue, tiret long
 function Test-Pannes($Donnees, [string]$Texte = '') {
     $pb = @()
     if ($Texte.IndexOfAny([char[]](0x2013, 0x2014)) -ge 0) { $pb += 'Tiret long dans le fichier' }
     if (-not $Donnees.Securite) { $pb += 'Consignes de sécurité manquantes' }
     if (-not $Donnees.RienTrouve.Titre) { $pb += 'Texte « rien trouvé » manquant' }
-    $idsPannes = @()
+    $idsPannes = @(); $voir = @()
     foreach ($p in $Donnees.Pannes) {
         $nom = "Panne $($p.Id)"
         if (-not $p.Id -or -not $p.Titre -or -not $p.Phrase) { $pb += "$nom : Id, Titre ou Phrase manquant" }
@@ -69,6 +70,7 @@ function Test-Pannes($Donnees, [string]$Texte = '') {
         $causes = @(foreach ($c in $p.Causes) { [string]$c.Id })
         foreach ($c in $p.Causes) {
             if (-not $c.Titre -or -not $c.Pourquoi -or -not $c.Gestes -or -not $c.Pro) { $pb += "$nom, cause $($c.Id) : Titre, Pourquoi, Gestes ou Pro manquant" }
+            if ($c.VoirPanne) { $voir += [pscustomobject]@{ Ou = "$nom, cause $($c.Id)"; Vers = [string]$c.VoirPanne; Depuis = [string]$p.Id } }
         }
         $ids = @(foreach ($q in $p.Questions) { [string]$q.Id })
         if (@($ids | Select-Object -Unique).Count -ne $ids.Count) { $pb += "$nom : deux questions ont le même Id" }
@@ -105,5 +107,6 @@ function Test-Pannes($Donnees, [string]$Texte = '') {
         foreach ($id in $ids) { if (-not $etat[$id]) { $pb += "$nom : la question $id n'est jamais posée" } }
     }
     if (-not $idsPannes) { $pb += 'Aucune panne' }
+    foreach ($v in $voir) { if ($idsPannes -notcontains $v.Vers -or $v.Vers -eq $v.Depuis) { $pb += "$($v.Ou) : renvoie vers une panne inconnue « $($v.Vers) »" } }
     $pb
 }

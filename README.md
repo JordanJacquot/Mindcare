@@ -9,9 +9,11 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
 
 ## Ce qu'elle sait faire (0.1.0)
 
-- Le diagnostic de la panne « Il s'éteint ou redémarre tout seul » : les questions une à une, avec « Je ne sais pas »
-  et « Retour », puis la conclusion (la cause la plus probable, ce qu'on peut faire soi-même, quand aller chez un
-  réparateur, les consignes de sécurité, et le rappel des réponses).
+- Le diagnostic de 5 pannes : rien ne s'allume, l'écran reste noir, il s'éteint ou redémarre tout seul, écran bleu,
+  très lent. Les questions une à une, avec « Je ne sais pas » et « Retour », puis la conclusion : la cause la plus
+  probable, ce qu'on peut faire soi-même, quand aller chez un réparateur, les consignes de sécurité, et le rappel des
+  réponses. Quand la vraie panne est une autre, un bouton passe directement à son diagnostic.
+- Les conseils suivent les pages d'aide de Microsoft, Dell et HP.
 
 ## Plan
 
@@ -21,7 +23,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
       pour l'instant ».
 - [x] 2. Une panne complète, « Il s'éteint tout seul » (le cas du cousin) : choix de la panne, questions une à une avec
       « Je ne sais pas » et retour, conclusion (texte seulement).
-- [ ] 3. Les 4 autres pannes : rien ne s'allume, écran noir, écran bleu, très lent (conseils vérifiés sur des sources
+- [x] 3. Les 4 autres pannes : rien ne s'allume, écran noir, écran bleu, très lent (conseils vérifiés sur des sources
       sérieuses ; un test parcourt chaque chemin, aucune impasse).
 - [ ] 4. Les images des questions, dessinées dans le style de la suite.
 - [ ] 5. Les diagnostics gardés : les 10 derniers, reprise d'un diagnostic pas fini, résumé pour le réparateur, carte de

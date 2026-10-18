@@ -78,7 +78,34 @@ $cas = @(
     @{ Nom = 'la maison qui coupe aussi'; Panne = 'extinction'; Choix = 1, 1, 0, 3, 1, 2, 3, -1; Premiere = 'prise' }
     @{ Nom = 'portable tombé par terre'; Panne = 'extinction'; Choix = 1, 0, 1, 0, -1, -1, 2, 2, 1; Premiere = 'materiel'; Jamais = @('alimentation') }
     @{ Nom = 'PC fixe, coupure en jeu, ventilateurs muets'; Panne = 'extinction'; Choix = 1, 1, 0, 1, 2, 1, 2, 3; Premiere = 'surchauffe'; Jamais = @('batterie') }
+    @{ Nom = 'portable sans voyant de charge'; Panne = 'rien'; Choix = 1, 0, 0, 1, 0, 2; Premiere = 'chargeur'; Jamais = @('alimentation', 'interrupteur') }
+    @{ Nom = 'tour, interrupteur sur O'; Panne = 'rien'; Choix = 1, 0, 1, 0, 0, 1, 3; Premiere = 'interrupteur'; Jamais = @('chargeur') }
+    @{ Nom = 'une lumière, mais écran noir'; Panne = 'rien'; Choix = 1, 1; Premiere = 'ecran' }
+    @{ Nom = 'tour après un orage, tout essayé'; Panne = 'rien'; Choix = 1, 0, 1, 0, 1, 0, 0; Premiere = 'alimentation'; Jamais = @('chargeur') }
+    @{ Nom = 'prise morte'; Panne = 'rien'; Choix = 1, 0, 1, 1, 2, 1, 3; Premiere = 'courant' }
+    @{ Nom = 'jamais vidé de son électricité'; Panne = 'rien'; Choix = 1, 0, -1, 1, 3; Premiere = 'residuelle' }
+    @{ Nom = 'écran noir avec la flèche de la souris'; Panne = 'ecran-noir'; Choix = 1, 2, 1, 1, 2, 1, 1, 0; Premiere = 'pilote' }
+    @{ Nom = 'pas de signal, câble en haut'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 1, 0, 1, 3; Premiere = 'cablecarte'; Jamais = @('eclairage', 'ecranportable') }
+    @{ Nom = 'écran éteint'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 0, 2, 1, 3; Premiere = 'ecranalim' }
+    @{ Nom = 'il dormait'; Panne = 'ecran-noir'; Choix = 1, 3, 0; Premiere = 'veille' }
+    @{ Nom = 'portable, image devinée à la lampe'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 0, 0, 1, 3; Premiere = 'eclairage'; Jamais = @('cable', 'ecranalim', 'cablecarte') }
+    @{ Nom = 'des bips au démarrage'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 1, 2, 2, 0, 2; Premiere = 'memoire' }
+    @{ Nom = 'portable tombé, plus d''image'; Panne = 'ecran-noir'; Choix = 1, 0, 1, 0, 1, 1, 1; Premiere = 'materiel'; Jamais = @('cable') }
+    @{ Nom = 'nouvelle manette'; Panne = 'ecran-bleu'; Choix = 0, 0, 2, 1, 1, 2; Premiere = 'appareil' }
+    @{ Nom = 'écran bleu à chaque démarrage'; Panne = 'ecran-bleu'; Choix = 1, 3, 3, 1, 1, 2; Premiere = 'bloque' }
+    @{ Nom = 'écrans bleus depuis l''ouverture du PC'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 1, 0; Premiere = 'memoire' }
+    @{ Nom = 'disque qui fait des clics'; Panne = 'ecran-bleu'; Choix = 0, 3, 1, 1, 0, 2; Premiere = 'disque' }
+    @{ Nom = 'jeu qui fait chauffer'; Panne = 'ecran-bleu'; Choix = 0, 3, 0, 0, 1, 2; Premiere = 'surchauffe' }
+    @{ Nom = 'écrans bleus après une mise à jour'; Panne = 'ecran-bleu'; Choix = 0, 2, 1, 1, 1, 2; Premiere = 'pilote' }
+    @{ Nom = 'jamais redémarré'; Panne = 'lent'; Choix = 3, 0, 1, 1, 1, 1, 1, 0, 1; Premiere = 'redemarrage' }
+    @{ Nom = 'pubs depuis un programme'; Panne = 'lent'; Choix = 2, 1, 0, 0, 1, 1, 1, 0, 1; Premiere = 'indesirables' }
+    @{ Nom = 'vieux PC à disque dur'; Panne = 'lent'; Choix = 0, 1, 1, 1, 1, 1, 0, 2, 1; Premiere = 'disquevieux' }
+    @{ Nom = 'disque plein'; Panne = 'lent'; Choix = 1, 1, 1, 1, 0, 1, 1, 0, 1; Premiere = 'disqueplein' }
+    @{ Nom = 'trop de pages ouvertes'; Panne = 'lent'; Choix = 1, 1, 2, 1, 1, 1, 1, 0, 1; Premiere = 'memoire' }
+    @{ Nom = 'mise à jour en cours'; Panne = 'lent'; Choix = 3, 1, -1, 1, 1, 1, 1, 0, 0; Premiere = 'maj' }
 )
+# Chaque panne a ses cas connus
+foreach ($p in $pannes.Pannes) { Write-Resultat "cas connus pour la panne $($p.Id)" (@($cas | Where-Object { $_.Panne -eq $p.Id }).Count -ge 3) }
 foreach ($k in $cas) {
     $p = Get-Panne $pannes $k.Panne
     $e = Get-Parcours $p $k.Choix
@@ -108,6 +135,8 @@ $s = Test-Capture 'conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-
 Write-Resultat 'conclusion affichée (journal)' ((Get-Journal $s) -match 'Conclusion extinction : surchauffe') '(pas de conclusion « surchauffe » dans le journal)'
 Test-Capture 'conclusion-bas' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_BAS = '1' } | Out-Null
 Test-Capture 'conclusion-danger' @{ MINDCARE_TEST_PARCOURS = 'extinction:0' } | Out-Null
+Test-Capture 'conclusion-renvoi' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
+Test-Capture 'conclusion-bon-a-savoir' @{ MINDCARE_TEST_PARCOURS = 'ecran-bleu:0,0,2,1,1,2' } | Out-Null
 
 # 6. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
 function Test-Quitter([string]$Nom, [switch]$Programme) {

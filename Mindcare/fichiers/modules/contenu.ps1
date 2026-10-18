@@ -146,6 +146,11 @@ function Show-Conclusion($Etat) {
         Add-Texte $c $(if ($urgent) { 'Urgent' } else { 'Le plus probable' }) 13 $(if ($urgent) { '#FF5A6E' } else { '#A9A3C9' }) 'SemiBold'
         Add-Cause $c $causes[0].Cause 'H1'
     }
+    if ($script:PanneEnCours.Conseil) {
+        $bon = New-Card
+        Add-Texte $bon 'Bon à savoir' 18 '#FFFFFF' 'SemiBold'
+        Add-Texte $bon ([string]$script:PanneEnCours.Conseil) 14 '#EEEBF7' 'Normal' '0,8,0,0'
+    }
     foreach ($autre in ($causes | Select-Object -Skip 1)) {
         $c2 = New-Card
         Add-Texte $c2 'Autre piste' 13 '#A9A3C9' 'SemiBold'
@@ -167,7 +172,8 @@ function Show-Conclusion($Etat) {
     Add-Bouton $rg 'Changer ma dernière réponse' { Undo-Choix }
 }
 
-# Une cause : son titre, pourquoi, ce qu'on peut faire soi-même, quand aller chez un réparateur
+# Une cause : son titre, pourquoi, ce qu'on peut faire soi-même, quand aller chez un réparateur, et parfois un bouton
+# vers le diagnostic d'une autre panne (VoirPanne)
 function Add-Cause($Parent, $Cause, [string]$Style) {
     Add-Titre $Parent ([string]$Cause.Titre) $Style '0,2,0,0'
     Add-Texte $Parent ([string]$Cause.Pourquoi) 14 '#A9A3C9' 'Normal' '0,8,0,0'
@@ -175,6 +181,13 @@ function Add-Cause($Parent, $Cause, [string]$Style) {
     Add-Liste $Parent $Cause.Gestes
     Add-Texte $Parent 'Quand aller chez un réparateur' 15 '#FFFFFF' 'SemiBold' '0,18,0,0'
     Add-Texte $Parent ([string]$Cause.Pro) 14 '#EEEBF7' 'Normal' '0,8,0,0'
+    $autre = if ($Cause.VoirPanne) { Get-Panne $script:Pannes ([string]$Cause.VoirPanne) } else { $null }
+    if ($autre) {
+        $b = New-Button "Faire le diagnostic « $($autre.Titre) »" 'BtnPrimary'
+        $b.HorizontalAlignment = 'Left'; $b.Margin = '0,16,0,0'; $b.Tag = [string]$autre.Id
+        $b.Add_Click({ param($s) Start-Diagnostic ([string]$s.Tag) })
+        [void]$Parent.Children.Add($b)
+    }
 }
 
 # La carte vivante dans l'accueil de Mindset (voir systeme.ps1, Write-EtatMindset) : ce qu'il y a d'utile à voir
