@@ -53,6 +53,38 @@ function Test-Capture([string]$Nom, [hashtable]$Env = @{}, [string]$Dossier) {
 # 1. La fenêtre, dans le thème Néon puis dans un autre thème de la suite
 $s = Test-Capture 'fenetre'
 Test-Capture 'theme-crepuscule' @{ MINDCARE_THEME = 'crepuscule' } | Out-Null
+# Les autres thèmes de base de la suite
+foreach ($th in 'terminal', 'arcade', 'rubis') { Test-Capture "theme-$th" @{ MINDCARE_THEME = $th; MINDCARE_TEST_PARCOURS = 'extinction:1,1' } | Out-Null }
+# Un thème perso de test (images dessinées ici, police de Windows : rien d'un vrai thème, rien dans le dépôt), complet :
+# couleurs propres, police pixel partout, image de fond, logo qui lévite, mascotte et dessin du bas animés, phrase
+Add-Type -AssemblyName System.Drawing
+$pk = Join-Path $test 'donnees-pack'
+if (Test-Path -LiteralPath $pk) { Remove-Item -LiteralPath $pk -Recurse -Force }
+$pd = Join-Path $pk 'packs\test'
+New-Item -ItemType Directory -Force -Path $pd | Out-Null
+function New-ImageTest([string]$Nom, [int]$L, [int]$H, [int]$Images, [string]$Couleur) {
+    $b = New-Object Drawing.Bitmap ($L * $Images), $H
+    $g = [Drawing.Graphics]::FromImage($b); $g.Clear([Drawing.Color]::Transparent)
+    for ($k = 0; $k -lt $Images; $k++) { $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.ColorTranslator]::FromHtml($Couleur))), ($k * $L + 4 + $k * 3), 4, ($L - 12), ($H - 8)) }
+    $g.Dispose(); $b.Save((Join-Path $pd $Nom), [Drawing.Imaging.ImageFormat]::Png); $b.Dispose()
+}
+New-ImageTest 'logo.png' 64 64 1 '#FFD166'
+New-ImageTest 'mascotte.png' 64 64 4 '#3DDC97'
+New-ImageTest 'bas.png' 48 24 2 '#FF8A00'
+$fond = New-Object Drawing.Bitmap 640, 360
+$g = [Drawing.Graphics]::FromImage($fond); $g.FillRectangle((New-Object Drawing.Drawing2D.LinearGradientBrush ([Drawing.Point]::new(0, 0)), ([Drawing.Point]::new(640, 360)), ([Drawing.Color]::DarkGreen), ([Drawing.Color]::DarkOrange)), 0, 0, 640, 360); $g.Dispose()
+$fond.Save((Join-Path $pd 'fond.jpg'), [Drawing.Imaging.ImageFormat]::Jpeg); $fond.Dispose()
+Copy-Item -LiteralPath "$env:WINDIR\Fonts\consola.ttf" -Destination (Join-Path $pd 'police.ttf')
+$reglage = [ordered]@{ Name = 'Test'; Colors = @{ P = '#3FA66B'; S = '#E0773A'; T = '#F2C66D'; NH = 24; NS = 0.45 }; Hello = '{0} ! Ceci est un thème de test.'
+    Font = 'police.ttf'; FontScope = 'tout'; Logo = 'logo.png'; LogoGlow = '#FFF4D6'; Background = 'fond.jpg'; BackgroundOpacity = 0.5; BackgroundAlign = 'bas-droite'
+    Mascotte = @{ File = 'mascotte.png'; Frames = 4; Delay = 120 }; Footer = @{ File = 'bas.png'; Frames = 2; Delay = 200; Height = 24 } }
+[IO.File]::WriteAllText((Join-Path $pd 'pack.json'), (ConvertTo-Json $reglage -Depth 4), (New-Object Text.UTF8Encoding($false)))
+$s = Test-Capture 'theme-perso' @{ MINDCARE_THEME = 'pack:test' } -Dossier 'pack'
+Write-Resultat 'thème perso : posé (journal)' ((Get-Journal $s) -match 'Thème perso : test' -and (Get-Journal $s) -notmatch 'visuels non posés') '(pas de « Thème perso : test » dans le journal)'
+Test-Capture 'theme-perso-question' @{ MINDCARE_THEME = 'pack:test'; MINDCARE_TEST_PARCOURS = 'extinction:1,1' } -Dossier 'pack' | Out-Null
+$s = Test-Capture 'theme-perso-absent' @{ MINDCARE_THEME = 'pack:nexistepas' }
+Write-Resultat 'thème perso absent : Néon, sans erreur' ((Get-Journal $s) -match 'introuvable : Néon') '(pas de retour au Néon dans le journal)'
+
 # 2. La carte vivante pour Mindset : etat.json au format commun
 $etat = Join-Path $s.Donnees 'etat.json'
 $bon = $false

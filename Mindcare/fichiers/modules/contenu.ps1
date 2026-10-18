@@ -444,4 +444,4 @@ function Add-Reparateur {
 function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Etat $script:ResumeDe.Causes }
 
 # À la fermeture : arrêter ce qui tourne (minuteries, travaux de fond), sinon rien ne doit rester ouvert
-function Stop-Contenu { Stop-LectureJournaux }
+function Stop-Contenu { Stop-LectureJournaux; Stop-ThemeVisuels }

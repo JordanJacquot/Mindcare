@@ -170,19 +170,24 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
     <!-- Fond : nuit violette et trois lueurs (cyan en haut à gauche, violet au centre, magenta en bas à droite) -->
-    <Grid Grid.RowSpan="2" IsHitTestVisible="False">
+    <Grid Grid.RowSpan="3" IsHitTestVisible="False">
       <Rectangle><Rectangle.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0C0920" Offset="0"/><GradientStop Color="#06050F" Offset="1"/></LinearGradientBrush></Rectangle.Fill></Rectangle>
       <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.12,0.05" GradientOrigin="0.12,0.05" RadiusX="0.5" RadiusY="0.55"><GradientStop Color="#4400E5FF" Offset="0"/><GradientStop Color="#0000E5FF" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
       <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.6,0.35" GradientOrigin="0.6,0.35" RadiusX="0.45" RadiusY="0.45"><GradientStop Color="#267A3CFF" Offset="0"/><GradientStop Color="#007A3CFF" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
       <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.92,0.9" GradientOrigin="0.92,0.9" RadiusX="0.5" RadiusY="0.55"><GradientStop Color="#44FF2EB5" Offset="0"/><GradientStop Color="#00FF2EB5" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
     </Grid>
+    <!-- Le décor du thème (themes.ps1) : l'image de fond d'un thème perso, les lignes du Terminal -->
+    <Grid x:Name="DecorTheme" Grid.RowSpan="3" IsHitTestVisible="False"/>
 
-    <!-- En-tête : le logo (anneau néon et pouls animé), le nom, la phrase -->
+    <!-- En-tête : le logo (anneau néon et pouls animé, ou celui du thème perso), le nom, la phrase, la mascotte du thème -->
     <DockPanel Grid.Row="0" Margin="32,26,32,10">
       <Grid Width="52" Height="52" DockPanel.Dock="Left" VerticalAlignment="Center">
+        <Image x:Name="LogoPack" Visibility="Collapsed" Width="56" Height="56" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+        <Grid x:Name="LogoAnneau">
         <Ellipse StrokeThickness="3.5">
           <Ellipse.Stroke><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#00E5FF" Offset="0"/><GradientStop Color="#B04BFF" Offset="0.5"/><GradientStop Color="#FF2EB5" Offset="1"/></LinearGradientBrush></Ellipse.Stroke>
           <Ellipse.Effect><DropShadowEffect Color="#B04BFF" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></Ellipse.Effect>
@@ -203,7 +208,9 @@
             </EventTrigger>
           </Path.Triggers>
         </Path>
+        </Grid>
       </Grid>
+      <Border x:Name="Mascotte" DockPanel.Dock="Right" Visibility="Collapsed" VerticalAlignment="Center" Margin="16,-10,0,-10"/>
       <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
         <TextBlock Text="Mindcare" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" FontFamily="Segoe UI Variable Display, Segoe UI"/>
         <TextBlock x:Name="Phrase" Text="Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples." FontSize="14" Foreground="#A6A1BC" Margin="1,0,0,0"/>
@@ -214,5 +221,8 @@
     <ScrollViewer x:Name="Defilement" Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="32,8,20,20" Padding="0,0,12,0">
       <StackPanel x:Name="Contenu"/>
     </ScrollViewer>
+
+    <!-- Le dessin animé du bas d'un thème perso -->
+    <Border x:Name="DessinBas" Grid.Row="2" Visibility="Collapsed" HorizontalAlignment="Left" Margin="32,0,32,8" IsHitTestVisible="False"/>
   </Grid>
 </Window>
