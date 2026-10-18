@@ -1,4 +1,4 @@
-// Mindcare.exe : le programme Mindcare. Il exécute lui-même le code de l'appli (fichiers\Mindcare.ps1) au lieu de le
+﻿// Mindcare.exe : le programme Mindcare. Il exécute lui-même le code de l'appli (fichiers\Mindcare.ps1) au lieu de le
 // confier à powershell.exe : pour Windows, c'est une vraie application, avec son nom et son icône.
 // Compilé par construire.ps1. « Mindcare.exe -Demarrage » : lancée cachée (par Mindset, ou avec Windows).
 using System;

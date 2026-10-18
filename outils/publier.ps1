@@ -52,7 +52,13 @@ if (-not (Test-Path -LiteralPath $cle) -or -not (Test-Path -LiteralPath $cleMind
 }
 if ($problemes) { $problemes | ForEach-Object { Write-Host $_ -ForegroundColor Red }; throw 'Publication annulée : corrige les points ci-dessus.' }
 
-function Invoke-Native([string]$Exe, [string[]]$Arguments) { & $Exe @Arguments; if ($LASTEXITCODE) { throw "Échec : $Exe $($Arguments -join ' ')" } }
+# Un programme (git, gh) : seul son code de sortie compte. Ses avertissements (« LF will be replaced by CRLF »...) ne
+# sont pas des échecs : sans « Continue », PowerShell les prenait pour des erreurs et arrêtait la publication.
+function Invoke-Native([string]$Exe, [string[]]$Arguments) {
+    $ErrorActionPreference = 'Continue'
+    & $Exe @Arguments 2>&1 | ForEach-Object { "$_" }
+    if ($LASTEXITCODE) { throw "Échec : $Exe $($Arguments -join ' ')" }
+}
 
 # 1. Numéro de version : dans l'appli (variable et en-tête) et dans le programme
 $c = [IO.File]::ReadAllText($ps1, [Text.Encoding]::UTF8)
