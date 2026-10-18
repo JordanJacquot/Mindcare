@@ -1,13 +1,19 @@
-﻿# Mindcare : CE QUE FAIT L'APPLI. Les trois écrans du diagnostic : le choix de la panne, les questions une à une (avec
-# « Je ne sais pas » et « Retour »), puis la conclusion. Les pannes et le calcul sont dans diagnostic.ps1.
-# Chargé par Mindcare.ps1 après diagnostic.ps1 ; Initialize-Contenu est appelé par evenements.ps1.
+﻿# Mindcare : CE QUE FAIT L'APPLI. Les trois écrans du diagnostic : le choix de la panne (et les derniers diagnostics),
+# les questions une à une (avec « Je ne sais pas » et « Retour »), puis la conclusion. Les pannes et le calcul sont dans
+# diagnostic.ps1, les diagnostics gardés et la carte de Mindset dans historique.ps1.
+# Chargé par Mindcare.ps1 après historique.ps1 ; Initialize-Contenu est appelé par evenements.ps1.
 
 $script:Pannes       = $null   # le contenu de questions.json
 $script:PanneEnCours = $null   # la panne choisie
 $script:ChoixFaits   = @()     # les choix faits jusqu'ici (voir diagnostic.ps1)
+$script:DiagId       = $null   # le diagnostic en cours, tel qu'il est gardé (historique.ps1)
 
 function Initialize-Contenu {
     try { $script:Pannes = Read-Pannes } catch { Write-Log "Questions illisibles ($QuestionsFichier) : $_" }
+    Read-Historique
+    if ($EnTest -and $env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered({ $ui.Defilement.ScrollToEnd() }) }   # (tests : capture du bas)
+    # Tests : reprendre le dernier diagnostic gardé
+    if ($EnTest -and $env:MINDCARE_TEST_REPRENDRE -and $script:Historique.Count -and $script:Pannes) { Open-Diagnostic ([string]$script:Historique[0].Id); return }
     # Tests : toutes les images sur une planche, pour les relire d'un coup d'œil
     if ($EnTest -and $env:MINDCARE_TEST_GALERIE) {
         $g = New-Object System.Windows.Controls.WrapPanel
@@ -23,10 +29,10 @@ function Initialize-Contenu {
         $id, $suite = $env:MINDCARE_TEST_PARCOURS -split ':', 2
         $p = Get-Panne $script:Pannes $id
         if ($p) {
-            $script:PanneEnCours = $p
+            $script:PanneEnCours = $p; $script:DiagId = New-DiagId
             $script:ChoixFaits = @(if ($suite) { $suite -split ',' | ForEach-Object { [int]$_ } })
             Show-Etape
-            if ($env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered({ $ui.Defilement.ScrollToEnd() }) }   # (capture du bas)
+            if ($env:MINDCARE_TEST_RESUME) { Save-Resume (Get-ResumeEnCours) | Out-Null }
             return
         }
     }
@@ -78,6 +84,17 @@ function Add-Liste($Parent, $Lignes, [string]$Puce = '', [string]$CouleurPuce = 
 function Show-Accueil {
     $script:PanneEnCours = $null; $script:ChoixFaits = @()
     Clear-Contenu
+    # Le dernier diagnostic n'est pas fini : le reprendre est proposé tout en haut
+    $dernier = if ($script:Historique.Count -and $script:Pannes) { $script:Historique[0] } else { $null }
+    $info = if ($dernier -and -not $dernier.Fini) { Get-DiagnosticInfo $dernier } else { $null }
+    if ($info -and $info.Panne) {
+        $r = New-Card
+        Add-Titre $r "Un diagnostic n'est pas fini" 'H2'
+        Add-Texte $r "« $($info.Panne.Titre) », commencé le $(Format-Date ([string]$dernier.Debut)), après $(@($dernier.Choix).Count) réponse(s)." 14 '#A9A3C9' 'Normal' '0,6,0,0'
+        $rg = New-Rangee $r
+        $script:AReprendre = [string]$dernier.Id
+        Add-Bouton $rg 'Le reprendre' { Open-Diagnostic $script:AReprendre } 'BtnPrimary'
+    }
     $c = New-Card
     if (-not $script:Pannes) {
         Add-Titre $c "Mindcare n'a pas pu lire ses questions"
@@ -93,12 +110,42 @@ function Show-Accueil {
         [void]$sp.Children.Add($ph)
         Add-ChoixBouton $c $sp ([string]$p.Id) { param($s) Start-Diagnostic ([string]$s.Tag) }
     }
+
+    # Les derniers diagnostics : un clic pour reprendre celui qui n'est pas fini, ou revoir une conclusion
+    $gardes = @(foreach ($d in $script:Historique) { $i = Get-DiagnosticInfo $d; if ($i.Panne) { [pscustomobject]@{ D = $d; I = $i } } })
+    if (-not $gardes) { return }
+    $h = New-Card
+    Add-Titre $h 'Tes derniers diagnostics' 'H2'
+    Add-Texte $h 'Clique sur un diagnostic pour revoir sa conclusion, ou pour le reprendre là où tu en étais.' 14 '#A9A3C9' 'Normal' '0,6,0,4'
+    foreach ($g in $gardes) {
+        $sp = New-Object System.Windows.Controls.StackPanel
+        [void]$sp.Children.Add((New-Text ([string]$g.I.Panne.Titre) 15 '#FFFFFF' 'SemiBold'))
+        $quoi = if ($g.D.Fini) { $g.I.Phrase } else { 'pas fini, clique pour le reprendre' }
+        $ph = New-Text "Le $(Format-Date ([string]$g.D.Debut)) : $quoi" 13 $(if ($g.D.Fini) { '#A9A3C9' } else { '#00E5FF' }); $ph.Margin = '0,2,0,0'
+        [void]$sp.Children.Add($ph)
+        Add-ChoixBouton $h $sp ([string]$g.D.Id) { param($s) Open-Diagnostic ([string]$s.Tag) }
+    }
 }
+
+function New-DiagId { "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$((Get-Random -Maximum 65536).ToString('x4'))" }
 
 function Start-Diagnostic([string]$Id) {
     $script:PanneEnCours = Get-Panne $script:Pannes $Id
     $script:ChoixFaits = @()
+    $script:DiagId = New-DiagId
     Write-Log "Diagnostic : $Id"
+    Show-Etape
+}
+
+# Un diagnostic gardé : là où on en était (sa question, ou sa conclusion)
+function Open-Diagnostic([string]$Id) {
+    $d = @($script:Historique | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1
+    $p = if ($d) { Get-Panne $script:Pannes ([string]$d.Panne) } else { $null }
+    if (-not $p) { Write-Log "Diagnostic $Id introuvable"; Show-Accueil; return }
+    $script:PanneEnCours = $p
+    $script:ChoixFaits = @(foreach ($n in $d.Choix) { [int]$n })
+    $script:DiagId = $Id
+    Write-Log "Reprise du diagnostic $Id ($($p.Id))"
     Show-Etape
 }
 
@@ -106,7 +153,10 @@ function Start-Diagnostic([string]$Id) {
 function Show-Etape {
     $etat = Get-Parcours $script:PanneEnCours $script:ChoixFaits
     $script:ChoixFaits = $etat.Choix
-    if ($etat.Question) { Show-Question $etat } else { Show-Conclusion $etat }
+    if ($etat.Question) {
+        Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false @()
+        Show-Question $etat
+    } else { Show-Conclusion $etat }
 }
 function Add-Choix([int]$N) { $script:ChoixFaits = @($script:ChoixFaits) + $N; Show-Etape }
 # Retour : la question d'avant (ou le choix de la panne, depuis la première)
@@ -158,6 +208,7 @@ function Show-Conclusion($Etat) {
     $causes = @(Get-Conclusion $script:PanneEnCours $Etat)
     $liste = if ($causes) { ($causes | ForEach-Object { "$($_.Cause.Id) ($($_.Points))" }) -join ', ' } else { 'rien de clair' }
     Write-Log "Conclusion $($script:PanneEnCours.Id) : $liste (choix $($script:ChoixFaits -join ','))"
+    Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true @($causes | ForEach-Object { $_.Cause.Id })
     Clear-Contenu
     $c = New-Card
     Add-Texte $c "$($script:PanneEnCours.Titre) : la conclusion" 13 '#00E5FF' 'SemiBold' '0,0,0,8'
@@ -192,10 +243,30 @@ function Show-Conclusion($Etat) {
         Add-Texte $rp $e.Question 13 '#A9A3C9' 'Normal' '0,10,0,0'
         Add-Texte $rp $e.Reponse 14 '#EEEBF7' 'SemiBold'
     }
-    $rg = New-Rangee $rp
+
+    # Pour le réparateur : le résumé (la panne, la conclusion, les réponses, le modèle du PC) en fichier ou à coller
+    $script:ResumeDe = @{ Panne = $script:PanneEnCours; Etat = $Etat; Causes = $causes }   # (le texte est fait au clic)
+    $rep = New-Card
+    Add-Titre $rep 'Pour le réparateur' 'H2'
+    Add-Texte $rep 'Garde un résumé de ce diagnostic (la panne, la conclusion, tes réponses et le modèle du PC) pour le montrer à un réparateur, ou pour l''envoyer à quelqu''un qui peut t''aider.' 14 '#A9A3C9' 'Normal' '0,6,0,0'
+    $rg = New-Rangee $rep
+    Add-Bouton $rg 'Enregistrer le résumé sur le Bureau' {
+        try { $f = Save-Resume (Get-ResumeEnCours); $ui.ResumeInfo.Text = "C'est fait : le fichier « $([IO.Path]::GetFileName($f)) » est sur le Bureau." }
+        catch { Write-Log "Résumé non enregistré : $_"; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être enregistré sur le Bureau. Essaie plutôt « Copier le résumé »." }
+    }
+    Add-Bouton $rg 'Copier le résumé' {
+        try { [System.Windows.Clipboard]::SetText((Get-ResumeEnCours)); $ui.ResumeInfo.Text = 'Le résumé est copié : tu peux le coller dans un message ou un e-mail.' }
+        catch { Write-Log "Résumé non copié : $_"; $ui.ResumeInfo.Text = "Le résumé n'a pas pu être copié. Essaie plutôt de l'enregistrer sur le Bureau." }
+    }
+    $ui.ResumeInfo = New-Text '' 14 '#3DDC97'; $ui.ResumeInfo.Margin = '0,4,0,0'
+    [void]$rep.Children.Add($ui.ResumeInfo)
+
+    $rg = New-Rangee $rep
     Add-Bouton $rg 'Nouveau diagnostic' { Show-Accueil } 'BtnPrimary'
     Add-Bouton $rg 'Changer ma dernière réponse' { Undo-Choix }
 }
+
+function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Etat $script:ResumeDe.Causes }
 
 # Une cause : son titre, pourquoi, ce qu'on peut faire soi-même, quand aller chez un réparateur, et parfois un bouton
 # vers le diagnostic d'une autre panne (VoirPanne)
@@ -212,16 +283,6 @@ function Add-Cause($Parent, $Cause, [string]$Style) {
         $b.HorizontalAlignment = 'Left'; $b.Margin = '0,16,0,0'; $b.Tag = [string]$autre.Id
         $b.Add_Click({ param($s) Start-Diagnostic ([string]$s.Tag) })
         [void]$Parent.Children.Add($b)
-    }
-}
-
-# La carte vivante dans l'accueil de Mindset (voir systeme.ps1, Write-EtatMindset) : ce qu'il y a d'utile à voir
-# sans ouvrir l'appli. Le dernier diagnostic arrivera avec les diagnostics gardés (étape 5 du plan).
-function Get-EtatCarte {
-    @{
-        Titre  = 'Dernier diagnostic'
-        Scores = @()                                                                # par exemple : @(@{ Nom = 'Santé'; Valeur = 82 })
-        Lignes = @(@{ Texte = "Aucun diagnostic pour l'instant."; Etat = 'info' })   # ok, info, attention, urgent
     }
 }
 

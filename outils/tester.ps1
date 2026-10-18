@@ -20,9 +20,10 @@ function Write-Resultat([string]$Nom, [bool]$Bon, [string]$Detail = '') {
 }
 
 # Lance l'appli (le script, ou le programme avec -Programme ; pas « -Exe » : il cacherait $exe) dans une situation donnée et renvoie le processus, ses données et sa capture
-function Start-Scenario([string]$Nom, [hashtable]$Env = @{}, [switch]$Programme) {
-    $donnees = Join-Path $test "donnees-$Nom"
-    if (Test-Path -LiteralPath $donnees) { Remove-Item -LiteralPath $donnees -Recurse -Force }
+# (-Dossier : les données d'un autre scénario, gardées telles quelles, pour enchaîner plusieurs lancements)
+function Start-Scenario([string]$Nom, [hashtable]$Env = @{}, [switch]$Programme, [string]$Dossier) {
+    $donnees = Join-Path $test "donnees-$(if ($Dossier) { $Dossier } else { $Nom })"
+    if (-not $Dossier -and (Test-Path -LiteralPath $donnees)) { Remove-Item -LiteralPath $donnees -Recurse -Force }
     New-Item -ItemType Directory -Force -Path $donnees | Out-Null
     $capture = Join-Path $test "capture-$Nom.png"
     Remove-Item -LiteralPath $capture -ErrorAction SilentlyContinue
@@ -40,9 +41,9 @@ function Get-Journal($S) { $j = Join-Path $S.Donnees 'journal.txt'; if (Test-Pat
 function Get-Erreurs($S) { if (Test-Path -LiteralPath $S.Erreurs) { ((Get-Content -LiteralPath $S.Erreurs -Raw) + '').Trim() } else { '' } }
 
 # Une fenêtre qui s'affiche, se capture et se ferme toute seule, sans erreur PowerShell
-function Test-Capture([string]$Nom, [hashtable]$Env = @{}) {
+function Test-Capture([string]$Nom, [hashtable]$Env = @{}, [string]$Dossier) {
     $env2 = @{ MINDCARE_CAPTURE = (Join-Path $test "capture-$Nom.png") } + $Env
-    $s = Start-Scenario $Nom $env2
+    $s = Start-Scenario $Nom $env2 -Dossier $Dossier
     if (-not $s.P.WaitForExit($Delai * 1000)) { $s.P.Kill(); Write-Resultat $Nom $false "(ne s'est pas fermée en $Delai s)"; return $s }
     $e = Get-Erreurs $s
     Write-Resultat $Nom ((Test-Path -LiteralPath $s.Capture) -and -not $e) $(if ($e) { "(erreurs : $($e.Substring(0, [math]::Min(300, $e.Length))))" } else { '(pas de capture)' })
@@ -159,7 +160,32 @@ Test-Capture 'images' @{ MINDCARE_TEST_GALERIE = '1' } | Out-Null
 Test-Capture 'conclusion-renvoi' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
 Test-Capture 'conclusion-bon-a-savoir' @{ MINDCARE_TEST_PARCOURS = 'ecran-bleu:0,0,2,1,1,2' } | Out-Null
 
-# 6. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
+# 6. Les diagnostics gardés : 10 au plus, le dernier en tête, la carte de Mindset, le résumé, la reprise
+$hist = Join-Path $test 'donnees-historique'
+if (Test-Path -LiteralPath $hist) { Remove-Item -LiteralPath $hist -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $hist | Out-Null
+$vieux = @(for ($i = 1; $i -le 10; $i++) { [ordered]@{ Id = "vieux-$i"; Panne = 'lent'; Choix = @(0); Debut = "2026-01-$('{0:d2}' -f $i)T10:00:00"; Maj = "2026-01-$('{0:d2}' -f $i)T10:00:00"; Fini = $false; Causes = @() } })
+[IO.File]::WriteAllText((Join-Path $hist 'diagnostics.json'), (ConvertTo-Json -InputObject ([ordered]@{ Version = 1; Diagnostics = $vieux }) -Depth 5), (New-Object Text.UTF8Encoding($false)))
+function Read-Etat { try { [IO.File]::ReadAllText((Join-Path $hist 'etat.json'), [Text.Encoding]::UTF8) | ConvertFrom-Json } catch { $null } }
+function Read-Gardes { try { @(([IO.File]::ReadAllText((Join-Path $hist 'diagnostics.json'), [Text.Encoding]::UTF8) | ConvertFrom-Json).Diagnostics) } catch { @() } }
+$s = Test-Capture 'historique-conclusion' @{ MINDCARE_TEST_PARCOURS = 'extinction:1,1,0,0,-1,0,2,3'; MINDCARE_TEST_RESUME = '1' } -Dossier 'historique'
+$g = Read-Gardes; $et = Read-Etat
+Write-Resultat 'diagnostic fini gardé (le plus récent en tête, 10 au plus)' ($g.Count -eq 10 -and $g[0].Panne -eq 'extinction' -and $g[0].Fini -and @($g[0].Causes)[0] -eq 'surchauffe' -and $g[1].Id -eq 'vieux-1') "($($g.Count) gardés, en tête : $($g[0].Panne))"
+Write-Resultat 'carte de Mindset : dernier diagnostic' ($et -and @($et.Lignes)[0].Texte -eq "Il s'éteint ou redémarre tout seul : Il chauffe trop" -and @($et.Lignes)[0].Etat -eq 'attention' -and @($et.Lignes | Where-Object { $_.Texte.Length -gt 80 }).Count -eq 0) "($(@($et.Lignes)[0].Texte))"
+$resume = @(Get-ChildItem -LiteralPath $hist -Filter 'Mindcare, diagnostic du *.txt')
+$rt = if ($resume) { [IO.File]::ReadAllText($resume[0].FullName, [Text.Encoding]::UTF8) } else { '' }
+Write-Resultat 'résumé pour le réparateur' ($rt -match 'Cause la plus probable : Il chauffe trop' -and $rt -match 'Autre piste : Le bloc' -and $rt -match 'Les réponses :' -and $rt -match "- Ton PC, c'est" -and $rt.IndexOfAny([char[]](0x2013, 0x2014)) -lt 0) "($($resume.Count) fichier)"
+Test-Capture 'historique-pas-fini' @{ MINDCARE_TEST_PARCOURS = 'rien:1,0' } -Dossier 'historique' | Out-Null
+$g = Read-Gardes; $et = Read-Etat
+Write-Resultat 'diagnostic pas fini gardé' ($g.Count -eq 10 -and $g[0].Panne -eq 'rien' -and -not $g[0].Fini -and (@($g[0].Choix) -join ',') -eq '1,0' -and $g[1].Panne -eq 'extinction') "(en tête : $($g[0].Panne), $(@($g[0].Choix) -join ','))"
+Write-Resultat 'carte de Mindset : pas fini' ($et -and @($et.Lignes)[0].Texte -eq "Rien ne s'allume : pas fini") "($(@($et.Lignes)[0].Texte))"
+Test-Capture 'historique-accueil' @{} -Dossier 'historique' | Out-Null
+Test-Capture 'historique-liste' @{ MINDCARE_TEST_BAS = '1' } -Dossier 'historique' | Out-Null
+$s = Test-Capture 'historique-reprise' @{ MINDCARE_TEST_REPRENDRE = '1' } -Dossier 'historique'
+$g = Read-Gardes
+Write-Resultat 'reprise du diagnostic pas fini' ((Get-Journal $s) -match 'Reprise du diagnostic .* \(rien\)' -and $g[0].Panne -eq 'rien' -and $g.Count -eq 10) '(pas de reprise dans le journal)'
+
+# 7. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
 function Test-Quitter([string]$Nom, [switch]$Programme) {
     $s = Start-Scenario $Nom @{ MINDCARE_TEST_DEMARRAGE = '1' } -Programme:$Programme
     $fin = (Get-Date).AddSeconds($Delai)
@@ -171,7 +197,7 @@ function Test-Quitter([string]$Nom, [switch]$Programme) {
     Write-Resultat $Nom ($parti -and (Get-Journal $s) -match 'Fermeture demandée par Mindset') $(if (-not $parti) { '(encore ouverte 8 s après la demande : Mindset la fermerait de force)' } else { '(pas de trace dans le journal)' })
 }
 Test-Quitter 'quitter (script)'
-# 7. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir)
+# 8. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir)
 if (Test-Path -LiteralPath $exe) { Test-Quitter 'quitter (programme)' -Programme } else { Write-Host "(pas de $exe : lance construire.ps1 pour tester le programme)" -ForegroundColor Yellow }
 
 if ($script:Ok) { Write-Host "`nTout est bon. Captures : $test" -ForegroundColor Green; exit 0 }

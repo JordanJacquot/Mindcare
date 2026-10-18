@@ -16,6 +16,10 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
 - Les conseils suivent les pages d'aide de Microsoft, Dell et HP.
 - Des dessins à côté des questions où ils aident (l'interrupteur de la tour, les prises de l'écran, la lampe sur
   l'écran du portable...), dans les couleurs du thème de la suite.
+- Les 10 derniers diagnostics gardés : en reprendre un pas fini (proposé en haut de l'accueil), revoir une conclusion.
+- Un résumé pour le réparateur (la panne, la conclusion, les réponses, le modèle du PC), enregistré sur le Bureau ou
+  copié pour l'envoyer.
+- Dans Mindset, la carte de Mindcare montre le dernier diagnostic.
 
 ## Plan
 
@@ -28,7 +32,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - [x] 3. Les 4 autres pannes : rien ne s'allume, écran noir, écran bleu, très lent (conseils vérifiés sur des sources
       sérieuses ; un test parcourt chaque chemin, aucune impasse).
 - [x] 4. Les images des questions, dessinées dans le style de la suite.
-- [ ] 5. Les diagnostics gardés : les 10 derniers, reprise d'un diagnostic pas fini, résumé pour le réparateur, carte de
+- [x] 5. Les diagnostics gardés : les 10 derniers, reprise d'un diagnostic pas fini, résumé pour le réparateur, carte de
       Mindset avec le dernier diagnostic.
 - [ ] 6. Relecture par Jordan (pannes « pour de faux ») et corrections.
 - [ ] 7. Première publication : Mindcare 0.1.0, puis Mindset qui la propose.
@@ -40,6 +44,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - `Mindcare\fichiers\Mindcare.ps1` : le démarrage ; `modules\` : le code découpé par partie.
   - `contenu.ps1` : **ce que fait l'appli** : les écrans du diagnostic ;
   - `diagnostic.ps1` : le calcul de la conclusion (sans affichage) ;
+  - `historique.ps1` : les diagnostics gardés (`diagnostics.json`), le résumé pour le réparateur, la carte de Mindset ;
   - `images.ps1` : les dessins de `fichiers\images\` (SVG simples, le même format servira au téléphone), dans le thème ;
   - `mindset.ps1`, `donnees.ps1`, `themes.ps1`, `interface.ps1`, `systeme.ps1`, `evenements.ps1` : la vie dans la suite
     (Mindset, données, thème, fenêtre, fermeture, carte vivante), déjà prêts.

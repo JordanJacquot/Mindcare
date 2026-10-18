@@ -65,7 +65,7 @@ function Show-MainWindow {
 # Carte vivante dans Mindset (etat.json, format commun)
 #   { Version, Maj, Titre, Scores : [ { Nom, Valeur 0 à 100 } ] (2 au plus), Lignes : [ { Texte, Etat } ] (3 au plus) }
 #   Etat : ok (vert), info (blanc), attention (orange), urgent (rouge). Textes courts : 80 caractères au plus.
-# Ce que la carte montre est décidé par Get-EtatCarte (contenu.ps1).
+# Ce que la carte montre est décidé par Get-EtatCarte (historique.ps1).
 # ---------------------------------------------------------------------------
 function Write-EtatMindset {
     if (-not $GereParMindset -and -not $EnTest) { return }
