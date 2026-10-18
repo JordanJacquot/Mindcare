@@ -180,14 +180,29 @@
       <Rectangle><Rectangle.Fill><RadialGradientBrush Center="0.92,0.9" GradientOrigin="0.92,0.9" RadiusX="0.5" RadiusY="0.55"><GradientStop Color="#44FF2EB5" Offset="0"/><GradientStop Color="#00FF2EB5" Offset="1"/></RadialGradientBrush></Rectangle.Fill></Rectangle>
     </Grid>
 
-    <!-- En-tête : le logo (anneau néon et lettre), le nom, la phrase -->
+    <!-- En-tête : le logo (anneau néon et pouls animé), le nom, la phrase -->
     <DockPanel Grid.Row="0" Margin="32,26,32,10">
       <Grid Width="52" Height="52" DockPanel.Dock="Left" VerticalAlignment="Center">
         <Ellipse StrokeThickness="3.5">
           <Ellipse.Stroke><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#00E5FF" Offset="0"/><GradientStop Color="#B04BFF" Offset="0.5"/><GradientStop Color="#FF2EB5" Offset="1"/></LinearGradientBrush></Ellipse.Stroke>
           <Ellipse.Effect><DropShadowEffect Color="#B04BFF" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></Ellipse.Effect>
         </Ellipse>
-        <TextBlock Text="M" FontSize="24" FontWeight="Black" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!-- Le pouls (le logo de Mindcare : un diagnostic) : la ligne en léger, et un trait lumineux qui la parcourt sans fin -->
+        <Path Data="M9,27 L18,27 L21,20 L25,35 L29,14 L33,32 L35,27 L43,27" Stroke="#FFFFFF" StrokeThickness="2.5" Opacity="0.45"
+              StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+        <Path x:Name="Pouls" Data="M9,27 L18,27 L21,20 L25,35 L29,14 L33,32 L35,27 L43,27" Stroke="#FFFFFF" StrokeThickness="2.5"
+              StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashArray="9 27">
+          <Path.Effect><DropShadowEffect Color="#00E5FF" BlurRadius="10" ShadowDepth="0" Opacity="1"/></Path.Effect>
+          <Path.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+              <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever">
+                  <DoubleAnimation Storyboard.TargetProperty="StrokeDashOffset" From="36" To="0" Duration="0:0:1.8"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </Path.Triggers>
+        </Path>
       </Grid>
       <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
         <TextBlock Text="Mindcare" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" FontFamily="Segoe UI Variable Display, Segoe UI"/>

@@ -1,5 +1,6 @@
-﻿# Génère l'icône de Mindcare : la lettre M glitchée (échos cyan et magenta, tranches décalées) sur fond sombre,
-# comme le N de Nevermind et le E d'Evermind.
+﻿# Génère l'icône de Mindcare : un pouls (la ligne d'un moniteur cardiaque : un diagnostic) glitché (échos cyan et
+# magenta, tranches décalées) sur fond sombre, dans le style du N de Nevermind et du E d'Evermind. (Pas de lettre :
+# le M est déjà celui de Mindset.)
 #   Mindcare.ico   icône de l'application
 #   apercu.png     rendu à plusieurs tailles, sur fond clair et sombre
 param([string]$OutDir = (Join-Path $PSScriptRoot 'icones'))
@@ -17,15 +18,14 @@ function New-RoundedRect([float]$x, [float]$y, [float]$w, [float]$h, [float]$r) 
 }
 function Col([string]$Hex, [int]$Alpha = 255) { $c = [Drawing.ColorTranslator]::FromHtml($Hex); [Drawing.Color]::FromArgb($Alpha, $c.R, $c.G, $c.B) }
 
-# La lettre, en très gras, centrée
+# Le pouls, en trait épais aux angles arrondis, centré
 function New-LettrePath([float]$s) {
     $p = New-Object Drawing.Drawing2D.GraphicsPath
-    $fam = New-Object Drawing.FontFamily 'Segoe UI Black'
-    $p.AddString('M', $fam, [int][Drawing.FontStyle]::Regular, [float]($s * 0.56), [Drawing.PointF]::new(0, 0), [Drawing.StringFormat]::GenericTypographic)
-    $b = $p.GetBounds()
-    $m = New-Object Drawing.Drawing2D.Matrix
-    $m.Translate([float](($s - $b.Width) / 2 - $b.X), [float](($s - $b.Height) / 2 - $b.Y))
-    $p.Transform($m)
+    $pts = foreach ($xy in @(0.10, 0.54), @(0.30, 0.54), @(0.38, 0.38), @(0.48, 0.74), @(0.58, 0.20), @(0.67, 0.64), @(0.72, 0.54), @(0.90, 0.54)) { [Drawing.PointF]::new([float]($s * $xy[0]), [float]($s * $xy[1])) }
+    $p.AddLines([Drawing.PointF[]]$pts)
+    $stylo = New-Object Drawing.Pen ([Drawing.Color]::White), ([float][math]::Max(1.6, $s * 0.10))
+    $stylo.LineJoin = 'Round'; $stylo.StartCap = 'Round'; $stylo.EndCap = 'Round'
+    $p.Widen($stylo)
     $p
 }
 
