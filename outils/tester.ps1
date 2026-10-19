@@ -140,6 +140,11 @@ $cas = @(
     @{ Nom = 'son trop fort : le volume d''une appli'; Panne = 'sonfort'; Choix = @(0); Type = 'trouve'; Suspect = 'volumeappli' }
     @{ Nom = 'Wi-Fi qui coupe (le cas du copain) : le Wi-Fi enregistré'; Panne = 'wificoupe'; Choix = @(1, 1, 0); Type = 'trouve'; Suspect = 'profilwifi' }
     @{ Nom = 'un seul site : le carnet d''adresses'; Panne = 'unsite'; Choix = @(1, 0); Type = 'trouve'; Suspect = 'dns' }
+    @{ Nom = 'démarre sur le BIOS : une touche coincée'; Panne = 'biosboucle'; Choix = @(0); Type = 'trouve'; Suspect = 'touchecoincee' }
+    @{ Nom = 'démarre sur le BIOS : aucun disque'; Panne = 'biosboucle'; Choix = @(1, 2); Type = 'elimination'; Suspect = 'disquenondetecte' }
+    @{ Nom = 'démarre sur le BIOS : la pile'; Panne = 'biosboucle'; Choix = @(1, 1, 0); Type = 'trouve'; Suspect = 'pilebios' }
+    @{ Nom = 'mot de passe oublié : compte Microsoft'; Panne = 'mdpoublie'; Choix = @(1, 0); Type = 'trouve'; Suspect = 'comptemicrosoft' }
+    @{ Nom = 'barre des tâches figée : l''Explorateur'; Panne = 'barretaches'; Choix = @(0); Type = 'trouve'; Suspect = 'explorateur' }
     @{ Nom = 'le micro : le mauvais micro choisi'; Panne = 'micro'; Choix = 1, 0; Type = 'trouve'; Suspect = 'microchoix' }
     @{ Nom = 'l''imprimante hors ligne'; Panne = 'imprimante'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'imprimantehorsligne' }
     @{ Nom = 'la batterie gonfle : urgent'; Panne = 'gonfle'; Choix = @(0); Type = 'trouve'; Suspect = 'batteriegonflee' }
@@ -171,7 +176,7 @@ Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() |
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
-                 @('pas de son', 'plusdeson'), @('le son est hyper fort', 'sonfort'), @('le wifi se coupe toutes les 5 minutes', 'wificoupe'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
+                 @('pas de son', 'plusdeson'), @('le son est hyper fort', 'sonfort'), @('le wifi se coupe toutes les 5 minutes', 'wificoupe'), @('le pc démarre sur le bios', 'biosboucle'), @('ma webcam marche pas', 'webcam'), @('j''ai oublié mon mot de passe', 'mdpoublie'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
     $trouvees = @(Find-Pannes $donnees $r[0])
     Write-Resultat "recherche « $($r[0]) »" ($trouvees -and ($r[1] -split '\|') -contains $trouvees[0].Id) "(trouvé : $(@($trouvees | Select-Object -First 4 | ForEach-Object { $_.Id }) -join ', '))"
 }

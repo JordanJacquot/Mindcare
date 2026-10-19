@@ -15,7 +15,7 @@
     {
       "Id": "demarrage",
       "Titre": "Démarrage de Windows",
-      "Phrase": "Réparation en boucle, disque introuvable",
+      "Phrase": "Reste sur le BIOS, réparation en boucle, disque introuvable",
       "Icone": "famille-demarrage"
     },
     {
@@ -77,6 +77,12 @@
       "Titre": "Fichiers et disques",
       "Phrase": "Disque plein, fichier perdu, disque externe",
       "Icone": "famille-fichiers"
+    },
+    {
+      "Id": "windows",
+      "Titre": "Windows et compte",
+      "Phrase": "Mot de passe oublié, mises à jour, menu Démarrer, heure",
+      "Icone": "famille-windows"
     }
   ],
   "Suspects": {
@@ -1211,6 +1217,613 @@
       "AFaire": [
         "C'est réglé : le carnet d'adresses a été vidé.",
         "Si ça recommence, refais la même commande."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "touchecoincee": {
+      "Titre": "Une touche enfoncée",
+      "Trouve": "Une touche restait enfoncée au démarrage",
+      "Pourquoi": "Une touche (F2, Suppr, Échap...) enfoncée au démarrage ouvre le BIOS à chaque fois : un clavier abîmé, ou un objet posé dessus.",
+      "AFaire": [
+        "Nettoie le clavier, ou change-le si une touche reste bloquée."
+      ],
+      "Pro": "Sur un portable, un réparateur peut changer le clavier."
+    },
+    "ordredemarrage": {
+      "Titre": "L'ordre de démarrage",
+      "Trouve": "Le PC ne cherchait pas Windows en premier",
+      "Pourquoi": "Le BIOS démarre sur le premier disque de sa liste. Après une mise à jour du BIOS ou l'ajout d'un disque, Windows peut ne plus être en premier.",
+      "AFaire": [
+        "Garde « Windows Boot Manager » en premier dans l'onglet « Boot »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "modeboot": {
+      "Titre": "Les réglages du BIOS",
+      "Trouve": "Un réglage du BIOS avait changé",
+      "Pourquoi": "Un réglage du BIOS (le mode de démarrage, « Secure Boot », « CSM ») peut changer après une mise à jour ou une coupure de courant : Windows n'est plus trouvé.",
+      "AFaire": [
+        "Garde les réglages par défaut du BIOS."
+      ],
+      "Pro": "Si ça revient, un réparateur peut mettre à jour le BIOS."
+    },
+    "disquenondetecte": {
+      "Titre": "Le disque n'est plus reconnu",
+      "Trouve": "Le PC ne voit plus son disque",
+      "Pourquoi": "Si le disque n'apparaît même pas dans le BIOS, il est débranché, mal en place, ou en panne. Tes fichiers sont dessus.",
+      "AFaire": [
+        "PC fixe : éteins et débranche le PC, ouvre le panneau de côté, et vérifie que les câbles du disque sont bien enfoncés des deux côtés (ou que le petit disque plat, sur la carte mère, est bien vissé).",
+        "Si rien ne change, n'insiste pas en boucle : un disque fatigué peut perdre tes fichiers."
+      ],
+      "Pro": "Un réparateur peut tester le disque et récupérer tes fichiers avant de le changer."
+    },
+    "pilebios": {
+      "Titre": "La pile du BIOS",
+      "Trouve": "La pile du BIOS est usée",
+      "Pourquoi": "Une petite pile ronde garde la date et les réglages du BIOS. Usée, le PC oublie tout dès qu'il est débranché.",
+      "AFaire": [
+        "PC fixe : c'est une pile ronde CR2032 (quelques euros) sur la carte mère. PC éteint et débranché, change-la.",
+        "Ensuite, dans le BIOS : F9 (réglages par défaut), F10 (enregistrer et quitter), et remets la bonne date dans Windows."
+      ],
+      "Pro": "Sur un portable, un réparateur la change en quelques minutes."
+    },
+    "explorateur": {
+      "Titre": "L'Explorateur Windows",
+      "Trouve": "L'Explorateur Windows (le Bureau et la barre des tâches) s'était bloqué",
+      "Pourquoi": "L'Explorateur Windows est le programme qui affiche le Bureau, la barre des tâches et le menu Démarrer. Il peut se bloquer : écran noir, barre des tâches figée, icônes qui ne répondent plus.",
+      "AFaire": [
+        "Si ça revient : Ctrl + Maj + Échap, cherche « Explorateur Windows » dans la liste, clic droit, « Redémarrer ».",
+        "Fais les mises à jour de Windows."
+      ],
+      "Pro": "Si ça revient tous les jours, un réparateur peut vérifier Windows."
+    },
+    "bitlockercompte": {
+      "Titre": "La clé dans ton compte Microsoft",
+      "Trouve": "La clé BitLocker était dans ton compte Microsoft",
+      "Pourquoi": "BitLocker protège les fichiers du PC. Après une mise à jour du BIOS, un changement de pièce ou de réglage, il demande sa clé pour être sûr que c'est bien toi. Elle est souvent gardée dans ton compte Microsoft.",
+      "AFaire": [
+        "Note la clé quelque part (papier, téléphone) : elle peut être redemandée après une mise à jour du BIOS."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "bitlockerailleurs": {
+      "Titre": "La clé gardée ailleurs",
+      "Trouve": "La clé BitLocker n'est pas dans ton compte Microsoft",
+      "Pourquoi": "La clé a peut-être été gardée ailleurs quand BitLocker a été activé : imprimée, sur une clé USB, sur le compte d'un proche, ou par l'entreprise ou l'école.",
+      "AFaire": [
+        "Cherche une feuille imprimée ou un fichier « BitLocker Recovery Key » sur une clé USB.",
+        "Essaie aka.ms/myrecoverykey avec les autres comptes Microsoft de la famille.",
+        "PC d'entreprise ou d'école : demande la clé au service informatique."
+      ],
+      "Pro": "Sans la clé, personne ne peut lire les fichiers : un réparateur peut seulement réinstaller Windows, et les fichiers sont perdus."
+    },
+    "fuseau": {
+      "Titre": "Le fuseau horaire",
+      "Trouve": "Le fuseau horaire n'était pas le bon",
+      "Pourquoi": "Si le fuseau horaire est faux, l'heure est décalée d'une ou plusieurs heures, même bien réglée.",
+      "AFaire": [
+        "Laisse « Définir le fuseau horaire automatiquement » activé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "synchro": {
+      "Titre": "L'heure du PC",
+      "Trouve": "L'heure du PC n'était plus réglée sur internet",
+      "Pourquoi": "Windows règle son heure sur internet. Si ce réglage est coupé, l'heure dérive ; une heure fausse empêche aussi certains sites et le Microsoft Store de marcher.",
+      "AFaire": [
+        "Laisse « Définir l'heure automatiquement » activé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pinoublie": {
+      "Titre": "Le code PIN",
+      "Trouve": "Seul le code PIN est oublié",
+      "Pourquoi": "Le code PIN remplace le mot de passe pour ouvrir la session, mais le mot de passe permet d'en choisir un nouveau.",
+      "AFaire": [
+        "Sous le champ du code PIN, clique sur « J'ai oublié mon code PIN ».",
+        "Tape ton mot de passe (ou suis les étapes du compte Microsoft), puis choisis un nouveau code PIN."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "comptemicrosoft": {
+      "Titre": "Le mot de passe du compte Microsoft",
+      "Trouve": "C'est un compte Microsoft : le mot de passe se change en ligne",
+      "Pourquoi": "Ce compte est relié à une adresse e-mail : Microsoft peut t'envoyer un code pour choisir un nouveau mot de passe.",
+      "AFaire": [
+        "Sous le champ, clique sur « J'ai oublié mon mot de passe » et suis les étapes : un code arrive par e-mail ou SMS.",
+        "Ou, depuis un téléphone : account.live.com/password/reset.",
+        "Le nouveau mot de passe marche aussi sur le PC (il doit être connecté à internet la première fois)."
+      ],
+      "Pro": "Si tu n'as plus accès ni à l'e-mail ni au téléphone du compte, Microsoft propose un formulaire de récupération : un réparateur ne peut pas forcer le compte."
+    },
+    "comptelocal": {
+      "Titre": "Le mot de passe d'un compte local",
+      "Trouve": "C'est un compte local : il se débloque avec les questions de sécurité",
+      "Pourquoi": "Ce compte n'existe que sur ce PC. À sa création, Windows a demandé trois questions de sécurité : elles permettent de choisir un nouveau mot de passe.",
+      "AFaire": [
+        "Tape un mauvais mot de passe, puis clique sur « Réinitialiser le mot de passe » et réponds aux trois questions.",
+        "Si un autre compte administrateur existe sur le PC, il peut changer ton mot de passe (Paramètres, « Comptes », « Autres utilisateurs »)."
+      ],
+      "Pro": "Sinon, un réparateur peut t'aider ; dans le pire des cas, il faut réinstaller Windows."
+    },
+    "cachemaj": {
+      "Titre": "Les fichiers de mise à jour",
+      "Trouve": "Les fichiers de mise à jour téléchargés étaient abîmés",
+      "Pourquoi": "Windows garde les mises à jour téléchargées dans un dossier. Un téléchargement abîmé fait échouer la mise à jour à chaque fois.",
+      "AFaire": [
+        "C'est réglé : Windows a tout retéléchargé proprement."
+      ],
+      "Pro": "Si ça échoue encore, un réparateur peut réparer Windows sans perdre tes fichiers."
+    },
+    "activinternet": {
+      "Titre": "La vérification par internet",
+      "Trouve": "Windows n'avait pas encore pu vérifier sa licence",
+      "Pourquoi": "Windows vérifie sa licence sur internet. Sans internet, ou juste après une réinstallation, il affiche « Activer Windows » quelque temps.",
+      "AFaire": [
+        "Rien d'autre à faire : garde le PC connecté à internet."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "changementpiece": {
+      "Titre": "Un changement de pièce",
+      "Trouve": "La licence était liée à l'ancienne carte mère",
+      "Pourquoi": "La licence de Windows est liée à la carte mère. Après son changement, il faut dire à Microsoft que c'est le même PC.",
+      "AFaire": [
+        "C'est réglé : la licence est de nouveau liée à ce PC."
+      ],
+      "Pro": "Si ça ne marche pas, l'assistance de Microsoft peut réactiver la licence."
+    },
+    "cleinvalide": {
+      "Titre": "La clé de produit",
+      "Trouve": "Windows n'avait pas la bonne clé de produit",
+      "Pourquoi": "Une licence achetée vient avec une clé de 25 caractères. Après une réinstallation, il faut parfois la retaper ; une clé achetée trop peu chère sur internet peut aussi être refusée.",
+      "AFaire": [
+        "Garde la clé de produit quelque part.",
+        "Si la clé est refusée : achète une licence dans le Microsoft Store (Paramètres, « Activation »)."
+      ],
+      "Pro": "Rien à réparer : c'est une question de licence."
+    },
+    "cachestore": {
+      "Titre": "Le cache du Store",
+      "Trouve": "Le cache du Microsoft Store était abîmé",
+      "Pourquoi": "Le Store garde des fichiers temporaires. Abîmés, ils bloquent l'ouverture ou les téléchargements.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "storeabime": {
+      "Titre": "L'appli Store",
+      "Trouve": "L'appli Microsoft Store elle-même était déréglée",
+      "Pourquoi": "L'appli Store peut se dérégler ; Windows peut la remettre à zéro sans rien perdre.",
+      "AFaire": [
+        "C'est réglé : le Store a été remis à zéro."
+      ],
+      "Pro": "Si ça ne suffit pas, un réparateur peut réparer Windows sans perdre tes fichiers."
+    },
+    "indexation": {
+      "Titre": "L'index de recherche",
+      "Trouve": "L'index de recherche de Windows était abîmé",
+      "Pourquoi": "Pour chercher vite, Windows tient une liste de tout ce qu'il y a sur le PC (l'index). Abîmée, la recherche ne trouve plus rien.",
+      "AFaire": [
+        "C'est réglé. Si ça revient, refais la même réparation."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "smartscreen": {
+      "Titre": "La protection de Windows",
+      "Trouve": "Windows bloquait un programme qu'il ne connaît pas",
+      "Pourquoi": "Pour te protéger, Windows bloque les programmes peu connus avec le message « Windows a protégé votre ordinateur ».",
+      "AFaire": [
+        "Si tu es SÛR du programme (téléchargé sur le site officiel de son éditeur) : « Informations complémentaires », puis « Exécuter quand même ».",
+        "Si tu as un doute, ne l'installe pas : c'est peut-être un virus."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "installeurabime": {
+      "Titre": "Le fichier d'installation",
+      "Trouve": "Le fichier d'installation était incomplet",
+      "Pourquoi": "Un téléchargement coupé donne un fichier d'installation abîmé : il ne se lance pas, ou s'arrête sur une erreur.",
+      "AFaire": [
+        "Télécharge toujours les programmes depuis le site officiel de leur éditeur."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "versionwindows": {
+      "Titre": "La version de Windows",
+      "Trouve": "Le programme ne convient pas à ce Windows",
+      "Pourquoi": "Certains programmes demandent une version précise de Windows (Windows 10 ou 11, 64 bits), ou un PC plus puissant.",
+      "AFaire": [
+        "Regarde sur le site du programme la version de Windows demandée.",
+        "Ta version : touche Windows + Pause, ou Paramètres, « Système », « Informations système »."
+      ],
+      "Pro": "Rien à réparer : il faut une autre version du programme, ou un autre PC."
+    },
+    "demarragerapide": {
+      "Titre": "Le démarrage rapide",
+      "Trouve": "Le « démarrage rapide » de Windows gênait la veille ou l'arrêt",
+      "Pourquoi": "Le démarrage rapide fait semblant d'éteindre le PC pour le rallumer plus vite. Avec certains PC, il bloque la veille, l'arrêt ou le rallumage.",
+      "AFaire": [
+        "Laisse le démarrage rapide désactivé : le PC démarre à peine plus lentement."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reglagesalim": {
+      "Titre": "Les réglages d'alimentation",
+      "Trouve": "Les réglages d'alimentation de Windows étaient déréglés",
+      "Pourquoi": "Windows a des réglages d'énergie (veille, écran, disque). Un réglage abîmé ou changé par un programme bloque la veille.",
+      "AFaire": [
+        "C'est réglé : les réglages d'origine sont revenus."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reveilsouris": {
+      "Titre": "La souris ou le clavier",
+      "Trouve": "La souris ou le clavier réveillait le PC",
+      "Pourquoi": "Une souris bouge très peu (une vibration, un passage) et réveille le PC.",
+      "AFaire": [
+        "Laisse décochée « Autoriser ce périphérique à sortir l'ordinateur du mode veille » pour la souris. Le clavier suffit pour le réveiller."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reveilreseau": {
+      "Titre": "La carte réseau",
+      "Trouve": "La carte réseau réveillait le PC",
+      "Pourquoi": "La carte réseau peut réveiller le PC quand la box lui envoie quelque chose.",
+      "AFaire": [
+        "Laisse décochée « Autoriser ce périphérique à sortir l'ordinateur du mode veille » pour la carte réseau."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "minuteurs": {
+      "Titre": "Les réveils programmés",
+      "Trouve": "Windows se réveillait pour ses tâches programmées",
+      "Pourquoi": "Windows peut réveiller le PC la nuit pour les mises à jour ou l'entretien. Ce n'est pas une panne.",
+      "AFaire": [
+        "Garde « Autoriser les minuteurs de réveil » désactivé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "orientation": {
+      "Titre": "L'orientation de l'écran",
+      "Trouve": "L'orientation de l'écran avait changé",
+      "Pourquoi": "Un raccourci clavier (Ctrl + Alt + une flèche) ou un réglage peut tourner l'image.",
+      "AFaire": [
+        "Garde l'orientation « Paysage »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "veilleuse": {
+      "Titre": "L'éclairage nocturne",
+      "Trouve": "L'« éclairage nocturne » de Windows jaunit l'écran",
+      "Pourquoi": "L'éclairage nocturne rend l'écran jaune ou orangé le soir, pour moins fatiguer les yeux.",
+      "AFaire": [
+        "Laisse-le désactivé, ou règle son heure et sa force."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "filtrecouleur": {
+      "Titre": "Les filtres de couleur",
+      "Trouve": "Un filtre de couleur de Windows était activé",
+      "Pourquoi": "Windows a des filtres pour les personnes qui voient mal certaines couleurs : noir et blanc, couleurs inversées. Un raccourci (touche Windows + Ctrl + C) les active sans le vouloir.",
+      "AFaire": [
+        "Laisse les filtres de couleur désactivés."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "contraste": {
+      "Titre": "Le contraste élevé",
+      "Trouve": "Le « contraste élevé » de Windows était activé",
+      "Pourquoi": "Le contraste élevé met un fond noir et des couleurs vives partout. Un raccourci (Alt gauche + Maj gauche + Impr écran) l'active sans le vouloir.",
+      "AFaire": [
+        "Laisse « Thèmes de contraste » sur « Aucun »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "echelle": {
+      "Titre": "La taille du texte et des éléments",
+      "Trouve": "La mise à l'échelle n'était pas la bonne",
+      "Pourquoi": "Windows agrandit tout (texte, fenêtres, icônes) selon un pourcentage : la mise à l'échelle.",
+      "AFaire": [
+        "Garde la valeur « (recommandé) »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "resolecran": {
+      "Titre": "La résolution",
+      "Trouve": "La résolution de l'écran n'était pas la bonne",
+      "Pourquoi": "La résolution, c'est le nombre de points affichés. Trop basse : tout est gros et flou ; trop haute : tout est minuscule.",
+      "AFaire": [
+        "Garde la résolution « (recommandé) »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "loupe": {
+      "Titre": "La loupe",
+      "Trouve": "La loupe de Windows était ouverte",
+      "Pourquoi": "La loupe grossit une partie de l'écran. Un raccourci (touche Windows + plus) l'ouvre sans le vouloir.",
+      "AFaire": [
+        "Pour la fermer : touche Windows + Échap."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ecranexterne": {
+      "Titre": "Un écran à part",
+      "Trouve": "La luminosité d'un écran à part se règle sur l'écran",
+      "Pourquoi": "Sur un PC fixe, Windows ne règle pas la luminosité de l'écran : elle se règle avec les boutons de l'écran lui-même.",
+      "AFaire": [
+        "Utilise les boutons de l'écran (souvent dessous ou derrière) : menu, puis « Luminosité » ou « Brightness »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "luminositeauto": {
+      "Titre": "La luminosité automatique",
+      "Trouve": "La luminosité automatique changeait l'écran toute seule",
+      "Pourquoi": "Windows peut régler la luminosité selon la lumière de la pièce ou ce qui est affiché, ce qui la fait varier ou l'empêche de rester où on la met.",
+      "AFaire": [
+        "Laisse la luminosité automatique désactivée."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ecransale": {
+      "Titre": "Une saleté sur l'écran",
+      "Trouve": "C'était une saleté sur l'écran",
+      "Pourquoi": "Une trace ou une poussière ressemble souvent à un point abîmé.",
+      "AFaire": [
+        "Nettoie l'écran avec un chiffon doux, à peine humide, écran éteint ; jamais de produit ménager."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pixelmort": {
+      "Titre": "Un point mort",
+      "Trouve": "Un point de l'écran (un pixel) est mort",
+      "Pourquoi": "L'écran est fait de millions de petits points. L'un d'eux peut rester bloqué (toujours de la même couleur) ou mort (toujours noir). Ça ne s'étend pas.",
+      "AFaire": [
+        "Ça ne se répare pas, mais ça ne s'aggrave pas.",
+        "Si l'écran est sous garantie et que plusieurs points sont touchés, renseigne-toi : beaucoup de marques l'échangent."
+      ],
+      "Pro": "Seul le changement de l'écran le fait disparaître ; ça ne vaut le coup que si ça gêne vraiment."
+    },
+    "tactiledesactive": {
+      "Titre": "L'écran tactile désactivé",
+      "Trouve": "L'écran tactile était désactivé dans Windows",
+      "Pourquoi": "Windows peut désactiver l'écran tactile, après une mise à jour ou un réglage.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reglagesveille": {
+      "Titre": "Les réglages de veille",
+      "Trouve": "L'écran s'éteignait trop vite à cause des réglages de veille",
+      "Pourquoi": "Windows éteint l'écran au bout d'un moment sans toucher la souris ni le clavier.",
+      "AFaire": [
+        "Garde un délai qui te convient (par exemple 15 minutes)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "economiseur": {
+      "Titre": "L'écran de veille",
+      "Trouve": "Un écran de veille s'affichait",
+      "Pourquoi": "Un vieux réglage, l'écran de veille, peut mettre l'écran en noir ou afficher une animation.",
+      "AFaire": [
+        "Laisse l'écran de veille sur « (aucun) »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "memoirevirtuelle": {
+      "Titre": "La mémoire de secours",
+      "Trouve": "La mémoire de secours de Windows était trop petite",
+      "Pourquoi": "Quand la mémoire est pleine, Windows se sert d'une partie du disque (le fichier d'échange). S'il est trop petit ou désactivé, les programmes plantent.",
+      "AFaire": [
+        "Laisse Windows gérer automatiquement le fichier d'échange."
+      ],
+      "Pro": "Si ça revient souvent, un réparateur peut ajouter de la mémoire (RAM) au PC."
+    },
+    "cachenav": {
+      "Titre": "Les fichiers gardés par le navigateur",
+      "Trouve": "Le navigateur était encombré de vieux fichiers",
+      "Pourquoi": "Le navigateur garde des morceaux des sites visités. À la longue, ces fichiers ralentissent ou dérèglent certains sites.",
+      "AFaire": [
+        "Vide-les de temps en temps (Ctrl + Maj + Suppr)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "hautparleursmicro": {
+      "Titre": "Les haut-parleurs et le micro",
+      "Trouve": "Le micro captait le son des haut-parleurs",
+      "Pourquoi": "Sans casque, le son des haut-parleurs repasse dans le micro : les autres s'entendent en écho.",
+      "AFaire": [
+        "Utilise un casque pour les appels."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ecoutemicro": {
+      "Titre": "« Écouter ce périphérique »",
+      "Trouve": "Windows renvoyait le micro dans les haut-parleurs",
+      "Pourquoi": "Un réglage de Windows, « Écouter ce périphérique », fait entendre le micro dans les haut-parleurs ou le casque.",
+      "AFaire": [
+        "Laisse « Écouter ce périphérique » décoché."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "echoappli": {
+      "Titre": "Les réglages de l'appli d'appel",
+      "Trouve": "L'appli d'appel ne retirait pas l'écho",
+      "Pourquoi": "Les applis d'appel (Discord, Teams, WhatsApp...) ont un réglage qui retire l'écho et les bruits.",
+      "AFaire": [
+        "Laisse « Annulation de l'écho » et « Suppression du bruit » activés."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "sortieappli": {
+      "Titre": "La sortie choisie dans le programme",
+      "Trouve": "Le programme envoyait le son ailleurs",
+      "Pourquoi": "Un programme (jeu, Discord) peut choisir sa propre sortie du son, différente de celle de Windows.",
+      "AFaire": [
+        "Dans le programme, choisis « Par défaut » ou ton casque comme sortie."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "mdpfaux": {
+      "Titre": "Une faute de frappe",
+      "Trouve": "Le mot de passe était mal tapé",
+      "Pourquoi": "Le mot de passe du Wi-Fi fait attention aux majuscules ; 0 et O, 1 et l se ressemblent.",
+      "AFaire": [
+        "Tape-le en affichant ce que tu écris (l'œil à droite du champ)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "boxmdp": {
+      "Titre": "Le mot de passe de la box",
+      "Trouve": "Le mot de passe de la box a changé",
+      "Pourquoi": "Le mot de passe a peut-être été changé (par toi, quelqu'un de la maison, ou après une remise à zéro de la box) : celui de l'étiquette ou celui retenu ne marche plus.",
+      "AFaire": [
+        "Retrouve le bon mot de passe dans l'appli de ta box, ou sur son écran ; après une remise à zéro, c'est celui de l'étiquette."
+      ],
+      "Pro": "Ton opérateur peut t'aider à le retrouver."
+    },
+    "forfait": {
+      "Titre": "Le téléphone lui-même",
+      "Trouve": "Le téléphone n'a pas internet lui-même",
+      "Pourquoi": "Le partage de connexion donne au PC l'internet du téléphone : sans réseau ou sans données, il n'y a rien à partager.",
+      "AFaire": [
+        "Vérifie le réseau et le forfait du téléphone (données mobiles activées, forfait pas épuisé)."
+      ],
+      "Pro": "Ton opérateur mobile peut vérifier ton forfait."
+    },
+    "partagetel": {
+      "Titre": "Les réglages du partage",
+      "Trouve": "Le partage du téléphone n'était pas compatible avec le PC",
+      "Pourquoi": "Certains PC ne voient pas le partage en 5 GHz, ou s'en déconnectent.",
+      "AFaire": [
+        "Garde « Maximiser la compatibilité » (iPhone) ou la bande 2,4 GHz (Android)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cachecamera": {
+      "Titre": "Le cache ou la touche de la caméra",
+      "Trouve": "La caméra était cachée ou coupée par sa touche",
+      "Pourquoi": "Beaucoup de PC ont un petit volet devant la caméra, ou une touche qui la coupe.",
+      "AFaire": [
+        "Garde le volet ouvert pour les appels."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "permissioncamera": {
+      "Titre": "L'autorisation de la caméra",
+      "Trouve": "Windows interdisait la caméra aux applis",
+      "Pourquoi": "Pour ta vie privée, Windows peut interdire la caméra à toutes les applis, ou à certaines.",
+      "AFaire": [
+        "Laisse la caméra autorisée pour les applis d'appel."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "camerautilisee": {
+      "Titre": "Une autre appli",
+      "Trouve": "Une autre appli gardait la caméra",
+      "Pourquoi": "La caméra ne marche que pour une appli à la fois : si une autre la garde, les suivantes ont une image noire.",
+      "AFaire": [
+        "Ferme les autres applis d'appel avant d'en ouvrir une."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pilotecamera": {
+      "Titre": "Le pilote de la caméra",
+      "Trouve": "Le pilote de la caméra était abîmé",
+      "Pourquoi": "Le pilote est le petit programme qui fait marcher la caméra ; il peut s'abîmer après une mise à jour.",
+      "AFaire": [
+        "Fais les mises à jour de Windows, y compris les facultatives."
+      ],
+      "Pro": "Si elle ne revient pas, un réparateur peut la vérifier."
+    },
+    "telverrouille": {
+      "Titre": "Le téléphone verrouillé",
+      "Trouve": "Le téléphone attendait ton autorisation",
+      "Pourquoi": "Pour protéger tes photos, le téléphone ne montre rien au PC tant qu'il est verrouillé ou que tu n'as pas autorisé l'accès.",
+      "AFaire": [
+        "Déverrouille le téléphone et accepte « Autoriser » ou « Faire confiance à cet ordinateur » à chaque branchement."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "modetransfert": {
+      "Titre": "Le mode du câble",
+      "Trouve": "Le téléphone était en mode « recharge seulement »",
+      "Pourquoi": "Un téléphone Android branché se met souvent en « recharge seulement » : le PC ne voit pas ses fichiers.",
+      "AFaire": [
+        "Choisis « Transfert de fichiers » à chaque branchement."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cablecharge": {
+      "Titre": "Le câble",
+      "Trouve": "Le câble ne servait qu'à recharger",
+      "Pourquoi": "Certains câbles (souvent les moins chers) ne font que recharger, sans transmettre de données.",
+      "AFaire": [
+        "Garde le câble d'origine du téléphone pour transférer des fichiers."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "steammanette": {
+      "Titre": "Les réglages de Steam",
+      "Trouve": "Steam ne prenait pas la manette en charge",
+      "Pourquoi": "Steam a ses propres réglages de manette : sans eux, certaines manettes (PlayStation, Switch) ne marchent pas dans les jeux.",
+      "AFaire": [
+        "Garde la prise en charge de ta manette activée dans Steam."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "loquet": {
+      "Titre": "Le petit bouton de verrou",
+      "Trouve": "Le petit bouton de verrou de la carte ou de la clé était poussé",
+      "Pourquoi": "Les cartes SD et certaines clés ont un petit bouton « Lock » sur le côté : poussé, on ne peut plus rien y écrire.",
+      "AFaire": [
+        "Pousse le bouton vers les contacts dorés (le haut de la carte)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ailleurs": {
+      "Titre": "Un autre dossier",
+      "Trouve": "Le fichier était enregistré dans un autre dossier",
+      "Pourquoi": "Les programmes enregistrent parfois dans un dossier inattendu (Documents, OneDrive, Téléchargements).",
+      "AFaire": [
+        "Au moment d'enregistrer, regarde le dossier indiqué en haut de la fenêtre."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "onedrive": {
+      "Titre": "OneDrive",
+      "Trouve": "Le fichier est dans OneDrive",
+      "Pourquoi": "OneDrive copie les dossiers Bureau, Documents et Images sur internet. Un fichier peut n'être que sur OneDrive, ou dans sa corbeille.",
+      "AFaire": [
+        "Tes fichiers sont sur onedrive.com, avec ton compte Microsoft."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ailleurs2": {
+      "Titre": "Un dossier inattendu",
+      "Trouve": "Le fichier était rangé dans un dossier inattendu",
+      "Pourquoi": "Un fichier glissé par erreur, ou enregistré par un programme dans son propre dossier.",
+      "AFaire": [
+        "Range tes fichiers dans « Documents », dans des dossiers à ton nom."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "fichierouvert": {
+      "Titre": "Un programme qui l'utilise",
+      "Trouve": "Un programme gardait le fichier ouvert",
+      "Pourquoi": "Windows refuse de supprimer ou déplacer un fichier ouvert dans un programme (« le fichier est ouvert dans... »).",
+      "AFaire": [
+        "Ferme le programme qui l'utilise, puis réessaie."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "apercu": {
+      "Titre": "L'aperçu de l'Explorateur",
+      "Trouve": "L'aperçu de l'Explorateur gardait le fichier ouvert",
+      "Pourquoi": "Le volet d'aperçu de l'Explorateur ouvre le fichier pour le montrer, ce qui l'empêche d'être supprimé.",
+      "AFaire": [
+        "Ferme le volet d'aperçu (Alt + P) si ça revient."
       ],
       "Pro": "Rien à réparer."
     }
@@ -3146,6 +3759,1862 @@
           "Preuve": "La réparation des fichiers de Windows n'a rien changé"
         }
       ]
+    },
+    "test-touche-coincee": {
+      "Type": "test",
+      "Court": "Une touche coincée",
+      "Pour": [
+        "touchecoincee"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Débranche le clavier et la souris, puis redémarre",
+      "Gestes": [
+        "Éteins le PC : appuie longtemps sur le bouton d'allumage.",
+        "Débranche le clavier et la souris. Sur un portable, vérifie qu'aucune touche n'est enfoncée (surtout F2, F10, Suppr et Échap).",
+        "Rallume-le sans toucher au clavier."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "touchecoincee",
+          "Preuve": "Sans le clavier, Windows démarre"
+        },
+        {
+          "Texte": "Toujours le BIOS",
+          "Ecarte": [
+            "touchecoincee"
+          ],
+          "Preuve": "Même sans clavier, il démarre sur le BIOS"
+        }
+      ]
+    },
+    "q-disque-bios": {
+      "Type": "question",
+      "Court": "Le disque dans le BIOS",
+      "Texte": "Dans le BIOS, vois-tu ton disque, ou « Windows Boot Manager » ?",
+      "Aide": "Avec les flèches du clavier, va dans l'onglet « Boot » (ou « Démarrage », « Storage »). Le disque porte un nom de marque : Samsung, WD, Crucial, Kingston, Seagate...",
+      "Reponses": [
+        {
+          "Texte": "Oui, « Windows Boot Manager » est là",
+          "Ecarte": [
+            "disquenondetecte"
+          ],
+          "Preuve": "Le BIOS voit le disque de Windows"
+        },
+        {
+          "Texte": "Je vois un disque, mais pas « Windows Boot Manager »",
+          "Garde": [
+            "modeboot",
+            "pilebios"
+          ],
+          "Preuve": "Le BIOS voit le disque, mais pas Windows"
+        },
+        {
+          "Texte": "Aucun disque",
+          "Garde": [
+            "disquenondetecte"
+          ],
+          "Preuve": "Le BIOS ne voit aucun disque"
+        }
+      ]
+    },
+    "test-ordre-boot": {
+      "Type": "test",
+      "Court": "L'ordre de démarrage",
+      "Pour": [
+        "ordredemarrage"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Mets Windows en premier dans l'ordre de démarrage",
+      "Gestes": [
+        "Dans le BIOS, va dans l'onglet « Boot » (ou « Démarrage »).",
+        "Dans « Boot Option #1 » (ou « Boot Priority »), choisis « Windows Boot Manager ».",
+        "Appuie sur F10 (« Save & Exit »), puis confirme par « Yes » ou « OK »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "ordredemarrage",
+          "Preuve": "Avec Windows en premier, il démarre"
+        },
+        {
+          "Texte": "Toujours le BIOS",
+          "Ecarte": [
+            "ordredemarrage"
+          ],
+          "Preuve": "L'ordre de démarrage n'y était pour rien"
+        }
+      ]
+    },
+    "q-date-bios": {
+      "Type": "question",
+      "Court": "La date du BIOS",
+      "Texte": "Dans le BIOS, la date et l'heure sont-elles justes ?",
+      "Aide": "Elles sont souvent sur le premier écran du BIOS (« System Date », « System Time »).",
+      "Pour": [
+        "pilebios"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Non, une vieille date (2000, 2010...)",
+          "Confirme": "pilebios",
+          "Preuve": "Le BIOS a oublié la date : sa pile est usée"
+        },
+        {
+          "Texte": "Oui, elles sont justes",
+          "Ecarte": [
+            "pilebios"
+          ],
+          "Preuve": "Le BIOS garde la bonne date"
+        }
+      ]
+    },
+    "test-defauts-bios": {
+      "Type": "test",
+      "Court": "Les réglages par défaut",
+      "Pour": [
+        "modeboot"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Remets les réglages par défaut du BIOS",
+      "Gestes": [
+        "Dans le BIOS, appuie sur F9, ou cherche « Load Optimized Defaults » (ou « Load Setup Defaults », « Restore Defaults »), puis confirme.",
+        "Appuie sur F10 pour enregistrer et quitter, puis confirme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "modeboot",
+          "Preuve": "Avec les réglages par défaut, Windows démarre"
+        },
+        {
+          "Texte": "Toujours le BIOS",
+          "Ecarte": [
+            "modeboot"
+          ],
+          "Preuve": "Les réglages par défaut n'ont rien changé"
+        }
+      ]
+    },
+    "test-explorateur-lancer": {
+      "Type": "test",
+      "Court": "Relancer le Bureau",
+      "Pour": [
+        "explorateur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Relance le Bureau de Windows",
+      "Gestes": [
+        "Appuie en même temps sur Ctrl + Maj + Échap : le Gestionnaire des tâches s'ouvre.",
+        "Clique sur « Exécuter une nouvelle tâche » (en haut, ou dans le menu « Fichier »).",
+        "Tape explorer.exe et appuie sur Entrée."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le Bureau revient",
+          "Confirme": "explorateur",
+          "Preuve": "Relancé, le Bureau revient"
+        },
+        {
+          "Texte": "Toujours noir",
+          "Ecarte": [
+            "explorateur"
+          ],
+          "Preuve": "Relancer le Bureau n'a rien changé"
+        }
+      ]
+    },
+    "test-cle-bitlocker": {
+      "Type": "test",
+      "Court": "La clé du compte",
+      "Pour": [
+        "bitlockercompte"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Retrouve la clé dans ton compte Microsoft",
+      "Gestes": [
+        "Note les premiers caractères de l'« ID de clé » affiché sur l'écran bleu.",
+        "Sur ton téléphone ou un autre appareil, va sur aka.ms/myrecoverykey et connecte-toi avec le compte Microsoft du PC.",
+        "Trouve la clé dont l'ID correspond, et tape ses 48 chiffres sur le PC."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le PC démarre",
+          "Confirme": "bitlockercompte",
+          "Preuve": "Avec la clé du compte Microsoft, le PC démarre"
+        },
+        {
+          "Texte": "Pas de clé sur ce compte",
+          "Ecarte": [
+            "bitlockercompte"
+          ],
+          "Preuve": "Aucune clé dans le compte Microsoft"
+        }
+      ]
+    },
+    "q-vieille-date": {
+      "Type": "question",
+      "Court": "Une vieille date ?",
+      "Texte": "Au démarrage, la date revient-elle à une vieille date (2000, 2010...) ?",
+      "Pour": [
+        "pilebios"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui, surtout après avoir débranché le PC",
+          "Confirme": "pilebios",
+          "Preuve": "La date revient en arrière au démarrage : la pile du BIOS est usée"
+        },
+        {
+          "Texte": "Non, juste un décalage",
+          "Ecarte": [
+            "pilebios"
+          ],
+          "Preuve": "La date ne revient pas en arrière"
+        }
+      ]
+    },
+    "test-fuseau": {
+      "Type": "test",
+      "Court": "Le fuseau horaire",
+      "Pour": [
+        "fuseau"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle le fuseau horaire",
+      "Gestes": [
+        "Clic droit sur l'heure en bas à droite, puis « Ajuster la date et l'heure ».",
+        "Active « Définir le fuseau horaire automatiquement ». Sinon, choisis-le : en France, « (UTC+01:00) Bruxelles, Copenhague, Madrid, Paris »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'heure est juste",
+          "Confirme": "fuseau",
+          "Preuve": "Avec le bon fuseau, l'heure est juste"
+        },
+        {
+          "Texte": "Toujours décalée",
+          "Ecarte": [
+            "fuseau"
+          ],
+          "Preuve": "Le fuseau était déjà le bon"
+        }
+      ]
+    },
+    "test-synchro": {
+      "Type": "test",
+      "Court": "Régler l'heure",
+      "Pour": [
+        "synchro"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Laisse Windows régler l'heure sur internet",
+      "Gestes": [
+        "Clic droit sur l'heure en bas à droite, puis « Ajuster la date et l'heure ».",
+        "Active « Définir l'heure automatiquement ».",
+        "Plus bas, clique sur « Synchroniser maintenant »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'heure est juste et le reste",
+          "Confirme": "synchro",
+          "Preuve": "Réglée sur internet, l'heure est juste"
+        },
+        {
+          "Texte": "Toujours fausse",
+          "Ecarte": [
+            "synchro"
+          ],
+          "Preuve": "Régler l'heure sur internet n'a rien changé"
+        }
+      ]
+    },
+    "q-quoi-oublie": {
+      "Type": "question",
+      "Court": "Ce qui est oublié",
+      "Texte": "Qu'est-ce que tu as oublié ?",
+      "Reponses": [
+        {
+          "Texte": "Le code PIN (le mot de passe, je le connais)",
+          "Confirme": "pinoublie",
+          "Preuve": "Seul le code PIN est oublié"
+        },
+        {
+          "Texte": "Le mot de passe",
+          "Ecarte": [
+            "pinoublie"
+          ],
+          "Preuve": "Le mot de passe est oublié"
+        }
+      ]
+    },
+    "q-type-compte": {
+      "Type": "question",
+      "Court": "Le type de compte",
+      "Texte": "Sur l'écran de connexion, une adresse e-mail apparaît-elle sous ton nom ?",
+      "Aide": "Clique sur ton nom en bas à gauche si besoin.",
+      "Reponses": [
+        {
+          "Texte": "Oui, une adresse e-mail",
+          "Confirme": "comptemicrosoft",
+          "Preuve": "Une adresse e-mail apparaît : c'est un compte Microsoft"
+        },
+        {
+          "Texte": "Non, juste un nom",
+          "Confirme": "comptelocal",
+          "Preuve": "Pas d'adresse e-mail : c'est un compte local"
+        }
+      ]
+    },
+    "test-explorateur-redem": {
+      "Type": "test",
+      "Court": "Redémarrer l'Explorateur",
+      "Pour": [
+        "explorateur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Redémarre l'Explorateur Windows",
+      "Gestes": [
+        "Appuie en même temps sur Ctrl + Maj + Échap : le Gestionnaire des tâches s'ouvre.",
+        "Dans la liste, cherche « Explorateur Windows ».",
+        "Clic droit dessus, puis « Redémarrer ». L'écran clignote : c'est normal."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Tout répond de nouveau",
+          "Confirme": "explorateur",
+          "Preuve": "Après le redémarrage de l'Explorateur, tout répond"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "explorateur"
+          ],
+          "Preuve": "Redémarrer l'Explorateur n'a rien changé"
+        }
+      ]
+    },
+    "test-depanneur-maj": {
+      "Type": "test",
+      "Court": "La réparation des mises à jour",
+      "Pour": [
+        "cachemaj"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Vide les mises à jour téléchargées, puis réessaie",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Fais-le pour chaque ligne, dans l'ordre (la troisième renomme le dossier des mises à jour, Windows en refait un propre).",
+        "Redémarre le PC, puis relance Windows Update."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "net stop wuauserv",
+          "net stop bits",
+          "ren C:\\Windows\\SoftwareDistribution SoftwareDistribution.old",
+          "net start wuauserv",
+          "net start bits"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "La mise à jour passe",
+          "Confirme": "cachemaj",
+          "Preuve": "Après avoir vidé les mises à jour téléchargées, ça passe"
+        },
+        {
+          "Texte": "Toujours une erreur",
+          "Ecarte": [
+            "cachemaj"
+          ],
+          "Preuve": "Vider les mises à jour téléchargées n'a rien changé"
+        }
+      ]
+    },
+    "test-activ-internet": {
+      "Type": "test",
+      "Court": "La vérification",
+      "Pour": [
+        "activinternet"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Laisse Windows vérifier sa licence",
+      "Gestes": [
+        "Vérifie qu'internet marche (ouvre un site).",
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Activation ». Si un bouton « Résoudre les problèmes » apparaît, clique dessus."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows est activé",
+          "Confirme": "activinternet",
+          "Preuve": "Connecté à internet, Windows s'est activé"
+        },
+        {
+          "Texte": "Toujours pas activé",
+          "Ecarte": [
+            "activinternet"
+          ],
+          "Preuve": "Même connecté, Windows ne s'active pas"
+        }
+      ]
+    },
+    "test-activ-materiel": {
+      "Type": "test",
+      "Court": "Après un changement de pièce",
+      "Pour": [
+        "changementpiece"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Dis à Microsoft que tu as changé une pièce",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Activation », puis « Résoudre les problèmes ».",
+        "Choisis « J'ai changé de matériel récemment sur cet appareil », connecte-toi avec ton compte Microsoft, puis choisis ce PC dans la liste."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows est activé",
+          "Confirme": "changementpiece",
+          "Preuve": "Après le changement de pièce déclaré, Windows est activé"
+        },
+        {
+          "Texte": "Ça n'a pas marché, ou pas de pièce changée",
+          "Ecarte": [
+            "changementpiece"
+          ],
+          "Preuve": "Ce n'était pas un changement de pièce"
+        }
+      ]
+    },
+    "test-activ-cle": {
+      "Type": "test",
+      "Court": "La clé de produit",
+      "Pour": [
+        "cleinvalide"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Tape la clé de produit",
+      "Gestes": [
+        "Cherche la clé de 25 caractères : sur l'étiquette sous le PC, sur la boîte, ou dans l'e-mail d'achat.",
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Activation », puis « Modifier la clé de produit » et tape-la."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows est activé",
+          "Confirme": "cleinvalide",
+          "Preuve": "Avec la clé de produit, Windows est activé"
+        },
+        {
+          "Texte": "La clé est refusée, ou je n'en ai pas",
+          "Ecarte": [
+            "cleinvalide"
+          ],
+          "Preuve": "Aucune clé valable"
+        }
+      ]
+    },
+    "test-wsreset": {
+      "Type": "test",
+      "Court": "Vider le cache du Store",
+      "Pour": [
+        "cachestore"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vide le cache du Microsoft Store",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ».",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Une fenêtre vide s'ouvre quelques secondes, puis le Store se rouvre tout seul."
+      ],
+      "Commande": {
+        "Admin": false,
+        "Lignes": [
+          "wsreset.exe"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Le Store remarche",
+          "Confirme": "cachestore",
+          "Preuve": "Le cache du Store vidé, il remarche"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "cachestore"
+          ],
+          "Preuve": "Vider le cache du Store n'a rien changé"
+        }
+      ]
+    },
+    "test-reinit-store": {
+      "Type": "test",
+      "Court": "Remettre le Store à zéro",
+      "Pour": [
+        "storeabime"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Remets l'appli Store à zéro",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Applications », puis « Applications installées », et cherche « Microsoft Store ».",
+        "Clique sur les trois points à droite (ou sur son nom), puis « Options avancées ».",
+        "Clique sur « Réinitialiser »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le Store remarche",
+          "Confirme": "storeabime",
+          "Preuve": "Remis à zéro, le Store remarche"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "storeabime"
+          ],
+          "Preuve": "Remettre le Store à zéro n'a rien changé"
+        }
+      ]
+    },
+    "test-index": {
+      "Type": "test",
+      "Court": "Réparer la recherche",
+      "Pour": [
+        "indexation"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Laisse Windows réparer la recherche",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Résolution des problèmes », puis « Autres utilitaires de résolution de problèmes ».",
+        "Sur la ligne « Recherche et indexation », clique sur « Exécuter » et coche « Les fichiers n'apparaissent pas dans les résultats de recherche ».",
+        "Laisse faire, puis redémarre le PC. La recherche peut mettre une heure à tout retrouver."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La recherche remarche",
+          "Confirme": "indexation",
+          "Preuve": "Après la réparation, la recherche remarche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "indexation"
+          ],
+          "Preuve": "La réparation de la recherche n'a rien changé"
+        }
+      ]
+    },
+    "q-smartscreen": {
+      "Type": "question",
+      "Court": "Un message bleu ?",
+      "Texte": "Un message bleu « Windows a protégé votre ordinateur » s'affiche-t-il ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "smartscreen",
+          "Preuve": "Windows bloque le programme pour te protéger"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "smartscreen"
+          ],
+          "Preuve": "Pas de blocage de Windows"
+        }
+      ]
+    },
+    "test-retelecharger": {
+      "Type": "test",
+      "Court": "Retélécharger",
+      "Pour": [
+        "installeurabime"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Télécharge de nouveau le programme",
+      "Gestes": [
+        "Supprime le fichier d'installation téléchargé (dans le dossier « Téléchargements »).",
+        "Télécharge-le de nouveau, depuis le site officiel de son éditeur.",
+        "Lance-le, avec un clic droit puis « Exécuter en tant qu'administrateur »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'installe",
+          "Confirme": "installeurabime",
+          "Preuve": "Retéléchargé, le programme s'installe"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "installeurabime"
+          ],
+          "Preuve": "Le retélécharger n'a rien changé"
+        }
+      ]
+    },
+    "test-demarrage-rapide": {
+      "Type": "test",
+      "Court": "Le démarrage rapide",
+      "Pour": [
+        "demarragerapide"
+      ],
+      "Duree": "cinq minutes, puis quelques jours",
+      "Texte": "Désactive le démarrage rapide",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Panneau de configuration » et ouvre-le.",
+        "Clique sur « Matériel et audio », puis « Options d'alimentation ».",
+        "À gauche : « Choisir l'action des boutons d'alimentation ».",
+        "Clique sur « Modifier des paramètres actuellement non disponibles » (Windows peut demander une autorisation : accepte).",
+        "Décoche « Activer le démarrage rapide », puis « Enregistrer les modifications ».",
+        "Essaie de nouveau, pendant quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "demarragerapide",
+          "Preuve": "Sans le démarrage rapide, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "demarragerapide"
+          ],
+          "Preuve": "Le démarrage rapide n'y était pour rien"
+        }
+      ]
+    },
+    "test-alim-defaut": {
+      "Type": "test",
+      "Court": "Les réglages d'origine",
+      "Pour": [
+        "reglagesalim"
+      ],
+      "Duree": "deux minutes, puis quelques jours",
+      "Texte": "Remets les réglages d'alimentation d'origine",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée.",
+        "Essaie de nouveau, pendant quelques jours."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "powercfg -restoredefaultschemes"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "reglagesalim",
+          "Preuve": "Avec les réglages d'alimentation d'origine, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "reglagesalim"
+          ],
+          "Preuve": "Les réglages d'alimentation n'y étaient pour rien"
+        }
+      ]
+    },
+    "q-lastwake": {
+      "Type": "question",
+      "Court": "Ce qui l'a réveillé",
+      "Texte": "Demande à Windows ce qui l'a réveillé la dernière fois",
+      "Aide": "Juste après un réveil tout seul : clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ». Tape powercfg /lastwake et appuie sur Entrée, puis lis la ligne qui suit « Source de réveil ».",
+      "Reponses": [
+        {
+          "Texte": "Une souris, un clavier, ou « USB »",
+          "Confirme": "reveilsouris",
+          "Preuve": "Windows dit que la souris ou le clavier l'a réveillé"
+        },
+        {
+          "Texte": "Une carte réseau (Ethernet, Wi-Fi, « Network », « Realtek », « Intel »)",
+          "Confirme": "reveilreseau",
+          "Preuve": "Windows dit que la carte réseau l'a réveillé"
+        },
+        {
+          "Texte": "Rien de clair (« Unknown », « Aucun », une minuterie)",
+          "Ecarte": [
+            "reveilsouris",
+            "reveilreseau"
+          ],
+          "Preuve": "Ni la souris ni la carte réseau ne l'ont réveillé"
+        }
+      ]
+    },
+    "test-reveil-souris": {
+      "Type": "test",
+      "Court": "Le réveil par la souris",
+      "Pour": [
+        "reveilsouris"
+      ],
+      "Duree": "deux minutes, puis quelques jours",
+      "Texte": "Empêche la souris de réveiller le PC",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Souris et autres périphériques de pointage », double-clique sur ta souris.",
+        "Onglet « Gestion de l'alimentation » : décoche « Autoriser ce périphérique à sortir l'ordinateur du mode veille ». OK.",
+        "Attends quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'allume plus tout seul",
+          "Confirme": "reveilsouris",
+          "Preuve": "La souris ne peut plus le réveiller, et il reste éteint"
+        },
+        {
+          "Texte": "Il s'allume encore",
+          "Ecarte": [
+            "reveilsouris"
+          ],
+          "Preuve": "La souris n'y était pour rien"
+        }
+      ]
+    },
+    "test-reveil-reseau": {
+      "Type": "test",
+      "Court": "Le réveil par le réseau",
+      "Pour": [
+        "reveilreseau"
+      ],
+      "Duree": "deux minutes, puis quelques jours",
+      "Texte": "Empêche la carte réseau de réveiller le PC",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Cartes réseau », double-clique sur la carte « Ethernet » (ou « Wi-Fi »).",
+        "Onglet « Gestion de l'alimentation » : décoche « Autoriser ce périphérique à sortir l'ordinateur du mode veille ». OK.",
+        "Attends quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'allume plus tout seul",
+          "Confirme": "reveilreseau",
+          "Preuve": "La carte réseau ne peut plus le réveiller, et il reste éteint"
+        },
+        {
+          "Texte": "Il s'allume encore",
+          "Ecarte": [
+            "reveilreseau"
+          ],
+          "Preuve": "La carte réseau n'y était pour rien"
+        }
+      ]
+    },
+    "test-minuteurs": {
+      "Type": "test",
+      "Court": "Les réveils programmés",
+      "Pour": [
+        "minuteurs"
+      ],
+      "Duree": "deux minutes, puis quelques jours",
+      "Texte": "Coupe les réveils programmés",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Modifier le mode de gestion de l'alimentation » et ouvre-le.",
+        "Clique sur « Modifier les paramètres d'alimentation avancés ».",
+        "Ouvre « Veille », puis « Autoriser les minuteurs de réveil » : choisis « Désactiver ». OK.",
+        "Attends quelques jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'allume plus tout seul",
+          "Confirme": "minuteurs",
+          "Preuve": "Sans réveil programmé, il reste éteint"
+        },
+        {
+          "Texte": "Il s'allume encore",
+          "Ecarte": [
+            "minuteurs"
+          ],
+          "Preuve": "Les réveils programmés n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-orientation": {
+      "Type": "test",
+      "Court": "L'orientation",
+      "Pour": [
+        "orientation"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets l'image à l'endroit",
+      "Gestes": [
+        "Essaie d'abord : Ctrl + Alt + flèche du haut.",
+        "Sinon : clic droit sur le Bureau, « Paramètres d'affichage ».",
+        "Dans « Orientation de l'affichage », choisis « Paysage », puis « Conserver les modifications »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image est à l'endroit",
+          "Confirme": "orientation",
+          "Preuve": "L'orientation remise, l'image est à l'endroit"
+        },
+        {
+          "Texte": "Toujours tournée",
+          "Ecarte": [
+            "orientation"
+          ],
+          "Preuve": "L'orientation était déjà la bonne"
+        }
+      ]
+    },
+    "q-couleurs": {
+      "Type": "question",
+      "Court": "Les couleurs",
+      "Texte": "Comment sont les couleurs ?",
+      "Reponses": [
+        {
+          "Texte": "Tout est jaune ou orangé",
+          "Garde": [
+            "veilleuse",
+            "pilote"
+          ],
+          "Preuve": "Tout est jaune ou orangé"
+        },
+        {
+          "Texte": "En noir et blanc, ou inversées comme un négatif",
+          "Garde": [
+            "filtrecouleur",
+            "contraste"
+          ],
+          "Preuve": "Les couleurs sont en noir et blanc ou inversées"
+        },
+        {
+          "Texte": "Fond noir et textes très vifs partout",
+          "Garde": [
+            "contraste",
+            "filtrecouleur"
+          ],
+          "Preuve": "Fond noir et textes vifs partout"
+        },
+        {
+          "Texte": "Une couleur domine (tout rose, vert ou bleu), ou c'est délavé",
+          "Garde": [
+            "cable",
+            "pilote",
+            "ecranhs"
+          ],
+          "Preuve": "Une couleur domine ou c'est délavé"
+        }
+      ]
+    },
+    "test-veilleuse": {
+      "Type": "test",
+      "Court": "L'éclairage nocturne",
+      "Pour": [
+        "veilleuse"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe l'éclairage nocturne",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Écran ».",
+        "Désactive « Éclairage nocturne »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les couleurs sont normales",
+          "Confirme": "veilleuse",
+          "Preuve": "Sans l'éclairage nocturne, les couleurs sont normales"
+        },
+        {
+          "Texte": "Toujours jaune",
+          "Ecarte": [
+            "veilleuse"
+          ],
+          "Preuve": "L'éclairage nocturne était déjà coupé"
+        }
+      ]
+    },
+    "test-filtre": {
+      "Type": "test",
+      "Court": "Les filtres de couleur",
+      "Pour": [
+        "filtrecouleur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe les filtres de couleur",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows, Ctrl et C.",
+        "Si rien ne change : touche Windows + I, « Accessibilité », « Filtres de couleur » : désactive-les."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les couleurs sont normales",
+          "Confirme": "filtrecouleur",
+          "Preuve": "Sans filtre de couleur, les couleurs sont normales"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "filtrecouleur"
+          ],
+          "Preuve": "Aucun filtre de couleur n'était activé"
+        }
+      ]
+    },
+    "test-contraste": {
+      "Type": "test",
+      "Court": "Le contraste élevé",
+      "Pour": [
+        "contraste"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe le contraste élevé",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Accessibilité », puis « Thèmes de contraste ».",
+        "Choisis « Aucun », puis « Appliquer »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les couleurs sont normales",
+          "Confirme": "contraste",
+          "Preuve": "Sans le contraste élevé, les couleurs sont normales"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "contraste"
+          ],
+          "Preuve": "Le contraste élevé n'était pas activé"
+        }
+      ]
+    },
+    "test-cable-couleur": {
+      "Type": "test",
+      "Court": "Le câble de l'écran",
+      "Pour": [
+        "cable"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Rebranche le câble de l'écran",
+      "Gestes": [
+        "Débranche le câble entre le PC et l'écran, aux deux bouts, puis renfonce-le bien (et visse-le s'il a des vis).",
+        "Si tu as un autre câble, essaie-le."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les couleurs sont normales",
+          "Confirme": "cable",
+          "Preuve": "Câble rebranché, les couleurs sont normales"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "cable"
+          ],
+          "Preuve": "Le câble n'y était pour rien"
+        }
+      ]
+    },
+    "test-loupe": {
+      "Type": "test",
+      "Court": "La loupe",
+      "Pour": [
+        "loupe"
+      ],
+      "Duree": "une minute",
+      "Texte": "Ferme la loupe",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows et Échap."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Tout est revenu normal",
+          "Confirme": "loupe",
+          "Preuve": "La loupe fermée, tout est normal"
+        },
+        {
+          "Texte": "Rien n'a changé",
+          "Ecarte": [
+            "loupe"
+          ],
+          "Preuve": "La loupe n'était pas ouverte"
+        }
+      ]
+    },
+    "test-resolution-reco": {
+      "Type": "test",
+      "Court": "La résolution",
+      "Pour": [
+        "resolecran"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets la résolution recommandée",
+      "Gestes": [
+        "Clic droit sur le Bureau, « Paramètres d'affichage ».",
+        "Dans « Résolution d'écran », choisis celle marquée « (recommandé) », puis « Conserver les modifications »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est redevenu normal",
+          "Confirme": "resolecran",
+          "Preuve": "Avec la résolution recommandée, c'est normal"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "resolecran"
+          ],
+          "Preuve": "La résolution était déjà la bonne"
+        }
+      ]
+    },
+    "test-echelle": {
+      "Type": "test",
+      "Court": "La mise à l'échelle",
+      "Pour": [
+        "echelle"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets la taille recommandée",
+      "Gestes": [
+        "Clic droit sur le Bureau, « Paramètres d'affichage ».",
+        "Dans « Mise à l'échelle » (ou « Échelle »), choisis la valeur marquée « (recommandé) »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est redevenu normal",
+          "Confirme": "echelle",
+          "Preuve": "Avec la mise à l'échelle recommandée, c'est normal"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "echelle"
+          ],
+          "Preuve": "La mise à l'échelle était déjà la bonne"
+        }
+      ]
+    },
+    "q-ecran-type": {
+      "Type": "question",
+      "Court": "Quel écran ?",
+      "Texte": "La luminosité qui ne se règle pas, c'est sur :",
+      "Reponses": [
+        {
+          "Texte": "Un écran à part (PC fixe, ou écran branché au portable)",
+          "Confirme": "ecranexterne",
+          "Preuve": "C'est un écran à part"
+        },
+        {
+          "Texte": "L'écran d'un portable",
+          "Ecarte": [
+            "ecranexterne"
+          ],
+          "Preuve": "C'est l'écran d'un portable"
+        }
+      ]
+    },
+    "test-lum-auto": {
+      "Type": "test",
+      "Court": "La luminosité automatique",
+      "Pour": [
+        "luminositeauto"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe la luminosité automatique",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Écran », et ouvre « Luminosité ».",
+        "Décoche « Modifier automatiquement la luminosité lorsque l'éclairage change » et « Aider à améliorer la batterie en optimisant le contenu affiché »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "luminositeauto",
+          "Preuve": "Sans la luminosité automatique, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "luminositeauto"
+          ],
+          "Preuve": "La luminosité automatique n'y était pour rien"
+        }
+      ]
+    },
+    "test-nettoyer-ecran": {
+      "Type": "test",
+      "Court": "Nettoyer l'écran",
+      "Pour": [
+        "ecransale"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Nettoie l'écran",
+      "Gestes": [
+        "Éteins l'écran.",
+        "Passe un chiffon doux et sec (ou à peine humide d'eau), sans appuyer. Jamais de produit ménager."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La tache a disparu",
+          "Confirme": "ecransale",
+          "Preuve": "Nettoyé, la tache a disparu"
+        },
+        {
+          "Texte": "Elle est toujours là",
+          "Ecarte": [
+            "ecransale"
+          ],
+          "Preuve": "Ce n'était pas une saleté"
+        }
+      ]
+    },
+    "q-pixel": {
+      "Type": "question",
+      "Court": "Le point",
+      "Texte": "Comment est ce qui reste ?",
+      "Reponses": [
+        {
+          "Texte": "Un tout petit point, toujours de la même couleur, au même endroit",
+          "Confirme": "pixelmort",
+          "Preuve": "Un tout petit point fixe : un point mort"
+        },
+        {
+          "Texte": "Une tache plus grande, une ligne, ou une zone plus claire",
+          "Confirme": "ecranhs",
+          "Preuve": "Une tache ou une ligne : l'écran est abîmé"
+        }
+      ]
+    },
+    "test-tactile": {
+      "Type": "test",
+      "Court": "Réactiver le tactile",
+      "Pour": [
+        "tactiledesactive"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Réactive l'écran tactile",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Périphériques d'interface utilisateur ».",
+        "Clic droit sur « Écran tactile compatible HID » : « Activer l'appareil ». S'il est déjà activé : « Désactiver l'appareil », puis de nouveau « Activer l'appareil »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le tactile remarche",
+          "Confirme": "tactiledesactive",
+          "Preuve": "Réactivé, le tactile remarche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "tactiledesactive"
+          ],
+          "Preuve": "Le tactile n'était pas désactivé"
+        }
+      ]
+    },
+    "test-veille-ecran": {
+      "Type": "test",
+      "Court": "Les réglages de veille",
+      "Pour": [
+        "reglagesveille"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Allonge le délai avant que l'écran s'éteigne",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Alimentation » (ou « Alimentation et batterie »), et ouvre « Écran et veille ».",
+        "Choisis un délai plus long pour « Éteindre mon écran » et « Mettre mon appareil en veille »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "reglagesveille",
+          "Preuve": "Avec un délai plus long, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "reglagesveille"
+          ],
+          "Preuve": "Les réglages de veille n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-economiseur": {
+      "Type": "test",
+      "Court": "L'écran de veille",
+      "Pour": [
+        "economiseur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe l'écran de veille",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Écran de veille » et ouvre « Modifier l'écran de veille ».",
+        "Choisis « (aucun) », puis OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "economiseur",
+          "Preuve": "Sans écran de veille, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "economiseur"
+          ],
+          "Preuve": "L'écran de veille n'y était pour rien"
+        }
+      ]
+    },
+    "test-memvirt": {
+      "Type": "test",
+      "Court": "La mémoire de secours",
+      "Pour": [
+        "memoirevirtuelle"
+      ],
+      "Duree": "cinq minutes, puis quelques jours",
+      "Texte": "Laisse Windows gérer la mémoire de secours",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Afficher les paramètres système avancés » et ouvre-le.",
+        "Dans « Performances », clique sur « Paramètres », onglet « Avancé », puis « Modifier ».",
+        "Coche « Gérer automatiquement la taille du fichier d'échange pour tous les lecteurs ». OK, puis redémarre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le message ne revient plus",
+          "Confirme": "memoirevirtuelle",
+          "Preuve": "Avec la mémoire de secours gérée par Windows, le message ne revient plus"
+        },
+        {
+          "Texte": "Le message revient",
+          "Ecarte": [
+            "memoirevirtuelle"
+          ],
+          "Preuve": "La mémoire de secours n'y était pour rien"
+        }
+      ]
+    },
+    "test-cache-nav": {
+      "Type": "test",
+      "Court": "Vider le navigateur",
+      "Pour": [
+        "cachenav"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vide les fichiers gardés par le navigateur",
+      "Gestes": [
+        "Dans le navigateur, appuie en même temps sur Ctrl + Maj + Suppr.",
+        "Choisis la période « Toutes les périodes » (ou « Depuis toujours »).",
+        "Coche seulement « Images et fichiers en cache » (pas les mots de passe), puis « Effacer »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est plus rapide",
+          "Confirme": "cachenav",
+          "Preuve": "Le navigateur vidé, c'est plus rapide"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "cachenav"
+          ],
+          "Preuve": "Vider le navigateur n'a rien changé"
+        }
+      ]
+    },
+    "test-casque-echo": {
+      "Type": "test",
+      "Court": "Avec un casque",
+      "Pour": [
+        "hautparleursmicro"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Mets un casque pendant l'appel",
+      "Gestes": [
+        "Branche un casque (ou des écouteurs), et refais un appel."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus d'écho",
+          "Confirme": "hautparleursmicro",
+          "Preuve": "Avec un casque, plus d'écho"
+        },
+        {
+          "Texte": "Toujours de l'écho",
+          "Ecarte": [
+            "hautparleursmicro"
+          ],
+          "Preuve": "Même avec un casque, il y a de l'écho"
+        }
+      ]
+    },
+    "test-ecouter": {
+      "Type": "test",
+      "Court": "« Écouter ce périphérique »",
+      "Pour": [
+        "ecoutemicro"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Décoche « Écouter ce périphérique »",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Panneau de configuration du son » (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Enregistrement » : double-clique sur ton micro.",
+        "Onglet « Écouter » : décoche « Écouter ce périphérique ». OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus d'écho",
+          "Confirme": "ecoutemicro",
+          "Preuve": "« Écouter ce périphérique » décoché, plus d'écho"
+        },
+        {
+          "Texte": "Toujours de l'écho",
+          "Ecarte": [
+            "ecoutemicro"
+          ],
+          "Preuve": "Ce réglage était déjà décoché"
+        }
+      ]
+    },
+    "test-echo-appli": {
+      "Type": "test",
+      "Court": "Les réglages de l'appli",
+      "Pour": [
+        "echoappli"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Active l'annulation de l'écho dans l'appli d'appel",
+      "Gestes": [
+        "Ouvre les réglages de l'appli d'appel (Discord : la roue dentée, « Voix et vidéo » ; Teams : « Paramètres », « Appareils »).",
+        "Active « Annulation de l'écho » et « Suppression du bruit »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus d'écho",
+          "Confirme": "echoappli",
+          "Preuve": "Avec l'annulation de l'écho, plus d'écho"
+        },
+        {
+          "Texte": "Toujours de l'écho",
+          "Ecarte": [
+            "echoappli"
+          ],
+          "Preuve": "Les réglages de l'appli n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-sortie-appli": {
+      "Type": "test",
+      "Court": "La sortie du programme",
+      "Pour": [
+        "sortieappli"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis la sortie du son du programme",
+      "Gestes": [
+        "Dans les réglages du programme, cherche « Audio », « Son » ou « Voix », puis « Périphérique de sortie » : choisis « Par défaut » ou ton casque.",
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent. Puis « Système », « Son », « Mélangeur de volume » : vérifie la sortie choisie pour ce programme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son revient",
+          "Confirme": "sortieappli",
+          "Preuve": "Avec la bonne sortie dans le programme, le son revient"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "sortieappli"
+          ],
+          "Preuve": "La sortie du programme était la bonne"
+        }
+      ]
+    },
+    "test-mdp-oeil": {
+      "Type": "test",
+      "Court": "Le mot de passe",
+      "Pour": [
+        "mdpfaux"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Retape le mot de passe en le regardant",
+      "Gestes": [
+        "Dans la fenêtre du mot de passe, clique sur l'œil à droite pour voir ce que tu tapes.",
+        "Compare lettre par lettre avec l'étiquette de la box : attention aux majuscules, à 0 et O, à 1 et l.",
+        "Vérifie aussi que la touche Verr. Maj n'est pas allumée."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça se connecte",
+          "Confirme": "mdpfaux",
+          "Preuve": "Bien retapé, le mot de passe marche"
+        },
+        {
+          "Texte": "Toujours refusé",
+          "Ecarte": [
+            "mdpfaux"
+          ],
+          "Preuve": "Le mot de passe est bien tapé, mais refusé"
+        }
+      ]
+    },
+    "q-mdp-tel": {
+      "Type": "question",
+      "Court": "Un téléphone ?",
+      "Texte": "Un téléphone arrive-t-il à se connecter avec ce même mot de passe ?",
+      "Reponses": [
+        {
+          "Texte": "Non, refusé aussi",
+          "Confirme": "boxmdp",
+          "Preuve": "Le téléphone est refusé aussi : le mot de passe a changé"
+        },
+        {
+          "Texte": "Oui, le téléphone se connecte",
+          "Ecarte": [
+            "boxmdp"
+          ],
+          "Preuve": "Le téléphone se connecte avec ce mot de passe"
+        }
+      ]
+    },
+    "q-tel-internet": {
+      "Type": "question",
+      "Court": "Le téléphone a internet ?",
+      "Texte": "Le Wi-Fi du téléphone coupé, a-t-il internet lui-même (en 4G ou 5G) ?",
+      "Reponses": [
+        {
+          "Texte": "Non",
+          "Confirme": "forfait",
+          "Preuve": "Le téléphone n'a pas internet lui-même"
+        },
+        {
+          "Texte": "Oui",
+          "Ecarte": [
+            "forfait"
+          ],
+          "Preuve": "Le téléphone a internet lui-même"
+        }
+      ]
+    },
+    "test-partage-compat": {
+      "Type": "test",
+      "Court": "La compatibilité",
+      "Pour": [
+        "partagetel"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Rends le partage compatible",
+      "Gestes": [
+        "iPhone : Réglages, « Partage de connexion », active « Maximiser la compatibilité ».",
+        "Android : Paramètres, « Point d'accès mobile », choisis la bande « 2,4 GHz ».",
+        "Reconnecte le PC au partage."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche",
+          "Confirme": "partagetel",
+          "Preuve": "Avec le partage compatible, ça marche"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "partagetel"
+          ],
+          "Preuve": "La compatibilité n'y était pour rien"
+        }
+      ]
+    },
+    "test-cache-camera": {
+      "Type": "test",
+      "Court": "Le volet et la touche",
+      "Pour": [
+        "cachecamera"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vérifie le volet et la touche de la caméra",
+      "Gestes": [
+        "Regarde la caméra : un petit volet coulissant la cache peut-être.",
+        "Sur un portable, cherche une touche avec une caméra barrée (souvent F6, F8, F10 ou F12) et appuie dessus.",
+        "Réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image revient",
+          "Confirme": "cachecamera",
+          "Preuve": "Volet ouvert ou touche appuyée, l'image revient"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "cachecamera"
+          ],
+          "Preuve": "Ni le volet ni la touche"
+        }
+      ]
+    },
+    "test-permission-camera": {
+      "Type": "test",
+      "Court": "L'autorisation",
+      "Pour": [
+        "permissioncamera"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Autorise la caméra",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Confidentialité et sécurité », puis « Caméra ».",
+        "Active « Accès à la caméra », « Autoriser les applications à accéder à votre caméra », l'appli voulue, et « Autoriser les applications de bureau à accéder à votre caméra »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image revient",
+          "Confirme": "permissioncamera",
+          "Preuve": "Autorisée, la caméra marche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "permissioncamera"
+          ],
+          "Preuve": "La caméra était déjà autorisée"
+        }
+      ]
+    },
+    "test-camera-utilisee": {
+      "Type": "test",
+      "Court": "Une autre appli",
+      "Pour": [
+        "camerautilisee"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Ferme les autres applis",
+      "Gestes": [
+        "Ferme les applis qui peuvent utiliser la caméra : Teams, Zoom, Discord, Skype, WhatsApp, OBS, le navigateur.",
+        "Regarde aussi près de l'heure en bas à droite (la petite flèche) : quitte celles qui y sont.",
+        "Réessaie dans une seule appli."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image revient",
+          "Confirme": "camerautilisee",
+          "Preuve": "Les autres applis fermées, la caméra marche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "camerautilisee"
+          ],
+          "Preuve": "Aucune autre appli ne gardait la caméra"
+        }
+      ]
+    },
+    "test-pilote-camera": {
+      "Type": "test",
+      "Court": "Le pilote de la caméra",
+      "Pour": [
+        "pilotecamera"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Réinstalle la caméra",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Caméras » (ou « Périphériques d'imagerie »).",
+        "Clic droit sur la caméra, « Désinstaller l'appareil », puis confirme. Windows peut demander une autorisation : accepte.",
+        "Redémarre le PC : Windows la réinstalle tout seul."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image revient",
+          "Confirme": "pilotecamera",
+          "Preuve": "Réinstallée, la caméra marche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "pilotecamera"
+          ],
+          "Preuve": "La réinstaller n'a rien changé"
+        }
+      ]
+    },
+    "test-tel-deverrouille": {
+      "Type": "test",
+      "Court": "Déverrouiller",
+      "Pour": [
+        "telverrouille"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Déverrouille le téléphone et autorise l'accès",
+      "Gestes": [
+        "Débranche puis rebranche le téléphone.",
+        "Déverrouille-le, et accepte le message « Autoriser l'accès » ou « Faire confiance à cet ordinateur »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le téléphone apparaît",
+          "Confirme": "telverrouille",
+          "Preuve": "Déverrouillé et autorisé, le téléphone apparaît"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "telverrouille"
+          ],
+          "Preuve": "Ce n'était pas le verrouillage"
+        }
+      ]
+    },
+    "test-mode-transfert": {
+      "Type": "test",
+      "Court": "Le mode du câble",
+      "Pour": [
+        "modetransfert"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis « Transfert de fichiers » sur le téléphone",
+      "Gestes": [
+        "Sur un téléphone Android, tire le haut de l'écran vers le bas : touche la notification « Recharge via USB » (ou « USB »).",
+        "Choisis « Transfert de fichiers » (ou « MTP »). Sur un iPhone, passe à l'étape suivante."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le téléphone apparaît",
+          "Confirme": "modetransfert",
+          "Preuve": "En mode transfert de fichiers, le téléphone apparaît"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "modetransfert"
+          ],
+          "Preuve": "Le mode du câble n'y était pour rien"
+        },
+        {
+          "Texte": "C'est un iPhone",
+          "Ecarte": [
+            "modetransfert"
+          ],
+          "SansPreuve": true
+        }
+      ]
+    },
+    "test-cable-donnees": {
+      "Type": "test",
+      "Court": "Un autre câble",
+      "Pour": [
+        "cablecharge"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie un autre câble",
+      "Gestes": [
+        "Branche le téléphone avec son câble d'origine, ou un autre câble."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le téléphone apparaît",
+          "Confirme": "cablecharge",
+          "Preuve": "Avec un autre câble, le téléphone apparaît"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "cablecharge"
+          ],
+          "Preuve": "Le câble n'y était pour rien"
+        }
+      ]
+    },
+    "test-steam-manette": {
+      "Type": "test",
+      "Court": "Les réglages de Steam",
+      "Pour": [
+        "steammanette"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Active ta manette dans Steam",
+      "Gestes": [
+        "Si le jeu passe par Steam : ouvre Steam, menu « Steam », « Paramètres », puis « Manette ».",
+        "Active la prise en charge de ta manette (PlayStation, Xbox, Switch, ou « générique »).",
+        "Relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La manette marche",
+          "Confirme": "steammanette",
+          "Preuve": "Activée dans Steam, la manette marche"
+        },
+        {
+          "Texte": "Toujours rien, ou pas de Steam",
+          "Ecarte": [
+            "steammanette"
+          ],
+          "Preuve": "Steam n'y était pour rien"
+        }
+      ]
+    },
+    "test-loquet": {
+      "Type": "test",
+      "Court": "Le bouton de verrou",
+      "Pour": [
+        "loquet"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Regarde le petit bouton sur le côté",
+      "Gestes": [
+        "Retire la carte ou la clé.",
+        "Sur le côté, cherche un petit bouton « Lock » : pousse-le vers les contacts dorés.",
+        "Rebranche-la et réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "On peut écrire dessus",
+          "Confirme": "loquet",
+          "Preuve": "Le bouton déverrouillé, on peut écrire"
+        },
+        {
+          "Texte": "Pas de bouton, ou toujours protégée",
+          "Ecarte": [
+            "loquet"
+          ],
+          "Preuve": "Ce n'est pas le bouton de verrou"
+        }
+      ]
+    },
+    "test-recents": {
+      "Type": "test",
+      "Court": "Les fichiers récents",
+      "Pour": [
+        "ailleurs"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Retrouve-le par le programme qui l'a créé",
+      "Gestes": [
+        "Ouvre le programme qui a créé le fichier (Word, Excel, un logiciel photo...).",
+        "Menu « Fichier », puis « Ouvrir » : regarde la liste « Récents ».",
+        "S'il y est : clic droit, « Ouvrir l'emplacement du fichier »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je l'ai retrouvé",
+          "Confirme": "ailleurs",
+          "Preuve": "Le fichier est dans la liste des récents"
+        },
+        {
+          "Texte": "Il n'y est pas",
+          "Ecarte": [
+            "ailleurs"
+          ],
+          "Preuve": "Le fichier n'est pas dans les récents"
+        }
+      ]
+    },
+    "test-cherche-fichier": {
+      "Type": "test",
+      "Court": "Chercher partout",
+      "Pour": [
+        "ailleurs2"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Cherche le fichier dans tout le PC",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows et E : l'Explorateur de fichiers s'ouvre.",
+        "À gauche, clique sur « Ce PC ».",
+        "En haut à droite, tape une partie du nom du fichier, et attends que la recherche finisse."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je l'ai retrouvé",
+          "Confirme": "ailleurs2",
+          "Preuve": "La recherche dans tout le PC l'a retrouvé"
+        },
+        {
+          "Texte": "Rien",
+          "Ecarte": [
+            "ailleurs2"
+          ],
+          "Preuve": "La recherche dans tout le PC ne le trouve pas"
+        }
+      ]
+    },
+    "test-onedrive": {
+      "Type": "test",
+      "Court": "OneDrive",
+      "Pour": [
+        "onedrive"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Regarde dans OneDrive",
+      "Gestes": [
+        "Sur onedrive.com, connecte-toi avec ton compte Microsoft.",
+        "Regarde « Mes fichiers », puis la « Corbeille » (en bas à gauche) : un fichier supprimé y reste 30 jours."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je l'ai retrouvé",
+          "Confirme": "onedrive",
+          "Preuve": "Le fichier est dans OneDrive"
+        },
+        {
+          "Texte": "Il n'y est pas",
+          "Ecarte": [
+            "onedrive"
+          ],
+          "Preuve": "Le fichier n'est pas dans OneDrive"
+        }
+      ]
+    },
+    "test-fermer-prog": {
+      "Type": "test",
+      "Court": "Fermer le programme",
+      "Pour": [
+        "fichierouvert"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Ferme le programme qui utilise le fichier",
+      "Gestes": [
+        "Lis le message : il dit souvent quel programme garde le fichier.",
+        "Ferme ce programme (et Word, un lecteur vidéo ou photo, un navigateur s'ils l'ont ouvert).",
+        "Réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche",
+          "Confirme": "fichierouvert",
+          "Preuve": "Le programme fermé, ça marche"
+        },
+        {
+          "Texte": "Toujours refusé",
+          "Ecarte": [
+            "fichierouvert"
+          ],
+          "Preuve": "Aucun programme ne gardait le fichier"
+        }
+      ]
+    },
+    "test-apercu": {
+      "Type": "test",
+      "Court": "L'aperçu",
+      "Pour": [
+        "apercu"
+      ],
+      "Duree": "une minute",
+      "Texte": "Ferme l'aperçu de l'Explorateur",
+      "Gestes": [
+        "Dans l'Explorateur de fichiers, appuie en même temps sur Alt et P (l'aperçu se ferme).",
+        "Réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche",
+          "Confirme": "apercu",
+          "Preuve": "L'aperçu fermé, ça marche"
+        },
+        {
+          "Texte": "Toujours refusé",
+          "Ecarte": [
+            "apercu"
+          ],
+          "Preuve": "L'aperçu n'y était pour rien"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -4111,6 +6580,41 @@
       ]
     },
     {
+      "Id": "memoireinsuffisante",
+      "Famille": "plantages",
+      "Titre": "Message « mémoire insuffisante »",
+      "Phrase": "Un programme ou Windows dit qu'il manque de mémoire",
+      "Mots": [
+        "mémoire insuffisante",
+        "memoire insuffisante",
+        "manque de mémoire",
+        "out of memory",
+        "ram pleine",
+        "mémoire pleine",
+        "mémoire faible"
+      ],
+      "Suspects": [
+        "programmegourmand",
+        "memoirepeu",
+        "disqueplein",
+        "memoirevirtuelle"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-gestionnaire"
+        },
+        {
+          "Ref": "test-memoire-pleine"
+        },
+        {
+          "Ref": "place"
+        },
+        {
+          "Ref": "test-memvirt"
+        }
+      ]
+    },
+    {
       "Id": "rien",
       "Famille": "allumage",
       "Titre": "Rien ne s'allume",
@@ -4833,6 +7337,103 @@
       ]
     },
     {
+      "Id": "sortveille",
+      "Famille": "allumage",
+      "Titre": "Il ne sort pas de la veille",
+      "Phrase": "Écran noir après la veille, il faut forcer l'arrêt",
+      "Mots": [
+        "veille",
+        "sort pas de veille",
+        "réveil",
+        "mise en veille",
+        "se réveille pas",
+        "écran noir après veille",
+        "hibernation",
+        "rabat"
+      ],
+      "Suspects": [
+        "pilote",
+        "demarragerapide",
+        "reglagesalim"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-demarrage-rapide"
+        },
+        {
+          "Ref": "test-alim-defaut"
+        }
+      ]
+    },
+    {
+      "Id": "nesteintpas",
+      "Famille": "allumage",
+      "Titre": "Il ne s'éteint pas",
+      "Phrase": "Après « Arrêter », il reste allumé, ou l'écran s'éteint mais les ventilateurs tournent",
+      "Mots": [
+        "s'éteint pas",
+        "éteint pas",
+        "reste allumé",
+        "arrêter",
+        "arrêt",
+        "shutdown",
+        "ventilateurs tournent",
+        "ne s'arrête pas"
+      ],
+      "Suspects": [
+        "majencours",
+        "demarragerapide",
+        "reglagesalim"
+      ],
+      "Etapes": [
+        {
+          "Ref": "maj-en-cours"
+        },
+        {
+          "Ref": "test-demarrage-rapide"
+        },
+        {
+          "Ref": "test-alim-defaut"
+        }
+      ]
+    },
+    {
+      "Id": "allumeseul",
+      "Famille": "allumage",
+      "Titre": "Il s'allume tout seul",
+      "Phrase": "Il sort de veille ou s'allume la nuit, sans qu'on y touche",
+      "Mots": [
+        "s'allume tout seul",
+        "allume seul",
+        "se réveille tout seul",
+        "la nuit",
+        "sort de veille tout seul",
+        "démarre tout seul"
+      ],
+      "Suspects": [
+        "reveilsouris",
+        "reveilreseau",
+        "minuteurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-lastwake"
+        },
+        {
+          "Ref": "test-reveil-souris"
+        },
+        {
+          "Ref": "test-reveil-reseau"
+        },
+        {
+          "Ref": "test-minuteurs"
+        }
+      ]
+    },
+    {
       "Id": "reparationboucle",
       "Famille": "demarrage",
       "Titre": "Réparation automatique en boucle",
@@ -4842,7 +7443,10 @@
         "réparation",
         "boucle",
         "choisir une option",
-        "diagnostic de votre pc"
+        "diagnostic de votre pc",
+        "n'a pas démarré correctement",
+        "réparation automatique",
+        "préparation de la réparation"
       ],
       "Suspects": [
         "cleusb",
@@ -5076,6 +7680,51 @@
       ]
     },
     {
+      "Id": "biosboucle",
+      "Famille": "demarrage",
+      "Titre": "Il démarre sur le BIOS et n'en sort pas",
+      "Phrase": "Un écran de réglages (BIOS, UEFI, Setup) s'affiche à la place de Windows",
+      "Mots": [
+        "bios",
+        "uefi",
+        "setup",
+        "aptio",
+        "american megatrends",
+        "boot",
+        "boot menu",
+        "reste sur le bios",
+        "démarre sur le bios",
+        "ouvre le bios",
+        "utility",
+        "f2",
+        "réglages bleus"
+      ],
+      "Suspects": [
+        "touchecoincee",
+        "ordredemarrage",
+        "modeboot",
+        "pilebios",
+        "disquenondetecte"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-touche-coincee"
+        },
+        {
+          "Ref": "q-disque-bios"
+        },
+        {
+          "Ref": "test-ordre-boot"
+        },
+        {
+          "Ref": "q-date-bios"
+        },
+        {
+          "Ref": "test-defauts-bios"
+        }
+      ]
+    },
+    {
       "Id": "noirlogo",
       "Famille": "demarrage",
       "Titre": "Écran noir après le logo",
@@ -5142,6 +7791,85 @@
               "Preuve": "Même après 30 minutes, toujours noir"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "ecrannoircurseur",
+      "Famille": "demarrage",
+      "Titre": "Écran noir avec la souris après la connexion",
+      "Phrase": "On voit le curseur, mais pas le Bureau ni la barre des tâches",
+      "Mots": [
+        "curseur",
+        "écran noir souris",
+        "souris écran noir",
+        "pas de bureau",
+        "bureau noir",
+        "barre des tâches disparue",
+        "noir après connexion",
+        "noir après le mot de passe"
+      ],
+      "Suspects": [
+        "affichage",
+        "explorateur",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-affichage"
+        },
+        {
+          "Ref": "test-explorateur-lancer"
+        },
+        {
+          "Ref": "test-sfc",
+          "Pour": [
+            "windowsabime"
+          ],
+          "Gestes": [
+            "Appuie en même temps sur Ctrl + Maj + Échap, puis « Exécuter une nouvelle tâche ».",
+            "Tape cmd, coche « Créer cette tâche avec les privilèges d'administration », puis OK.",
+            "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Fais-le pour la première commande, attends la fin, puis pour la deuxième.",
+            "Redémarre le PC."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il a réparé des fichiers, et le Bureau revient",
+              "Confirme": "windowsabime",
+              "Preuve": "Windows a réparé ses fichiers, et le Bureau revient"
+            },
+            {
+              "Texte": "Rien trouvé, ou toujours noir",
+              "Ecarte": [
+                "windowsabime"
+              ],
+              "Preuve": "La réparation des fichiers de Windows n'a rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "bitlocker",
+      "Famille": "demarrage",
+      "Titre": "Il demande une clé de récupération BitLocker",
+      "Phrase": "Un écran bleu demande une longue clé de chiffres",
+      "Mots": [
+        "bitlocker",
+        "clé de récupération",
+        "cle de recuperation",
+        "recovery key",
+        "48 chiffres",
+        "chiffrement",
+        "récupération bitlocker"
+      ],
+      "Suspects": [
+        "bitlockercompte",
+        "bitlockerailleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cle-bitlocker"
         }
       ]
     },
@@ -5977,6 +8705,260 @@
       ]
     },
     {
+      "Id": "ecranenvers",
+      "Famille": "ecran",
+      "Titre": "L'image est tournée ou à l'envers",
+      "Phrase": "Tout est penché sur le côté ou la tête en bas",
+      "Mots": [
+        "envers",
+        "tourné",
+        "tournée",
+        "retourné",
+        "à l'envers",
+        "tête en bas",
+        "pivoté",
+        "rotation",
+        "de côté",
+        "vertical"
+      ],
+      "Suspects": [
+        "orientation",
+        "pilote"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-orientation"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "couleurs",
+      "Famille": "ecran",
+      "Titre": "Les couleurs sont bizarres",
+      "Phrase": "Tout est jaune, en noir et blanc, inversé ou délavé",
+      "Mots": [
+        "couleurs",
+        "couleur",
+        "jaune",
+        "orange",
+        "noir et blanc",
+        "gris",
+        "inversé",
+        "négatif",
+        "délavé",
+        "rose",
+        "vert",
+        "contraste"
+      ],
+      "Suspects": [
+        "veilleuse",
+        "filtrecouleur",
+        "contraste",
+        "cable",
+        "pilote",
+        "ecranhs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-couleurs"
+        },
+        {
+          "Ref": "test-veilleuse"
+        },
+        {
+          "Ref": "test-filtre"
+        },
+        {
+          "Ref": "test-contraste"
+        },
+        {
+          "Ref": "test-cable-couleur"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "taille",
+      "Famille": "ecran",
+      "Titre": "Tout est trop grand ou trop petit",
+      "Phrase": "Le texte, les icônes ou les fenêtres n'ont pas la bonne taille",
+      "Mots": [
+        "trop grand",
+        "trop petit",
+        "zoom",
+        "zoomé",
+        "énorme",
+        "minuscule",
+        "taille",
+        "agrandi",
+        "gros",
+        "icônes géantes",
+        "loupe",
+        "trop gros",
+        "tout est gros"
+      ],
+      "Suspects": [
+        "loupe",
+        "resolecran",
+        "echelle"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-loupe"
+        },
+        {
+          "Ref": "test-resolution-reco"
+        },
+        {
+          "Ref": "test-echelle"
+        }
+      ]
+    },
+    {
+      "Id": "luminosite",
+      "Famille": "ecran",
+      "Titre": "La luminosité ne se règle plus",
+      "Phrase": "Trop sombre ou trop clair, ou elle change toute seule",
+      "Mots": [
+        "luminosité",
+        "lumineux",
+        "sombre",
+        "trop clair",
+        "trop sombre",
+        "brightness",
+        "change toute seule"
+      ],
+      "Suspects": [
+        "ecranexterne",
+        "luminositeauto",
+        "pilote"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-ecran-type"
+        },
+        {
+          "Ref": "test-lum-auto"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "pixels",
+      "Famille": "ecran",
+      "Titre": "Des points ou des taches sur l'écran",
+      "Phrase": "Un point de couleur fixe, une tache, une zone plus claire",
+      "Mots": [
+        "pixel",
+        "pixels",
+        "point",
+        "tache",
+        "taches",
+        "pixel mort",
+        "point noir",
+        "point blanc",
+        "zone claire",
+        "fuite"
+      ],
+      "Suspects": [
+        "ecransale",
+        "pixelmort",
+        "ecranhs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-nettoyer-ecran"
+        },
+        {
+          "Ref": "q-pixel"
+        }
+      ]
+    },
+    {
+      "Id": "tactile",
+      "Famille": "ecran",
+      "Titre": "L'écran tactile ne répond plus",
+      "Phrase": "Toucher l'écran ne fait plus rien",
+      "Mots": [
+        "tactile",
+        "toucher",
+        "doigt",
+        "touch",
+        "écran tactile",
+        "stylet"
+      ],
+      "Suspects": [
+        "ecransale",
+        "tactiledesactive",
+        "pilote",
+        "ecranhs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-nettoyer-ecran",
+          "Reponses": [
+            {
+              "Texte": "Le tactile remarche",
+              "Confirme": "ecransale",
+              "Preuve": "Nettoyé, le tactile remarche"
+            },
+            {
+              "Texte": "Toujours rien",
+              "Ecarte": [
+                "ecransale"
+              ],
+              "Preuve": "Ce n'était pas une saleté"
+            }
+          ]
+        },
+        {
+          "Ref": "test-tactile"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "ecranseteint",
+      "Famille": "ecran",
+      "Titre": "L'écran s'éteint trop vite",
+      "Phrase": "Il devient noir au bout de quelques minutes, même pendant une vidéo",
+      "Mots": [
+        "veille",
+        "écran noir vidéo",
+        "trop vite",
+        "écran de veille",
+        "se met en veille",
+        "écran s'éteint",
+        "l'écran s'éteint",
+        "écran noir tout seul"
+      ],
+      "Suspects": [
+        "reglagesveille",
+        "economiseur",
+        "pilote"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-veille-ecran"
+        },
+        {
+          "Ref": "test-economiseur"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
       "Id": "portablecasse",
       "Famille": "ecran",
       "Titre": "Écran du portable cassé ou taché",
@@ -6456,6 +9438,42 @@
               "Preuve": "Sans la dernière mise à jour, toujours lent"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "navigateurlent",
+      "Famille": "lenteur",
+      "Titre": "Le navigateur est lent",
+      "Phrase": "Les pages mettent longtemps à s'ouvrir, ça rame dans Chrome, Edge ou Firefox",
+      "Mots": [
+        "navigateur lent",
+        "chrome lent",
+        "edge lent",
+        "firefox lent",
+        "pages lentes",
+        "internet rame",
+        "onglets",
+        "site lent"
+      ],
+      "Suspects": [
+        "memoirepeu",
+        "extension",
+        "cachenav",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-memoire-pleine"
+        },
+        {
+          "Ref": "test-extensions"
+        },
+        {
+          "Ref": "test-cache-nav"
+        },
+        {
+          "Ref": "test-analyse"
         }
       ]
     },
@@ -6944,6 +9962,55 @@
       ]
     },
     {
+      "Id": "sonunseul",
+      "Famille": "son",
+      "Titre": "Le son manque dans un seul programme ou jeu",
+      "Phrase": "Le son marche partout, sauf là",
+      "Mots": [
+        "un seul programme",
+        "seulement dans",
+        "son dans un jeu",
+        "sauf dans",
+        "discord muet",
+        "youtube muet",
+        "jeu muet",
+        "jeu sans son",
+        "son dans mon jeu",
+        "dans mon jeu",
+        "dans le jeu"
+      ],
+      "Suspects": [
+        "volumeappli",
+        "sortieappli",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mixer",
+          "Reponses": [
+            {
+              "Texte": "Le son revient",
+              "Confirme": "volumeappli",
+              "Preuve": "Le volume de ce programme était coupé"
+            },
+            {
+              "Texte": "Toujours rien",
+              "Ecarte": [
+                "volumeappli"
+              ],
+              "Preuve": "Le volume du programme était normal"
+            }
+          ]
+        },
+        {
+          "Ref": "test-sortie-appli"
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
       "Id": "micro",
       "Famille": "son",
       "Titre": "Le micro ne marche pas",
@@ -7024,6 +10091,39 @@
         },
         {
           "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "echo",
+      "Famille": "son",
+      "Titre": "Les autres m'entendent en écho",
+      "Phrase": "En appel, ils entendent leur voix ou un écho",
+      "Mots": [
+        "écho",
+        "echo",
+        "entendent leur voix",
+        "retour",
+        "larsen",
+        "résonne",
+        "appel",
+        "discord",
+        "teams"
+      ],
+      "Suspects": [
+        "hautparleursmicro",
+        "ecoutemicro",
+        "echoappli"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-casque-echo"
+        },
+        {
+          "Ref": "test-ecouter"
+        },
+        {
+          "Ref": "test-echo-appli"
         }
       ]
     },
@@ -7165,7 +10265,13 @@
         "aucun accès",
         "hors ligne",
         "déconnecté",
-        "réseau"
+        "réseau",
+        "aucun accès",
+        "pas d'accès internet",
+        "connecté sans internet",
+        "sans internet",
+        "globe",
+        "aucun accès internet"
       ],
       "Suspects": [
         "box",
@@ -7355,6 +10461,69 @@
         },
         {
           "Ref": "test-box"
+        }
+      ]
+    },
+    {
+      "Id": "mdpwifi",
+      "Famille": "internet",
+      "Titre": "Le mot de passe du Wi-Fi est refusé",
+      "Phrase": "« Clé de sécurité réseau incorrecte » ou impossible de se connecter",
+      "Mots": [
+        "clé de sécurité",
+        "cle de securite",
+        "mot de passe refusé",
+        "refusé",
+        "incorrect",
+        "clé réseau",
+        "clé de sécurité réseau incorrecte"
+      ],
+      "Suspects": [
+        "mdpfaux",
+        "boxmdp",
+        "profilwifi"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mdp-oeil"
+        },
+        {
+          "Ref": "q-mdp-tel"
+        },
+        {
+          "Ref": "test-profil-wifi"
+        }
+      ]
+    },
+    {
+      "Id": "partage",
+      "Famille": "internet",
+      "Titre": "Le partage de connexion du téléphone ne marche pas",
+      "Phrase": "Le PC ne voit pas le téléphone, ou n'a pas internet par lui",
+      "Mots": [
+        "partage de connexion",
+        "point d'accès",
+        "hotspot",
+        "4g",
+        "5g",
+        "téléphone",
+        "modem",
+        "tethering"
+      ],
+      "Suspects": [
+        "forfait",
+        "partagetel",
+        "profilwifi"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-tel-internet"
+        },
+        {
+          "Ref": "test-partage-compat"
+        },
+        {
+          "Ref": "test-profil-wifi"
         }
       ]
     },
@@ -7944,6 +11113,129 @@
         },
         {
           "Ref": "test-bluetooth-p"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "webcam",
+      "Famille": "peripheriques",
+      "Titre": "La webcam ne marche pas",
+      "Phrase": "Image noire, « aucune caméra trouvée », ou elle n'est pas reconnue",
+      "Mots": [
+        "webcam",
+        "caméra",
+        "camera",
+        "visio",
+        "image noire",
+        "aucune caméra",
+        "teams",
+        "zoom",
+        "skype",
+        "appel vidéo"
+      ],
+      "Suspects": [
+        "cachecamera",
+        "permissioncamera",
+        "camerautilisee",
+        "pilotecamera",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cache-camera"
+        },
+        {
+          "Ref": "test-permission-camera"
+        },
+        {
+          "Ref": "test-camera-utilisee"
+        },
+        {
+          "Ref": "test-pilote-camera"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "telephone",
+      "Famille": "peripheriques",
+      "Titre": "Le téléphone branché n'apparaît pas",
+      "Phrase": "Impossible de voir les photos du téléphone sur le PC",
+      "Mots": [
+        "téléphone",
+        "telephone",
+        "photos",
+        "iphone",
+        "android",
+        "samsung",
+        "transférer",
+        "transfert",
+        "câble usb",
+        "mtp",
+        "smartphone"
+      ],
+      "Suspects": [
+        "telverrouille",
+        "modetransfert",
+        "cablecharge",
+        "portusb"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-tel-deverrouille"
+        },
+        {
+          "Ref": "test-mode-transfert"
+        },
+        {
+          "Ref": "test-cable-donnees"
+        },
+        {
+          "Ref": "test-autre-port"
+        }
+      ]
+    },
+    {
+      "Id": "manette",
+      "Famille": "peripheriques",
+      "Titre": "La manette ne marche pas",
+      "Phrase": "Elle n'est pas reconnue, ou ne marche pas dans un jeu",
+      "Mots": [
+        "manette",
+        "controller",
+        "joystick",
+        "ps4",
+        "ps5",
+        "dualsense",
+        "dualshock",
+        "xbox",
+        "gamepad",
+        "switch"
+      ],
+      "Suspects": [
+        "piles",
+        "bluetoothp",
+        "portusb",
+        "steammanette",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-piles"
+        },
+        {
+          "Ref": "test-bluetooth-p"
+        },
+        {
+          "Ref": "test-autre-port"
+        },
+        {
+          "Ref": "test-steam-manette"
         },
         {
           "Ref": "test-autre-pc"
@@ -8612,6 +11904,116 @@
       ]
     },
     {
+      "Id": "fichierintrouvable",
+      "Famille": "fichiers",
+      "Titre": "Je ne retrouve plus un fichier enregistré",
+      "Phrase": "Il a été enregistré, mais il n'est plus là où on pensait",
+      "Mots": [
+        "retrouve plus",
+        "introuvable",
+        "disparu",
+        "fichier perdu",
+        "où est",
+        "enregistré",
+        "sauvegardé",
+        "document perdu"
+      ],
+      "Suspects": [
+        "ailleurs",
+        "ailleurs2",
+        "onedrive",
+        "corbeille"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-recents"
+        },
+        {
+          "Ref": "test-cherche-fichier"
+        },
+        {
+          "Ref": "test-onedrive"
+        },
+        {
+          "Id": "test-corbeille-2",
+          "Type": "test",
+          "Court": "La corbeille",
+          "Pour": [
+            "corbeille"
+          ],
+          "Duree": "une minute",
+          "Texte": "Regarde dans la corbeille",
+          "Gestes": [
+            "Double-clique sur la « Corbeille » du Bureau.",
+            "S'il y est : clic droit, « Restaurer »."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Je l'ai retrouvé",
+              "Confirme": "corbeille",
+              "Preuve": "Le fichier était dans la corbeille"
+            },
+            {
+              "Texte": "Il n'y est pas",
+              "Ecarte": [
+                "corbeille"
+              ],
+              "Preuve": "Le fichier n'est pas dans la corbeille"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "suppressionimpossible",
+      "Famille": "fichiers",
+      "Titre": "Impossible de supprimer ou déplacer un fichier",
+      "Phrase": "« Le fichier est ouvert dans un autre programme » ou « Accès refusé »",
+      "Mots": [
+        "supprimer",
+        "effacer",
+        "impossible de supprimer",
+        "ouvert dans un autre programme",
+        "accès refusé",
+        "déplacer",
+        "renommer",
+        "utilisé"
+      ],
+      "Suspects": [
+        "fichierouvert",
+        "apercu",
+        "redemarrage"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fermer-prog"
+        },
+        {
+          "Ref": "test-apercu"
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Ça marche",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, ça marche"
+            },
+            {
+              "Texte": "Toujours refusé",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, c'est refusé"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "disqueexterne",
       "Famille": "fichiers",
       "Titre": "Un disque externe n'est pas reconnu",
@@ -8675,6 +12077,34 @@
         },
         {
           "Ref": "test-autre-port"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "protegee",
+      "Famille": "fichiers",
+      "Titre": "La clé USB ou la carte SD est protégée en écriture",
+      "Phrase": "« Le disque est protégé en écriture » : impossible d'y copier ou effacer",
+      "Mots": [
+        "protégé en écriture",
+        "protégée",
+        "lecture seule",
+        "écriture",
+        "carte sd",
+        "lock",
+        "verrouillée",
+        "impossible de copier"
+      ],
+      "Suspects": [
+        "loquet",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-loquet"
         },
         {
           "Ref": "test-autre-pc"
@@ -8901,6 +12331,373 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "heurefausse",
+      "Famille": "windows",
+      "Titre": "L'heure ou la date est fausse",
+      "Phrase": "Elle se décale, ou revient à une vieille date au démarrage",
+      "Mots": [
+        "heure",
+        "date",
+        "heure fausse",
+        "mauvaise heure",
+        "horloge",
+        "décalée",
+        "se dérègle",
+        "2000",
+        "date fausse"
+      ],
+      "Suspects": [
+        "pilebios",
+        "fuseau",
+        "synchro"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-vieille-date"
+        },
+        {
+          "Ref": "test-fuseau"
+        },
+        {
+          "Ref": "test-synchro"
+        }
+      ]
+    },
+    {
+      "Id": "mdpoublie",
+      "Famille": "windows",
+      "Titre": "Mot de passe ou code PIN oublié",
+      "Phrase": "Impossible d'ouvrir sa session Windows",
+      "Mots": [
+        "mot de passe",
+        "mdp",
+        "code pin",
+        "pin",
+        "oublié",
+        "session",
+        "connexion",
+        "identifiant",
+        "verrouillé",
+        "login"
+      ],
+      "Suspects": [
+        "pinoublie",
+        "comptemicrosoft",
+        "comptelocal"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-quoi-oublie"
+        },
+        {
+          "Ref": "q-type-compte"
+        }
+      ]
+    },
+    {
+      "Id": "barretaches",
+      "Famille": "windows",
+      "Titre": "La barre des tâches ou le menu Démarrer ne répond plus",
+      "Phrase": "Clic sans effet, icônes figées, menu qui ne s'ouvre pas",
+      "Mots": [
+        "barre des tâches",
+        "menu démarrer",
+        "démarrer",
+        "ne s'ouvre pas",
+        "figée",
+        "icônes",
+        "bureau",
+        "explorateur",
+        "taskbar",
+        "ne répond plus"
+      ],
+      "Suspects": [
+        "explorateur",
+        "redemarrage",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-explorateur-redem"
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Tout remarche",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, tout remarche"
+            },
+            {
+              "Texte": "Toujours pareil",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, le problème continue"
+            }
+          ]
+        },
+        {
+          "Ref": "test-sfc",
+          "Pour": [
+            "windowsabime"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il a réparé des fichiers, et ça va mieux",
+              "Confirme": "windowsabime",
+              "Preuve": "Windows a réparé ses fichiers, et tout répond"
+            },
+            {
+              "Texte": "Rien trouvé, ou toujours pareil",
+              "Ecarte": [
+                "windowsabime"
+              ],
+              "Preuve": "La réparation des fichiers de Windows n'a rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "majerreur",
+      "Famille": "windows",
+      "Titre": "Les mises à jour de Windows échouent",
+      "Phrase": "Une erreur, ou ça bloque au même pourcentage",
+      "Mots": [
+        "windows update",
+        "mise à jour",
+        "mises à jour",
+        "échec",
+        "erreur mise à jour",
+        "0x80",
+        "bloque à",
+        "pourcentage",
+        "update"
+      ],
+      "Suspects": [
+        "disqueplein",
+        "redemarrage",
+        "cachemaj",
+        "fichierssysteme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "place"
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "La mise à jour passe",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, la mise à jour passe"
+            },
+            {
+              "Texte": "Toujours une erreur",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, ça échoue"
+            }
+          ]
+        },
+        {
+          "Ref": "test-depanneur-maj"
+        },
+        {
+          "Ref": "test-sfc"
+        }
+      ]
+    },
+    {
+      "Id": "activation",
+      "Famille": "windows",
+      "Titre": "Windows n'est pas activé",
+      "Phrase": "« Activer Windows » s'affiche en bas de l'écran",
+      "Mots": [
+        "activer windows",
+        "activation",
+        "licence",
+        "clé de produit",
+        "non activé",
+        "filigrane",
+        "activer"
+      ],
+      "Suspects": [
+        "activinternet",
+        "changementpiece",
+        "cleinvalide"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-activ-internet"
+        },
+        {
+          "Ref": "test-activ-materiel"
+        },
+        {
+          "Ref": "test-activ-cle"
+        }
+      ]
+    },
+    {
+      "Id": "store",
+      "Famille": "windows",
+      "Titre": "Le Microsoft Store ne marche pas",
+      "Phrase": "Il ne s'ouvre pas, ou les téléchargements restent bloqués",
+      "Mots": [
+        "store",
+        "microsoft store",
+        "boutique",
+        "appli",
+        "application",
+        "téléchargement bloqué",
+        "ne télécharge pas",
+        "xbox app",
+        "game pass"
+      ],
+      "Suspects": [
+        "synchro",
+        "cachestore",
+        "storeabime",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-synchro",
+          "Reponses": [
+            {
+              "Texte": "L'heure était fausse : maintenant le Store remarche",
+              "Confirme": "synchro",
+              "Preuve": "L'heure remise à jour, le Store remarche"
+            },
+            {
+              "Texte": "L'heure était juste, ou toujours bloqué",
+              "Ecarte": [
+                "synchro"
+              ],
+              "Preuve": "L'heure du PC n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-wsreset"
+        },
+        {
+          "Ref": "test-reinit-store"
+        },
+        {
+          "Ref": "test-sfc",
+          "Pour": [
+            "windowsabime"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il a réparé des fichiers, et le Store remarche",
+              "Confirme": "windowsabime",
+              "Preuve": "Windows a réparé ses fichiers, et le Store remarche"
+            },
+            {
+              "Texte": "Rien trouvé, ou toujours pareil",
+              "Ecarte": [
+                "windowsabime"
+              ],
+              "Preuve": "La réparation des fichiers de Windows n'a rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "recherchewin",
+      "Famille": "windows",
+      "Titre": "La recherche de Windows ne trouve plus rien",
+      "Phrase": "Taper dans la recherche ne donne rien, ou elle ne s'ouvre pas",
+      "Mots": [
+        "recherche",
+        "rechercher",
+        "chercher",
+        "trouve rien",
+        "barre de recherche",
+        "search",
+        "loupe"
+      ],
+      "Suspects": [
+        "explorateur",
+        "redemarrage",
+        "indexation"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-explorateur-redem"
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Tout remarche",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, tout remarche"
+            },
+            {
+              "Texte": "Toujours pareil",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, le problème continue"
+            }
+          ]
+        },
+        {
+          "Ref": "test-index"
+        }
+      ]
+    },
+    {
+      "Id": "installation",
+      "Famille": "windows",
+      "Titre": "Un programme ne s'installe pas",
+      "Phrase": "L'installation ne se lance pas, ou s'arrête sur une erreur",
+      "Mots": [
+        "installer",
+        "installation",
+        "s'installe pas",
+        "setup",
+        "exe",
+        "installe",
+        "programme",
+        "logiciel",
+        "erreur installation"
+      ],
+      "Suspects": [
+        "disqueplein",
+        "smartscreen",
+        "installeurabime",
+        "versionwindows"
+      ],
+      "Etapes": [
+        {
+          "Ref": "place"
+        },
+        {
+          "Ref": "q-smartscreen"
+        },
+        {
+          "Ref": "test-retelecharger"
         }
       ]
     }
