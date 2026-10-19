@@ -153,6 +153,8 @@ foreach ($k in $cas) {
 }
 $ailleurs = Get-Enquete $donnees (Get-Panne $donnees 'redemarre') @(1, 1) @{ 'testmemoire-erreurs' = (New-Indice $true 'erreurs') }
 Write-Resultat 'indices de Windows ignorés si Mindcare est ouvert sur un autre appareil' ($ailleurs.Etape -and -not $ailleurs.Auto) "(étape : $($ailleurs.Etape.Id))"
+$av = @(foreach ($c in @(@(), @(1), @(1, 1, 1, 1, 1))) { $e = Get-Enquete $donnees (Get-Panne $donnees 'songresille') $c; "$(@($e.Faits).Count + 1)/$(@($e.Faits).Count + 1 + $e.AVenir)" })
+Write-Resultat 'avancement « étape N sur M » (son qui grésille)' (($av -join ' ') -eq '1/8 2/7 6/7') "($($av -join ' '))"
 # Des centaines d'enquêtes au hasard (toujours les mêmes) : chacune finit, avec une réponse
 $mauvais = @(); $types = @{}
 $hasard = New-Object Random 42
@@ -220,6 +222,8 @@ Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed
 # 5. Les écrans : l'accueil, une famille, la recherche, les étapes de l'enquête, les réponses
 Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
 Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
+Test-Capture 'accueil' | Out-Null
+Test-Capture 'enquete-son' @{ MINDCARE_TEST_PARCOURS = 'songresille:1' } | Out-Null
 Test-Capture 'enquete-interrupteur' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
 Test-Capture 'enquete-code' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:0,1' } | Out-Null
 Test-Capture 'recherche' @{ MINDCARE_TEST_RECHERCHE = 'il redémarre' } | Out-Null

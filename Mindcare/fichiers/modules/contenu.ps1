@@ -130,7 +130,8 @@ function Add-Ligne($Parent, [string]$CouleurPoint, $Texte, [string]$Marge = '0,8
 # ---------------------------------------------------------------------------
 # 1. L'accueil : « Qu'est-ce qui ne va pas ? », la recherche, les familles
 # ---------------------------------------------------------------------------
-function Show-Accueil {
+function Show-Accueil([string]$Famille = '') {
+    $script:FamilleChoisie = $Famille
     $script:PanneEnCours = $null; $script:ChoixFaits = @(); $script:ReparateurOuvert = $false
     Clear-Contenu
     if (-not $script:Donnees) {
@@ -139,23 +140,21 @@ function Show-Accueil {
         Add-Texte $c 'Son fichier est absent ou abîmé. Réinstalle Mindcare depuis Mindset.' 14 '#A9A3C9' 'Normal' '0,8,0,0'
         return
     }
-    Add-Titre $ui.Contenu "Qu'est-ce qui ne va pas ?" 'H1' '0,0,0,12'
-
-    # La recherche par mots : les résultats remplacent les familles pendant qu'on tape
+    # En haut, la recherche par mots (pour qui préfère écrire) : les résultats remplacent les questions pendant qu'on tape
     $champ = New-Object System.Windows.Controls.Border
-    $champ.CornerRadius = 16; $champ.Padding = '16,10'; $champ.Margin = '0,0,0,14'
+    $champ.CornerRadius = 14; $champ.Padding = '14,7'; $champ.Margin = '0,0,0,18'
     $champ.Background = Get-Brush '#12FFFFFF'; $champ.BorderBrush = Get-Brush '#7300E5FF'; $champ.BorderThickness = 1
     $dp = New-Object System.Windows.Controls.DockPanel
     $loupe = New-Object System.Windows.Shapes.Path
     $loupe.Data = [System.Windows.Media.Geometry]::Parse('M 8,8 m -6,0 a 6,6 0 1 0 12,0 a 6,6 0 1 0 -12,0 M 12.5,12.5 L 17,17')
     $loupe.Stroke = Get-Brush '#00E5FF'; $loupe.StrokeThickness = 2; $loupe.StrokeEndLineCap = 'Round'
-    $loupe.Width = 20; $loupe.Height = 20; $loupe.Margin = '0,0,10,0'; $loupe.VerticalAlignment = 'Center'
+    $loupe.Width = 18; $loupe.Height = 18; $loupe.Margin = '0,0,10,0'; $loupe.VerticalAlignment = 'Center'
     [System.Windows.Controls.DockPanel]::SetDock($loupe, 'Left'); [void]$dp.Children.Add($loupe)
     $zone = New-Object System.Windows.Controls.Grid
-    $indice = New-Text 'Décris ce qui se passe : « bip », « wifi », « écran bleu », « il redémarre »...' 15 '#7E78A0'
+    $indice = New-Text 'Tu peux aussi écrire ton problème avec tes mots : « bip », « le son grésille », « écran bleu »...' 14 '#7E78A0'
     $indice.IsHitTestVisible = $false; $indice.VerticalAlignment = 'Center'
     $saisie = New-Object System.Windows.Controls.TextBox
-    $saisie.Background = [System.Windows.Media.Brushes]::Transparent; $saisie.BorderThickness = 0; $saisie.FontSize = 16
+    $saisie.Background = [System.Windows.Media.Brushes]::Transparent; $saisie.BorderThickness = 0; $saisie.FontSize = 15
     $saisie.Foreground = Get-Brush '#FFFFFF'; $saisie.CaretBrush = Get-Brush '#00E5FF'; $saisie.VerticalContentAlignment = 'Center'
     $saisie.Tag = $indice
     $saisie.Add_TextChanged({ param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Update-Accueil })
@@ -196,13 +195,35 @@ function Update-Accueil {
     if ($texte.Trim()) {
         $trouvees = @(Find-Pannes $script:Donnees $texte)
         if (-not $trouvees) {
-            Add-Texte $z "Rien ne correspond à « $($texte.Trim()) ». Essaie d'autres mots, ou efface pour voir les familles." 15 '#A9A3C9' 'Normal' '4,4,0,0'
+            Add-Texte $z "Rien ne correspond à « $($texte.Trim()) ». Essaie d'autres mots, ou efface pour répondre aux questions." 15 '#A9A3C9' 'Normal' '4,4,0,0'
             return
         }
         Add-Texte $z $(if ($trouvees.Count -eq 1) { 'Une panne correspond :' } else { "$($trouvees.Count) pannes correspondent :" }) 14 '#A9A3C9' 'Normal' '4,0,0,4'
         Add-EnGrille $z @($trouvees | Select-Object -First 8 | ForEach-Object { New-PanneBouton $_ $true }) 2
         return
     }
+    # Question 2 : la famille choisie, et ses pannes comme réponses
+    $fc = if ($script:FamilleChoisie) { Get-Famille $script:Donnees $script:FamilleChoisie } else { $null }
+    if ($fc) {
+        $choisi = New-Object System.Windows.Controls.DockPanel; $choisi.Margin = '0,0,0,16'
+        $b = New-Button 'Changer' 'BtnSecondary'; $b.VerticalAlignment = 'Center'
+        $b.Add_Click({ $script:FamilleChoisie = ''; Update-Accueil; $ui.Defilement.ScrollToTop() })
+        [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$choisi.Children.Add($b)
+        $ic = ConvertFrom-Svg ([string]$fc.Icone)
+        if ($ic) { $ic.Width = 26; $ic.Height = 26; $ic.Margin = '0,0,10,0'; [System.Windows.Controls.DockPanel]::SetDock($ic, 'Left'); [void]$choisi.Children.Add($ic) }
+        $t = New-Text "1. Ça concerne : $($fc.Titre)" 15 '#A9A3C9' 'SemiBold'; $t.VerticalAlignment = 'Center'; [void]$choisi.Children.Add($t)
+        [void]$z.Children.Add($choisi)
+        Add-Titre $z "2. Qu'est-ce qui se passe ?" 'H1' '0,0,0,12'
+        foreach ($p in @($script:Donnees.Pannes | Where-Object { $_.Famille -eq $fc.Id })) {
+            $b = New-PanneBouton $p; $b.Margin = '0,0,0,10'; $b.HorizontalContentAlignment = 'Stretch'
+            [void]$z.Children.Add($b)
+        }
+        Add-Texte $z 'Rien ne ressemble ? Écris ton problème tout en haut, ou change de famille. Ton cas pourra être ajouté.' 14 '#A9A3C9' 'Normal' '4,6,0,0'
+        return
+    }
+
+    # Question 1 : ça concerne quoi ?
+    Add-Titre $z '1. Ça concerne quoi ?' 'H1' '0,0,0,12'
     $tuiles = foreach ($f in $script:Donnees.Familles) {
         $n = @($script:Donnees.Pannes | Where-Object { $_.Famille -eq $f.Id }).Count
         $sp = New-Object System.Windows.Controls.StackPanel
@@ -245,22 +266,11 @@ function New-PanneBouton($Panne, [bool]$AvecFamille = $false) {
 }
 
 # ---------------------------------------------------------------------------
-# 2. Une famille : ses pannes
+# 2. Une famille : ses pannes (la question 2 de l'accueil)
 # ---------------------------------------------------------------------------
 function Show-Famille([string]$Id) {
-    $f = Get-Famille $script:Donnees $Id
-    if (-not $f) { Show-Accueil; return }
-    Clear-Contenu
-    $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,0,0,14'
-    $b = New-Button 'Toutes les familles' 'BtnSecondary'; $b.VerticalAlignment = 'Top'; $b.Add_Click({ Show-Accueil })
-    [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$haut.Children.Add($b)
-    $t = New-Object System.Windows.Controls.StackPanel
-    Add-Texte $t ([string]$f.Titre).ToUpper() 13 '#00E5FF' 'Bold'
-    Add-Titre $t "Qu'est-ce qui ressemble le plus à ce qui arrive ?" 'H1' '0,4,0,0'
-    [void]$haut.Children.Add($t)
-    [void]$ui.Contenu.Children.Add($haut)
-    Add-EnGrille $ui.Contenu @($script:Donnees.Pannes | Where-Object { $_.Famille -eq $Id } | ForEach-Object { New-PanneBouton $_ }) 2
-    Add-Texte $ui.Contenu 'Rien ne ressemble ? Essaie la recherche, ou une autre famille. Ton cas pourra être ajouté.' 14 '#A9A3C9' 'Normal' '4,6,0,0'
+    if (-not (Get-Famille $script:Donnees $Id)) { Show-Accueil; return }
+    Show-Accueil $Id
 }
 
 # ---------------------------------------------------------------------------
@@ -339,6 +349,49 @@ function Add-PanneauEnquete($Parent, $E) {
     }
 }
 
+# « Étape 2 sur 5 » et sa barre (le total peut baisser : des étapes deviennent inutiles en route)
+function Add-Avancement($Parent, [int]$N, [int]$Total) {
+    if ($Total -lt $N) { $Total = $N }
+    Add-Texte $Parent "ÉTAPE $N SUR $Total" 12 '#A9A3C9' 'Bold'
+    $barre = New-Object System.Windows.Controls.Grid; $barre.Height = 6; $barre.Margin = '0,6,0,16'
+    $fond = New-Object System.Windows.Controls.Border; $fond.CornerRadius = 3; $fond.Background = Get-Brush '#22FFFFFF'
+    [System.Windows.Controls.Grid]::SetColumnSpan($fond, 2); [void]$barre.Children.Add($fond)
+    foreach ($l in $N, ($Total - $N)) {
+        $cd = New-Object System.Windows.Controls.ColumnDefinition; $cd.Width = New-Object System.Windows.GridLength ([double]$l), ([System.Windows.GridUnitType]::Star)
+        [void]$barre.ColumnDefinitions.Add($cd)
+    }
+    $plein = New-Object System.Windows.Controls.Border; $plein.CornerRadius = 3; $plein.Background = Get-Brush '#00E5FF'
+    [void]$barre.Children.Add($plein)
+    [void]$Parent.Children.Add($barre)
+}
+
+# Les gestes d'une manipulation, chacun avec sa case à cocher (un clic sur la ligne coche ou décoche)
+function Add-Gestes($Parent, $Gestes) {
+    $n = 0
+    foreach ($l in $Gestes) {
+        $n++
+        $d = New-Object System.Windows.Controls.DockPanel; $d.Margin = '0,8,0,0'; $d.Cursor = 'Hand'; $d.Background = [System.Windows.Media.Brushes]::Transparent
+        $case = New-Object System.Windows.Controls.Border
+        $case.Width = 20; $case.Height = 20; $case.CornerRadius = 6; $case.BorderThickness = 2; $case.Margin = '0,0,12,0'; $case.VerticalAlignment = 'Top'
+        $case.BorderBrush = Get-Brush '#00E5FF'; $case.Background = [System.Windows.Media.Brushes]::Transparent
+        $coche = New-Object System.Windows.Shapes.Path
+        $coche.Data = [System.Windows.Media.Geometry]::Parse('M 3,8 L 7,12 L 13,4'); $coche.Stroke = Get-Brush '#0B0A14'; $coche.StrokeThickness = 2.4
+        $coche.StrokeEndLineCap = 'Round'; $coche.StrokeStartLineCap = 'Round'; $coche.Visibility = 'Hidden'; $coche.Margin = '0.5,0.5,0,0'
+        $case.Child = $coche
+        [System.Windows.Controls.DockPanel]::SetDock($case, 'Left'); [void]$d.Children.Add($case)
+        $t = New-Text "$n. $l" 14 '#C9C3DD'; [void]$d.Children.Add($t)
+        $d.Tag = @{ Case = $case; Coche = $coche; Texte = $t; Fait = $false }
+        $d.Add_MouseLeftButtonUp({
+            param($s)
+            $g = $s.Tag; $g.Fait = -not $g.Fait
+            $g.Case.Background = if ($g.Fait) { Get-Brush '#00E5FF' } else { [System.Windows.Media.Brushes]::Transparent }
+            $g.Coche.Visibility = if ($g.Fait) { 'Visible' } else { 'Hidden' }
+            $g.Texte.Foreground = Get-Brush $(if ($g.Fait) { '#6E6890' } else { '#C9C3DD' })
+        })
+        [void]$Parent.Children.Add($d)
+    }
+}
+
 function Show-EtapeEnquete($E) {
     $et = $E.Etape
     Clear-Contenu
@@ -354,7 +407,8 @@ function Show-EtapeEnquete($E) {
     $droite = New-CarteDans $g 2
     $test = $et.Type -eq 'test'
     $suspects = @($E.Restants | Where-Object { -not (Get-Suspect $script:Donnees $_).Urgent }).Count
-    $label = if ($test) { "UN TEST À FAIRE$(if ($et.Duree) { " ($($et.Duree))" })" } elseif ($suspects -gt 1) { "Il reste $suspects suspects" } else { 'Une dernière vérification' }
+    Add-Avancement $droite (@($E.Faits).Count + 1) (@($E.Faits).Count + 1 + [int]$E.AVenir)
+    $label = if ($test) { "UNE MANIPULATION À FAIRE$(if ($et.Duree) { " ($($et.Duree))" })" } elseif ($suspects -gt 1) { "Il reste $suspects suspects" } else { 'Une dernière vérification' }
     Add-Texte $droite $label 13 $(if ($test) { '#FF2EB5' } else { '#00E5FF' }) 'Bold' '0,0,0,8'
     $haut = New-Object System.Windows.Controls.DockPanel
     [void]$droite.Children.Add($haut)
@@ -371,9 +425,13 @@ function Show-EtapeEnquete($E) {
     Add-Titre $texte ([string]$et.Texte) 'H1'
     if ($et.Aide) { Add-Texte $texte ([string]$et.Aide) 14 '#A9A3C9' 'Normal' '0,8,0,0' }
     if ($test) {
-        Add-Liste $droite $et.Gestes '' '#00E5FF' '#C9C3DD'
-        Add-Ligne $droite '#FFB547' (New-Text ([string]@($script:Donnees.Securite)[0]) 13 '#FFB547') '0,12,0,0'
-        Add-Texte $droite 'Ensuite, dis à Mindcare ce qui s''est passé :' 14 '#A9A3C9' 'Normal' '0,16,0,0'
+        Add-Texte $droite 'Coche chaque geste une fois fait :' 14 '#A9A3C9' 'Normal' '0,12,0,0'
+        Add-Gestes $droite $et.Gestes
+        # (la consigne de sécurité seulement pour les gestes sur le matériel, pas pour une manipulation dans Windows)
+        if ((@($et.Gestes) -join ' ') -match 'débranch|câble|barrette|boîtier|capot|ventilat|multiprise|ouvr(e|ir) le PC|tournevis|batterie') {
+            Add-Ligne $droite '#FFB547' (New-Text ([string]@($script:Donnees.Securite)[0]) 13 '#FFB547') '0,12,0,0'
+        }
+        Add-Texte $droite 'Ensuite, dis à Mindcare ce que ça a donné :' 14 '#A9A3C9' 'Normal' '0,16,0,0'
     }
     $reponses = New-Object System.Windows.Controls.StackPanel; $reponses.Margin = '0,6,0,0'
     [void]$droite.Children.Add($reponses)

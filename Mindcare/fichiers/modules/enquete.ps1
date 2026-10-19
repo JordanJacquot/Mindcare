@@ -83,6 +83,18 @@ function Get-Enquete($Donnees, $Panne, [int[]]$Choix = @(), $Indices = $null) {
         if ($r) { & $applique $r $(if ($r.SansPreuve) { '' } elseif ($r.Preuve) { [string]$r.Preuve } else { "$($et.Court) : $($r.Texte)" }) }
     }
 
+    # Les étapes qui peuvent encore venir après celle-ci (au plus) : pour « Étape 2 sur 5 »
+    $aVenir = 0
+    if ($courante) {
+        foreach ($x in $etapes) {
+            if ($faites[[string]$x.Id] -or $x.Type -eq 'auto') { continue }
+            if ($x.Pour -and -not @($x.Pour | Where-Object { $st.Restants.Contains([string]$_) })) { continue }
+            if ($x.SiNote -and -not @($x.SiNote | Where-Object { $st.Notes -contains $_ })) { continue }
+            if ($x.SaufNote -and @($x.SaufNote | Where-Object { $st.Notes -contains $_ })) { continue }
+            $aVenir++
+        }
+    }
+
     $verdict = if ($courante) { $null }
                elseif ($st.Confirme) { [pscustomobject]@{ Type = 'trouve'; Suspect = $st.Confirme; Detail = $st.Detail; Restants = @($st.Confirme) } }
                elseif ($st.Restants.Count -eq 1) { [pscustomobject]@{ Type = 'elimination'; Suspect = $st.Restants[0]; Detail = ''; Restants = @($st.Restants) } }
@@ -90,7 +102,7 @@ function Get-Enquete($Donnees, $Panne, [int[]]$Choix = @(), $Indices = $null) {
                else { [pscustomobject]@{ Type = 'reparateur'; Suspect = $null; Detail = ''; Restants = @($st.Restants) } }
     [pscustomobject]@{
         Etape = $courante; Choix = @($Choix | Select-Object -First $n); Restants = @($st.Restants); Ecartes = $st.Ecartes
-        Notes = $st.Notes; Preuves = $st.Preuves; Faits = $faits; Auto = $auto; Verdict = $verdict
+        Notes = $st.Notes; Preuves = $st.Preuves; Faits = $faits; Auto = $auto; Verdict = $verdict; AVenir = $aVenir
     }
 }
 
