@@ -80,6 +80,21 @@ Remove-Item -LiteralPath "$zip.sig" -ErrorAction SilentlyContinue   # jamais l'a
 & (Join-Path $mindset 'outils\signer.ps1') -Fichier $zip
 if (-not (Test-Path -LiteralPath "$zip.sig")) { throw 'Publication annulée : le zip n''a pas pu être signé.' }
 
+# 2 bis. Le catalogue pour Mindcare Mobile (le téléphone le télécharge tout seul) : enquetes.json et images\*.svg,
+# avec son empreinte dans les notes (« SHA-256 du catalogue : ... », lue par l'appli Android, maj/MajCatalogue.kt)
+$catalogue = Join-Path $racine 'release\catalogue.zip'
+Remove-Item -LiteralPath $catalogue -ErrorAction SilentlyContinue
+Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+$fichiers = Join-Path $racine 'Mindcare\fichiers'
+$archive = [IO.Compression.ZipFile]::Open($catalogue, 'Create')
+try {
+    [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, (Join-Path $fichiers 'enquetes.json'), 'enquetes.json')
+    foreach ($img in Get-ChildItem -LiteralPath (Join-Path $fichiers 'images') -Filter '*.svg') {
+        [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $img.FullName, "images/$($img.Name)")   # (des « / » : Android les attend)
+    }
+} finally { $archive.Dispose() }
+$shaCatalogue = (Get-FileHash -LiteralPath $catalogue -Algorithm SHA256).Hash.ToLowerInvariant()
+
 # 3. Commit, tag, Release (le zip et sa signature sont seulement joints à la Release : release\ n'est pas suivi par git)
 Push-Location $racine
 try {
@@ -88,6 +103,7 @@ try {
     Invoke-Native git @('tag', "v$Version")
     Invoke-Native git @('push', 'origin', 'HEAD', '--tags')
     if (-not $Notes) { $Notes = "Mindcare $Version" }
-    Invoke-Native gh @('release', 'create', "v$Version", $zip, "$zip.sig", '--title', "Mindcare $Version", '--notes', $Notes)
+    $Notes += "`n`nLe catalogue de pannes est aussi pour Mindcare Mobile (il se met à jour tout seul).`n`nSHA-256 du catalogue : $shaCatalogue"
+    Invoke-Native gh @('release', 'create', "v$Version", $zip, "$zip.sig", $catalogue, '--title', "Mindcare $Version", '--notes', $Notes)
 } finally { Pop-Location }
 "Mindcare $Version publiée."
