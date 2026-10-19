@@ -9,6 +9,8 @@
 $JournauxCode = {
     # Les codes d'écran bleu les plus courants, et ce qu'ils accusent le plus souvent
     $script:CodesEcranBleu = @{
+        0x139 = @('KERNEL_SECURITY_CHECK_FAILURE', 'pilote');  0x1E  = @('KMODE_EXCEPTION_NOT_HANDLED', 'pilote')
+        0x154 = @('UNEXPECTED_STORE_EXCEPTION', 'disque');   0x119 = @('VIDEO_SCHEDULER_INTERNAL_ERROR', 'pilote')
         0x1A  = @('MEMORY_MANAGEMENT', 'memoire');           0x50  = @('PAGE_FAULT_IN_NONPAGED_AREA', 'memoire')
         0x4E  = @('PFN_LIST_CORRUPT', 'memoire');            0x12B = @('FAULTY_HARDWARE_CORRUPTED_PAGE', 'memoire')
         0xA   = @('IRQL_NOT_LESS_OR_EQUAL', 'pilote');       0xD1  = @('DRIVER_IRQL_NOT_LESS_OR_EQUAL', 'pilote')
@@ -41,17 +43,17 @@ $JournauxCode = {
 
         # Écrans bleus, et ce que leur code accuse
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-WER-SystemErrorReporting'; Id = 1001; StartTime = $depuis }
-        $noms = @(); $familles = @{}
+        $noms = @(); $familles = @{}; $parFamille = @{}
         foreach ($e in $ev) {
             $m = [regex]::Match("$($e.Properties[0].Value) $($e.Message)", '0x([0-9a-fA-F]{8})')
             if (-not $m.Success) { continue }
             $code = [Convert]::ToInt32($m.Groups[1].Value, 16)
             $c = $script:CodesEcranBleu[$code]
-            if ($c) { $noms += $c[0]; $familles[$c[1]] = $true } else { $noms += ('0x{0:X}' -f $code) }
+            if ($c) { $noms += $c[0]; $familles[$c[1]] = $true; $parFamille[$c[1]] = @($parFamille[$c[1]]) + $c[0] } else { $noms += ('0x{0:X}' -f $code) }
         }
         $noms = @($noms | Select-Object -Unique)
         & $ajoute 'ecransbleus' $ev.Count "$(Get-Quantite $ev.Count 'écran bleu' 'écrans bleus') ces $Jours jours$(if ($noms) { " ($($noms -join ', '))" })" "Aucun écran bleu ces $Jours jours"
-        foreach ($f in 'memoire', 'pilote', 'disque', 'materiel') { & $ajoute "bsod-$f" $familles[$f] '' '' $false }
+        foreach ($f in 'memoire', 'pilote', 'disque', 'materiel') { & $ajoute "bsod-$f" $familles[$f] "Code d'écran bleu noté par Windows : $(@($parFamille[$f] | Where-Object { $_ } | Select-Object -Unique) -join ', ')" '' $false }
 
         # Erreurs matérielles graves, notées par le processeur ou la carte mère
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-WHEA-Logger'; Level = 1, 2; StartTime = $depuis }

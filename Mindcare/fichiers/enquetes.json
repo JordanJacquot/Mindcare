@@ -2956,6 +2956,34 @@
           }
         },
         {
+          "Id": "auto-code-memoire",
+          "Type": "auto",
+          "Indice": "bsod-memoire",
+          "Pour": [
+            "memoire"
+          ],
+          "SiVu": {
+            "Garde": [
+              "memoire",
+              "pilote"
+            ]
+          }
+        },
+        {
+          "Id": "auto-code-pilote",
+          "Type": "auto",
+          "Indice": "bsod-pilote",
+          "Pour": [
+            "pilote"
+          ],
+          "SiVu": {
+            "Garde": [
+              "pilote",
+              "memoire"
+            ]
+          }
+        },
+        {
           "Id": "bleu",
           "Type": "question",
           "Court": "Un écran bleu ?",
@@ -3162,7 +3190,29 @@
         "stop code",
         "erreur critique",
         "smiley triste",
-        "qr code"
+        "qr code",
+        "code",
+        "stop code",
+        "code d'arrêt",
+        "memory_management",
+        "irql_not_less_or_equal",
+        "video_tdr_failure",
+        "critical_process_died",
+        "whea_uncorrectable_error",
+        "kernel_data_inpage_error",
+        "page_fault_in_nonpaged_area",
+        "system_service_exception",
+        "dpc_watchdog_violation",
+        "0x1a",
+        "0x0000001a",
+        "0xa",
+        "0xd1",
+        "0x116",
+        "0x124",
+        "0xef",
+        "0x7a",
+        "0x50",
+        "0x3b"
       ],
       "Suspects": [
         "windowsabime",
@@ -3171,7 +3221,8 @@
         "disque",
         "memoire",
         "pilote",
-        "surchauffe"
+        "surchauffe",
+        "gpu"
       ],
       "Etapes": [
         {
@@ -3211,6 +3262,147 @@
         },
         {
           "Ref": "auto-disque"
+        },
+        {
+          "Id": "auto-code-memoire",
+          "Type": "auto",
+          "Indice": "bsod-memoire",
+          "Pour": [
+            "memoire"
+          ],
+          "SiVu": {
+            "Garde": [
+              "memoire",
+              "pilote"
+            ],
+            "Note": "codelu"
+          }
+        },
+        {
+          "Id": "auto-code-pilote",
+          "Type": "auto",
+          "Indice": "bsod-pilote",
+          "Pour": [
+            "pilote"
+          ],
+          "SiVu": {
+            "Garde": [
+              "pilote",
+              "appareil",
+              "programme",
+              "memoire",
+              "gpu"
+            ],
+            "Note": "codelu"
+          }
+        },
+        {
+          "Id": "auto-code-disque",
+          "Type": "auto",
+          "Indice": "bsod-disque",
+          "Pour": [
+            "disque"
+          ],
+          "SiVu": {
+            "Garde": [
+              "disque",
+              "windowsabime"
+            ],
+            "Note": "codelu"
+          }
+        },
+        {
+          "Id": "auto-code-materiel",
+          "Type": "auto",
+          "Indice": "bsod-materiel",
+          "Pour": [
+            "surchauffe",
+            "memoire",
+            "gpu"
+          ],
+          "SiVu": {
+            "Garde": [
+              "surchauffe",
+              "memoire",
+              "gpu"
+            ],
+            "Note": "codelu"
+          }
+        },
+        {
+          "Id": "code",
+          "Type": "question",
+          "Court": "Le code d'arrêt",
+          "SaufNote": [
+            "codelu"
+          ],
+          "Texte": "Quel est le code de l'écran bleu ?",
+          "Image": "ecran-bleu",
+          "Aide": "Regarde la photo de l'écran bleu : la ligne « Code d'arrêt » (ou « Stop code »), en majuscules avec des _. Choisis le groupe où il apparaît.",
+          "Reponses": [
+            {
+              "Texte": "MEMORY_MANAGEMENT, PAGE_FAULT_IN_NONPAGED_AREA ou PFN_LIST_CORRUPT",
+              "Garde": [
+                "memoire",
+                "pilote"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (MEMORY_MANAGEMENT...) accuse la mémoire ou un pilote"
+            },
+            {
+              "Texte": "IRQL_NOT_LESS_OR_EQUAL, DRIVER_IRQL_NOT_LESS_OR_EQUAL, SYSTEM_SERVICE_EXCEPTION, KMODE_EXCEPTION_NOT_HANDLED ou DPC_WATCHDOG_VIOLATION",
+              "Garde": [
+                "pilote",
+                "appareil",
+                "programme",
+                "memoire"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (IRQL_NOT_LESS_OR_EQUAL...) accuse un pilote, un appareil ou un programme"
+            },
+            {
+              "Texte": "VIDEO_TDR_FAILURE ou VIDEO_SCHEDULER_INTERNAL_ERROR",
+              "Garde": [
+                "pilote",
+                "gpu",
+                "surchauffe"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (VIDEO_TDR_FAILURE...) accuse la carte graphique ou son pilote"
+            },
+            {
+              "Texte": "KERNEL_DATA_INPAGE_ERROR, NTFS_FILE_SYSTEM, UNEXPECTED_STORE_EXCEPTION ou INACCESSIBLE_BOOT_DEVICE",
+              "Garde": [
+                "disque",
+                "windowsabime"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (KERNEL_DATA_INPAGE_ERROR...) accuse le disque"
+            },
+            {
+              "Texte": "CRITICAL_PROCESS_DIED ou SYSTEM_THREAD_EXCEPTION_NOT_HANDLED",
+              "Garde": [
+                "windowsabime",
+                "disque",
+                "pilote"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (CRITICAL_PROCESS_DIED...) accuse Windows lui-même, le disque ou un pilote"
+            },
+            {
+              "Texte": "WHEA_UNCORRECTABLE_ERROR ou CLOCK_WATCHDOG_TIMEOUT",
+              "Garde": [
+                "surchauffe",
+                "memoire",
+                "gpu"
+              ],
+              "Note": "codelu",
+              "Preuve": "Le code d'arrêt (WHEA_UNCORRECTABLE_ERROR...) accuse une pièce : la chaleur, la mémoire ou la carte graphique"
+            },
+            {
+              "Texte": "Un autre code"
+            }
+          ]
         },
         {
           "Id": "nouveau",

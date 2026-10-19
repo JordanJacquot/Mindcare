@@ -119,13 +119,16 @@ $cas = @(
     @{ Nom = 'portable qui lâche sur batterie'; Panne = 'seteint'; Choix = 1, 0, 1, 0; Type = 'trouve'; Suspect = 'batterie' }
     @{ Nom = 'multiprise : branché au mur, il tient'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 0, 0; Type = 'trouve'; Suspect = 'prise' }
     @{ Nom = 'PC fixe au mur, frais : alimentation par élimination'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 1; Type = 'elimination'; Suspect = 'alimentation' }
-    @{ Nom = 'écran bleu depuis une nouvelle manette'; Panne = 'ecranbleu'; Choix = 0, 1, 0, 0; Type = 'trouve'; Suspect = 'appareil' }
+    @{ Nom = 'écran bleu depuis une nouvelle manette'; Panne = 'ecranbleu'; Choix = 0, 1, 6, 0, 0; Type = 'trouve'; Suspect = 'appareil' }
     @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 1, 3, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
     @{ Nom = 'écran bleu, Windows dit que le disque est malade'; Panne = 'ecranbleu'; Choix = 0, 0; Indices = @{ disque = (New-Indice $true 'Windows dit qu''un disque n''est pas en bonne santé') }; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'jeu : écran noir qui revient, réglé par le pilote'; Panne = 'jeu'; Choix = 1, 1, 1, 2, 1, 0; Type = 'trouve'; Suspect = 'pilote' }
     @{ Nom = 'jeu : des traits bizarres, frais : la carte graphique'; Panne = 'jeu'; Choix = 1, 1, 1, 3, 1; Type = 'elimination'; Suspect = 'gpu' }
     @{ Nom = 'se fige avec des clics : le disque'; Panne = 'fige'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'un seul jeu plante, réinstallé : réglé'; Panne = 'programme'; Choix = 1, 0, 0; Type = 'trouve'; Suspect = 'leprogramme' }
+    @{ Nom = 'écran bleu MEMORY_MANAGEMENT, test de mémoire raté'; Panne = 'ecranbleu'; Choix = 0, 1, 0, 0; Type = 'trouve'; Suspect = 'memoire' }
+    @{ Nom = 'écran bleu : code lu par Windows (pilote), réglé par les mises à jour'; Panne = 'ecranbleu'; Choix = 0, 0, 3, 1, 0; Indices = @{ 'bsod-pilote' = (New-Indice $true 'Code d''écran bleu noté par Windows : DRIVER_IRQL_NOT_LESS_OR_EQUAL') }; Type = 'trouve'; Suspect = 'pilote' }
+    @{ Nom = 'écran bleu VIDEO_TDR_FAILURE, frais, pilote sans effet : la carte graphique'; Panne = 'ecranbleu'; Choix = 0, 1, 2, 1, 1; Type = 'elimination'; Suspect = 'gpu' }
     @{ Nom = 'rien ne s''allume : interrupteur sur O'; Panne = 'rien'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'interrupteur' }
     @{ Nom = 'écran noir, pas de signal, image sur la prise du haut : la carte graphique'; Panne = 'ecrannoir'; Choix = 1, 1, 1, 1, 1, 1, 1, 1, 0; Type = 'trouve'; Suspect = 'gpu' }
     @{ Nom = 'tout est lent, le disque est plein'; Panne = 'toutlent'; Choix = 1, 1, 1, 0; Type = 'trouve'; Suspect = 'disqueplein' }
@@ -161,7 +164,7 @@ Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() |
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
-                 @('pas de son', 'plusdeson'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'))) {
+                 @('pas de son', 'plusdeson'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
     $trouvees = @(Find-Pannes $donnees $r[0])
     Write-Resultat "recherche « $($r[0]) »" ($trouvees -and ($r[1] -split '\|') -contains $trouvees[0].Id) "(trouvé : $(@($trouvees | Select-Object -First 4 | ForEach-Object { $_.Id }) -join ', '))"
 }
@@ -215,6 +218,7 @@ Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed
 Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
 Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
 Test-Capture 'enquete-interrupteur' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
+Test-Capture 'enquete-code' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:0,1' } | Out-Null
 Test-Capture 'recherche' @{ MINDCARE_TEST_RECHERCHE = 'il redémarre' } | Out-Null
 Test-Capture 'recherche-rien' @{ MINDCARE_TEST_RECHERCHE = 'wifi' } | Out-Null
 Test-Capture 'enquete-question' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1' } | Out-Null
