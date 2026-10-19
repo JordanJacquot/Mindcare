@@ -11,8 +11,11 @@ Mindcare PC **et** pour Mindcare Mobile (Android, `D:\Projets\Mindcare-Mobile`, 
     Mindcare Mobile, et monter `Version` en tête de `enquetes.json` si un ancien téléphone le lirait mal. Le dire à
     Jordan, et donner le texte à passer à la conversation de Mindcare Mobile si elle travaille en même temps.
 - Les images restent dans le sous-ensemble de SVG lu par `modules\images.ps1` (le téléphone a le même lecteur).
-- Avant de publier : `outils\tester.ps1` tout OK, puis le test d'équivalence de Mindcare Mobile s'il existe
-  (`D:\Projets\Mindcare-Mobile`, voir son README) : le PC et le téléphone doivent donner les mêmes enquêtes.
+- Avant de publier : `outils\tester.ps1` tout OK, puis le test d'équivalence de Mindcare Mobile
+  (`D:\Projets\Mindcare-Mobile` : `gradlew preBuild`, `outils\exporter-reference.ps1`, puis `gradlew test`) : le PC et
+  le téléphone doivent donner les mêmes enquêtes et les mêmes recherches.
+- Un changement de LOGIQUE dans `modules\enquete.ps1` (Get-Enquete, Find-Pannes...) doit être porté à l'identique dans
+  `moteur/` de Mindcare Mobile.
 - La publication de Mindcare PC (`outils\publier.ps1`) publie aussi le catalogue pour le téléphone (une fois l'étape 6
   de Mindcare Mobile faite) : le téléphone le télécharge tout seul.
 
