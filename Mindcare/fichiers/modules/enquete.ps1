@@ -129,7 +129,9 @@ function Find-Pannes($Donnees, [string]$Requete) {
     $mots = @((ConvertTo-Simple $Requete) -split '\s+' | Where-Object { $_.Length -ge 2 -and $vides -notcontains $_ })
     if (-not $mots) { return @() }
     $phrase = ((ConvertTo-Simple $Requete) -replace '\s+', ' ').Trim()
+    $ordre = 0
     $res = foreach ($p in $Donnees.Pannes) {
+        $ordre++
         $fam = Get-Famille $Donnees ([string]$p.Famille)
         $titre = ConvertTo-Simple "$($p.Titre)"
         $tout = ConvertTo-Simple "$($p.Titre) $($p.Phrase) $(@($p.Mots) -join ' ') $($fam.Titre)"
@@ -140,9 +142,10 @@ function Find-Pannes($Donnees, [string]$Requete) {
         }
         # La phrase tapée telle quelle (« pas de son ») compte plus que des mots épars
         if ($phrase.Length -ge 4) { if ($titre.Contains($phrase)) { $score += 6 } elseif ($tout.Contains($phrase)) { $score += 4 } }
-        if ($score) { [pscustomobject]@{ Panne = $p; Score = $score } }
+        if ($score) { [pscustomobject]@{ Panne = $p; Score = $score; Ordre = $ordre } }
     }
-    @($res | Sort-Object @{ Expression = 'Score'; Descending = $true } | ForEach-Object { $_.Panne })
+    # (à score égal, l'ordre du catalogue : le téléphone trie exactement pareil)
+    @($res | Sort-Object @{ Expression = 'Score'; Descending = $true }, @{ Expression = 'Ordre'; Descending = $false } | ForEach-Object { $_.Panne })
 }
 
 # Ce qui ne va pas dans le fichier des enquêtes (une liste vide : tout est bon)
