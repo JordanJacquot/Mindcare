@@ -55,8 +55,8 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 ## Pour les développeurs
 
 - `Mindcare\fichiers\enquetes.json` : les familles, les pannes, leurs suspects et leurs étapes (questions,
-  vérifications automatiques, tests), le même fichier pour le futur téléphone ; chaque réponse écarte, garde ou
-  confirme des suspects.
+  vérifications automatiques, tests) ; chaque réponse écarte, garde ou confirme des suspects. **Catalogue partagé avec
+  Mindcare Mobile** (avec `images\`) : il ne s'écrit qu'ici, voir `CLAUDE.md`.
 - `Mindcare\fichiers\Mindcare.ps1` : le démarrage ; `modules\` : le code découpé par partie.
   - `contenu.ps1` : **ce que fait l'appli** : les écrans du diagnostic ;
   - `enquete.ps1` : le moteur des enquêtes (sans affichage) et la recherche par mots ;
