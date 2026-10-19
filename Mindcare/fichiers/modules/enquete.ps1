@@ -9,7 +9,7 @@
 
 $EnquetesFichier = Join-Path $AppDir 'enquetes.json'
 $IndicesConnus = 'coupures', 'ecransbleus', 'bsod-memoire', 'bsod-pilote', 'bsod-disque', 'bsod-materiel', 'materiel',
-                 'testmemoire-erreurs', 'testmemoire-ok', 'disque', 'pilotegraphique', 'majredemarrage', 'freinage', 'placelibre', 'allume'
+                 'testmemoire-erreurs', 'testmemoire-ok', 'disque', 'pilotegraphique', 'majredemarrage', 'freinage', 'placelibre', 'allume', 'usurebatterie'
 
 function Read-Enquetes([string]$Fichier = $EnquetesFichier) { [IO.File]::ReadAllText($Fichier, [Text.Encoding]::UTF8) | ConvertFrom-Json }
 
@@ -110,12 +110,13 @@ function Get-VerdictTitre($Donnees, $Panne, $Verdict) {
 
 # La recherche par mots (sans internet, toujours les mêmes résultats) : les pannes dont le nom, la phrase ou les mots
 # contiennent les mots tapés, les plus proches d'abord
-function ConvertTo-Simple([string]$Texte) { ($Texte.Normalize([Text.NormalizationForm]::FormD) -replace '\p{Mn}', '').ToLowerInvariant() -replace "[^a-z0-9 ]", ' ' }
+function ConvertTo-Simple([string]$Texte) { ((($Texte.Normalize([Text.NormalizationForm]::FormD) -replace '\p{Mn}', '').ToLowerInvariant() -replace "[^a-z0-9 ]", ' ') -replace '\s+', ' ').Trim() }
 function Find-Pannes($Donnees, [string]$Requete) {
     $vides = 'il', 'le', 'la', 'les', 'un', 'une', 'de', 'du', 'des', 'ne', 'pas', 'plus', 'mon', 'ma', 'mes', 'pc', 'ordi', 'ordinateur',
              'et', 'ou', 'est', 'en', 'sur', 'qui', 'que', 'se', 'ca', 'tout', 'au', 'aux', 'je', 'j', 'me', 'quand', 'avec'
     $mots = @((ConvertTo-Simple $Requete) -split '\s+' | Where-Object { $_.Length -ge 2 -and $vides -notcontains $_ })
     if (-not $mots) { return @() }
+    $phrase = ((ConvertTo-Simple $Requete) -replace '\s+', ' ').Trim()
     $res = foreach ($p in $Donnees.Pannes) {
         $fam = Get-Famille $Donnees ([string]$p.Famille)
         $titre = ConvertTo-Simple "$($p.Titre)"
@@ -125,6 +126,8 @@ function Find-Pannes($Donnees, [string]$Requete) {
             $racine = if ($m.Length -gt 5) { $m.Substring(0, $m.Length - 1) } else { $m }   # (« redemarre » trouve « redemarrage »)
             if ($titre -match "\b$([regex]::Escape($racine))") { $score += 3 } elseif ($tout -match "\b$([regex]::Escape($racine))") { $score += 2 }
         }
+        # La phrase tapée telle quelle (« pas de son ») compte plus que des mots épars
+        if ($phrase.Length -ge 4) { if ($titre.Contains($phrase)) { $score += 6 } elseif ($tout.Contains($phrase)) { $score += 4 } }
         if ($score) { [pscustomobject]@{ Panne = $p; Score = $score } }
     }
     @($res | Sort-Object @{ Expression = 'Score'; Descending = $true } | ForEach-Object { $_.Panne })

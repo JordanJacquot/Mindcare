@@ -7,11 +7,11 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 Mindcare s'installe avec **[Mindset](https://github.com/JordanJacquot/Mindset/releases/latest)**, le portail de la suite :
 installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et l'affiche dans sa fenêtre.
 
-## Ce qu'elle sait faire (0.4.0)
+## Ce qu'elle sait faire (0.5.0)
 
-- Un catalogue de pannes rangé en 12 familles, et une recherche par mots (« il redémarre », « écran bleu »...) qui marche
-  sans internet. Première famille complète : Plantages (il redémarre tout seul, il s'éteint d'un coup, écran bleu, il
-  se fige, un programme plante, ça plante en jeu) ; les autres familles arrivent.
+- Un catalogue de 68 pannes rangé en 12 familles (allumage, démarrage de Windows, écran, plantages, lenteur, bruits et
+  chaleur, son, internet, clavier et souris, batterie, virus, fichiers), et une recherche par mots (« bip », « wifi »,
+  « écran bleu »...) qui marche sans internet.
 - Une enquête par élimination : les suspects à gauche, barrés au fur et à mesure ; une question ou un test à la fois
   (le test de mémoire de Windows, le nettoyage, les mises à jour, la multiprise...), jusqu'à une réponse nette
   (« Trouvé : une barrette de mémoire est abîmée »), ou ce qui reste pour un réparateur, avec le rapport.
@@ -24,8 +24,8 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
 ## Plan
 
 - Refonte du 19 octobre 2026 (après la relecture de Jordan) : enquête par élimination, catalogue de 12 familles et
-  72 pannes (maquettes validées). Fait : le moteur, les écrans, la famille Plantages (0.4.0). Reste : les 11 autres
-  familles, une par une.
+  72 pannes (maquettes validées). Fait : le moteur, les écrans, la famille Plantages (0.4.0), puis les 11 autres
+  familles (0.5.0). Ensuite : les cas que Jordan rencontrera.
 
 Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 

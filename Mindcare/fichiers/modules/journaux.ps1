@@ -88,6 +88,20 @@ $JournauxCode = {
             & $ajoute 'placelibre' ($part -lt 10) "Plus que $libre Go libres sur le disque $($env:SystemDrive) ($part %)" "$libre Go libres sur le disque $($env:SystemDrive)"
         } catch { & $ajoute 'placelibre' $false '' '' $false }
 
+        # L'usure de la batterie (portables) : sa capacité actuelle, comparée à celle d'origine (le rapport de batterie de
+        # Windows, sans droits administrateur ; un fichier temporaire, effacé tout de suite)
+        try {
+            $f = Join-Path $env:TEMP "mindcare-batterie-$PID.xml"
+            $null = & "$env:SystemRoot\System32\powercfg.exe" /batteryreport /xml /output $f 2>&1
+            $b = $null
+            if ([IO.File]::Exists($f)) { $b = @(([xml][IO.File]::ReadAllText($f)).BatteryReport.Batteries.Battery)[0]; Remove-Item -LiteralPath $f -Force -ErrorAction SilentlyContinue }
+            $origine = if ($b) { [double]$b.DesignCapacity } else { 0 }
+            if ($origine -gt 0) {
+                $part = [math]::Round(100.0 * [double]$b.FullChargeCapacity / $origine)
+                & $ajoute 'usurebatterie' ($part -lt 60) "La batterie ne garde plus que $part % de sa capacité d'origine" "La batterie garde $part % de sa capacité d'origine"
+            } else { & $ajoute 'usurebatterie' $false '' '' $false }
+        } catch { & $ajoute 'usurebatterie' $false '' '' $false }
+
         # Le dernier vrai redémarrage (« Arrêter » ne compte pas)
         try {
             $jours = [int]((Get-Date) - (Get-CimInstance Win32_OperatingSystem -ErrorAction Stop).LastBootUpTime).TotalDays

@@ -120,12 +120,23 @@ $cas = @(
     @{ Nom = 'multiprise : branché au mur, il tient'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 0, 0; Type = 'trouve'; Suspect = 'prise' }
     @{ Nom = 'PC fixe au mur, frais : alimentation par élimination'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 1; Type = 'elimination'; Suspect = 'alimentation' }
     @{ Nom = 'écran bleu depuis une nouvelle manette'; Panne = 'ecranbleu'; Choix = 0, 1, 0, 0; Type = 'trouve'; Suspect = 'appareil' }
-    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 1, 3, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
+    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 1, 3, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
     @{ Nom = 'écran bleu, Windows dit que le disque est malade'; Panne = 'ecranbleu'; Choix = 0, 0; Indices = @{ disque = (New-Indice $true 'Windows dit qu''un disque n''est pas en bonne santé') }; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'jeu : écran noir qui revient, réglé par le pilote'; Panne = 'jeu'; Choix = 1, 1, 1, 2, 1, 0; Type = 'trouve'; Suspect = 'pilote' }
     @{ Nom = 'jeu : des traits bizarres, frais : la carte graphique'; Panne = 'jeu'; Choix = 1, 1, 1, 3, 1; Type = 'elimination'; Suspect = 'gpu' }
     @{ Nom = 'se fige avec des clics : le disque'; Panne = 'fige'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'un seul jeu plante, réinstallé : réglé'; Panne = 'programme'; Choix = 1, 0, 0; Type = 'trouve'; Suspect = 'leprogramme' }
+    @{ Nom = 'rien ne s''allume : interrupteur sur O'; Panne = 'rien'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'interrupteur' }
+    @{ Nom = 'écran noir, pas de signal, image sur la prise du haut : la carte graphique'; Panne = 'ecrannoir'; Choix = 1, 1, 1, 1, 1, 1, 1, 1, 0; Type = 'trouve'; Suspect = 'gpu' }
+    @{ Nom = 'tout est lent, le disque est plein'; Panne = 'toutlent'; Choix = 1, 1, 1, 0; Type = 'trouve'; Suspect = 'disqueplein' }
+    @{ Nom = 'plus d''internet nulle part, la box redémarrée'; Panne = 'plusinternet'; Choix = 0, 0; Type = 'trouve'; Suspect = 'box' }
+    @{ Nom = 'le Wi-Fi a disparu : le mode avion'; Panne = 'wifiabsent'; Choix = @(0); Type = 'trouve'; Suspect = 'wifioff' }
+    @{ Nom = 'plus de son : le son était coupé'; Panne = 'plusdeson'; Choix = @(0); Type = 'trouve'; Suspect = 'soncoupe' }
+    @{ Nom = 'le micro : le mauvais micro choisi'; Panne = 'micro'; Choix = 1, 0; Type = 'trouve'; Suspect = 'microchoix' }
+    @{ Nom = 'l''imprimante hors ligne'; Panne = 'imprimante'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'imprimantehorsligne' }
+    @{ Nom = 'la batterie gonfle : urgent'; Panne = 'gonfle'; Choix = @(0); Type = 'trouve'; Suspect = 'batteriegonflee' }
+    @{ Nom = 'faux support Microsoft'; Panne = 'arnaquesupport'; Choix = @(0); Type = 'trouve'; Suspect = 'arnaque' }
+    @{ Nom = 'fichier supprimé, ni corbeille ni sauvegarde : un spécialiste'; Panne = 'fichiersupprime'; Choix = 1, 1; Type = 'elimination'; Suspect = 'perdu' }
 )
 foreach ($k in $cas) {
     $p = Get-Panne $donnees $k.Panne
@@ -147,11 +158,33 @@ foreach ($p in $donnees.Pannes) {
     }
 }
 Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() | Sort-Object Name | ForEach-Object { "$($_.Name) $($_.Value)" }) -join ', '))" (-not $mauvais) "($($mauvais | Select-Object -First 3))"
-# La recherche par mots
-foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme'), @('il chauffe et plante en jeu', 'jeu'))) {
+# La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
+foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
+                 @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
+                 @('pas de son', 'plusdeson'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'))) {
     $trouvees = @(Find-Pannes $donnees $r[0])
-    Write-Resultat "recherche « $($r[0]) »" ($trouvees -and $trouvees[0].Id -eq $r[1]) "(trouvé : $(@($trouvees | ForEach-Object { $_.Id }) -join ', '))"
+    Write-Resultat "recherche « $($r[0]) »" ($trouvees -and ($r[1] -split '\|') -contains $trouvees[0].Id) "(trouvé : $(@($trouvees | Select-Object -First 4 | ForEach-Object { $_.Id }) -join ', '))"
 }
+# Chaque suspect de chaque panne peut être identifié (trouvé, ou tout le reste écarté) par au moins une suite de réponses
+function Get-SuspectsTrouvables($Panne, $Indices) {
+    $trouves = @{}; $file = New-Object 'Collections.Generic.Queue[object]'; $file.Enqueue(@()); $n = 0
+    while ($file.Count -and $n -lt 4000 -and $trouves.Count -lt @($Panne.Suspects).Count) {
+        $choix = [int[]]$file.Dequeue(); $n++
+        $e = Get-Enquete $donnees $Panne $choix $Indices
+        if (-not $e.Etape) { if ($e.Verdict.Type -in 'trouve', 'elimination') { $trouves[[string]$e.Verdict.Suspect] = $true }; continue }
+        for ($k = 0; $k -lt @($e.Etape.Reponses).Count; $k++) { $file.Enqueue(@($choix) + $k) }
+    }
+    $trouves
+}
+$tousVus = @{}; foreach ($i in $IndicesConnus) { $tousVus[$i] = New-Indice $true $i }
+$introuvables = @()
+foreach ($p in $donnees.Pannes) {
+    $t = Get-SuspectsTrouvables $p $null
+    $manque = @($p.Suspects | Where-Object { -not $t.ContainsKey([string]$_) })
+    if ($manque) { $t2 = Get-SuspectsTrouvables $p $tousVus; $manque = @($manque | Where-Object { -not $t2.ContainsKey([string]$_) }) }
+    foreach ($m in $manque) { $introuvables += "$($p.Id) : $m" }
+}
+Write-Resultat "chaque suspect peut être identifié ($(@($donnees.Pannes).Count) pannes)" (-not $introuvables) "(jamais identifiés : $($introuvables -join ' ; '))"
 
 # Les images : chaque image citée (étapes, familles) existe, se dessine et n'utilise que ce que images.ps1 comprend
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
@@ -180,6 +213,8 @@ Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed
 
 # 5. Les écrans : l'accueil, une famille, la recherche, les étapes de l'enquête, les réponses
 Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
+Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
+Test-Capture 'enquete-interrupteur' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
 Test-Capture 'recherche' @{ MINDCARE_TEST_RECHERCHE = 'il redémarre' } | Out-Null
 Test-Capture 'recherche-rien' @{ MINDCARE_TEST_RECHERCHE = 'wifi' } | Out-Null
 Test-Capture 'enquete-question' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1' } | Out-Null
@@ -189,7 +224,7 @@ $s = Test-Capture 'verdict-trouve' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,
 Write-Resultat 'réponse trouvée (journal)' ((Get-Journal $s) -match 'Réponse redemarre : trouve memoire') '(pas de « trouve memoire » dans le journal)'
 Test-Capture 'verdict-elimination' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,1,1,1,1' } | Out-Null
 Test-Capture 'verdict-urgent' @{ MINDCARE_TEST_PARCOURS = 'redemarre:0' } | Out-Null
-Test-Capture 'verdict-reparateur' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:1,1,3,1,1' } | Out-Null
+Test-Capture 'verdict-reparateur' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:1,1,3,1,1,1' } | Out-Null
 $jx = '{"testmemoire-erreurs":{"Vu":true,"Texte":"Le test de mémoire du 18 octobre a trouvé des erreurs"},"testmemoire-ok":{"Vu":false},"majredemarrage":{"Vu":false,"TexteOk":"Aucun redémarrage pour les mises à jour ces 30 jours"}}'
 $s = Test-Capture 'verdict-journaux' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,0'; MINDCARE_TEST_JOURNAUX = $jx; MINDCARE_TEST_BARRETTES = '16 Go Corsair CMK16GX4M2B3200C16 (DIMM 1)|16 Go Corsair CMK16GX4M2B3200C16 (DIMM 2)' }
 Write-Resultat 'réponse grâce à ce que Windows a noté (journal)' ((Get-Journal $s) -match 'Réponse redemarre : trouve memoire') '(pas de « trouve memoire » dans le journal)'
