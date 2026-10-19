@@ -1,6 +1,6 @@
 ﻿#Requires -Version 5.1
 <#
-    Mindcare 0.6.1
+    Mindcare 0.7.0
     Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.
 
     Une appli de la suite Mindset : Mindset l'installe, la met à jour et l'affiche dans son onglet.
@@ -10,7 +10,7 @@
 #>
 param([switch]$Demarrage)   # (pas d'autre paramètre au nom d'une variable du script : il la cacherait aux fonctions appelées)
 
-$AppVersion = '0.6.1'
+$AppVersion = '0.7.0'
 $AppNom     = 'Mindcare'
 $AppId      = 'mindcare'
 $AppDescription = @'
