@@ -239,10 +239,10 @@ function Update-Accueil {
     }
     Add-EnGrille $z @($tuiles) 4
 
-    # Les derniers diagnostics : un clic pour revoir la réponse, ou reprendre une enquête
-    $gardes = @(foreach ($d in ($script:Historique | Select-Object -First 5)) { $i = Get-DiagnosticInfo $d; if ($i.Panne) { [pscustomobject]@{ D = $d; I = $i } } })
+    # Les enquêtes terminées : un clic pour revoir la réponse (une enquête pas finie se reprend par le bandeau du haut)
+    $gardes = @(foreach ($d in ($script:Historique | Where-Object { $_.Fini } | Select-Object -First 5)) { $i = Get-DiagnosticInfo $d; if ($i.Panne) { [pscustomobject]@{ D = $d; I = $i } } })
     if (-not $gardes) { return }
-    Add-Titre $z 'Tes derniers diagnostics' 'H2' '4,10,0,4'
+    Add-Titre $z 'Tes enquêtes terminées' 'H2' '4,10,0,4'
     foreach ($g in $gardes) {
         $sp = New-Object System.Windows.Controls.DockPanel
         $quand = New-Text "le $(Format-Date ([string]$g.D.Debut))" 12 '#7E78A0'; $quand.VerticalAlignment = 'Center'; $quand.Margin = '14,0,0,0'
@@ -307,7 +307,9 @@ function Show-Etape {
     $e = Get-EnqueteEnCours
     $script:ChoixFaits = $e.Choix
     if ($e.Etape) {
-        Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null ''
+        # (une enquête déjà finie le reste dans l'historique tant qu'une nouvelle réponse ne la remplace pas)
+        $ancien = @($script:Historique | Where-Object { $_.Id -eq $script:DiagId }) | Select-Object -First 1
+        if (-not ($ancien -and $ancien.Fini)) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null '' }
         Show-EtapeEnquete $e
     } else { Show-Verdict $e }
 }
@@ -438,9 +440,10 @@ function Show-EtapeEnquete($E) {
     $i = 0
     foreach ($r in $et.Reponses) { [void](Add-ChoixBouton $reponses (New-Text ([string]$r.Texte) 15 '#F2EFFA') $i { param($s) Add-Choix ([int]$s.Tag) }); $i++ }
     $rg = New-Rangee $droite
-    Add-Bouton $rg 'Retour' { Undo-Choix }
+    Add-Bouton $rg 'Étape précédente' { Undo-Choix }
     Add-Bouton $rg 'Je ne sais pas' { Add-Choix -1 }
     if ($test) { Add-Bouton $rg 'Je le ferai plus tard (Mindcare s''en souviendra)' { Write-Log 'Test remis à plus tard'; Show-Accueil } }
+    else { Add-Bouton $rg 'Accueil' { Show-Accueil } }
 }
 
 # ---------------------------------------------------------------------------
@@ -458,9 +461,9 @@ function Show-Verdict($E) {
     $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,0,0,14'
     $boutons = New-Object System.Windows.Controls.StackPanel; $boutons.Orientation = 'Horizontal'; $boutons.VerticalAlignment = 'Center'
     [System.Windows.Controls.DockPanel]::SetDock($boutons, 'Right'); [void]$haut.Children.Add($boutons)
-    Add-Bouton $boutons 'Retour' { Undo-Choix }
+    Add-Bouton $boutons 'Changer ma dernière réponse' { Undo-Choix }
     Add-Bouton $boutons 'Pour le réparateur' { $script:ReparateurOuvert = -not $script:ReparateurOuvert; Show-Verdict (Get-EnqueteEnCours) }
-    Add-Bouton $boutons 'Nouveau diagnostic' { Show-Accueil } 'BtnPrimary'
+    Add-Bouton $boutons 'Retour à l''accueil' { Show-Accueil } 'BtnPrimary'
     $pn = New-Text ([string]$script:PanneEnCours.Titre) 14 '#A9A3C9'; $pn.VerticalAlignment = 'Center'
     [void]$haut.Children.Add($pn)
     [void]$ui.Contenu.Children.Add($haut)
