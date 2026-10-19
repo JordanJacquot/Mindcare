@@ -1155,6 +1155,44 @@
         "Sauvegarde tes fichiers importants par précaution."
       ],
       "Pro": "Un réparateur peut vérifier et réparer le disque en gardant tes fichiers."
+    },
+    "serviceaudio": {
+      "Titre": "Le service audio de Windows",
+      "Trouve": "Le service audio de Windows s'était bloqué",
+      "Pourquoi": "Le service audio est le programme de Windows qui gère tout le son. Il peut se bloquer : le son grésille, devient beaucoup trop fort, se déforme ou disparaît, jusqu'au prochain redémarrage.",
+      "AFaire": [
+        "Si ça revient : redémarre le service « Audio Windows » comme tout à l'heure, ou redémarre simplement le PC.",
+        "Fais les mises à jour de Windows et du pilote son (touche Windows, « Windows Update », y compris les mises à jour facultatives)."
+      ],
+      "Pro": "Si ça revient souvent malgré les mises à jour, un réparateur peut réinstaller proprement le pilote son."
+    },
+    "ameliorations": {
+      "Titre": "Les améliorations audio",
+      "Trouve": "Les « améliorations audio » de Windows déformaient le son",
+      "Pourquoi": "Windows et certains fabricants ajoutent des effets au son (basses, son 3D, égaliseur). Ils peuvent faire grésiller, saturer ou rendre le son bien trop fort.",
+      "AFaire": [
+        "Laisse les améliorations audio désactivées pour ce casque ou ces haut-parleurs."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "formataudio": {
+      "Titre": "Le format du son",
+      "Trouve": "Le format du son ne convenait pas à l'appareil",
+      "Pourquoi": "Chaque sortie son a un format (par exemple 24 bits, 48000 Hz). Un format que l'appareil supporte mal donne des craquements ou un son déformé.",
+      "AFaire": [
+        "Garde le format qui marche."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "volumeappli": {
+      "Titre": "Le volume d'une appli",
+      "Trouve": "Le volume ou les réglages d'une appli étaient trop hauts",
+      "Pourquoi": "Chaque appli (jeu, Discord, navigateur) a son propre volume, parfois un égaliseur ou une amplification : ça s'ajoute au volume de Windows.",
+      "AFaire": [
+        "Règle le volume de chaque appli dans le « Mélangeur de volume » (clic droit sur le haut-parleur en bas à droite).",
+        "Dans l'appli, coupe les options d'amplification ou d'égaliseur."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -2858,6 +2896,128 @@
             "jeuxprogs"
           ],
           "Preuve": "Les jeux ne suffisaient pas"
+        }
+      ]
+    },
+    "test-service-audio": {
+      "Type": "test",
+      "Court": "Le service audio",
+      "Pour": [
+        "serviceaudio"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Redémarre le service audio de Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Services » et ouvre-le.",
+        "Dans la liste (rangée par ordre alphabétique), cherche « Audio Windows ».",
+        "Clic droit dessus, puis « Redémarrer ». Si Windows demande une autorisation, accepte.",
+        "Si tu n'y arrives pas : redémarre simplement le PC, ça revient au même.",
+        "Remets le son et écoute."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son est revenu normal",
+          "Confirme": "serviceaudio",
+          "Preuve": "Après le redémarrage du service audio, le son est normal"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "serviceaudio"
+          ],
+          "Preuve": "Redémarrer le service audio n'a rien changé"
+        }
+      ]
+    },
+    "test-ameliorations": {
+      "Type": "test",
+      "Court": "Les améliorations audio",
+      "Pour": [
+        "ameliorations"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe les améliorations audio",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier, tape « Paramètres du son » et ouvre-le.",
+        "Clique sur ton casque ou tes haut-parleurs (dans « Sortie »).",
+        "Dans « Améliorations audio », choisis « Désactivé ». Sous Windows 10 : « Propriétés de l'appareil », « Propriétés supplémentaires », onglet « Améliorations », coche « Désactiver tous les effets ».",
+        "Remets le son et écoute."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son est redevenu normal",
+          "Confirme": "ameliorations",
+          "Preuve": "Sans les améliorations audio, le son est normal"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "ameliorations"
+          ],
+          "Preuve": "Couper les améliorations n'a rien changé"
+        },
+        {
+          "Texte": "Il n'y a pas cette option",
+          "Ecarte": [
+            "ameliorations"
+          ],
+          "SansPreuve": true
+        }
+      ]
+    },
+    "test-format": {
+      "Type": "test",
+      "Court": "Le format du son",
+      "Pour": [
+        "formataudio"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Change le format du son",
+      "Gestes": [
+        "Dans les mêmes réglages de ton casque ou de tes haut-parleurs (« Paramètres du son », puis l'appareil), cherche « Format ».",
+        "Choisis « 24 bits, 48000 Hz » ; si ça ne change rien, essaie « 16 bits, 48000 Hz ».",
+        "Remets le son et écoute."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son est redevenu normal",
+          "Confirme": "formataudio",
+          "Preuve": "Avec un autre format, le son est normal"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "formataudio"
+          ],
+          "Preuve": "Changer le format n'a rien changé"
+        }
+      ]
+    },
+    "test-mixer": {
+      "Type": "test",
+      "Court": "Le volume des applis",
+      "Pour": [
+        "volumeappli"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vérifie le volume de chaque appli",
+      "Gestes": [
+        "Clic droit sur l'icône du haut-parleur en bas à droite, puis « Mélangeur de volume ».",
+        "Baisse le volume de l'appli trop forte.",
+        "Dans l'appli (jeu, Discord, navigateur), regarde ses réglages de son : coupe les options d'amplification ou d'égaliseur."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "volumeappli",
+          "Preuve": "Le volume d'une appli était trop haut"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "volumeappli"
+          ],
+          "Preuve": "Le volume des applis était normal"
         }
       ]
     }
@@ -6468,9 +6628,10 @@
       "Suspects": [
         "soncoupe",
         "sortie",
+        "serviceaudio",
+        "pilotesson",
         "prisejack",
-        "hautparleurs",
-        "pilotesson"
+        "hautparleurs"
       ],
       "Etapes": [
         {
@@ -6480,13 +6641,16 @@
           "Ref": "test-sortie"
         },
         {
+          "Ref": "test-service-audio"
+        },
+        {
+          "Ref": "test-depanneur-son"
+        },
+        {
           "Ref": "test-prise-jack"
         },
         {
           "Ref": "test-ailleurs"
-        },
-        {
-          "Ref": "test-depanneur-son"
         }
       ]
     },
@@ -6506,10 +6670,13 @@
         "hache"
       ],
       "Suspects": [
-        "prisejack",
-        "hautparleurs",
         "bluetoothson",
-        "pilotesson"
+        "serviceaudio",
+        "ameliorations",
+        "formataudio",
+        "pilotesson",
+        "prisejack",
+        "hautparleurs"
       ],
       "Etapes": [
         {
@@ -6522,8 +6689,11 @@
               "Texte": "Oui, sans fil",
               "Garde": [
                 "bluetoothson",
-                "hautparleurs",
-                "pilotesson"
+                "serviceaudio",
+                "ameliorations",
+                "formataudio",
+                "pilotesson",
+                "hautparleurs"
               ]
             },
             {
@@ -6565,13 +6735,68 @@
           ]
         },
         {
+          "Ref": "test-service-audio"
+        },
+        {
+          "Ref": "test-ameliorations"
+        },
+        {
+          "Ref": "test-format"
+        },
+        {
+          "Ref": "test-depanneur-son"
+        },
+        {
           "Ref": "test-prise-jack"
         },
         {
           "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "sonfort",
+      "Famille": "son",
+      "Titre": "Le son est beaucoup trop fort ou déformé",
+      "Phrase": "Le son sature, hurle, ou change tout seul",
+      "Mots": [
+        "trop fort",
+        "fort",
+        "sature",
+        "saturé",
+        "déformé",
+        "hurle",
+        "volume",
+        "son bizarre",
+        "distordu",
+        "fou"
+      ],
+      "Suspects": [
+        "volumeappli",
+        "serviceaudio",
+        "ameliorations",
+        "formataudio",
+        "pilotesson",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mixer"
+        },
+        {
+          "Ref": "test-service-audio"
+        },
+        {
+          "Ref": "test-ameliorations"
+        },
+        {
+          "Ref": "test-format"
         },
         {
           "Ref": "test-depanneur-son"
+        },
+        {
+          "Ref": "test-ailleurs"
         }
       ]
     },
@@ -6593,6 +6818,7 @@
       "Suspects": [
         "micropermission",
         "microchoix",
+        "serviceaudio",
         "prisejack",
         "hautparleurs"
       ],
@@ -6648,6 +6874,9 @@
           ]
         },
         {
+          "Ref": "test-service-audio"
+        },
+        {
           "Ref": "test-prise-jack"
         },
         {
@@ -6670,8 +6899,9 @@
       "Suspects": [
         "prisejack",
         "sortie",
-        "hautparleurs",
-        "pilotesson"
+        "serviceaudio",
+        "pilotesson",
+        "hautparleurs"
       ],
       "Etapes": [
         {
@@ -6681,10 +6911,13 @@
           "Ref": "test-sortie"
         },
         {
-          "Ref": "test-ailleurs"
+          "Ref": "test-service-audio"
         },
         {
           "Ref": "test-depanneur-son"
+        },
+        {
+          "Ref": "test-ailleurs"
         }
       ]
     },
@@ -6705,6 +6938,7 @@
       "Suspects": [
         "bluetoothson",
         "sortie",
+        "serviceaudio",
         "hautparleurs"
       ],
       "Etapes": [
@@ -6736,6 +6970,9 @@
         },
         {
           "Ref": "test-sortie"
+        },
+        {
+          "Ref": "test-service-audio"
         },
         {
           "Ref": "test-ailleurs"
@@ -7600,6 +7837,7 @@
           "Gestes": [
             "Touche Windows, tape « Imprimantes et scanners », clique sur ton imprimante, puis « Ouvrir la file d'attente ».",
             "Menu « Imprimante », puis « Annuler tous les documents ».",
+            "Si des documents restent bloqués : touche Windows, tape « Services », clic droit sur « Spouleur d'impression », puis « Redémarrer » (si Windows demande une autorisation, accepte).",
             "Éteins l'imprimante 30 secondes, rallume-la, et réessaie."
           ],
           "Reponses": [

@@ -135,6 +135,9 @@ $cas = @(
     @{ Nom = 'plus d''internet nulle part, la box redémarrée'; Panne = 'plusinternet'; Choix = 0, 0; Type = 'trouve'; Suspect = 'box' }
     @{ Nom = 'le Wi-Fi a disparu : le mode avion'; Panne = 'wifiabsent'; Choix = @(0); Type = 'trouve'; Suspect = 'wifioff' }
     @{ Nom = 'plus de son : le son était coupé'; Panne = 'plusdeson'; Choix = @(0); Type = 'trouve'; Suspect = 'soncoupe' }
+    @{ Nom = 'son qui grésille (le cas de Jordan) : le service audio'; Panne = 'songresille'; Choix = @(1, 0); Type = 'trouve'; Suspect = 'serviceaudio' }
+    @{ Nom = 'son qui grésille, rien de réglable : le casque'; Panne = 'songresille'; Choix = @(1, 1, 1, 1, 1, 1, 1); Type = 'trouve'; Suspect = 'hautparleurs' }
+    @{ Nom = 'son trop fort : le volume d''une appli'; Panne = 'sonfort'; Choix = @(0); Type = 'trouve'; Suspect = 'volumeappli' }
     @{ Nom = 'le micro : le mauvais micro choisi'; Panne = 'micro'; Choix = 1, 0; Type = 'trouve'; Suspect = 'microchoix' }
     @{ Nom = 'l''imprimante hors ligne'; Panne = 'imprimante'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'imprimantehorsligne' }
     @{ Nom = 'la batterie gonfle : urgent'; Panne = 'gonfle'; Choix = @(0); Type = 'trouve'; Suspect = 'batteriegonflee' }
@@ -164,7 +167,7 @@ Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() |
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
-                 @('pas de son', 'plusdeson'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
+                 @('pas de son', 'plusdeson'), @('le son est hyper fort', 'sonfort'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
     $trouvees = @(Find-Pannes $donnees $r[0])
     Write-Resultat "recherche « $($r[0]) »" ($trouvees -and ($r[1] -split '\|') -contains $trouvees[0].Id) "(trouvé : $(@($trouvees | Select-Object -First 4 | ForEach-Object { $_.Id }) -join ', '))"
 }

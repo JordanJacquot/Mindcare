@@ -7,9 +7,9 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 Mindcare s'installe avec **[Mindset](https://github.com/JordanJacquot/Mindset/releases/latest)**, le portail de la suite :
 installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et l'affiche dans sa fenêtre.
 
-## Ce qu'elle sait faire (0.5.0)
+## Ce qu'elle sait faire (0.5.2)
 
-- Un catalogue de 68 pannes rangé en 12 familles (allumage, démarrage de Windows, écran, plantages, lenteur, bruits et
+- Un catalogue de 69 pannes rangé en 12 familles (allumage, démarrage de Windows, écran, plantages, lenteur, bruits et
   chaleur, son, internet, clavier et souris, batterie, virus, fichiers), et une recherche par mots (« bip », « wifi »,
   « écran bleu »...) qui marche sans internet.
 - Une enquête par élimination : les suspects à gauche, barrés au fur et à mesure ; une question ou un test à la fois
@@ -17,6 +17,8 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
   (« Trouvé : une barrette de mémoire est abîmée »), ou ce qui reste pour un réparateur, avec le rapport.
 - Ouverte sur le PC en panne, elle lit ce que Windows a noté (redémarrages brutaux, écrans bleus, test de mémoire,
   disque...) et les barrettes de mémoire, sans droits administrateur et sans rien modifier.
+- Elle guide sans rien faire à ta place : quand la panne se règle dans Windows (le service audio, les réglages du
+  son, la file d'impression...), elle fait faire les manipulations une à une avant d'accuser le matériel.
 - Les 10 dernières enquêtes gardées (on reprend une enquête pas finie, par exemple après un test), un rapport pour le
   réparateur (Bureau ou copie), la carte de Mindset avec la dernière réponse.
 - Tous les thèmes de la suite, thèmes perso compris, et un logo animé (un pouls).
