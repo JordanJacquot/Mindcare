@@ -138,6 +138,8 @@ $cas = @(
     @{ Nom = 'son qui grésille (le cas de Jordan) : le service audio'; Panne = 'songresille'; Choix = @(1, 0); Type = 'trouve'; Suspect = 'serviceaudio' }
     @{ Nom = 'son qui grésille, rien de réglable : le casque'; Panne = 'songresille'; Choix = @(1, 1, 1, 1, 1, 1, 1); Type = 'trouve'; Suspect = 'hautparleurs' }
     @{ Nom = 'son trop fort : le volume d''une appli'; Panne = 'sonfort'; Choix = @(0); Type = 'trouve'; Suspect = 'volumeappli' }
+    @{ Nom = 'Wi-Fi qui coupe (le cas du copain) : le Wi-Fi enregistré'; Panne = 'wificoupe'; Choix = @(1, 1, 0); Type = 'trouve'; Suspect = 'profilwifi' }
+    @{ Nom = 'un seul site : le carnet d''adresses'; Panne = 'unsite'; Choix = @(1, 0); Type = 'trouve'; Suspect = 'dns' }
     @{ Nom = 'le micro : le mauvais micro choisi'; Panne = 'micro'; Choix = 1, 0; Type = 'trouve'; Suspect = 'microchoix' }
     @{ Nom = 'l''imprimante hors ligne'; Panne = 'imprimante'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'imprimantehorsligne' }
     @{ Nom = 'la batterie gonfle : urgent'; Panne = 'gonfle'; Choix = @(0); Type = 'trouve'; Suspect = 'batteriegonflee' }
@@ -169,7 +171,7 @@ Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() |
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
-                 @('pas de son', 'plusdeson'), @('le son est hyper fort', 'sonfort'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
+                 @('pas de son', 'plusdeson'), @('le son est hyper fort', 'sonfort'), @('le wifi se coupe toutes les 5 minutes', 'wificoupe'), @('no bootable device', 'nodisque'), @('le pc chauffe', 'chauffe'), @('micro discord', 'micro'), @('clé usb pas reconnue', 'usbnonreconnu'), @('MEMORY_MANAGEMENT', 'ecranbleu'), @('0x1A', 'ecranbleu'))) {
     $trouvees = @(Find-Pannes $donnees $r[0])
     Write-Resultat "recherche « $($r[0]) »" ($trouvees -and ($r[1] -split '\|') -contains $trouvees[0].Id) "(trouvé : $(@($trouvees | Select-Object -First 4 | ForEach-Object { $_.Id }) -join ', '))"
 }
@@ -224,6 +226,7 @@ Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
 Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
 Test-Capture 'accueil' | Out-Null
 Test-Capture 'enquete-son' @{ MINDCARE_TEST_PARCOURS = 'songresille:1' } | Out-Null
+Test-Capture 'enquete-commande' @{ MINDCARE_TEST_PARCOURS = 'wificoupe:1,1' } | Out-Null
 Test-Capture 'enquete-interrupteur' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
 Test-Capture 'enquete-code' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:0,1' } | Out-Null
 Test-Capture 'recherche' @{ MINDCARE_TEST_RECHERCHE = 'il redémarre' } | Out-Null

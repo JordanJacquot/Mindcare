@@ -367,9 +367,9 @@ function Add-Avancement($Parent, [int]$N, [int]$Total) {
     [void]$Parent.Children.Add($barre)
 }
 
-# Les gestes d'une manipulation, chacun avec sa case à cocher (un clic sur la ligne coche ou décoche)
-function Add-Gestes($Parent, $Gestes) {
-    $n = 0
+# Les gestes d'une manipulation, chacun avec sa case à cocher (un clic sur la ligne coche ou décoche), et la commande à taper
+function Add-Gestes($Parent, $Gestes, $Commande = $null) {
+    $n = 0; $posee = $false
     foreach ($l in $Gestes) {
         $n++
         $d = New-Object System.Windows.Controls.DockPanel; $d.Margin = '0,8,0,0'; $d.Cursor = 'Hand'; $d.Background = [System.Windows.Media.Brushes]::Transparent
@@ -391,7 +391,37 @@ function Add-Gestes($Parent, $Gestes) {
             $g.Texte.Foreground = Get-Brush $(if ($g.Fait) { '#6E6890' } else { '#C9C3DD' })
         })
         [void]$Parent.Children.Add($d)
+        # (la commande juste sous le geste qui dit de la copier)
+        if ($Commande -and -not $posee -and [string]$l -match 'Copier') { Add-Commandes $Parent $Commande; $posee = $true }
     }
+    if ($Commande -and -not $posee) { Add-Commandes $Parent $Commande }
+}
+
+# Les commandes à taper dans le Terminal (Mindcare ne les lance jamais) : chacune avec son bouton « Copier »
+function Add-Commandes($Parent, $Commande) {
+    $bloc = New-Object System.Windows.Controls.Border
+    $bloc.CornerRadius = 12; $bloc.Padding = '14,10'; $bloc.Margin = '0,12,0,0'
+    $bloc.Background = Get-Brush '#33000000'; $bloc.BorderBrush = Get-Brush '#4000E5FF'; $bloc.BorderThickness = 1
+    $sp = New-Object System.Windows.Controls.StackPanel
+    $titre = if ($Commande.Admin) { 'À TAPER DANS LE TERMINAL (ADMINISTRATEUR)' } else { 'À TAPER DANS LE TERMINAL' }
+    Add-Texte $sp $titre 11 '#00E5FF' 'Bold' '0,0,0,4'
+    foreach ($l in @($Commande.Lignes)) {
+        $d = New-Object System.Windows.Controls.DockPanel; $d.Margin = '0,6,0,0'
+        $b = New-Button 'Copier' 'BtnSecondary'; $b.Tag = [string]$l; $b.Margin = '12,0,0,0'
+        $b.Add_Click({
+            param($s)
+            try { [System.Windows.Clipboard]::SetText([string]$s.Tag); $s.Content = 'Copiée' } catch { Write-Log "Commande non copiée : $_"; $s.Content = 'Copie impossible' }
+        })
+        [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$d.Children.Add($b)
+        $t = New-Object System.Windows.Controls.TextBox
+        $t.Text = [string]$l; $t.IsReadOnly = $true; $t.BorderThickness = 0; $t.Background = [System.Windows.Media.Brushes]::Transparent
+        $t.Foreground = Get-Brush '#FFFFFF'; $t.FontFamily = New-Object System.Windows.Media.FontFamily 'Cascadia Mono, Consolas'; $t.FontSize = 15
+        $t.VerticalAlignment = 'Center'; $t.TextWrapping = 'Wrap'
+        [void]$d.Children.Add($t)
+        [void]$sp.Children.Add($d)
+    }
+    $bloc.Child = $sp
+    [void]$Parent.Children.Add($bloc)
 }
 
 function Show-EtapeEnquete($E) {
@@ -428,7 +458,7 @@ function Show-EtapeEnquete($E) {
     if ($et.Aide) { Add-Texte $texte ([string]$et.Aide) 14 '#A9A3C9' 'Normal' '0,8,0,0' }
     if ($test) {
         Add-Texte $droite 'Coche chaque geste une fois fait :' 14 '#A9A3C9' 'Normal' '0,12,0,0'
-        Add-Gestes $droite $et.Gestes
+        Add-Gestes $droite $et.Gestes $et.Commande
         # (la consigne de sécurité seulement pour les gestes sur le matériel, pas pour une manipulation dans Windows)
         if ((@($et.Gestes) -join ' ') -match 'débranch|câble|barrette|boîtier|capot|ventilat|multiprise|ouvr(e|ir) le PC|tournevis|batterie') {
             Add-Ligne $droite '#FFB547' (New-Text ([string]@($script:Donnees.Securite)[0]) 13 '#FFB547') '0,12,0,0'

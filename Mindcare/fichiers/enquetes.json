@@ -1193,6 +1193,26 @@
         "Dans l'appli, coupe les options d'amplification ou d'égaliseur."
       ],
       "Pro": "Rien à réparer."
+    },
+    "profilwifi": {
+      "Titre": "Le Wi-Fi enregistré dans le PC",
+      "Trouve": "Le Wi-Fi enregistré dans le PC était abîmé",
+      "Pourquoi": "Le PC garde les réglages de chaque Wi-Fi où il s'est connecté. Ces réglages peuvent s'abîmer (après une mise à jour, un changement de box) : le Wi-Fi coupe toutes les 5 ou 10 minutes, ou se connecte sans internet.",
+      "AFaire": [
+        "C'est réglé : le Wi-Fi a été enregistré de nouveau, proprement.",
+        "Si ça recommence, refais la même chose."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "dns": {
+      "Titre": "Le carnet d'adresses d'internet",
+      "Trouve": "Le carnet d'adresses d'internet du PC était périmé",
+      "Pourquoi": "Le PC garde en mémoire l'adresse des sites (le « cache DNS »). Une adresse périmée empêche d'ouvrir un site, alors que les autres marchent.",
+      "AFaire": [
+        "C'est réglé : le carnet d'adresses a été vidé.",
+        "Si ça recommence, refais la même commande."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -3020,6 +3040,112 @@
           "Preuve": "Le volume des applis était normal"
         }
       ]
+    },
+    "test-profil-wifi": {
+      "Type": "test",
+      "Court": "Le Wi-Fi enregistré",
+      "Pour": [
+        "profilwifi"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Fais oublier le Wi-Fi au PC, puis reconnecte-toi",
+      "Aide": "Note avant le mot de passe de ton Wi-Fi (souvent écrit sous la box ou dessus) : il faudra le retaper.",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Le PC oublie tous les Wi-Fi enregistrés et se déconnecte : c'est normal.",
+        "Clique sur l'icône du Wi-Fi en bas à droite, choisis ton Wi-Fi et tape son mot de passe.",
+        "Sers-toi du PC une bonne demi-heure."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "netsh wlan delete profile name=*"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Ça ne coupe plus",
+          "Confirme": "profilwifi",
+          "Preuve": "Le Wi-Fi enregistré de nouveau, ça ne coupe plus"
+        },
+        {
+          "Texte": "Ça coupe encore",
+          "Ecarte": [
+            "profilwifi"
+          ],
+          "Preuve": "Enregistrer le Wi-Fi de nouveau n'a rien changé"
+        }
+      ]
+    },
+    "test-dns": {
+      "Type": "test",
+      "Court": "Le carnet d'adresses",
+      "Pour": [
+        "dns"
+      ],
+      "Duree": "une minute",
+      "Texte": "Vide le carnet d'adresses d'internet du PC",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ».",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée.",
+        "Ferme le navigateur, rouvre-le, et réessaie le site."
+      ],
+      "Commande": {
+        "Admin": false,
+        "Lignes": [
+          "ipconfig /flushdns"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Le site s'ouvre",
+          "Confirme": "dns",
+          "Preuve": "Le carnet d'adresses vidé, le site s'ouvre"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "dns"
+          ],
+          "Preuve": "Vider le carnet d'adresses n'a rien changé"
+        }
+      ]
+    },
+    "test-sfc": {
+      "Type": "test",
+      "Court": "Réparer les fichiers de Windows",
+      "Pour": [
+        "fichierssysteme"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Laisse Windows vérifier et réparer ses fichiers",
+      "Aide": "Deux commandes, l'une après l'autre. Chacune prend 5 à 20 minutes : laisse la fenêtre ouverte jusqu'à la fin.",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Fais-le pour la première commande, attends la fin, puis pour la deuxième.",
+        "Redémarre le PC et sers-t'en comme d'habitude."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "DISM /Online /Cleanup-Image /RestoreHealth",
+          "sfc /scannow"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Il a réparé des fichiers, et ça va mieux",
+          "Confirme": "fichierssysteme",
+          "Preuve": "Windows a réparé ses fichiers, et ça va mieux"
+        },
+        {
+          "Texte": "Rien trouvé, ou toujours pareil",
+          "Ecarte": [
+            "fichierssysteme"
+          ],
+          "Preuve": "La réparation des fichiers de Windows n'a rien changé"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -3689,6 +3815,23 @@
         },
         {
           "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-sfc",
+          "Pour": [
+            "windowsabime"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il a réparé des fichiers, et ça va mieux",
+              "Confirme": "windowsabime",
+              "Preuve": "Windows a réparé ses fichiers, et les écrans bleus ont cessé"
+            },
+            {
+              "Texte": "Rien trouvé, ou toujours pareil",
+              "Preuve": "La réparation des fichiers de Windows n'a rien changé"
+            }
+          ]
         },
         {
           "Ref": "test-restauration"
@@ -7029,7 +7172,8 @@
         "operateur",
         "wifioff",
         "reseauwindows",
-        "piloteres"
+        "piloteres",
+        "profilwifi"
       ],
       "Etapes": [
         {
@@ -7065,6 +7209,9 @@
         },
         {
           "Ref": "test-modeavion"
+        },
+        {
+          "Ref": "test-profil-wifi"
         },
         {
           "Ref": "test-reinit-reseau"
@@ -7146,14 +7293,20 @@
         "se déconnecte",
         "instable",
         "revient",
-        "décroche"
+        "décroche",
+        "toutes les 5 minutes",
+        "toutes les 10 minutes",
+        "se coupe tout le temps",
+        "wifi instable"
       ],
       "Suspects": [
         "signal",
         "operateur",
         "box",
         "piloteres",
-        "energiewifi"
+        "energiewifi",
+        "profilwifi",
+        "reseauwindows"
       ],
       "Etapes": [
         {
@@ -7161,6 +7314,12 @@
         },
         {
           "Ref": "test-pres-box"
+        },
+        {
+          "Ref": "test-profil-wifi"
+        },
+        {
+          "Ref": "test-reinit-reseau"
         },
         {
           "Id": "test-energie-wifi",
@@ -7363,7 +7522,8 @@
       ],
       "Suspects": [
         "site",
-        "navigateur"
+        "navigateur",
+        "dns"
       ],
       "Etapes": [
         {
@@ -7389,6 +7549,9 @@
               "Preuve": "Le site marche ailleurs"
             }
           ]
+        },
+        {
+          "Ref": "test-dns"
         },
         {
           "Id": "test-autre-navigateur",
@@ -8542,6 +8705,9 @@
         },
         {
           "Ref": "auto-disque"
+        },
+        {
+          "Ref": "test-sfc"
         },
         {
           "Id": "clics",

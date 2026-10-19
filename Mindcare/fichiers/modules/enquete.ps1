@@ -177,6 +177,11 @@ function Test-Enquetes($Donnees, [string]$Texte = '') {
                 if (-not $e.Texte -or -not $e.Court) { $pb += "$ou : Texte ou Court manquant" }
                 if (@($e.Reponses).Count -lt 2) { $pb += "$ou : moins de 2 réponses" }
                 if ($e.Type -eq 'test' -and -not $e.Gestes) { $pb += "$ou : un test sans gestes" }
+                if ($e.Commande) {
+                    if (-not @($e.Commande.Lignes)) { $pb += "$ou : une commande sans lignes" }
+                    foreach ($l in @($e.Commande.Lignes)) { if ([string]$l -match '[«»“”‘’]') { $pb += "$ou : guillemets français dans la commande « $l »" } }
+                    if (-not (@($e.Gestes) -match 'Copier')) { $pb += "$ou : les gestes ne disent pas comment copier la commande" }
+                }
                 foreach ($r in $e.Reponses) { if (-not $r.Texte) { $pb += "$ou : une réponse sans texte" } }
                 $effets = @($e.Reponses)
             }
