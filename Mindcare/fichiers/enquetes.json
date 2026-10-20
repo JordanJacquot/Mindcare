@@ -2344,6 +2344,227 @@
         "Ou un casque sans fil avec son propre petit récepteur USB."
       ],
       "Pro": "Rien à réparer."
+    },
+    "portailwifi": {
+      "Titre": "La page de connexion du Wi-Fi public",
+      "Trouve": "Le Wi-Fi public attendait que tu acceptes ses conditions",
+      "Pourquoi": "Dans un hôtel, une gare ou un fast-food, le Wi-Fi bloque les sites tant que tu n'as pas validé sa page de connexion : les sites sécurisés affichent alors une erreur.",
+      "AFaire": [
+        "Ouvre le site neverssl.com : la page de connexion du Wi-Fi s'affiche, valide-la."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "antivirusweb": {
+      "Titre": "Un antivirus ou un VPN",
+      "Trouve": "Un antivirus ou un VPN bloquait les connexions",
+      "Pourquoi": "Certains antivirus (autres que celui de Windows) et les VPN se mettent entre le PC et internet : mal réglés ou périmés, ils cassent les connexions sécurisées ou coupent internet.",
+      "AFaire": [
+        "Garde un seul antivirus : celui de Windows suffit.",
+        "Mets à jour le VPN, ou désinstalle-le s'il ne sert plus."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "dnsoperateur": {
+      "Titre": "Le carnet d'adresses de l'opérateur",
+      "Trouve": "Le carnet d'adresses (DNS) de l'opérateur répondait mal",
+      "Pourquoi": "Pour trouver un site, le PC demande son adresse à un « DNS », souvent celui de la box. S'il répond mal, aucun site ne s'ouvre alors qu'internet marche.",
+      "AFaire": [
+        "Garde un DNS public (par exemple 1.1.1.1 et 1.0.0.1)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "boxbande": {
+      "Titre": "Le réglage de la box",
+      "Trouve": "La box n'émettait pas en 5 GHz (ou le cachait)",
+      "Pourquoi": "Une box émet souvent deux Wi-Fi : 2,4 GHz (loin mais lent) et 5 GHz (rapide). Le 5 GHz peut être coupé, ou réuni sous le même nom que l'autre.",
+      "AFaire": [
+        "Dans l'appli de ta box (ou son site), active le Wi-Fi 5 GHz, ou donne-lui un nom différent."
+      ],
+      "Pro": "Ton opérateur peut t'aider à régler ta box."
+    },
+    "cartewifi24": {
+      "Titre": "La carte Wi-Fi du PC",
+      "Trouve": "La carte Wi-Fi du PC ne connaît pas le 5 GHz",
+      "Pourquoi": "Les cartes Wi-Fi anciennes (« Wireless-N », « 802.11n » seulement) ne captent que le 2,4 GHz.",
+      "AFaire": [
+        "Une petite clé Wi-Fi USB « Wi-Fi 5 » ou « Wi-Fi 6 » (environ 15 euros) règle le problème."
+      ],
+      "Pro": "Un réparateur peut aussi changer la carte Wi-Fi d'une tour ou de certains portables."
+    },
+    "carteeth": {
+      "Titre": "La carte réseau du PC",
+      "Trouve": "La carte réseau du PC se limitait à 100 Mb/s",
+      "Pourquoi": "La carte réseau peut se régler à une vitesse trop basse, ou son pilote être trop vieux.",
+      "AFaire": [
+        "Gestionnaire de périphériques, « Cartes réseau », la carte Ethernet, onglet « Avancé » : « Vitesse et duplex » sur « Négociation automatique ».",
+        "Fais les mises à jour de Windows."
+      ],
+      "Pro": "Un réparateur peut tester la carte réseau."
+    },
+    "fnlock": {
+      "Titre": "Le verrou de la touche Fn",
+      "Trouve": "Le verrou de la touche Fn était activé (ou coupé)",
+      "Pourquoi": "Sur beaucoup de portables, les touches F1 à F12 font deux choses (volume, luminosité ou F1...F12). Un verrou (Fn + Échap, souvent) choisit laquelle passe en premier.",
+      "AFaire": [
+        "Pour basculer : Fn + Échap (ou la touche avec un cadenas et « Fn »)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "biosfn": {
+      "Titre": "Le réglage du BIOS",
+      "Trouve": "Le BIOS choisissait le rôle des touches F1 à F12",
+      "Pourquoi": "Certains portables règlent le rôle des touches F1 à F12 dans le BIOS (« Action Keys Mode », « Hotkey Mode », « Function Key Behavior »).",
+      "AFaire": [
+        "Dans le BIOS (touche F2 ou F10 au démarrage) : change « Action Keys Mode » (ou « Hotkey Mode »), puis F10 pour enregistrer."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reglagesclavier": {
+      "Titre": "Les réglages du clavier",
+      "Trouve": "Un réglage du clavier faisait répéter ou rater des touches",
+      "Pourquoi": "Les « touches filtres » ignorent les appuis rapides, les « touches rémanentes » gardent Maj ou Ctrl enfoncés, et un délai de répétition trop court double les lettres.",
+      "AFaire": [
+        "Garde les touches filtres et rémanentes désactivées, et un délai de répétition moyen."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "vitessedoubleclic": {
+      "Titre": "La vitesse du double-clic",
+      "Trouve": "La vitesse du double-clic était mal réglée",
+      "Pourquoi": "Si la vitesse du double-clic est trop lente, deux clics simples rapprochés comptent comme un double-clic.",
+      "AFaire": [
+        "Garde une vitesse de double-clic moyenne."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "surfacesouris": {
+      "Titre": "La surface ou le capteur",
+      "Trouve": "La surface sous la souris (ou son capteur) gênait",
+      "Pourquoi": "Le capteur de la souris lit la surface : le verre, le brillant, ou une poussière sur le capteur la font sauter ou trembler.",
+      "AFaire": [
+        "Utilise un tapis de souris, et nettoie de temps en temps le capteur avec un coton-tige sec."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "usbenergie": {
+      "Titre": "L'économie d'énergie des prises USB",
+      "Trouve": "Windows coupait les prises USB pour économiser l'énergie",
+      "Pourquoi": "Windows peut éteindre les prises USB pour économiser : elles ne se réveillent pas toujours.",
+      "AFaire": [
+        "Garde décoché « Autoriser l'ordinateur à éteindre ce périphérique » sur les « Concentrateur USB racine »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "alimdock": {
+      "Titre": "Le chargeur du dock",
+      "Trouve": "Le dock manquait de courant",
+      "Pourquoi": "Un dock ou un adaptateur avec écran, réseau et plusieurs USB a souvent besoin de son propre chargeur : sans lui, une partie ne marche pas.",
+      "AFaire": [
+        "Garde le chargeur du dock branché."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "portusbc": {
+      "Titre": "La prise USB-C du PC",
+      "Trouve": "La prise USB-C du PC ne transmet pas l'image",
+      "Pourquoi": "Toutes les prises USB-C n'envoient pas l'image : il faut une prise « Thunderbolt » (petit éclair) ou « DisplayPort » (un D en forme de P) à côté.",
+      "AFaire": [
+        "Branche le dock sur la prise USB-C qui a un éclair ou le logo DisplayPort ; sinon, il faut un dock « DisplayLink » (avec son pilote)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pilotedock": {
+      "Titre": "Le pilote du dock",
+      "Trouve": "Le pilote du dock manquait ou était périmé",
+      "Pourquoi": "Les docks « DisplayLink » ont besoin d'un pilote pour afficher l'image ; les autres profitent des mises à jour de Windows.",
+      "AFaire": [
+        "Si le dock est « DisplayLink » : installe son pilote depuis synaptics.com (DisplayLink).",
+        "Fais les mises à jour de Windows."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "toucheretro": {
+      "Titre": "La touche du rétroéclairage",
+      "Trouve": "Le rétroéclairage était éteint par sa touche",
+      "Pourquoi": "Le rétroéclairage du clavier s'allume avec une touche (souvent Fn + une touche avec une petite lampe, F5, F9 ou Espace), qui a plusieurs niveaux.",
+      "AFaire": [
+        "Appuie plusieurs fois sur la touche pour choisir le niveau."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "eclairagedyn": {
+      "Titre": "L'éclairage dynamique de Windows",
+      "Trouve": "L'éclairage dynamique de Windows gérait le clavier",
+      "Pourquoi": "Windows 11 peut prendre la main sur l'éclairage des claviers (« Éclairage dynamique ») et l'éteindre ou le changer.",
+      "AFaire": [
+        "Dans Paramètres, « Personnalisation », « Éclairage dynamique » : règle-le, ou désactive « Utiliser l'éclairage dynamique sur mes appareils »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "logicielclavier": {
+      "Titre": "Le logiciel du fabricant",
+      "Trouve": "Le logiciel du fabricant du clavier manquait ou était périmé",
+      "Pourquoi": "L'éclairage de beaucoup de claviers dépend du logiciel de leur marque (Logitech G Hub, Razer Synapse, Corsair iCUE, MSI Center, Armoury Crate...).",
+      "AFaire": [
+        "Installe ou mets à jour le logiciel de la marque, et règle l'éclairage dedans."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "buses": {
+      "Titre": "Les têtes d'impression",
+      "Trouve": "Les têtes d'impression étaient bouchées",
+      "Pourquoi": "Sur une imprimante à jet d'encre, l'encre sèche dans les petites buses quand on imprime peu : traits blancs, couleurs qui manquent.",
+      "AFaire": [
+        "Imprime une page de temps en temps, et lance un nettoyage si ça revient."
+      ],
+      "Pro": "Si le nettoyage ne suffit pas, change la cartouche (ou les têtes, sur certaines imprimantes)."
+    },
+    "chargeurfaible": {
+      "Titre": "Un chargeur trop faible",
+      "Trouve": "Le chargeur n'est pas assez puissant pour ce portable",
+      "Pourquoi": "Un chargeur USB-C de téléphone, ou moins puissant que celui d'origine, charge très lentement (parfois pas du tout quand le portable travaille).",
+      "AFaire": [
+        "Utilise le chargeur d'origine, ou un chargeur de même puissance (le nombre de « W » écrit dessus)."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "veillecapot": {
+      "Titre": "Le capot fermé (veille)",
+      "Trouve": "Le portable se mettait en veille au lieu de s'éteindre",
+      "Pourquoi": "Fermer le capot ne l'éteint pas : il se met en veille et continue à consommer un peu, jusqu'à vider la batterie en quelques jours.",
+      "AFaire": [
+        "Fais « Arrêter » quand tu ne t'en sers pas longtemps, ou règle la fermeture du capot sur « Mettre en veille prolongée » (Panneau de configuration, « Options d'alimentation », « Choisir l'action qui suit la fermeture du capot »)."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "chargeurabime": {
+      "Titre": "Le chargeur abîmé",
+      "Trouve": "Danger : le chargeur est abîmé",
+      "Pourquoi": "Un chargeur qui fait des étincelles, crépite ou noircit peut prendre feu.",
+      "AFaire": [
+        "Débranche-le tout de suite du mur, sans toucher les parties abîmées.",
+        "Ne t'en sers plus : remplace-le par un chargeur identique (même marque, même puissance)."
+      ],
+      "Pro": "Le fabricant ou un réparateur fournit le bon chargeur.",
+      "Urgent": true
+    },
+    "prisemur": {
+      "Titre": "La prise du mur",
+      "Trouve": "La prise du mur fait des étincelles",
+      "Pourquoi": "Une étincelle au branchement vient parfois de la prise elle-même (usée, mal fixée).",
+      "AFaire": [
+        "N'utilise plus cette prise, et fais-la vérifier par un électricien."
+      ],
+      "Pro": "Un électricien doit vérifier la prise."
     }
   },
   "Tests": {
@@ -7562,6 +7783,525 @@
             "microbluetooth"
           ],
           "Preuve": "Le micro n'est pas en Bluetooth"
+        }
+      ]
+    },
+    "q-wifi-public": {
+      "Type": "question",
+      "Court": "Wi-Fi public ?",
+      "Texte": "Es-tu connecté à un Wi-Fi public (hôtel, gare, restaurant, école) ?",
+      "Pour": [
+        "portailwifi"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "portailwifi",
+          "Preuve": "Le PC est sur un Wi-Fi public"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "portailwifi"
+          ],
+          "Preuve": "Le PC n'est pas sur un Wi-Fi public"
+        }
+      ]
+    },
+    "test-sans-antivirus": {
+      "Type": "test",
+      "Court": "Sans antivirus ni VPN",
+      "Pour": [
+        "antivirusweb"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Coupe l'antivirus en plus et le VPN",
+      "Gestes": [
+        "Si un VPN est installé (NordVPN, ProtonVPN, celui de l'antivirus...) : déconnecte-le, ou quitte-le près de l'heure en bas à droite.",
+        "Si un antivirus autre que Sécurité Windows est installé (Avast, AVG, Norton, McAfee...) : touche Windows, « Ajouter ou supprimer des programmes », désinstalle-le, puis redémarre.",
+        "Réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça remarche",
+          "Confirme": "antivirusweb",
+          "Preuve": "Sans l'antivirus en plus ni le VPN, ça remarche"
+        },
+        {
+          "Texte": "Toujours pareil, ou je n'en ai pas",
+          "Ecarte": [
+            "antivirusweb"
+          ],
+          "Preuve": "Aucun antivirus ni VPN ne gênait"
+        }
+      ]
+    },
+    "test-dns-public": {
+      "Type": "test",
+      "Court": "Un autre DNS",
+      "Pour": [
+        "dnsoperateur"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Règle un carnet d'adresses public",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Réseau et Internet », clique sur ta connexion (Wi-Fi ou Ethernet), puis sur ses propriétés (« Propriétés du matériel » ou le nom du réseau).",
+        "À « Attribution du serveur DNS », clique sur « Modifier », choisis « Manuel », active « IPv4 ».",
+        "DNS préféré : 1.1.1.1 ; autre DNS : 1.0.0.1. Enregistre, puis réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les sites s'ouvrent",
+          "Confirme": "dnsoperateur",
+          "Preuve": "Avec un DNS public, les sites s'ouvrent"
+        },
+        {
+          "Texte": "Toujours l'erreur",
+          "Ecarte": [
+            "dnsoperateur"
+          ],
+          "Preuve": "Le DNS de l'opérateur n'y était pour rien"
+        }
+      ]
+    },
+    "q-tel-5ghz": {
+      "Type": "question",
+      "Court": "Le téléphone le voit ?",
+      "Texte": "Un téléphone récent voit-il le Wi-Fi 5 GHz de la box (souvent un nom finissant par « 5G » ou « 5GHz ») ?",
+      "Pour": [
+        "boxbande"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Non, lui non plus",
+          "Confirme": "boxbande",
+          "Preuve": "Même le téléphone ne voit pas le Wi-Fi 5 GHz"
+        },
+        {
+          "Texte": "Oui, lui le voit",
+          "Ecarte": [
+            "boxbande"
+          ],
+          "Preuve": "Le téléphone voit le Wi-Fi 5 GHz"
+        }
+      ]
+    },
+    "test-cable-cat": {
+      "Type": "test",
+      "Court": "Un autre câble",
+      "Pour": [
+        "cableres"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie un autre câble réseau",
+      "Gestes": [
+        "Remplace le câble réseau par un autre, de préférence marqué « Cat 5e », « Cat 6 » ou plus (écrit sur le câble).",
+        "Vérifie que ses deux bouts font bien « clic »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est à 1 Gb/s (ou plus)",
+          "Confirme": "cableres",
+          "Preuve": "Avec un autre câble, la vitesse est bonne"
+        },
+        {
+          "Texte": "Toujours 100 Mb/s",
+          "Ecarte": [
+            "cableres"
+          ],
+          "Preuve": "Le câble n'y était pour rien"
+        }
+      ]
+    },
+    "test-fn-lock": {
+      "Type": "test",
+      "Court": "Le verrou Fn",
+      "Pour": [
+        "fnlock"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Bascule le verrou de la touche Fn",
+      "Gestes": [
+        "Appuie en même temps sur Fn et Échap (cherche une touche avec un petit cadenas ou « Fn Lock »).",
+        "Essaie une touche F (par exemple F5 dans le navigateur)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les touches F remarchent",
+          "Confirme": "fnlock",
+          "Preuve": "Le verrou Fn basculé, les touches F remarchent"
+        },
+        {
+          "Texte": "Rien ne change",
+          "Ecarte": [
+            "fnlock"
+          ],
+          "Preuve": "Le verrou Fn n'y était pour rien"
+        }
+      ]
+    },
+    "test-reglages-clavier": {
+      "Type": "test",
+      "Court": "Les réglages du clavier",
+      "Pour": [
+        "reglagesclavier"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets les réglages du clavier",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Accessibilité », puis « Clavier » : désactive « Touches rémanentes », « Touches filtres » et « Touches bascules ».",
+        "Puis touche Windows, tape « Panneau de configuration », « Clavier » : mets « Délai de répétition » vers « Long ». OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "reglagesclavier",
+          "Preuve": "Les réglages du clavier remis, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "reglagesclavier"
+          ],
+          "Preuve": "Les réglages du clavier n'y étaient pour rien"
+        }
+      ]
+    },
+    "q-liquide-clavier": {
+      "Type": "question",
+      "Court": "Liquide ou miettes ?",
+      "Texte": "Un liquide a-t-il coulé sur le clavier, ou y a-t-il des miettes sous les touches ?",
+      "Pour": [
+        "sale"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "sale",
+          "Preuve": "Un liquide ou des miettes sont sous les touches"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "sale"
+          ],
+          "Preuve": "Pas de liquide ni de miettes"
+        }
+      ]
+    },
+    "test-double-clic": {
+      "Type": "test",
+      "Court": "La vitesse du double-clic",
+      "Pour": [
+        "vitessedoubleclic"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle la vitesse du double-clic",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Paramètres de la souris », puis « Paramètres de souris supplémentaires ».",
+        "Onglet « Boutons » : mets « Vitesse du double-clic » vers le milieu, essaie sur le petit dossier, puis OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne double-clique plus tout seul",
+          "Confirme": "vitessedoubleclic",
+          "Preuve": "La vitesse réglée, plus de double-clic tout seul"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "vitessedoubleclic"
+          ],
+          "Preuve": "La vitesse du double-clic n'y était pour rien"
+        }
+      ]
+    },
+    "test-surface-souris": {
+      "Type": "test",
+      "Court": "La surface",
+      "Pour": [
+        "surfacesouris"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie sur un tapis et nettoie le capteur",
+      "Gestes": [
+        "Retourne la souris et nettoie le petit capteur avec un coton-tige sec.",
+        "Utilise-la sur un tapis de souris, ou une feuille de papier."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle ne saute plus",
+          "Confirme": "surfacesouris",
+          "Preuve": "Sur une bonne surface, elle ne saute plus"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "surfacesouris"
+          ],
+          "Preuve": "La surface n'y était pour rien"
+        }
+      ]
+    },
+    "test-usb-energie": {
+      "Type": "test",
+      "Court": "L'économie d'énergie USB",
+      "Pour": [
+        "usbenergie"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Empêche Windows de couper les prises USB",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Contrôleurs de bus USB ». Pour chaque « Concentrateur USB racine » (ou « Concentrateur USB générique ») : double-clic, onglet « Gestion de l'alimentation », décoche « Autoriser l'ordinateur à éteindre ce périphérique ». OK.",
+        "Redémarre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les prises remarchent",
+          "Confirme": "usbenergie",
+          "Preuve": "Sans l'économie d'énergie USB, les prises marchent"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "usbenergie"
+          ],
+          "Preuve": "L'économie d'énergie USB n'y était pour rien"
+        }
+      ]
+    },
+    "q-dock-chargeur": {
+      "Type": "question",
+      "Court": "Son chargeur ?",
+      "Texte": "Le dock a-t-il une prise pour un chargeur, sans rien de branché dessus ?",
+      "Pour": [
+        "alimdock"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui, rien de branché",
+          "Confirme": "alimdock",
+          "Preuve": "Le dock n'est pas alimenté"
+        },
+        {
+          "Texte": "Non, ou il est branché",
+          "Ecarte": [
+            "alimdock"
+          ],
+          "Preuve": "Le dock est alimenté (ou n'en a pas besoin)"
+        }
+      ]
+    },
+    "q-usbc-image": {
+      "Type": "question",
+      "Court": "La bonne prise ?",
+      "Texte": "À côté de la prise USB-C du PC où est branché le dock, y a-t-il un petit éclair ou un logo DisplayPort ?",
+      "Pour": [
+        "portusbc"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Non, aucun logo",
+          "Confirme": "portusbc",
+          "Preuve": "La prise USB-C ne transmet pas l'image"
+        },
+        {
+          "Texte": "Oui, un éclair ou un logo",
+          "Ecarte": [
+            "portusbc"
+          ],
+          "Preuve": "La prise USB-C transmet l'image"
+        }
+      ]
+    },
+    "test-touche-retro": {
+      "Type": "test",
+      "Court": "La touche d'éclairage",
+      "Pour": [
+        "toucheretro"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Allume le rétroéclairage avec le clavier",
+      "Gestes": [
+        "Cherche une touche avec une petite lampe ou un clavier lumineux (souvent F5, F9, F10 ou la barre d'espace).",
+        "Appuie dessus plusieurs fois, seule puis avec Fn."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'allume",
+          "Confirme": "toucheretro",
+          "Preuve": "Avec sa touche, le rétroéclairage s'allume"
+        },
+        {
+          "Texte": "Toujours éteint",
+          "Ecarte": [
+            "toucheretro"
+          ],
+          "Preuve": "La touche n'y était pour rien"
+        }
+      ]
+    },
+    "test-eclairage-dyn": {
+      "Type": "test",
+      "Court": "L'éclairage dynamique",
+      "Pour": [
+        "eclairagedyn"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle l'éclairage dynamique de Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Personnalisation », puis « Éclairage dynamique » (s'il n'y est pas, passe à la suite).",
+        "Désactive « Utiliser l'éclairage dynamique sur mes appareils », puis éteins et rallume le PC."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'allume",
+          "Confirme": "eclairagedyn",
+          "Preuve": "Sans l'éclairage dynamique, le clavier s'allume"
+        },
+        {
+          "Texte": "Toujours éteint, ou pas cette option",
+          "Ecarte": [
+            "eclairagedyn"
+          ],
+          "Preuve": "L'éclairage dynamique n'y était pour rien"
+        }
+      ]
+    },
+    "test-nettoyage-tetes": {
+      "Type": "test",
+      "Court": "Nettoyer les têtes",
+      "Pour": [
+        "buses"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Lance le nettoyage des têtes d'impression",
+      "Gestes": [
+        "Sur l'écran de l'imprimante, ou dans son appli sur le PC (HP Smart, Epson, Canon...) : « Entretien » ou « Maintenance ».",
+        "Lance « Nettoyage des têtes » (une ou deux fois), puis imprime une page de test."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est net",
+          "Confirme": "buses",
+          "Preuve": "Les têtes nettoyées, l'impression est nette"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "buses"
+          ],
+          "Preuve": "Le nettoyage n'a rien changé"
+        }
+      ]
+    },
+    "q-encre-niveau": {
+      "Type": "question",
+      "Court": "Le niveau d'encre",
+      "Texte": "Les niveaux d'encre (ou de toner), sur l'imprimante ou dans son appli, sont-ils bas ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, au moins un est bas",
+          "Confirme": "imprimanteconso",
+          "Preuve": "Une encre est presque vide"
+        },
+        {
+          "Texte": "Non, tout est rempli",
+          "Ecarte": [
+            "imprimanteconso"
+          ],
+          "Preuve": "Les encres sont remplies"
+        }
+      ]
+    },
+    "q-chargeur-origine": {
+      "Type": "question",
+      "Court": "Le chargeur d'origine ?",
+      "Texte": "Le portable charge-t-il avec un autre chargeur que le sien (de téléphone, ou moins puissant) ?",
+      "Pour": [
+        "chargeurfaible"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui, un autre chargeur",
+          "Confirme": "chargeurfaible",
+          "Preuve": "Le chargeur n'est pas celui d'origine"
+        },
+        {
+          "Texte": "Non, le sien",
+          "Ecarte": [
+            "chargeurfaible"
+          ],
+          "Preuve": "C'est le chargeur d'origine"
+        }
+      ]
+    },
+    "q-capot": {
+      "Type": "question",
+      "Court": "Comment l'arrêtes-tu ?",
+      "Texte": "Quand tu ne t'en sers plus, tu :",
+      "Reponses": [
+        {
+          "Texte": "Fermes simplement le capot",
+          "Confirme": "veillecapot",
+          "Preuve": "Le portable est seulement fermé, donc en veille"
+        },
+        {
+          "Texte": "Fais « Arrêter » dans le menu Démarrer",
+          "Ecarte": [
+            "veillecapot"
+          ],
+          "Preuve": "Le portable est vraiment arrêté"
+        }
+      ]
+    },
+    "q-chargeur-abime": {
+      "Type": "question",
+      "Court": "Le chargeur",
+      "Texte": "Le câble ou le bloc du chargeur est-il abîmé, noirci, tordu, ou fait-il du bruit ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "chargeurabime",
+          "Preuve": "Le chargeur est abîmé"
+        },
+        {
+          "Texte": "Non, seulement l'étincelle en branchant",
+          "Ecarte": [
+            "chargeurabime"
+          ],
+          "Preuve": "Le chargeur semble intact"
+        }
+      ]
+    },
+    "test-charge-eteint": {
+      "Type": "test",
+      "Court": "Charger éteint",
+      "Pour": [
+        "consommation"
+      ],
+      "Duree": "une heure",
+      "Texte": "Charge-le éteint pendant une heure",
+      "Gestes": [
+        "Éteins le portable (« Arrêter »), chargeur branché.",
+        "Attends une heure, puis rallume et regarde le pourcentage gagné."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il a bien chargé",
+          "Confirme": "consommation",
+          "Preuve": "Éteint, il charge bien : c'est ce qui tournait qui consommait"
+        },
+        {
+          "Texte": "Presque rien gagné",
+          "Ecarte": [
+            "consommation"
+          ],
+          "Preuve": "Même éteint, il charge à peine"
         }
       ]
     }
@@ -13233,6 +13973,48 @@
       ]
     },
     {
+      "Id": "wifi5ghz",
+      "Famille": "internet",
+      "Titre": "Le Wi-Fi 5 GHz n'apparaît pas",
+      "Phrase": "Le PC ne voit que le Wi-Fi 2,4 GHz de la box",
+      "Mots": [
+        "5 ghz",
+        "5ghz",
+        "5g",
+        "2,4 ghz",
+        "2.4",
+        "wifi rapide",
+        "ne voit pas le 5"
+      ],
+      "Suspects": [
+        "boxbande",
+        "piloteres",
+        "cartewifi24"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-tel-5ghz"
+        },
+        {
+          "Ref": "test-pilote-res",
+          "Reponses": [
+            {
+              "Texte": "Le Wi-Fi 5 GHz apparaît",
+              "Confirme": "piloteres",
+              "Preuve": "Après les mises à jour, le Wi-Fi 5 GHz apparaît"
+            },
+            {
+              "Texte": "Toujours pas",
+              "Ecarte": [
+                "piloteres"
+              ],
+              "Preuve": "Les mises à jour n'ont rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "wificoupe",
       "Famille": "internet",
       "Titre": "Le Wi-Fi coupe souvent",
@@ -13521,6 +14303,59 @@
       ]
     },
     {
+      "Id": "ethernet100",
+      "Famille": "internet",
+      "Titre": "Le câble réseau est limité à 100 Mb/s",
+      "Phrase": "Branché à la box par câble, la vitesse plafonne à 100 Mb/s",
+      "Mots": [
+        "100 mb",
+        "100 mbps",
+        "100 mégabits",
+        "limité à 100",
+        "ethernet lent",
+        "câble lent",
+        "1 gbps"
+      ],
+      "Suspects": [
+        "cableres",
+        "carteeth"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cable-cat"
+        }
+      ]
+    },
+    {
+      "Id": "apresvpn",
+      "Famille": "internet",
+      "Titre": "Plus d'internet depuis un VPN ou un nouvel antivirus",
+      "Phrase": "Internet a disparu après avoir installé (ou désinstallé) un VPN ou un antivirus",
+      "Mots": [
+        "vpn",
+        "antivirus",
+        "depuis le vpn",
+        "après l'antivirus",
+        "nordvpn",
+        "proton",
+        "avast",
+        "mcafee",
+        "norton"
+      ],
+      "Suspects": [
+        "antivirusweb",
+        "reseauwindows"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-antivirus"
+        },
+        {
+          "Ref": "test-reinit-reseau"
+        }
+      ]
+    },
+    {
       "Id": "unsite",
       "Famille": "internet",
       "Titre": "Un seul site ou une seule appli ne marche pas",
@@ -13590,6 +14425,101 @@
               "Preuve": "Même ailleurs, ça ne marche pas"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "certificat",
+      "Famille": "internet",
+      "Titre": "« Votre connexion n'est pas privée » sur beaucoup de sites",
+      "Phrase": "Le navigateur parle de certificat, de connexion non sécurisée, d'horloge",
+      "Mots": [
+        "connexion n'est pas privée",
+        "pas sécurisé",
+        "certificat",
+        "net::err_cert",
+        "err_cert_date_invalid",
+        "votre horloge",
+        "avertissement de sécurité",
+        "site non sécurisé"
+      ],
+      "Suspects": [
+        "synchro",
+        "portailwifi",
+        "antivirusweb"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-synchro",
+          "Reponses": [
+            {
+              "Texte": "L'heure était fausse : maintenant les sites s'ouvrent",
+              "Confirme": "synchro",
+              "Preuve": "L'heure remise à jour, les sites s'ouvrent"
+            },
+            {
+              "Texte": "L'heure était juste, ou toujours l'erreur",
+              "Ecarte": [
+                "synchro"
+              ],
+              "Preuve": "L'heure du PC n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "q-wifi-public"
+        },
+        {
+          "Ref": "test-sans-antivirus"
+        }
+      ]
+    },
+    {
+      "Id": "erreurdns",
+      "Famille": "internet",
+      "Titre": "Erreur « DNS » : aucun site ne s'ouvre",
+      "Phrase": "« DNS_PROBE_FINISHED », « Impossible de trouver l'adresse DNS du serveur »",
+      "Mots": [
+        "dns",
+        "dns_probe",
+        "dns_probe_finished_nxdomain",
+        "adresse dns",
+        "serveur dns",
+        "impossible de trouver l'adresse",
+        "nxdomain"
+      ],
+      "Suspects": [
+        "dns",
+        "box",
+        "dnsoperateur",
+        "reseauwindows"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-dns",
+          "Reponses": [
+            {
+              "Texte": "Les sites s'ouvrent",
+              "Confirme": "dns",
+              "Preuve": "Le carnet d'adresses vidé, les sites s'ouvrent"
+            },
+            {
+              "Texte": "Toujours l'erreur",
+              "Ecarte": [
+                "dns"
+              ],
+              "Preuve": "Vider le carnet d'adresses n'a rien changé"
+            }
+          ]
+        },
+        {
+          "Ref": "test-box"
+        },
+        {
+          "Ref": "test-dns-public"
+        },
+        {
+          "Ref": "test-reinit-reseau"
         }
       ]
     },
@@ -13763,6 +14693,94 @@
       ]
     },
     {
+      "Id": "touchesf",
+      "Famille": "peripheriques",
+      "Titre": "Les touches F1 à F12 font autre chose (volume, luminosité...)",
+      "Phrase": "F5 baisse le son au lieu d'actualiser, Alt + F4 ne ferme plus...",
+      "Mots": [
+        "f1",
+        "f2",
+        "f5",
+        "f12",
+        "touches f",
+        "touche fn",
+        "alt f4",
+        "fn lock",
+        "touches de fonction"
+      ],
+      "Suspects": [
+        "fnlock",
+        "biosfn"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fn-lock"
+        }
+      ]
+    },
+    {
+      "Id": "toucherepete",
+      "Famille": "peripheriques",
+      "Titre": "Des lettres se répètent ou le clavier tape tout seul",
+      "Phrase": "Des lettres en double, des touches qui s'enfoncent seules, ou qui ne répondent qu'une fois sur deux",
+      "Mots": [
+        "répète",
+        "lettres en double",
+        "tape tout seul",
+        "touche bloquée",
+        "écrit tout seul",
+        "double les lettres",
+        "touche coincée"
+      ],
+      "Suspects": [
+        "sale",
+        "reglagesclavier",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-liquide-clavier"
+        },
+        {
+          "Ref": "test-reglages-clavier"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "retroeclairage",
+      "Famille": "peripheriques",
+      "Titre": "Le rétroéclairage du clavier ne s'allume plus",
+      "Phrase": "Les touches ne sont plus éclairées",
+      "Mots": [
+        "rétroéclairage",
+        "clavier éclairé",
+        "lumière du clavier",
+        "rgb",
+        "touches lumineuses",
+        "clavier ne s'allume plus",
+        "led clavier"
+      ],
+      "Suspects": [
+        "toucheretro",
+        "eclairagedyn",
+        "logicielclavier"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-touche-retro"
+        },
+        {
+          "Ref": "test-eclairage-dyn"
+        }
+      ]
+    },
+    {
       "Id": "souris",
       "Famille": "peripheriques",
       "Titre": "La souris ou le pavé tactile ne marche plus",
@@ -13860,6 +14878,68 @@
       ]
     },
     {
+      "Id": "doubleclic",
+      "Famille": "peripheriques",
+      "Titre": "La souris fait des doubles clics toute seule",
+      "Phrase": "Un clic ouvre deux fois, un glisser lâche tout seul",
+      "Mots": [
+        "double clic",
+        "double-clic",
+        "clique deux fois",
+        "clic tout seul",
+        "lâche le glisser",
+        "clic gauche",
+        "bouton de la souris"
+      ],
+      "Suspects": [
+        "vitessedoubleclic",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-double-clic"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "sourissaute",
+      "Famille": "peripheriques",
+      "Titre": "Le curseur saute, tremble ou bouge tout seul",
+      "Phrase": "La flèche part toute seule, saccade ou tremble",
+      "Mots": [
+        "curseur saute",
+        "souris saute",
+        "souris tremble",
+        "curseur bouge tout seul",
+        "flèche bouge",
+        "souris saccade",
+        "souris lag"
+      ],
+      "Suspects": [
+        "surfacesouris",
+        "piles",
+        "recepteur",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-surface-souris"
+        },
+        {
+          "Ref": "test-piles"
+        },
+        {
+          "Ref": "test-recepteur"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
       "Id": "usbnonreconnu",
       "Famille": "peripheriques",
       "Titre": "Une clé USB ou un disque non reconnu",
@@ -13908,6 +14988,66 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "portsusb",
+      "Famille": "peripheriques",
+      "Titre": "Plusieurs prises USB ne marchent plus",
+      "Phrase": "Aucun appareil ne marche sur certaines prises, ou sur toutes",
+      "Mots": [
+        "prises usb",
+        "ports usb",
+        "aucune prise usb",
+        "usb ne marche plus",
+        "plus aucun usb",
+        "ports usb morts"
+      ],
+      "Suspects": [
+        "residuelle",
+        "usbenergie",
+        "piloteperiph",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-usb-energie"
+        },
+        {
+          "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
+      "Id": "dock",
+      "Famille": "peripheriques",
+      "Titre": "Un dock ou un adaptateur USB-C ne marche pas",
+      "Phrase": "L'écran, le réseau ou les prises USB branchés sur le dock restent muets",
+      "Mots": [
+        "dock",
+        "station d'accueil",
+        "adaptateur usb-c",
+        "hub usb-c",
+        "usb c",
+        "usb-c",
+        "displaylink",
+        "thunderbolt"
+      ],
+      "Suspects": [
+        "alimdock",
+        "portusbc",
+        "pilotedock"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-dock-chargeur"
+        },
+        {
+          "Ref": "q-usbc-image"
         }
       ]
     },
@@ -14183,6 +15323,36 @@
       ]
     },
     {
+      "Id": "impressionmauvaise",
+      "Famille": "peripheriques",
+      "Titre": "L'imprimante imprime mal (pâle, traînées, couleurs fausses)",
+      "Phrase": "Des traits blancs, des taches, une couleur qui manque",
+      "Mots": [
+        "imprime mal",
+        "pâle",
+        "traînées",
+        "rayures",
+        "taches",
+        "couleur manque",
+        "impression floue",
+        "lignes blanches",
+        "imprime blanc"
+      ],
+      "Suspects": [
+        "imprimanteconso",
+        "buses",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-encre-niveau"
+        },
+        {
+          "Ref": "test-nettoyage-tetes"
+        }
+      ]
+    },
+    {
       "Id": "necharge",
       "Famille": "batterie",
       "Titre": "Il ne charge plus",
@@ -14193,7 +15363,12 @@
         "pas en charge",
         "batterie",
         "chargeur",
-        "branché"
+        "branché",
+        "bloqué à 80",
+        "s'arrête à 80",
+        "60 %",
+        "80 %",
+        "branché pas en charge"
       ],
       "Suspects": [
         "batteriegonflee",
@@ -14220,6 +15395,33 @@
         },
         {
           "Ref": "auto-usure"
+        }
+      ]
+    },
+    {
+      "Id": "chargelente",
+      "Famille": "batterie",
+      "Titre": "Il charge très lentement",
+      "Phrase": "Des heures pour gagner quelques pour cent, ou « charge lente » s'affiche",
+      "Mots": [
+        "charge lente",
+        "charge lentement",
+        "met longtemps à charger",
+        "chargeur lent",
+        "usb-c",
+        "charge pas vite"
+      ],
+      "Suspects": [
+        "chargeurfaible",
+        "consommation",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-chargeur-origine"
+        },
+        {
+          "Ref": "test-charge-eteint"
         }
       ]
     },
@@ -14279,6 +15481,34 @@
               "Preuve": "Réduire la consommation ne change rien"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "videeteint",
+      "Famille": "batterie",
+      "Titre": "La batterie se vide alors qu'il est éteint ou fermé",
+      "Phrase": "Le lendemain, la batterie a beaucoup baissé sans s'en servir",
+      "Mots": [
+        "se vide éteint",
+        "batterie se vide",
+        "décharge fermé",
+        "perd de la batterie",
+        "la nuit",
+        "capot fermé",
+        "batterie vide le matin"
+      ],
+      "Suspects": [
+        "veillecapot",
+        "demarragerapide",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-capot"
+        },
+        {
+          "Ref": "test-demarrage-rapide"
         }
       ]
     },
@@ -14376,6 +15606,30 @@
               "Preuve": "Le chargeur est chaud, sans odeur ni dégât"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "etincelles",
+      "Famille": "batterie",
+      "Titre": "Le chargeur fait des étincelles ou crépite",
+      "Phrase": "Une étincelle au branchement, un grésillement, une odeur",
+      "Mots": [
+        "étincelle",
+        "étincelles",
+        "crépite",
+        "grésille chargeur",
+        "chargeur noirci",
+        "flash",
+        "court-circuit"
+      ],
+      "Suspects": [
+        "chargeurabime",
+        "prisemur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-chargeur-abime"
         }
       ]
     },
