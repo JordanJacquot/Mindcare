@@ -3120,6 +3120,201 @@
         "Tu peux le signaler sur signal-spam.fr."
       ],
       "Pro": "Rien à réparer."
+    },
+    "grubreste": {
+      "Titre": "Un ancien Linux",
+      "Trouve": "Le PC démarre sur un ancien Linux (GRUB) au lieu de Windows",
+      "Pourquoi": "Après un essai de Linux, son menu de démarrage (GRUB) peut rester en premier : il affiche « grub> » ou « grub rescue », ou un menu de Linux.",
+      "AFaire": [
+        "Dans le BIOS, onglet « Boot » : mets « Windows Boot Manager » en premier, puis F10.",
+        "Ensuite seulement, si Linux ne sert plus, un réparateur peut retirer proprement ce qu'il reste."
+      ],
+      "Pro": "Un réparateur peut nettoyer le démarrage sans toucher à tes fichiers."
+    },
+    "fauxcontact": {
+      "Titre": "Un faux contact",
+      "Trouve": "Un faux contact s'éteint au moindre mouvement",
+      "Pourquoi": "Quand le PC s'éteint en le bougeant ou en le touchant, quelque chose est mal en place : prise du chargeur, batterie, mémoire ou câble à l'intérieur.",
+      "AFaire": [
+        "N'utilise pas le PC en le déplaçant tant que ce n'est pas réparé.",
+        "PC fixe, éteint et débranché : renfonce les câbles de l'alimentation et la mémoire."
+      ],
+      "Pro": "Un réparateur trouvera le faux contact rapidement."
+    },
+    "modedupliquer": {
+      "Titre": "Le mode « Dupliquer »",
+      "Trouve": "Les écrans étaient en mode « Dupliquer »",
+      "Pourquoi": "Windows peut montrer la même image sur les deux écrans (« Dupliquer ») ou en faire un grand bureau (« Étendre »).",
+      "AFaire": [
+        "Touche Windows + P, puis « Étendre »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "curseurcache": {
+      "Titre": "Le curseur caché",
+      "Trouve": "Le curseur était caché (pavé tactile coupé, ou réglage)",
+      "Pourquoi": "Sur un portable, une touche coupe le pavé tactile (et le curseur avec) ; un réglage peut aussi cacher le curseur pendant la frappe.",
+      "AFaire": [
+        "La touche du pavé tactile a souvent un petit rectangle barré (avec Fn)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "tactilefou": {
+      "Titre": "L'écran tactile abîmé",
+      "Trouve": "L'écran tactile détecte des appuis fantômes",
+      "Pourquoi": "Une dalle tactile fissurée, humide ou abîmée « voit » des doigts qui n'existent pas : elle clique toute seule.",
+      "AFaire": [
+        "En attendant la réparation, coupe l'écran tactile : Gestionnaire de périphériques, « Périphériques d'interface utilisateur », « Écran tactile compatible HID », clic droit, « Désactiver l'appareil »."
+      ],
+      "Pro": "Un réparateur peut changer la dalle tactile."
+    },
+    "quarantaine": {
+      "Titre": "Sécurité Windows",
+      "Trouve": "Sécurité Windows a bloqué ou mis en quarantaine le fichier",
+      "Pourquoi": "Quand Sécurité Windows juge un fichier dangereux, il le bloque ou le met de côté : le raccourci ne trouve plus rien.",
+      "AFaire": [
+        "Ne débloque que si tu es sûr du fichier : Sécurité Windows, « Protection contre les virus et menaces », « Historique de protection », puis « Actions », « Restaurer » ou « Autoriser »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "mixstereo": {
+      "Titre": "Le micro réglé sur le son du PC",
+      "Trouve": "Le micro choisi était le « Mixage stéréo » (le son du PC)",
+      "Pourquoi": "Windows propose un faux micro, « Mixage stéréo » (Stereo Mix), qui envoie tout le son du PC : choisi par erreur, les autres entendent ta musique et ton jeu.",
+      "AFaire": [
+        "Choisis ton vrai micro dans Windows et dans l'appli d'appel, et désactive « Mixage stéréo »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "proxy": {
+      "Titre": "Un proxy",
+      "Trouve": "Un « proxy » réglé dans Windows bloquait le navigateur",
+      "Pourquoi": "Un proxy fait passer internet par un autre ordinateur. Laissé par un programme (ou un virus), il casse le navigateur alors que d'autres applis marchent.",
+      "AFaire": [
+        "Garde « Utiliser un serveur proxy » désactivé (sauf au travail, si on te l'a demandé)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "rallonge": {
+      "Titre": "Le récepteur trop près des prises USB 3",
+      "Trouve": "Le récepteur sans fil était brouillé par les prises USB 3",
+      "Pourquoi": "Les prises USB 3 (bleues) et leurs câbles brouillent les petits récepteurs sans fil en 2,4 GHz : la souris ou le clavier se coupent.",
+      "AFaire": [
+        "Branche le récepteur sur une prise USB 2 (noire), ou au bout d'une petite rallonge USB posée sur le bureau, près de la souris."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appnumerisation": {
+      "Titre": "L'appli de numérisation",
+      "Trouve": "Il manquait la bonne appli pour numériser",
+      "Pourquoi": "Le pilote de base installé par Windows fait souvent imprimer, pas numériser. Il faut l'appli de Windows « Numérisation », ou le logiciel complet de la marque.",
+      "AFaire": [
+        "Installe le logiciel complet de l'imprimante (site de la marque, « pilote complet » ou « Full Driver ») : HP Smart, Epson Scan, Canon IJ Scan Utility..."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cartesdformat": {
+      "Titre": "La carte elle-même",
+      "Trouve": "La carte n'est pas lisible par ce PC (abîmée ou d'un format inconnu)",
+      "Pourquoi": "Une carte d'appareil photo, de console ou de caméra peut être dans un format que Windows ne lit pas, ou abîmée.",
+      "AFaire": [
+        "Essaie-la dans l'appareil d'origine, ou sur un autre PC.",
+        "Si elle n'a rien d'important : formate-la dans l'appareil qui s'en sert."
+      ],
+      "Pro": "Un réparateur peut récupérer des photos sur une carte abîmée."
+    },
+    "lecteursd": {
+      "Titre": "Le lecteur de cartes du PC",
+      "Trouve": "Le lecteur de cartes du PC ne marche plus",
+      "Pourquoi": "Le petit lecteur de cartes intégré au PC peut lâcher, ou perdre son pilote après une mise à jour.",
+      "AFaire": [
+        "Utilise un lecteur de cartes USB (quelques euros) en attendant.",
+        "Fais les mises à jour de Windows."
+      ],
+      "Pro": "Un réparateur peut le changer."
+    },
+    "reparerword": {
+      "Titre": "Le fichier abîmé",
+      "Trouve": "Le fichier Word était abîmé (en partie réparable)",
+      "Pourquoi": "Un fichier mal enregistré (coupure, clé retirée trop tôt) peut être abîmé. Word sait souvent en récupérer le texte.",
+      "AFaire": [
+        "Enregistre tout de suite le document réparé sous un autre nom.",
+        "Retire toujours une clé avec « Éjecter »."
+      ],
+      "Pro": "Des logiciels de récupération (ou un réparateur) peuvent parfois en sauver plus."
+    },
+    "corbeillemasquee": {
+      "Titre": "L'icône de la corbeille masquée",
+      "Trouve": "L'icône de la corbeille était masquée",
+      "Pourquoi": "Les icônes système du Bureau (Corbeille, Ce PC...) s'affichent ou se cachent dans les réglages de Windows.",
+      "AFaire": [
+        "Garde la case « Corbeille » cochée dans « Paramètres des icônes du Bureau »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "modetablette": {
+      "Titre": "Le mode tablette ou clavier tactile",
+      "Trouve": "Windows affichait le clavier tactile tout seul",
+      "Pourquoi": "Sur les PC tactiles ou 2-en-1, Windows peut ouvrir le clavier à l'écran dès qu'on touche une zone de texte.",
+      "AFaire": [
+        "Dans « Paramètres », « Heure et langue », « Saisie », « Clavier tactile » : choisis « Jamais » pour « Afficher le clavier tactile »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "clavieraccessibilite": {
+      "Titre": "Le clavier visuel d'accessibilité",
+      "Trouve": "Le « clavier visuel » d'accessibilité s'ouvrait au démarrage",
+      "Pourquoi": "Un autre clavier à l'écran, celui de l'accessibilité, peut être réglé pour s'ouvrir à chaque connexion.",
+      "AFaire": [
+        "Dans « Paramètres », « Accessibilité », « Clavier » : désactive « Clavier visuel »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "fondactivation": {
+      "Titre": "Windows non activé",
+      "Trouve": "Le fond d'écran se règle seulement quand Windows est activé",
+      "Pourquoi": "Sans activation, Windows ne permet plus de personnaliser le fond d'écran, et il peut redevenir noir.",
+      "AFaire": [
+        "Active Windows (voir la panne « Windows n'est pas activé »)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "fondreglage": {
+      "Titre": "Le réglage du fond d'écran",
+      "Trouve": "Le fond d'écran était réglé sur « Couleur unie » ou un diaporama vide",
+      "Pourquoi": "Un fond réglé sur une couleur, ou sur un dossier de photos vide ou déplacé, s'affiche noir.",
+      "AFaire": [
+        "Dans « Personnalisation », « Arrière-plan » : choisis une image."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "desinstalleur": {
+      "Titre": "Le désinstalleur du programme",
+      "Trouve": "Le désinstalleur du programme était abîmé",
+      "Pourquoi": "Chaque programme a son propre désinstalleur ; s'il manque ou est abîmé, la désinstallation échoue. Microsoft a un outil gratuit pour forcer.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Un réparateur peut retirer les programmes récalcitrants."
+    },
+    "gpuvieille": {
+      "Titre": "La carte graphique trop ancienne",
+      "Trouve": "La carte graphique est trop ancienne pour ce jeu (DirectX 12)",
+      "Pourquoi": "Les jeux récents demandent DirectX 12 (et parfois le « ray tracing ») : les cartes graphiques anciennes ne savent pas le faire, même avec un pilote à jour.",
+      "AFaire": [
+        "Vérifie la carte graphique demandée dans la « configuration minimale » du jeu.",
+        "Pour connaître la tienne : Gestionnaire de périphériques, « Cartes graphiques »."
+      ],
+      "Pro": "Un réparateur peut te conseiller une carte graphique compatible avec ton PC."
+    },
+    "bibliotheque": {
+      "Titre": "Le dossier de jeux de Steam",
+      "Trouve": "Le dossier de jeux de Steam était abîmé ou plein",
+      "Pourquoi": "Steam range les jeux dans des « bibliothèques ». Un dossier abîmé, un disque plein ou débranché donnent « contenu verrouillé » ou « erreur d'écriture disque ».",
+      "AFaire": [
+        "Garde de la place sur le disque des jeux (au moins le double de la mise à jour)."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -10087,6 +10282,489 @@
           "Preuve": "Rien n'a été tapé ni téléchargé"
         }
       ]
+    },
+    "test-boot-windows": {
+      "Type": "test",
+      "Court": "Windows en premier",
+      "Pour": [
+        "grubreste"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Mets Windows en premier dans le BIOS",
+      "Gestes": [
+        "Allume le PC et appuie plusieurs fois sur Suppr (ou F2) dès qu'il démarre : le BIOS s'ouvre.",
+        "Onglet « Boot » (ou « Démarrage ») : dans « Boot Option #1 », choisis « Windows Boot Manager ».",
+        "Appuie sur F10, puis confirme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "grubreste",
+          "Preuve": "Avec Windows en premier, il démarre"
+        },
+        {
+          "Texte": "Toujours GRUB, ou pas de Windows Boot Manager",
+          "Ecarte": [
+            "grubreste"
+          ],
+          "Preuve": "L'ordre de démarrage n'a rien changé"
+        }
+      ]
+    },
+    "q-bouge-chargeur": {
+      "Type": "question",
+      "Court": "Le câble du chargeur ?",
+      "Texte": "Ça arrive surtout quand le câble du chargeur bouge (le voyant de charge clignote) ?",
+      "Pour": [
+        "prisecharge"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "prisecharge",
+          "Preuve": "Le PC s'éteint quand le câble du chargeur bouge"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "prisecharge"
+          ],
+          "Preuve": "Le câble du chargeur n'y est pour rien"
+        }
+      ]
+    },
+    "test-etendre": {
+      "Type": "test",
+      "Court": "Étendre",
+      "Pour": [
+        "modedupliquer"
+      ],
+      "Duree": "une minute",
+      "Texte": "Passe les écrans en « Étendre »",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows et P.",
+        "Choisis « Étendre »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Chaque écran a son bureau",
+          "Confirme": "modedupliquer",
+          "Preuve": "En mode « Étendre », chaque écran a son bureau"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "modedupliquer"
+          ],
+          "Preuve": "Le mode d'affichage n'y était pour rien"
+        }
+      ]
+    },
+    "test-curseur": {
+      "Type": "test",
+      "Court": "Retrouver le curseur",
+      "Pour": [
+        "curseurcache"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Fais réapparaître le curseur",
+      "Gestes": [
+        "Appuie sur la touche du pavé tactile (un petit rectangle, souvent F6, F7 ou F9, avec ou sans Fn).",
+        "Branche une souris USB et bouge-la.",
+        "Sinon : touche Windows, tape « souris », « Paramètres de la souris », « Paramètres de souris supplémentaires », onglet « Options du pointeur » : décoche « Masquer le pointeur pendant la frappe »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le curseur est revenu",
+          "Confirme": "curseurcache",
+          "Preuve": "Le curseur était caché"
+        },
+        {
+          "Texte": "Toujours invisible",
+          "Ecarte": [
+            "curseurcache"
+          ],
+          "Preuve": "Le curseur n'était pas caché"
+        }
+      ]
+    },
+    "test-couper-tactile": {
+      "Type": "test",
+      "Court": "Couper le tactile",
+      "Pour": [
+        "tactilefou"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Désactive l'écran tactile pour voir",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Périphériques d'interface utilisateur ».",
+        "Clic droit sur « Écran tactile compatible HID », « Désactiver l'appareil ». (Pour le rallumer : même chemin, « Activer ».)"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus de clics fantômes",
+          "Confirme": "tactilefou",
+          "Preuve": "Sans le tactile, plus de clics fantômes"
+        },
+        {
+          "Texte": "Ça continue",
+          "Ecarte": [
+            "tactilefou"
+          ],
+          "Preuve": "Le tactile n'y était pour rien"
+        }
+      ]
+    },
+    "test-historique-protection": {
+      "Type": "test",
+      "Court": "L'historique de protection",
+      "Pour": [
+        "quarantaine"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Regarde ce que Sécurité Windows a bloqué",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Sécurité Windows » et ouvre-le.",
+        "« Protection contre les virus et menaces », puis « Historique de protection ».",
+        "Le fichier ou le programme y apparaît-il comme « bloqué » ou « mis en quarantaine » ?"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui, il y est",
+          "Confirme": "quarantaine",
+          "Preuve": "Sécurité Windows a bloqué le fichier"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "quarantaine"
+          ],
+          "Preuve": "Sécurité Windows n'a rien bloqué"
+        }
+      ]
+    },
+    "test-mix-stereo": {
+      "Type": "test",
+      "Court": "Le mixage stéréo",
+      "Pour": [
+        "mixstereo"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Désactive le « Mixage stéréo »",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Panneau de configuration du son » et ouvre-le (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Enregistrement » : clic droit sur « Mixage stéréo » (ou « Stereo Mix »), « Désactiver ».",
+        "Clic droit sur ton vrai micro, « Définir comme périphérique par défaut ». Dans Discord ou Teams, choisis aussi ce micro."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ils ne m'entendent plus qu'en voix",
+          "Confirme": "mixstereo",
+          "Preuve": "Sans le mixage stéréo, seule la voix passe"
+        },
+        {
+          "Texte": "Ça continue, ou pas de mixage stéréo",
+          "Ecarte": [
+            "mixstereo"
+          ],
+          "Preuve": "Le mixage stéréo n'y était pour rien"
+        }
+      ]
+    },
+    "test-proxy": {
+      "Type": "test",
+      "Court": "Le proxy",
+      "Pour": [
+        "proxy"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe le proxy de Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Réseau et Internet », puis « Proxy ».",
+        "Active « Détecter automatiquement les paramètres », et désactive « Utiliser un serveur proxy » et « Utiliser un script d'installation »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le navigateur remarche",
+          "Confirme": "proxy",
+          "Preuve": "Sans proxy, le navigateur remarche"
+        },
+        {
+          "Texte": "Toujours pareil, ou rien n'était activé",
+          "Ecarte": [
+            "proxy"
+          ],
+          "Preuve": "Il n'y avait pas de proxy"
+        }
+      ]
+    },
+    "test-rallonge": {
+      "Type": "test",
+      "Court": "Une rallonge",
+      "Pour": [
+        "rallonge"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Rapproche le récepteur avec une rallonge",
+      "Gestes": [
+        "Branche le récepteur sur une prise USB noire (USB 2), loin des prises bleues et des disques USB.",
+        "Ou mets-le au bout d'une rallonge USB, posée sur le bureau près de la souris ou du clavier."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus de coupures",
+          "Confirme": "rallonge",
+          "Preuve": "Le récepteur plus près et au calme, plus de coupures"
+        },
+        {
+          "Texte": "Ça coupe encore",
+          "Ecarte": [
+            "rallonge"
+          ],
+          "Preuve": "L'emplacement du récepteur n'y était pour rien"
+        }
+      ]
+    },
+    "test-numerisation": {
+      "Type": "test",
+      "Court": "Numériser",
+      "Pour": [
+        "appnumerisation"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Numérise avec la bonne appli",
+      "Gestes": [
+        "Essaie l'appli « Windows Scan » (« Numérisation » dans le Microsoft Store, gratuite).",
+        "Sinon, installe le logiciel de la marque depuis son site : HP Smart, Epson Scan 2, Canon IJ Scan Utility, Brother iPrint&Scan."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La numérisation marche",
+          "Confirme": "appnumerisation",
+          "Preuve": "Avec la bonne appli, la numérisation marche"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "appnumerisation"
+          ],
+          "Preuve": "L'appli de numérisation n'y était pour rien"
+        }
+      ]
+    },
+    "test-carte-adaptateur": {
+      "Type": "test",
+      "Court": "Un adaptateur",
+      "Pour": [
+        "lecteursd",
+        "cartesdformat"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie la carte avec un lecteur USB",
+      "Gestes": [
+        "Mets la carte dans un petit lecteur de cartes USB (ou dans un adaptateur), branché sur une autre prise.",
+        "Ou essaie-la sur un autre PC."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche là",
+          "Confirme": "lecteursd",
+          "Preuve": "La carte se lit avec un autre lecteur : c'est le lecteur du PC"
+        },
+        {
+          "Texte": "Elle n'est lue nulle part",
+          "Confirme": "cartesdformat",
+          "Preuve": "La carte n'est lue nulle part"
+        }
+      ]
+    },
+    "q-batterie-0": {
+      "Type": "question",
+      "Court": "Sans le chargeur ?",
+      "Texte": "Débranché du chargeur, le portable s'éteint-il tout de suite (ou ne démarre-t-il pas) ?",
+      "Pour": [
+        "batterieusee"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "batterieusee",
+          "Preuve": "Sans chargeur, il ne tient pas une seconde"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "batterieusee"
+          ],
+          "Preuve": "Sans chargeur, il tient un peu"
+        }
+      ]
+    },
+    "test-ouvrir-reparer": {
+      "Type": "test",
+      "Court": "Ouvrir et réparer",
+      "Pour": [
+        "reparerword"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Ouvre le fichier avec « Ouvrir et réparer »",
+      "Gestes": [
+        "Ouvre Word (ou Excel) vide, puis « Fichier », « Ouvrir », « Parcourir ».",
+        "Clique une fois sur le fichier abîmé, puis sur la petite flèche à côté du bouton « Ouvrir » : « Ouvrir et réparer »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre",
+          "Confirme": "reparerword",
+          "Preuve": "Avec « Ouvrir et réparer », le fichier s'ouvre"
+        },
+        {
+          "Texte": "Toujours une erreur",
+          "Ecarte": [
+            "reparerword"
+          ],
+          "Preuve": "« Ouvrir et réparer » n'a rien pu faire"
+        }
+      ]
+    },
+    "test-icone-corbeille": {
+      "Type": "test",
+      "Court": "Les icônes du Bureau",
+      "Pour": [
+        "corbeillemasquee"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Réaffiche la corbeille",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « icônes du Bureau » et ouvre « Afficher ou masquer les icônes usuelles du Bureau ».",
+        "Coche « Corbeille » (et « Ordinateur » si tu veux « Ce PC »), puis OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle est revenue",
+          "Confirme": "corbeillemasquee",
+          "Preuve": "L'icône de la corbeille était masquée"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "corbeillemasquee"
+          ],
+          "Preuve": "L'icône n'était pas masquée"
+        }
+      ]
+    },
+    "test-clavier-tactile": {
+      "Type": "test",
+      "Court": "Le clavier tactile",
+      "Pour": [
+        "modetablette"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Empêche le clavier tactile de s'ouvrir",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Heure et langue », « Saisie », puis « Clavier tactile ».",
+        "À « Afficher le clavier tactile », choisis « Jamais » (ou décoche « Lorsqu'aucun clavier n'est connecté »)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'ouvre plus",
+          "Confirme": "modetablette",
+          "Preuve": "Réglé, le clavier tactile ne s'ouvre plus"
+        },
+        {
+          "Texte": "Il s'ouvre encore",
+          "Ecarte": [
+            "modetablette"
+          ],
+          "Preuve": "Le réglage n'y était pour rien"
+        }
+      ]
+    },
+    "test-fond": {
+      "Type": "test",
+      "Court": "L'arrière-plan",
+      "Pour": [
+        "fondreglage"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis un nouveau fond d'écran",
+      "Gestes": [
+        "Clic droit sur le Bureau, « Personnaliser », puis « Arrière-plan ».",
+        "Choisis « Image », puis une image. Si tout est grisé, Windows n'est sans doute pas activé."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le fond est revenu",
+          "Confirme": "fondreglage",
+          "Preuve": "Un nouveau fond choisi, c'est réglé"
+        },
+        {
+          "Texte": "Tout est grisé",
+          "Ecarte": [
+            "fondreglage"
+          ],
+          "Preuve": "Les réglages du fond sont bloqués"
+        }
+      ]
+    },
+    "test-desinstalleur": {
+      "Type": "test",
+      "Court": "Forcer la désinstallation",
+      "Pour": [
+        "desinstalleur"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Force la désinstallation avec l'outil de Microsoft",
+      "Gestes": [
+        "Cherche « Utilitaire de résolution des problèmes d'installation et de désinstallation de programmes » sur le site de Microsoft (support.microsoft.com) et lance-le.",
+        "Choisis « Désinstallation », puis le programme dans la liste, et laisse faire."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il est désinstallé",
+          "Confirme": "desinstalleur",
+          "Preuve": "Avec l'outil de Microsoft, il est désinstallé"
+        },
+        {
+          "Texte": "Toujours là",
+          "Ecarte": [
+            "desinstalleur"
+          ],
+          "Preuve": "L'outil n'a pas pu le retirer"
+        }
+      ]
+    },
+    "test-reparer-bibliotheque": {
+      "Type": "test",
+      "Court": "Réparer le dossier",
+      "Pour": [
+        "bibliotheque"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Répare le dossier de jeux de Steam",
+      "Gestes": [
+        "Steam : menu « Steam », « Paramètres », « Stockage ».",
+        "Choisis le disque du jeu, puis les trois points à droite, « Réparer le dossier ». Vérifie aussi qu'il reste de la place.",
+        "Relance la mise à jour."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La mise à jour passe",
+          "Confirme": "bibliotheque",
+          "Preuve": "Le dossier réparé, la mise à jour passe"
+        },
+        {
+          "Texte": "Toujours l'erreur",
+          "Ecarte": [
+            "bibliotheque"
+          ],
+          "Preuve": "Réparer le dossier n'a rien changé"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -10958,7 +11636,10 @@
         "introuvable",
         "est manquant",
         "missing dll",
-        "api-ms-win"
+        "api-ms-win",
+        "0xc000007b",
+        "n'a pas pu démarrer correctement",
+        "0xc0000142"
       ],
       "Suspects": [
         "vcredist",
@@ -11113,6 +11794,35 @@
               "Preuve": "Même après un vrai redémarrage, rien"
             }
           ]
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "accespath",
+      "Famille": "plantages",
+      "Titre": "« Windows ne peut pas accéder au périphérique, au chemin ou au fichier »",
+      "Phrase": "Un raccourci ou un programme refuse de s'ouvrir avec ce message",
+      "Mots": [
+        "ne peut pas accéder",
+        "chemin d'accès",
+        "périphérique, au chemin",
+        "accéder au fichier spécifié",
+        "autorisations nécessaires"
+      ],
+      "Suspects": [
+        "quarantaine",
+        "motw",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-historique-protection"
+        },
+        {
+          "Ref": "test-debloquer"
         },
         {
           "Ref": "test-reinstaller"
@@ -12224,6 +12934,40 @@
       ]
     },
     {
+      "Id": "eteintbouge",
+      "Famille": "allumage",
+      "Titre": "Il s'éteint quand on le bouge ou qu'on le touche",
+      "Phrase": "Un petit choc, déplacer le portable ou toucher la tour, et tout s'éteint",
+      "Mots": [
+        "s'éteint quand je le bouge",
+        "quand on le touche",
+        "quand je le déplace",
+        "petit choc",
+        "s'éteint en bougeant",
+        "faux contact"
+      ],
+      "Suspects": [
+        "prisecharge",
+        "cableinterne",
+        "memoire",
+        "fauxcontact"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "q-bouge-chargeur"
+        },
+        {
+          "Ref": "test-cables-internes"
+        },
+        {
+          "Ref": "test-memoire-reinserer"
+        }
+      ]
+    },
+    {
       "Id": "allumesecteur",
       "Famille": "allumage",
       "Titre": "Il s'allume dès qu'on branche la prise",
@@ -12333,7 +13077,10 @@
         "0xc0000225",
         "votre pc doit être réparé",
         "your pc needs to be repaired",
-        "your device needs to be repaired"
+        "your device needs to be repaired",
+        "0xc000021a",
+        "récupération",
+        "écran de récupération"
       ],
       "Suspects": [
         "cleusb",
@@ -12777,7 +13524,11 @@
         "préparation de windows",
         "chargement",
         "bloqué au démarrage",
-        "tourne sans fin"
+        "tourne sans fin",
+        "préparation de windows",
+        "ne pas éteindre",
+        "ne pas éteindre l'ordinateur",
+        "travail sur les mises à jour"
       ],
       "Suspects": [
         "majbloquee",
@@ -12974,6 +13725,30 @@
       "Etapes": [
         {
           "Ref": "test-msconfig-entree"
+        }
+      ]
+    },
+    {
+      "Id": "grub",
+      "Famille": "demarrage",
+      "Titre": "Un écran « GRUB » ou « grub rescue » au démarrage",
+      "Phrase": "Un écran noir avec « grub> », « grub rescue » ou un menu Linux",
+      "Mots": [
+        "grub",
+        "grub rescue",
+        "linux",
+        "ubuntu",
+        "grub>",
+        "minimal bash",
+        "error: no such partition"
+      ],
+      "Suspects": [
+        "grubreste",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-boot-windows"
         }
       ]
     },
@@ -14097,6 +14872,47 @@
       ]
     },
     {
+      "Id": "cliquesfantomes",
+      "Famille": "ecran",
+      "Titre": "L'écran tactile (ou la souris) clique tout seul",
+      "Phrase": "Des fenêtres s'ouvrent, ça clique et défile sans qu'on touche",
+      "Mots": [
+        "clique tout seul",
+        "ghost touch",
+        "appuis fantômes",
+        "écran touche tout seul",
+        "ouvre des choses tout seul",
+        "tactile fou"
+      ],
+      "Suspects": [
+        "ecransale",
+        "tactilefou",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-nettoyer-ecran",
+          "Reponses": [
+            {
+              "Texte": "Ça ne clique plus",
+              "Confirme": "ecransale",
+              "Preuve": "Nettoyé, l'écran ne clique plus"
+            },
+            {
+              "Texte": "Ça continue",
+              "Ecarte": [
+                "ecransale"
+              ],
+              "Preuve": "Ce n'était pas une saleté"
+            }
+          ]
+        },
+        {
+          "Ref": "test-couper-tactile"
+        }
+      ]
+    },
+    {
       "Id": "ecranseteint",
       "Famille": "ecran",
       "Titre": "L'écran s'éteint trop vite",
@@ -14291,6 +15107,33 @@
       ]
     },
     {
+      "Id": "ecrandupl",
+      "Famille": "ecran",
+      "Titre": "Le deuxième écran affiche la même chose que le premier",
+      "Phrase": "Impossible de mettre une fenêtre sur l'autre écran : c'est la même image",
+      "Mots": [
+        "même image",
+        "même chose",
+        "dupliqué",
+        "dupliquer",
+        "étendre",
+        "les deux écrans pareils",
+        "écran en miroir"
+      ],
+      "Suspects": [
+        "modedupliquer",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-etendre"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
       "Id": "fenetrehorsecran",
       "Famille": "ecran",
       "Titre": "Une fenêtre a disparu ou s'ouvre hors de l'écran",
@@ -14314,6 +15157,36 @@
         },
         {
           "Ref": "test-winp"
+        }
+      ]
+    },
+    {
+      "Id": "curseurdisparu",
+      "Famille": "ecran",
+      "Titre": "Le curseur de la souris a disparu",
+      "Phrase": "Plus de flèche à l'écran, même en bougeant la souris",
+      "Mots": [
+        "curseur disparu",
+        "plus de curseur",
+        "flèche disparue",
+        "pointeur invisible",
+        "souris invisible",
+        "pas de curseur"
+      ],
+      "Suspects": [
+        "curseurcache",
+        "explorateur",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-curseur"
+        },
+        {
+          "Ref": "test-explorateur-redem"
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
@@ -14349,7 +15222,7 @@
     {
       "Id": "portableecrannoir",
       "Famille": "ecran",
-      "Titre": "L'écran du portable reste noir, mais un écran branché marche",
+      "Titre": "L'écran du portable reste noir, mais un écran externe affiche l'image",
       "Phrase": "Branché à un écran ou une télé, l'image apparaît là-bas mais pas sur le portable",
       "Mots": [
         "écran du portable noir",
@@ -15849,6 +16722,37 @@
       ]
     },
     {
+      "Id": "entendmusique",
+      "Famille": "son",
+      "Titre": "Les autres entendent ma musique ou mon jeu",
+      "Phrase": "En appel, les autres entendent le son de mon PC",
+      "Mots": [
+        "entendent ma musique",
+        "entendent mon jeu",
+        "entendent le son du pc",
+        "stream le son",
+        "discord entend",
+        "mixage stéréo",
+        "stereo mix"
+      ],
+      "Suspects": [
+        "mixstereo",
+        "ecoutemicro",
+        "hautparleursmicro"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mix-stereo"
+        },
+        {
+          "Ref": "test-ecouter"
+        },
+        {
+          "Ref": "test-casque-echo"
+        }
+      ]
+    },
+    {
       "Id": "casque",
       "Famille": "son",
       "Titre": "Le casque n'est pas reconnu",
@@ -16641,6 +17545,41 @@
       ]
     },
     {
+      "Id": "proxy",
+      "Famille": "internet",
+      "Titre": "Le navigateur dit « pas de connexion », mais d'autres applis marchent",
+      "Phrase": "Discord ou les jeux marchent, mais aucun site ne s'ouvre dans le navigateur",
+      "Mots": [
+        "proxy",
+        "err_proxy",
+        "navigateur pas de connexion",
+        "discord marche mais pas internet",
+        "err_connection",
+        "pas de connexion navigateur",
+        "seulement le navigateur"
+      ],
+      "Suspects": [
+        "proxy",
+        "extension",
+        "antivirusweb",
+        "dns"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-proxy"
+        },
+        {
+          "Ref": "test-extensions"
+        },
+        {
+          "Ref": "test-sans-antivirus"
+        },
+        {
+          "Ref": "test-dns"
+        }
+      ]
+    },
+    {
       "Id": "certificat",
       "Famille": "internet",
       "Titre": "« Votre connexion n'est pas privée » sur beaucoup de sites",
@@ -17190,6 +18129,41 @@
       ]
     },
     {
+      "Id": "sansfilcoupe",
+      "Famille": "peripheriques",
+      "Titre": "La souris ou le clavier sans fil se coupent souvent",
+      "Phrase": "Ça saccade, des touches sont perdues, il faut attendre qu'ils reviennent",
+      "Mots": [
+        "sans fil se coupe",
+        "se déconnecte",
+        "souris sans fil",
+        "clavier sans fil",
+        "perd la connexion",
+        "décroche",
+        "lag souris sans fil"
+      ],
+      "Suspects": [
+        "piles",
+        "rallonge",
+        "recepteur",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-piles"
+        },
+        {
+          "Ref": "test-rallonge"
+        },
+        {
+          "Ref": "test-recepteur"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
       "Id": "vitessesouris",
       "Famille": "peripheriques",
       "Titre": "La souris est trop lente ou trop rapide",
@@ -17265,6 +18239,33 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "cartesd",
+      "Famille": "peripheriques",
+      "Titre": "Le PC ne lit pas la carte SD (ou micro SD)",
+      "Phrase": "La carte d'un appareil photo ou d'un téléphone n'apparaît pas",
+      "Mots": [
+        "carte sd",
+        "micro sd",
+        "lecteur de carte",
+        "carte mémoire",
+        "sd",
+        "carte de l'appareil photo"
+      ],
+      "Suspects": [
+        "loquet",
+        "lecteursd",
+        "cartesdformat"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-loquet"
+        },
+        {
+          "Ref": "test-carte-adaptateur"
         }
       ]
     },
@@ -17542,7 +18543,10 @@
         "hors ligne",
         "n'imprime pas",
         "encre",
-        "papier"
+        "papier",
+        "imprime tout seul",
+        "vieux documents",
+        "file d'attente bloquée"
       ],
       "Suspects": [
         "imprimanteconso",
@@ -17659,6 +18663,33 @@
       ]
     },
     {
+      "Id": "scanner",
+      "Famille": "peripheriques",
+      "Titre": "Le scanner (ou l'imprimante pour numériser) ne marche pas",
+      "Phrase": "Impossible de numériser un document, alors que l'impression marche",
+      "Mots": [
+        "scanner",
+        "numériser",
+        "scan",
+        "scanner ne marche pas",
+        "numérisation",
+        "photocopie"
+      ],
+      "Suspects": [
+        "appnumerisation",
+        "imprimantehorsligne",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-numerisation"
+        },
+        {
+          "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
       "Id": "necharge",
       "Famille": "batterie",
       "Titre": "Il ne charge plus",
@@ -17732,6 +18763,36 @@
       ]
     },
     {
+      "Id": "secteurseul",
+      "Famille": "batterie",
+      "Titre": "Le portable ne marche que branché sur le chargeur",
+      "Phrase": "Dès qu'on débranche, il s'éteint (ou ne démarre pas sans le chargeur)",
+      "Mots": [
+        "que branché",
+        "seulement branché",
+        "sans chargeur",
+        "batterie morte",
+        "ne marche que sur secteur",
+        "débranché s'éteint"
+      ],
+      "Suspects": [
+        "residuelle",
+        "pilotebatterie",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-pilote-batterie"
+        },
+        {
+          "Ref": "q-batterie-0"
+        }
+      ]
+    },
+    {
       "Id": "chargelente",
       "Famille": "batterie",
       "Titre": "Il charge très lentement",
@@ -17742,7 +18803,9 @@
         "met longtemps à charger",
         "chargeur lent",
         "usb-c",
-        "charge pas vite"
+        "charge pas vite",
+        "charge seulement éteint",
+        "ne charge qu'éteint"
       ],
       "Suspects": [
         "chargeurfaible",
@@ -18404,7 +19467,10 @@
         "mot de passe changé",
         "messages envoyés à ma place",
         "compte hacké",
-        "on a volé mon compte"
+        "on a volé mon compte",
+        "mails envoyés à mes contacts",
+        "messages à mes contacts",
+        "on a envoyé des mails"
       ],
       "Suspects": [
         "indesirables",
@@ -18428,7 +19494,10 @@
         "stockage",
         "barre rouge",
         "insuffisant",
-        "go"
+        "go",
+        "stockage presque plein",
+        "espace disque insuffisant",
+        "plus de place"
       ],
       "Suspects": [
         "temporaires",
@@ -19021,6 +20090,33 @@
       ]
     },
     {
+      "Id": "wordendommage",
+      "Famille": "fichiers",
+      "Titre": "Word ou Excel dit que le fichier est endommagé",
+      "Phrase": "« Word a rencontré une erreur », « le fichier est endommagé », caractères bizarres",
+      "Mots": [
+        "fichier endommagé",
+        "corrompu",
+        "word a rencontré une erreur",
+        "excel endommagé",
+        "caractères bizarres",
+        "ne peut pas ouvrir le fichier"
+      ],
+      "Suspects": [
+        "motw",
+        "reparerword",
+        "fichierabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-debloquer"
+        },
+        {
+          "Ref": "test-ouvrir-reparer"
+        }
+      ]
+    },
+    {
       "Id": "zip",
       "Famille": "fichiers",
       "Titre": "Une archive (ZIP, RAR, 7z) ne s'ouvre pas",
@@ -19304,6 +20400,51 @@
       ]
     },
     {
+      "Id": "claviertactile",
+      "Famille": "windows",
+      "Titre": "Le clavier à l'écran apparaît tout le temps",
+      "Phrase": "Un clavier s'affiche en bas dès qu'on clique pour écrire",
+      "Mots": [
+        "clavier à l'écran",
+        "clavier tactile",
+        "clavier visuel",
+        "clavier qui apparaît",
+        "clavier virtuel"
+      ],
+      "Suspects": [
+        "modetablette",
+        "clavieraccessibilite"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-clavier-tactile"
+        }
+      ]
+    },
+    {
+      "Id": "fondnoir",
+      "Famille": "windows",
+      "Titre": "Le fond d'écran est devenu noir (ou ne se change plus)",
+      "Phrase": "Le Bureau est noir, et les réglages de personnalisation sont grisés",
+      "Mots": [
+        "fond d'écran noir",
+        "fond noir",
+        "arrière-plan",
+        "fond d'écran",
+        "personnalisation grisée",
+        "wallpaper"
+      ],
+      "Suspects": [
+        "fondreglage",
+        "fondactivation"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fond"
+        }
+      ]
+    },
+    {
       "Id": "mdpoublie",
       "Famille": "windows",
       "Titre": "Mot de passe ou code PIN oublié",
@@ -19559,6 +20700,31 @@
         },
         {
           "Ref": "q-onedrive-bureau"
+        }
+      ]
+    },
+    {
+      "Id": "corbeillecachee",
+      "Famille": "windows",
+      "Titre": "La corbeille (ou « Ce PC ») a disparu du Bureau",
+      "Phrase": "Plus d'icône de corbeille sur le Bureau",
+      "Mots": [
+        "corbeille disparue",
+        "plus de corbeille",
+        "icône corbeille",
+        "ce pc disparu",
+        "poste de travail"
+      ],
+      "Suspects": [
+        "corbeillemasquee",
+        "iconesmasquees"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-icone-corbeille"
+        },
+        {
+          "Ref": "test-icones-bureau"
         }
       ]
     },
@@ -19960,6 +21126,35 @@
         },
         {
           "Ref": "test-retelecharger"
+        }
+      ]
+    },
+    {
+      "Id": "desinstaller",
+      "Famille": "windows",
+      "Titre": "Impossible de désinstaller un programme",
+      "Phrase": "La désinstallation échoue, ou le programme revient",
+      "Mots": [
+        "désinstaller",
+        "impossible de désinstaller",
+        "ne se désinstalle pas",
+        "supprimer un programme",
+        "désinstallation échoue"
+      ],
+      "Suspects": [
+        "blocagefond",
+        "desinstalleur",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fin-tache"
+        },
+        {
+          "Ref": "test-desinstalleur"
+        },
+        {
+          "Ref": "test-analyse"
         }
       ]
     },
@@ -20494,6 +21689,74 @@
         },
         {
           "Ref": "test-memvirt"
+        }
+      ]
+    },
+    {
+      "Id": "dx12",
+      "Famille": "jeux",
+      "Titre": "« DirectX 12 n'est pas pris en charge » ou « pilote graphique trop ancien »",
+      "Phrase": "Le jeu refuse de démarrer à cause de DirectX ou du pilote graphique",
+      "Mots": [
+        "directx 12",
+        "dx12",
+        "directx",
+        "pilote graphique trop ancien",
+        "outdated driver",
+        "feature level",
+        "d3d12",
+        "shader model"
+      ],
+      "Suspects": [
+        "pilotegraphique",
+        "ecransurcartemere",
+        "gpuintegre",
+        "gpuvieille"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        },
+        {
+          "Ref": "test-prise-gpu"
+        },
+        {
+          "Ref": "test-gpu-jeu"
+        }
+      ]
+    },
+    {
+      "Id": "steamerreur",
+      "Famille": "jeux",
+      "Titre": "Erreur Steam pendant une mise à jour (« contenu verrouillé », « erreur d'écriture »)",
+      "Phrase": "La mise à jour d'un jeu s'arrête sur une erreur de Steam",
+      "Mots": [
+        "contenu verrouillé",
+        "erreur d'écriture",
+        "disk write error",
+        "content file locked",
+        "steam erreur",
+        "mise à jour steam",
+        "corrupt update files"
+      ],
+      "Suspects": [
+        "bibliotheque",
+        "quarantaine",
+        "jeufichiers",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-reparer-bibliotheque"
+        },
+        {
+          "Ref": "test-historique-protection"
+        },
+        {
+          "Ref": "test-verifier-jeu"
         }
       ]
     }
