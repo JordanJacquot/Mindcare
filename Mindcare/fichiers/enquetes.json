@@ -2112,6 +2112,238 @@
         "Pour le ramener : touche Windows + Maj + flèche gauche ou droite."
       ],
       "Pro": "Rien à réparer."
+    },
+    "fenetreperdue": {
+      "Titre": "La fenêtre hors de l'écran",
+      "Trouve": "La fenêtre s'ouvrait en dehors de l'écran",
+      "Pourquoi": "Une fenêtre garde sa dernière place : après avoir débranché un deuxième écran ou changé de résolution, elle peut s'ouvrir hors de la partie visible.",
+      "AFaire": [
+        "Si ça recommence : clique sur le programme dans la barre des tâches, puis touche Windows + Maj + flèche gauche ou droite."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "modeprojection": {
+      "Titre": "Le mode d'affichage",
+      "Trouve": "Windows envoyait l'image ailleurs (mode d'affichage)",
+      "Pourquoi": "Le raccourci touche Windows + P choisit où va l'image : l'écran du PC, un autre écran, ou les deux. Un mauvais choix envoie l'image ou les fenêtres sur un écran absent.",
+      "AFaire": [
+        "Pour changer : touche Windows + P, puis choisis."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "overscan": {
+      "Titre": "Le réglage de la télé",
+      "Trouve": "La télé agrandissait ou rétrécissait l'image",
+      "Pourquoi": "Les télés agrandissent souvent l'image (« overscan ») : les bords sont coupés, ou il reste des bandes noires.",
+      "AFaire": [
+        "Garde sur la télé le format « Plein écran », « Juste à l'écran » ou « 1:1 » pour l'entrée de l'ordinateur."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "echellegpu": {
+      "Titre": "La mise à l'échelle de la carte graphique",
+      "Trouve": "La carte graphique réduisait l'image",
+      "Pourquoi": "Le logiciel de la carte graphique peut garder l'image à sa taille d'origine, avec des bandes noires autour, au lieu de l'étirer.",
+      "AFaire": [
+        "NVIDIA : « Panneau de configuration NVIDIA », « Ajuster la taille et la position du bureau », « Plein écran ».",
+        "AMD : « AMD Software », « Affichage », active « Mise à l'échelle GPU », mode « Plein écran ».",
+        "Intel : « Centre de commande graphique Intel », « Affichage », « Mise à l'échelle » : « Étirer » ou « Plein écran »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "luminositezero": {
+      "Titre": "La luminosité à zéro",
+      "Trouve": "La luminosité de l'écran était au plus bas",
+      "Pourquoi": "Sur un portable, les touches de luminosité peuvent mettre l'écran tellement sombre qu'il paraît éteint.",
+      "AFaire": [
+        "Les touches de luminosité ont souvent un petit soleil (avec la touche Fn)."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "frequencewindows": {
+      "Titre": "Le réglage de Windows",
+      "Trouve": "Windows n'utilisait pas la fréquence maximale de l'écran",
+      "Pourquoi": "Un écran rapide (120, 144 Hz ou plus) reste souvent à 60 Hz tant qu'on ne le choisit pas dans Windows.",
+      "AFaire": [
+        "Garde la fréquence la plus haute dans « Écran avancé »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cablefrequence": {
+      "Titre": "Le câble de l'écran",
+      "Trouve": "Le câble ne laissait pas passer les hautes fréquences",
+      "Pourquoi": "Un vieux câble HDMI, ou un câble trop long, limite l'écran à 60 Hz. Le câble fourni avec l'écran (souvent DisplayPort) permet le maximum.",
+      "AFaire": [
+        "Garde le câble fourni avec l'écran (DisplayPort, ou HDMI 2.0 ou plus récent)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cleartype": {
+      "Titre": "Le lissage du texte",
+      "Trouve": "Le lissage du texte (ClearType) était mal réglé",
+      "Pourquoi": "Windows lisse les lettres pour l'écran (ClearType). Mal réglé ou coupé, le texte paraît baveux ou flou.",
+      "AFaire": [
+        "Garde ClearType activé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "programmebloquant": {
+      "Titre": "Un programme qui retient l'arrêt",
+      "Trouve": "Un programme empêchait Windows de s'éteindre",
+      "Pourquoi": "Un programme ouvert (souvent avec un travail pas enregistré) peut retenir l'arrêt : Windows attend qu'il se ferme.",
+      "AFaire": [
+        "Ferme tes programmes avant d'éteindre.",
+        "Si c'est toujours le même, mets-le à jour ou désinstalle-le."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ecobatterie": {
+      "Titre": "L'économiseur de batterie",
+      "Trouve": "L'économiseur de batterie bridait le portable",
+      "Pourquoi": "Sur batterie, Windows ralentit le portable pour tenir plus longtemps, surtout quand l'économiseur de batterie est activé.",
+      "AFaire": [
+        "Désactive l'économiseur quand tu as besoin de puissance, ou branche le chargeur."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "usblent": {
+      "Titre": "Une prise USB lente",
+      "Trouve": "La clé ou le disque était branché sur une prise USB lente",
+      "Pourquoi": "Les prises USB anciennes (USB 2, souvent noires ou blanches) sont 10 fois plus lentes que les bleues (USB 3, parfois marquées « SS »).",
+      "AFaire": [
+        "Branche tes clés et disques sur une prise USB bleue ou marquée « SS »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "petitsfichiers": {
+      "Titre": "Beaucoup de petits fichiers",
+      "Trouve": "Ce sont beaucoup de petits fichiers (c'est normal)",
+      "Pourquoi": "Copier des milliers de petits fichiers (photos, documents) est bien plus lent qu'un seul gros fichier de même taille.",
+      "AFaire": [
+        "Pour aller plus vite : clic droit sur le dossier, « Compresser en fichier ZIP », puis copie ce seul fichier."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cleelente": {
+      "Titre": "La clé ou le disque lui-même",
+      "Trouve": "La clé (ou le disque) est lente par nature",
+      "Pourquoi": "Les clés USB bon marché, et les vieux disques durs, écrivent lentement : la copie ralentit au bout de quelques secondes.",
+      "AFaire": [
+        "Pour les grosses copies, utilise un disque externe rapide (SSD) ou une clé USB 3 de marque."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "lecteurreseau": {
+      "Titre": "Un lecteur réseau absent",
+      "Trouve": "Un lecteur réseau déconnecté ralentissait l'Explorateur",
+      "Pourquoi": "Un ancien dossier partagé (un autre PC, une box, un NAS) relié comme lecteur : l'Explorateur attend qu'il réponde avant d'afficher.",
+      "AFaire": [
+        "C'est réglé : le lecteur absent est déconnecté."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "typedossier": {
+      "Titre": "Le type de dossier",
+      "Trouve": "Windows préparait des aperçus pour tout le dossier",
+      "Pourquoi": "Un dossier réglé pour les photos ou les vidéos demande à Windows de préparer un aperçu de chaque fichier : très lent quand il y en a beaucoup.",
+      "AFaire": [
+        "Garde « Éléments généraux » pour les dossiers très remplis."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "arretgpu": {
+      "Titre": "Le mode silence de la carte graphique",
+      "Trouve": "C'est le mode silence de la carte graphique (c'est normal)",
+      "Pourquoi": "Beaucoup de cartes graphiques arrêtent leurs ventilateurs quand elles ne travaillent pas fort, pour faire moins de bruit. Ils repartent tout seuls en jeu.",
+      "AFaire": [
+        "Rien à faire : vérifie juste qu'ils tournent pendant un jeu."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "cableventilo": {
+      "Titre": "Le câble du ventilateur",
+      "Trouve": "Le câble du ventilateur était débranché",
+      "Pourquoi": "Un ventilateur de boîtier est relié à la carte mère par un petit câble, qui peut sortir lors d'un nettoyage ou d'un déplacement.",
+      "AFaire": [
+        "Rebranche-le sur une prise « SYS_FAN » ou « CHA_FAN » de la carte mère, PC éteint et débranché."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "attenuation": {
+      "Titre": "L'atténuation des appels",
+      "Trouve": "Windows baissait les autres sons pendant les appels",
+      "Pourquoi": "Windows baisse le volume des autres sons dès qu'il croit qu'un appel commence (Discord, Teams, jeux avec voix).",
+      "AFaire": [
+        "Garde « Ne rien faire » dans l'onglet « Communications »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "attenuationappli": {
+      "Titre": "Le réglage de l'appli d'appel",
+      "Trouve": "L'appli d'appel baissait le son des autres programmes",
+      "Pourquoi": "Discord et d'autres applis baissent le son des autres programmes quand quelqu'un parle (« atténuation »).",
+      "AFaire": [
+        "Discord : roue dentée, « Voix et vidéo », « Atténuation » : mets-la à 0 %."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "balance": {
+      "Titre": "La balance gauche et droite",
+      "Trouve": "La balance gauche et droite était déréglée",
+      "Pourquoi": "Windows peut envoyer plus de son d'un côté que de l'autre (la « balance ») : un côté paraît muet.",
+      "AFaire": [
+        "Garde les deux côtés au même niveau."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "latencebluetooth": {
+      "Titre": "Le retard du Bluetooth",
+      "Trouve": "Le Bluetooth ajoute un retard au son (c'est normal)",
+      "Pourquoi": "Le son en Bluetooth arrive toujours un peu en retard (souvent 0,2 seconde) : c'est sa façon de marcher, surtout en jeu.",
+      "AFaire": [
+        "Pour les jeux et les vidéos, préfère un casque filaire, ou un casque sans fil avec son propre petit récepteur USB."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "synchrotv": {
+      "Titre": "La télé ou l'ampli",
+      "Trouve": "La télé ou l'ampli retardait le son",
+      "Pourquoi": "Les télés et les amplis traitent le son et l'image séparément : un réglage de « synchronisation audio » (lip sync) les recale.",
+      "AFaire": [
+        "Dans les réglages son de la télé ou de l'ampli : « Synchronisation AV », « Lip sync » ou « Décalage audio »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "niveaumicro": {
+      "Titre": "Le volume du micro",
+      "Trouve": "Le volume du micro était trop bas",
+      "Pourquoi": "Le micro a son propre volume dans Windows, et parfois une amplification : trop bas, on t'entend à peine.",
+      "AFaire": [
+        "Garde le volume du micro vers 80 à 100."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "microbluetooth": {
+      "Titre": "Le micro du casque Bluetooth",
+      "Trouve": "Le casque Bluetooth passe en mauvaise qualité quand son micro sert",
+      "Pourquoi": "En Bluetooth, un casque qui utilise son micro passe en mode « mains libres » : le son devient mauvais des deux côtés. C'est une limite du Bluetooth.",
+      "AFaire": [
+        "Utilise le micro du PC ou un micro filaire pour parler, et le casque seulement pour écouter.",
+        "Ou un casque sans fil avec son propre petit récepteur USB."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -6775,6 +7007,563 @@
           "Preuve": "Le bouton d'allumage s'enfonce normalement"
         }
       ]
+    },
+    "test-ramener-fenetre": {
+      "Type": "test",
+      "Court": "Ramener la fenêtre",
+      "Pour": [
+        "fenetreperdue"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Ramène la fenêtre sur l'écran",
+      "Gestes": [
+        "Clique sur le programme dans la barre des tâches (en bas).",
+        "Appuie en même temps sur la touche Windows, Maj et la flèche gauche (puis la flèche droite si rien ne change).",
+        "Sinon : Alt + Espace, puis la lettre D (« Déplacer »), puis les flèches du clavier, et Entrée."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La fenêtre est revenue",
+          "Confirme": "fenetreperdue",
+          "Preuve": "La fenêtre était hors de l'écran"
+        },
+        {
+          "Texte": "Toujours invisible",
+          "Ecarte": [
+            "fenetreperdue"
+          ],
+          "Preuve": "La fenêtre n'était pas hors de l'écran"
+        }
+      ]
+    },
+    "test-winp": {
+      "Type": "test",
+      "Court": "Le mode d'affichage",
+      "Pour": [
+        "modeprojection"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis où va l'image",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows et P.",
+        "Choisis « Écran du PC uniquement » (ou « Dupliquer »), avec les flèches et Entrée si tu ne vois rien."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est revenu",
+          "Confirme": "modeprojection",
+          "Preuve": "Avec le bon mode d'affichage, c'est revenu"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "modeprojection"
+          ],
+          "Preuve": "Le mode d'affichage était le bon"
+        }
+      ]
+    },
+    "test-overscan": {
+      "Type": "test",
+      "Court": "Le format de la télé",
+      "Pour": [
+        "overscan"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Change le format de l'image sur la télé",
+      "Gestes": [
+        "Avec la télécommande, ouvre le menu « Image » (ou « Paramètres de l'image »).",
+        "Cherche « Format », « Taille de l'image » ou « Format de l'image ».",
+        "Choisis « Plein écran », « Juste à l'écran », « Écran entier » ou « 1:1 »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image est entière",
+          "Confirme": "overscan",
+          "Preuve": "Avec le bon format de la télé, l'image est entière"
+        },
+        {
+          "Texte": "Toujours pareil, ou ce n'est pas une télé",
+          "Ecarte": [
+            "overscan"
+          ],
+          "Preuve": "Le format de la télé n'y était pour rien"
+        }
+      ]
+    },
+    "test-luminosite-touches": {
+      "Type": "test",
+      "Court": "La luminosité",
+      "Pour": [
+        "luminositezero"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Monte la luminosité avec le clavier",
+      "Gestes": [
+        "Cherche les touches avec un petit soleil (souvent F2 et F3, ou F11 et F12).",
+        "Appuie plusieurs fois sur celle qui monte la luminosité, seule puis avec la touche Fn."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image revient",
+          "Confirme": "luminositezero",
+          "Preuve": "En montant la luminosité, l'image revient"
+        },
+        {
+          "Texte": "Toujours noir",
+          "Ecarte": [
+            "luminositezero"
+          ],
+          "Preuve": "La luminosité n'y était pour rien"
+        }
+      ]
+    },
+    "test-hz": {
+      "Type": "test",
+      "Court": "La fréquence",
+      "Pour": [
+        "frequencewindows"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis la fréquence la plus haute",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Écran », puis « Écran avancé ».",
+        "Dans « Choisir une fréquence d'actualisation », prends la valeur la plus haute (par exemple 144 Hz)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "frequencewindows",
+          "Preuve": "La fréquence la plus haute choisie, c'est réglé"
+        },
+        {
+          "Texte": "Elle n'est pas proposée",
+          "Ecarte": [
+            "frequencewindows"
+          ],
+          "Preuve": "Windows ne propose pas la fréquence la plus haute"
+        }
+      ]
+    },
+    "test-cable-hz": {
+      "Type": "test",
+      "Court": "Le câble",
+      "Pour": [
+        "cablefrequence"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche l'écran avec le câble fourni",
+      "Gestes": [
+        "Branche l'écran avec le câble fourni dans sa boîte (souvent DisplayPort), sur la carte graphique.",
+        "Recommence le réglage de la fréquence."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La fréquence la plus haute est proposée",
+          "Confirme": "cablefrequence",
+          "Preuve": "Avec le bon câble, la fréquence la plus haute est proposée"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "cablefrequence"
+          ],
+          "Preuve": "Le câble n'y était pour rien"
+        }
+      ]
+    },
+    "test-cleartype": {
+      "Type": "test",
+      "Court": "Le lissage du texte",
+      "Pour": [
+        "cleartype"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle le lissage du texte",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « ClearType » et ouvre « Ajuster le texte ClearType ».",
+        "Coche « Activer ClearType », puis choisis à chaque étape le texte qui te paraît le plus net."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le texte est net",
+          "Confirme": "cleartype",
+          "Preuve": "ClearType réglé, le texte est net"
+        },
+        {
+          "Texte": "Toujours flou",
+          "Ecarte": [
+            "cleartype"
+          ],
+          "Preuve": "ClearType n'y était pour rien"
+        }
+      ]
+    },
+    "q-empeche-arret": {
+      "Type": "question",
+      "Court": "Un message ?",
+      "Texte": "Pendant l'arrêt, un message « Ce programme empêche l'arrêt » ou une liste de programmes s'affiche-t-il ?",
+      "Pour": [
+        "programmebloquant"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "programmebloquant",
+          "Preuve": "Un programme empêche l'arrêt"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "programmebloquant"
+          ],
+          "Preuve": "Aucun programme n'empêche l'arrêt"
+        }
+      ]
+    },
+    "test-economiseur-batterie": {
+      "Type": "test",
+      "Court": "L'économiseur de batterie",
+      "Pour": [
+        "ecobatterie"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe l'économiseur de batterie",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Alimentation et batterie ».",
+        "Ouvre « Économiseur de batterie » (ou « Économie d'énergie ») et désactive-le ; mets « Mode d'alimentation » sur « Performances optimales »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est plus rapide",
+          "Confirme": "ecobatterie",
+          "Preuve": "Sans l'économiseur de batterie, c'est plus rapide"
+        },
+        {
+          "Texte": "Ça ne change rien",
+          "Ecarte": [
+            "ecobatterie"
+          ],
+          "Preuve": "L'économiseur n'y était pour rien"
+        }
+      ]
+    },
+    "test-prise-bleue": {
+      "Type": "test",
+      "Court": "Une prise bleue",
+      "Pour": [
+        "usblent"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche la clé sur une prise USB bleue",
+      "Gestes": [
+        "Rebranche la clé (ou le disque) sur une prise USB bleue, ou marquée « SS » (sur une tour, à l'arrière).",
+        "Relance la copie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est bien plus rapide",
+          "Confirme": "usblent",
+          "Preuve": "Sur une prise USB rapide, la copie est rapide"
+        },
+        {
+          "Texte": "Pareil, ou c'était déjà une bleue",
+          "Ecarte": [
+            "usblent"
+          ],
+          "Preuve": "La prise USB n'y était pour rien"
+        }
+      ]
+    },
+    "q-petits-fichiers": {
+      "Type": "question",
+      "Court": "Beaucoup de fichiers ?",
+      "Texte": "Tu copies des milliers de petits fichiers (un dossier de photos, de documents) ?",
+      "Pour": [
+        "petitsfichiers"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "petitsfichiers",
+          "Preuve": "Ce sont des milliers de petits fichiers"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "petitsfichiers"
+          ],
+          "Preuve": "Ce sont quelques gros fichiers"
+        }
+      ]
+    },
+    "test-lecteur-reseau": {
+      "Type": "test",
+      "Court": "Les lecteurs réseau",
+      "Pour": [
+        "lecteurreseau"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Déconnecte les lecteurs réseau absents",
+      "Gestes": [
+        "Ouvre l'Explorateur de fichiers (touche Windows + E), puis « Ce PC ».",
+        "Si un lecteur a une croix rouge (lecteur réseau absent) : clic droit dessus, « Déconnecter ».",
+        "Rouvre l'Explorateur."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est rapide",
+          "Confirme": "lecteurreseau",
+          "Preuve": "Le lecteur absent déconnecté, c'est rapide"
+        },
+        {
+          "Texte": "Pareil, ou aucun lecteur réseau",
+          "Ecarte": [
+            "lecteurreseau"
+          ],
+          "Preuve": "Aucun lecteur réseau ne gênait"
+        }
+      ]
+    },
+    "test-type-dossier": {
+      "Type": "test",
+      "Court": "Le type de dossier",
+      "Pour": [
+        "typedossier"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle le dossier lent sur « Éléments généraux »",
+      "Gestes": [
+        "Clic droit sur le dossier lent, « Propriétés », onglet « Personnaliser ».",
+        "Dans « Optimiser ce dossier pour », choisis « Éléments généraux » et coche « Appliquer également ce modèle à tous les sous-dossiers ». OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est rapide",
+          "Confirme": "typedossier",
+          "Preuve": "Réglé en « Éléments généraux », le dossier s'ouvre vite"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "typedossier"
+          ],
+          "Preuve": "Le type de dossier n'y était pour rien"
+        }
+      ]
+    },
+    "q-ventilo-gpu": {
+      "Type": "question",
+      "Court": "Lequel ?",
+      "Texte": "Le ventilateur qui ne tourne pas est-il sur la carte graphique (la grande carte en bas), et le PC ne fait-il rien de lourd ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, celui de la carte graphique, sans jeu en cours",
+          "Confirme": "arretgpu",
+          "Preuve": "Le ventilateur de la carte graphique s'arrête au repos"
+        },
+        {
+          "Texte": "Non, un autre, ou même en jeu",
+          "Ecarte": [
+            "arretgpu"
+          ],
+          "Preuve": "Ce n'est pas le repos de la carte graphique"
+        }
+      ]
+    },
+    "test-ventilo-doigt": {
+      "Type": "test",
+      "Court": "Le ventilateur à la main",
+      "Pour": [
+        "ventilateur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Fais tourner le ventilateur à la main",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique.",
+        "Fais tourner le ventilateur du bout du doigt (ou avec un coton-tige).",
+        "Regarde aussi s'il est bien branché (son petit câble vers la carte mère)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il accroche, ou tourne mal",
+          "Confirme": "ventilateur",
+          "Preuve": "Le ventilateur accroche : il est fatigué"
+        },
+        {
+          "Texte": "Il tourne librement",
+          "Ecarte": [
+            "ventilateur"
+          ],
+          "Preuve": "Le ventilateur tourne librement"
+        },
+        {
+          "Texte": "Son câble était débranché",
+          "Confirme": "cableventilo",
+          "Preuve": "Le câble du ventilateur était débranché"
+        }
+      ]
+    },
+    "test-communications": {
+      "Type": "test",
+      "Court": "L'onglet Communications",
+      "Pour": [
+        "attenuation"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Dis à Windows de ne rien baisser",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Panneau de configuration du son » et ouvre-le (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Communications » : choisis « Ne rien faire », puis OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son ne baisse plus",
+          "Confirme": "attenuation",
+          "Preuve": "Avec « Ne rien faire », le son ne baisse plus"
+        },
+        {
+          "Texte": "Il baisse encore",
+          "Ecarte": [
+            "attenuation"
+          ],
+          "Preuve": "Le réglage de Windows n'y était pour rien"
+        }
+      ]
+    },
+    "test-attenuation-discord": {
+      "Type": "test",
+      "Court": "L'appli d'appel",
+      "Pour": [
+        "attenuationappli"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe l'atténuation dans l'appli d'appel",
+      "Gestes": [
+        "Discord : roue dentée en bas, « Voix et vidéo », descends à « Atténuation » : mets le curseur à 0 %.",
+        "Autres applis : cherche « atténuation » ou « baisser les autres sons » dans leurs réglages audio."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le son ne baisse plus",
+          "Confirme": "attenuationappli",
+          "Preuve": "L'atténuation coupée, le son ne baisse plus"
+        },
+        {
+          "Texte": "Il baisse encore",
+          "Ecarte": [
+            "attenuationappli"
+          ],
+          "Preuve": "L'appli d'appel n'y était pour rien"
+        }
+      ]
+    },
+    "test-balance": {
+      "Type": "test",
+      "Court": "La balance",
+      "Pour": [
+        "balance"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets la balance au milieu",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Panneau de configuration du son » et ouvre-le (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Lecture » : double-clique sur ton casque ou tes haut-parleurs, onglet « Niveaux », bouton « Balance ».",
+        "Mets la gauche et la droite au même chiffre. OK.",
+        "Vérifie aussi « Audio mono » : touche Windows + I, « Accessibilité », « Audio » : désactivé."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les deux côtés marchent",
+          "Confirme": "balance",
+          "Preuve": "La balance remise au milieu, les deux côtés marchent"
+        },
+        {
+          "Texte": "Toujours un seul côté",
+          "Ecarte": [
+            "balance"
+          ],
+          "Preuve": "La balance était déjà au milieu"
+        }
+      ]
+    },
+    "q-son-retard": {
+      "Type": "question",
+      "Court": "Par quoi passe le son ?",
+      "Texte": "Le son passe par :",
+      "Reponses": [
+        {
+          "Texte": "Un casque ou une enceinte Bluetooth",
+          "Confirme": "latencebluetooth",
+          "Preuve": "Le son passe en Bluetooth"
+        },
+        {
+          "Texte": "La télé ou un ampli (HDMI)",
+          "Garde": [
+            "synchrotv",
+            "pilotesson"
+          ],
+          "Preuve": "Le son passe par la télé ou un ampli"
+        },
+        {
+          "Texte": "Un casque filaire ou les haut-parleurs du PC",
+          "Ecarte": [
+            "latencebluetooth",
+            "synchrotv"
+          ],
+          "Preuve": "Le son passe par un fil"
+        }
+      ]
+    },
+    "test-niveau-micro": {
+      "Type": "test",
+      "Court": "Le volume du micro",
+      "Pour": [
+        "niveaumicro"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Monte le volume du micro",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Panneau de configuration du son » et ouvre-le (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Enregistrement » : double-clique sur ton micro, onglet « Niveaux ».",
+        "Mets « Microphone » à 100 ; s'il y a « Amplification du microphone », mets +10 dB. OK.",
+        "Refais un essai avec quelqu'un."
+      ],
+      "Reponses": [
+        {
+          "Texte": "On m'entend bien",
+          "Confirme": "niveaumicro",
+          "Preuve": "Le volume du micro monté, on t'entend bien"
+        },
+        {
+          "Texte": "Toujours faible",
+          "Ecarte": [
+            "niveaumicro"
+          ],
+          "Preuve": "Le volume du micro était déjà haut"
+        }
+      ]
+    },
+    "q-micro-bt": {
+      "Type": "question",
+      "Court": "Casque Bluetooth ?",
+      "Texte": "Tu parles avec un casque ou des écouteurs Bluetooth (sans fil) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "microbluetooth",
+          "Preuve": "Le micro est celui d'un casque Bluetooth"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "microbluetooth"
+          ],
+          "Preuve": "Le micro n'est pas en Bluetooth"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -10323,10 +11112,15 @@
         "étiré",
         "bandes noires",
         "zoom",
-        "petit"
+        "petit",
+        "texte flou",
+        "baveux",
+        "pas net",
+        "lettres floues"
       ],
       "Suspects": [
         "resolution",
+        "cleartype",
         "pilote",
         "cable"
       ],
@@ -10362,6 +11156,9 @@
               "Preuve": "Seules de petites résolutions sont proposées : le pilote graphique manque"
             }
           ]
+        },
+        {
+          "Ref": "test-cleartype"
         },
         {
           "Ref": "test-pilote"
@@ -10761,6 +11558,132 @@
       ]
     },
     {
+      "Id": "fenetrehorsecran",
+      "Famille": "ecran",
+      "Titre": "Une fenêtre a disparu ou s'ouvre hors de l'écran",
+      "Phrase": "Le programme est ouvert (dans la barre des tâches) mais on ne le voit pas",
+      "Mots": [
+        "fenêtre disparue",
+        "fenêtre invisible",
+        "hors de l'écran",
+        "fenêtre perdue",
+        "ne s'affiche pas",
+        "on ne voit pas la fenêtre",
+        "fenêtre hors écran"
+      ],
+      "Suspects": [
+        "fenetreperdue",
+        "modeprojection"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ramener-fenetre"
+        },
+        {
+          "Ref": "test-winp"
+        }
+      ]
+    },
+    {
+      "Id": "bandesnoires",
+      "Famille": "ecran",
+      "Titre": "Des bandes noires autour de l'image, ou des bords coupés",
+      "Phrase": "L'image ne remplit pas l'écran, ou il en manque sur les côtés (souvent sur une télé)",
+      "Mots": [
+        "bandes noires",
+        "bords noirs",
+        "pas plein écran",
+        "bords coupés",
+        "image coupée",
+        "barre des tâches coupée",
+        "overscan",
+        "télé"
+      ],
+      "Suspects": [
+        "resolecran",
+        "overscan",
+        "echellegpu"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-resolution-reco"
+        },
+        {
+          "Ref": "test-overscan"
+        }
+      ]
+    },
+    {
+      "Id": "portableecrannoir",
+      "Famille": "ecran",
+      "Titre": "L'écran du portable reste noir, mais un écran branché marche",
+      "Phrase": "Branché à un écran ou une télé, l'image apparaît là-bas mais pas sur le portable",
+      "Mots": [
+        "écran du portable noir",
+        "portable écran noir",
+        "écran externe marche",
+        "écran interne",
+        "écran du portable ne marche plus"
+      ],
+      "Suspects": [
+        "modeprojection",
+        "luminositezero",
+        "eclairage",
+        "ecranportable"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-winp"
+        },
+        {
+          "Ref": "test-luminosite-touches"
+        },
+        {
+          "Ref": "lampe-portable"
+        }
+      ]
+    },
+    {
+      "Id": "frequence",
+      "Famille": "ecran",
+      "Titre": "L'écran reste à 60 Hz au lieu de 144 Hz (ou plus)",
+      "Phrase": "Un écran rapide n'est pas fluide, Windows n'affiche pas sa fréquence maximale",
+      "Mots": [
+        "60 hz",
+        "144 hz",
+        "165 hz",
+        "240 hz",
+        "hz",
+        "fréquence",
+        "taux de rafraîchissement",
+        "pas fluide",
+        "écran gamer"
+      ],
+      "Suspects": [
+        "frequencewindows",
+        "ecransurcartemere",
+        "cablefrequence",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-hz"
+        },
+        {
+          "Ref": "test-prise-gpu"
+        },
+        {
+          "Ref": "test-cable-hz"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
       "Id": "toutlent",
       "Famille": "lenteur",
       "Titre": "Tout est lent",
@@ -10888,6 +11811,155 @@
         },
         {
           "Ref": "type-disque"
+        }
+      ]
+    },
+    {
+      "Id": "cpu100",
+      "Famille": "lenteur",
+      "Titre": "Le processeur est à 100 %",
+      "Phrase": "Le Gestionnaire des tâches montre le processeur (ou « CPU ») à fond",
+      "Mots": [
+        "processeur 100",
+        "cpu 100",
+        "100 %",
+        "processeur à fond",
+        "cpu à fond",
+        "processeur",
+        "cpu"
+      ],
+      "Suspects": [
+        "majencours",
+        "programmegourmand",
+        "indesirables",
+        "surchauffe"
+      ],
+      "Etapes": [
+        {
+          "Ref": "maj-en-cours"
+        },
+        {
+          "Ref": "test-gestionnaire"
+        },
+        {
+          "Ref": "test-analyse"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-nettoyage"
+        }
+      ]
+    },
+    {
+      "Id": "arretlong",
+      "Famille": "lenteur",
+      "Titre": "Il met très longtemps à s'éteindre",
+      "Phrase": "Après « Arrêter », l'écran « Arrêt en cours » dure des minutes",
+      "Mots": [
+        "long à s'éteindre",
+        "arrêt en cours",
+        "met longtemps à s'éteindre",
+        "s'éteint lentement",
+        "extinction lente"
+      ],
+      "Suspects": [
+        "majencours",
+        "programmebloquant",
+        "demarragerapide"
+      ],
+      "Etapes": [
+        {
+          "Ref": "maj-en-cours"
+        },
+        {
+          "Ref": "q-empeche-arret"
+        },
+        {
+          "Ref": "test-demarrage-rapide"
+        }
+      ]
+    },
+    {
+      "Id": "lentbatterie",
+      "Famille": "lenteur",
+      "Titre": "Il devient lent quand il est sur batterie",
+      "Phrase": "Le portable rame dès qu'on débranche le chargeur",
+      "Mots": [
+        "lent sur batterie",
+        "rame sur batterie",
+        "débranché",
+        "sans chargeur",
+        "batterie lent"
+      ],
+      "Suspects": [
+        "ecobatterie",
+        "energie",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-economiseur-batterie"
+        },
+        {
+          "Ref": "test-energie"
+        }
+      ]
+    },
+    {
+      "Id": "copielente",
+      "Famille": "lenteur",
+      "Titre": "Copier des fichiers est très lent",
+      "Phrase": "Vers une clé, un disque externe ou entre deux dossiers, la copie n'avance pas",
+      "Mots": [
+        "copie lente",
+        "copier lent",
+        "transfert lent",
+        "clé usb lente",
+        "copie très lente",
+        "vitesse de copie",
+        "mo/s",
+        "ko/s"
+      ],
+      "Suspects": [
+        "petitsfichiers",
+        "usblent",
+        "cleelente"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-petits-fichiers"
+        },
+        {
+          "Ref": "test-prise-bleue"
+        }
+      ]
+    },
+    {
+      "Id": "dossierslents",
+      "Famille": "lenteur",
+      "Titre": "Les dossiers mettent longtemps à s'afficher",
+      "Phrase": "L'Explorateur affiche une barre verte qui avance lentement",
+      "Mots": [
+        "dossier lent",
+        "explorateur lent",
+        "barre verte",
+        "long à s'ouvrir",
+        "dossier met du temps",
+        "affichage des dossiers lent"
+      ],
+      "Suspects": [
+        "lecteurreseau",
+        "typedossier",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-lecteur-reseau"
+        },
+        {
+          "Ref": "test-type-dossier"
         }
       ]
     },
@@ -11314,6 +12386,72 @@
       ]
     },
     {
+      "Id": "alarme",
+      "Famille": "bruits",
+      "Titre": "Un bip continu ou une alarme pendant que le PC marche",
+      "Phrase": "Le PC sonne ou bipe sans arrêt, alors qu'il était allumé",
+      "Mots": [
+        "alarme",
+        "bip continu",
+        "bip sans arrêt",
+        "sonne",
+        "bipe",
+        "bip aigu",
+        "bip pendant"
+      ],
+      "Suspects": [
+        "ventilocpu",
+        "surchauffe",
+        "alimentation"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "q-ventilo-cpu"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-bist"
+        }
+      ]
+    },
+    {
+      "Id": "ventiloarret",
+      "Famille": "bruits",
+      "Titre": "Un ventilateur ne tourne plus",
+      "Phrase": "Un ventilateur reste immobile alors que le PC est allumé",
+      "Mots": [
+        "ventilateur ne tourne pas",
+        "ventilo ne tourne plus",
+        "ventilateur arrêté",
+        "ventilo bloqué",
+        "fan ne tourne pas"
+      ],
+      "Suspects": [
+        "arretgpu",
+        "cableventilo",
+        "ventilateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "q-ventilo-gpu"
+        },
+        {
+          "Ref": "test-ventilo-doigt"
+        }
+      ]
+    },
+    {
       "Id": "plusdeson",
       "Famille": "son",
       "Titre": "Plus de son du tout",
@@ -11554,6 +12692,92 @@
       ]
     },
     {
+      "Id": "volumebaisse",
+      "Famille": "son",
+      "Titre": "Le son baisse tout seul pendant les appels",
+      "Phrase": "Pendant Discord, Teams ou un appel, le jeu ou la musique deviennent très bas",
+      "Mots": [
+        "baisse tout seul",
+        "volume baisse",
+        "son baisse",
+        "pendant les appels",
+        "discord baisse le son",
+        "atténuation",
+        "le son diminue"
+      ],
+      "Suspects": [
+        "attenuation",
+        "attenuationappli"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-communications"
+        },
+        {
+          "Ref": "test-attenuation-discord"
+        }
+      ]
+    },
+    {
+      "Id": "uncote",
+      "Famille": "son",
+      "Titre": "Le son ne sort que d'un côté",
+      "Phrase": "Seulement à gauche ou seulement à droite, au casque ou aux haut-parleurs",
+      "Mots": [
+        "un seul côté",
+        "seulement à gauche",
+        "seulement à droite",
+        "une oreille",
+        "un écouteur",
+        "côté gauche",
+        "côté droit"
+      ],
+      "Suspects": [
+        "balance",
+        "prisejack",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-balance"
+        },
+        {
+          "Ref": "test-prise-jack"
+        },
+        {
+          "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "sondecale",
+      "Famille": "son",
+      "Titre": "Le son est en retard sur l'image",
+      "Phrase": "Les lèvres ne collent pas aux paroles, les bruits arrivent après",
+      "Mots": [
+        "son en retard",
+        "décalé",
+        "décalage",
+        "son décalé",
+        "pas synchro",
+        "retard du son",
+        "lip sync"
+      ],
+      "Suspects": [
+        "latencebluetooth",
+        "synchrotv",
+        "pilotesson"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-son-retard"
+        },
+        {
+          "Ref": "test-depanneur-son"
+        }
+      ]
+    },
+    {
       "Id": "micro",
       "Famille": "son",
       "Titre": "Le micro ne marche pas",
@@ -11631,6 +12855,42 @@
         },
         {
           "Ref": "test-prise-jack"
+        },
+        {
+          "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "microfaible",
+      "Famille": "son",
+      "Titre": "On m'entend mal (micro faible, grésillant ou lointain)",
+      "Phrase": "Les autres disent que ta voix est trop basse, hachée ou de mauvaise qualité",
+      "Mots": [
+        "on m'entend mal",
+        "micro faible",
+        "micro trop bas",
+        "voix basse",
+        "micro grésille",
+        "mauvaise qualité micro",
+        "voix robot",
+        "micro lointain"
+      ],
+      "Suspects": [
+        "microbluetooth",
+        "niveaumicro",
+        "echoappli",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-micro-bt"
+        },
+        {
+          "Ref": "test-niveau-micro"
+        },
+        {
+          "Ref": "test-echo-appli"
         },
         {
           "Ref": "test-ailleurs"
@@ -11762,6 +13022,48 @@
         },
         {
           "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "bruitsusb",
+      "Famille": "son",
+      "Titre": "Des sons de branchement et débranchement sans arrêt",
+      "Phrase": "Windows fait « ding-dong » tout seul, encore et encore",
+      "Mots": [
+        "ding dong",
+        "son de branchement",
+        "bruit de connexion",
+        "son de déconnexion",
+        "bruit usb",
+        "son windows en boucle",
+        "bip de périphérique"
+      ],
+      "Suspects": [
+        "peripheriquebranche",
+        "portusb",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-usb",
+          "Reponses": [
+            {
+              "Texte": "Ça s'arrête",
+              "Confirme": "peripheriquebranche",
+              "Preuve": "Sans les appareils USB, les sons s'arrêtent"
+            },
+            {
+              "Texte": "Ça continue",
+              "Ecarte": [
+                "peripheriquebranche"
+              ],
+              "Preuve": "Les appareils USB n'y étaient pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
