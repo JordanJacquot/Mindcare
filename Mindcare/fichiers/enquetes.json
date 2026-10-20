@@ -13,6 +13,12 @@
       "Icone": "famille-allumage"
     },
     {
+      "Id": "voyants",
+      "Titre": "Voyants, lumières et bips",
+      "Phrase": "Une lumière sur la carte mère, un voyant qui clignote, des bips",
+      "Icone": "famille-voyants"
+    },
+    {
       "Id": "demarrage",
       "Titre": "Démarrage de Windows",
       "Phrase": "Reste sur le BIOS, réparation en boucle, disque introuvable",
@@ -3315,6 +3321,163 @@
         "Garde de la place sur le disque des jeux (au moins le double de la mise à jour)."
       ],
       "Pro": "Rien à réparer."
+    },
+    "cablecpu": {
+      "Titre": "Le câble du processeur",
+      "Trouve": "Le câble d'alimentation du processeur était mal branché",
+      "Pourquoi": "Le processeur reçoit son courant par un câble à part (4 ou 8 fils, écrit « CPU » ou « EPS »), en haut à gauche de la carte mère. Mal enfoncé, ou remplacé par un câble de carte graphique qui lui ressemble, le PC bloque sur le voyant CPU.",
+      "AFaire": [
+        "Garde ce câble bien enfoncé jusqu'au clic. N'y branche jamais un câble marqué « PCIe » : il entre presque, mais ce n'est pas le bon."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "biosincompatible": {
+      "Titre": "Le BIOS trop ancien pour le processeur",
+      "Trouve": "Le BIOS de la carte mère est trop ancien pour ce processeur",
+      "Pourquoi": "Un processeur récent sur une carte mère achetée avant lui demande une mise à jour du BIOS : sinon, le PC bloque sur le voyant CPU (parfois DRAM).",
+      "AFaire": [
+        "Mets le BIOS à jour avec la fonction « BIOS Flashback » de la carte mère (sans processeur compatible, c'est la seule façon) : le manuel de la carte mère explique le bouton et la clé USB à préparer.",
+        "Ou demande au magasin de mettre le BIOS à jour."
+      ],
+      "Pro": "Un réparateur ou le magasin peut mettre le BIOS à jour.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "cpuplace": {
+      "Titre": "Le processeur ou son support",
+      "Trouve": "Le processeur est mal en place, ou son support a des broches tordues",
+      "Pourquoi": "Le processeur est posé sur un support plein de petites broches. Mal posé, ou avec une broche tordue, il ne démarre pas (voyant CPU, parfois DRAM).",
+      "AFaire": [
+        "Ne démonte pas le processeur toi-même si tu ne l'as jamais fait : les broches se tordent très facilement."
+      ],
+      "Pro": "Un réparateur vérifie le processeur et son support, et peut redresser une broche.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "profilmemoire": {
+      "Titre": "Les réglages de la mémoire (XMP / EXPO)",
+      "Trouve": "Un réglage de la mémoire empêchait le démarrage (profil XMP ou EXPO)",
+      "Pourquoi": "Les profils XMP ou EXPO font tourner la mémoire plus vite. Trop ambitieux pour le processeur, ou après une mise à jour du BIOS, ils bloquent le démarrage sur le voyant DRAM.",
+      "AFaire": [
+        "Après le démarrage, si tu veux réactiver XMP / EXPO dans le BIOS, essaie le profil le plus bas.",
+        "Mets le BIOS à jour : la gestion de la mémoire s'améliore souvent."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "slotsmemoire": {
+      "Titre": "Les emplacements de la mémoire",
+      "Trouve": "Les barrettes de mémoire n'étaient pas dans les bons emplacements",
+      "Pourquoi": "Avec deux barrettes, la carte mère veut des emplacements précis (souvent A2 et B2 : le 2e et le 4e en partant du processeur). Ailleurs, elle peut refuser de démarrer.",
+      "AFaire": [
+        "Garde les barrettes dans les emplacements indiqués par le manuel (souvent écrits sur la carte : A2, B2)."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "cablegpu": {
+      "Titre": "Les câbles de la carte graphique",
+      "Trouve": "Les câbles d'alimentation de la carte graphique manquaient ou étaient mal branchés",
+      "Pourquoi": "Les cartes graphiques puissantes ont besoin d'un ou plusieurs câbles de l'alimentation (6, 8 ou 12 fils, « PCIe »). Il en manque un, ou il est mal enfoncé : voyant VGA, parfois une petite lumière rouge sur la carte.",
+      "AFaire": [
+        "Utilise des câbles séparés pour chaque prise de la carte graphique (pas un seul câble en Y pour une grosse carte).",
+        "Ces câbles doivent faire clic."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "gpuplace": {
+      "Titre": "La carte graphique mal enfoncée",
+      "Trouve": "La carte graphique était mal enfoncée dans sa fente",
+      "Pourquoi": "La carte graphique est longue et lourde : un transport ou un choc peut la sortir un peu de sa fente.",
+      "AFaire": [
+        "Un petit support (« anti-sag ») sous la carte l'empêche de pencher."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "cabledisque": {
+      "Titre": "Le câble ou la fixation du disque",
+      "Trouve": "Le disque était mal branché (câble ou vis)",
+      "Pourquoi": "Un disque SATA a deux câbles (données et courant) ; un SSD M.2 se glisse dans une fente et tient par une petite vis. Mal en place : voyant BOOT, ou « aucun disque ».",
+      "AFaire": [
+        "Garde les câbles bien enfoncés, et la vis du SSD M.2 en place."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "qcodenormal": {
+      "Titre": "Un code normal",
+      "Trouve": "Ce code est normal : le PC a fini de démarrer",
+      "Pourquoi": "Une fois Windows lancé, l'afficheur reste souvent sur un code (par exemple AA, A0 ou 40 selon la carte). Ce n'est pas une erreur.",
+      "AFaire": [
+        "Rien à faire si le PC marche."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "peripheriqueexterne": {
+      "Titre": "Un appareil branché",
+      "Trouve": "Un appareil branché bloquait le démarrage",
+      "Pourquoi": "Une clé, un disque, un hub ou une manette mal reconnus au démarrage peuvent bloquer la carte mère (code « périphérique externe », B2 sur ASUS).",
+      "AFaire": [
+        "Branche les appareils une fois Windows démarré, et change celui qui bloque."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "biosabimehp": {
+      "Titre": "Le BIOS du portable",
+      "Trouve": "Le BIOS du portable est abîmé (code 2.2)",
+      "Pourquoi": "Le BIOS est le petit programme qui démarre le portable. Une mise à jour coupée l'abîme. Les portables HP gardent souvent une copie de secours pour le réparer.",
+      "AFaire": [
+        "Recommence la récupération (Windows + B) si ça revient.",
+        "Ne coupe jamais le courant pendant une mise à jour du BIOS."
+      ],
+      "Pro": "Un réparateur ou HP peut réinstaller le BIOS.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "biosabimedell": {
+      "Titre": "Le BIOS du PC Dell",
+      "Trouve": "Le BIOS du PC Dell est abîmé (code 2,2)",
+      "Pourquoi": "Le BIOS est le petit programme qui démarre le PC. Les PC Dell savent souvent le réparer à partir d'une copie de secours.",
+      "AFaire": [
+        "Ne coupe jamais le courant pendant une mise à jour du BIOS."
+      ],
+      "Pro": "Un réparateur ou Dell peut réinstaller le BIOS."
+    },
+    "cableligne": {
+      "Titre": "Le câble de la box",
+      "Trouve": "Le câble fibre (ou téléphone) de la box était mal branché",
+      "Pourquoi": "La box reçoit internet par un câble fin (fibre, souvent blanc ou jaune, avec un embout vert ou bleu) ou par la prise téléphone. Débranché, plié ou abîmé, le voyant de la box devient rouge.",
+      "AFaire": [
+        "Ne plie jamais le câble fibre (pas d'angle serré, rien posé dessus)."
+      ],
+      "Pro": "Si le câble fibre est abîmé, ton opérateur le change."
+    },
+    "portbox": {
+      "Titre": "La prise de la box",
+      "Trouve": "La prise de la box utilisée ne marchait pas",
+      "Pourquoi": "Les box ont plusieurs prises réseau ; l'une d'elles peut lâcher, ou être réservée (TV).",
+      "AFaire": [
+        "Garde le câble sur une prise de la box qui marche."
+      ],
+      "Pro": "Ton opérateur peut changer la box si plusieurs prises ne marchent plus."
     }
   },
   "Tests": {
@@ -10765,6 +10928,663 @@
           "Preuve": "Réparer le dossier n'a rien changé"
         }
       ]
+    },
+    "test-cable-cpu": {
+      "Type": "test",
+      "Court": "Le câble du processeur",
+      "Pour": [
+        "cablecpu"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Renfonce le câble du processeur",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "En haut à gauche de la carte mère, trouve le câble à 4 ou 8 fils (écrit « CPU » ou « EPS 12V »). Débranche-le et rebranche-le jusqu'au clic.",
+        "Vérifie que c'est bien un câble marqué « CPU », pas « PCIe ». S'il y a deux prises, branche les deux.",
+        "Rebranche le PC et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le voyant CPU s'éteint, il démarre",
+          "Confirme": "cablecpu",
+          "Preuve": "Le câble du processeur renfoncé, il démarre"
+        },
+        {
+          "Texte": "Toujours le voyant CPU",
+          "Ecarte": [
+            "cablecpu"
+          ],
+          "Preuve": "Le câble du processeur était bien branché"
+        }
+      ]
+    },
+    "q-cpu-neuf": {
+      "Type": "question",
+      "Court": "Processeur neuf ?",
+      "Texte": "Le processeur (ou la carte mère) vient-il d'être changé ou monté ?",
+      "Pour": [
+        "biosincompatible"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "biosincompatible",
+          "Preuve": "Le processeur ou la carte mère est neuf"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "biosincompatible"
+          ],
+          "Preuve": "Rien n'a changé dans le PC"
+        }
+      ]
+    },
+    "test-clear-cmos": {
+      "Type": "test",
+      "Court": "Remettre le BIOS à zéro",
+      "Pour": [
+        "profilmemoire"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Remets le BIOS à zéro (« Clear CMOS »)",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "S'il y a un bouton « Clear CMOS » à l'arrière (près des prises USB) : appuie dessus 5 secondes. Sinon, ouvre la tour.",
+        "Sinon : retire la pile ronde de la carte mère (pousse le petit clip), attends 5 minutes, remets-la.",
+        "Rebranche et rallume. Le premier démarrage peut être long (le PC réapprend sa mémoire) : attends 5 minutes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "profilmemoire",
+          "Preuve": "Le BIOS remis à zéro, il démarre"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "profilmemoire"
+          ],
+          "Preuve": "Remettre le BIOS à zéro n'a rien changé"
+        }
+      ]
+    },
+    "test-slots-memoire": {
+      "Type": "test",
+      "Court": "Les bons emplacements",
+      "Pour": [
+        "slotsmemoire"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Mets les barrettes dans les bons emplacements",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "Regarde les noms écrits près des emplacements de mémoire (A1, A2, B1, B2) ou le manuel de la carte mère.",
+        "Avec deux barrettes, mets-les en A2 et B2 (souvent le 2e et le 4e en partant du processeur), enfoncées jusqu'au clic des deux clips.",
+        "Rebranche et rallume, et attends 5 minutes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "slotsmemoire",
+          "Preuve": "Dans les bons emplacements, il démarre"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "slotsmemoire"
+          ],
+          "Preuve": "Les emplacements étaient déjà les bons"
+        }
+      ]
+    },
+    "test-cables-gpu": {
+      "Type": "test",
+      "Court": "Les câbles de la carte graphique",
+      "Pour": [
+        "cablegpu"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Branche bien la carte graphique",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "Sur le côté (ou le dessus) de la carte graphique, regarde les prises de courant (6, 8 ou 12 fils). Chacune doit avoir son câble « PCIe », enfoncé jusqu'au clic.",
+        "Si un câble se termine en deux prises (un « Y ») et que la carte a deux prises, utilise plutôt deux câbles séparés.",
+        "Rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le voyant s'éteint, l'image vient",
+          "Confirme": "cablegpu",
+          "Preuve": "La carte graphique bien alimentée, l'image vient"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "cablegpu"
+          ],
+          "Preuve": "Les câbles de la carte graphique étaient bien branchés"
+        }
+      ]
+    },
+    "test-gpu-renfoncer": {
+      "Type": "test",
+      "Court": "Renfoncer la carte graphique",
+      "Pour": [
+        "gpuplace"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Renfonce la carte graphique",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "Débranche ses câbles de courant, dévisse la petite vis qui la tient à l'arrière, appuie sur le petit loquet au bout de sa fente et sors-la doucement.",
+        "Remets-la bien droite, en appuyant jusqu'au clic du loquet. Revisse, rebranche ses câbles.",
+        "Rebranche le PC et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le voyant s'éteint, l'image vient",
+          "Confirme": "gpuplace",
+          "Preuve": "La carte graphique renfoncée, l'image vient"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "gpuplace"
+          ],
+          "Preuve": "La carte graphique était bien en place"
+        }
+      ]
+    },
+    "test-sans-gpu": {
+      "Type": "test",
+      "Court": "Sans la carte graphique",
+      "Pour": [
+        "gpu"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Essaie sans la carte graphique",
+      "Gestes": [
+        "Ça ne marche que si le processeur a une puce graphique (une prise d'écran existe en haut, à l'arrière, sur la carte mère).",
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Retire la carte graphique (comme pour la renfoncer), et branche l'écran sur la prise de la carte mère.",
+        "Rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Sans elle, l'image vient",
+          "Confirme": "gpu",
+          "Preuve": "Sans la carte graphique, le PC démarre : c'est elle"
+        },
+        {
+          "Texte": "Rien non plus, ou pas de prise sur la carte mère",
+          "Ecarte": [
+            "gpu"
+          ],
+          "Preuve": "Le test sans carte graphique ne l'accuse pas"
+        }
+      ]
+    },
+    "test-cables-disque": {
+      "Type": "test",
+      "Court": "Le branchement du disque",
+      "Pour": [
+        "cabledisque"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Rebranche le disque",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique. Touche une partie métallique de la tour avant de toucher l'intérieur.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "Disque SATA (un boîtier avec deux câbles) : débranche et rebranche ses deux câbles, côté disque et côté carte mère / alimentation.",
+        "SSD M.2 (une petite barrette sur la carte mère, parfois sous une plaque) : vérifie qu'il est bien enfoncé et que sa petite vis le tient à plat.",
+        "Rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le voyant BOOT s'éteint, Windows démarre",
+          "Confirme": "cabledisque",
+          "Preuve": "Le disque rebranché, Windows démarre"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "cabledisque"
+          ],
+          "Preuve": "Le disque était bien branché"
+        }
+      ]
+    },
+    "test-debrancher-tout": {
+      "Type": "test",
+      "Court": "Sans les appareils",
+      "Pour": [
+        "peripheriqueexterne"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Débranche tous les appareils USB",
+      "Gestes": [
+        "Éteins le PC.",
+        "Débranche tout ce qui est en USB sauf le clavier : clés, disques, hubs, manettes, webcam, casque, imprimante.",
+        "Rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "peripheriqueexterne",
+          "Preuve": "Sans les appareils USB, il démarre"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "peripheriqueexterne"
+          ],
+          "Preuve": "Les appareils USB n'y étaient pour rien"
+        }
+      ]
+    },
+    "q-led-cm": {
+      "Type": "question",
+      "Court": "Quel voyant ?",
+      "Texte": "Quel voyant reste allumé sur la carte mère (des petites lettres sont écrites à côté) ?",
+      "Aide": "Il est normal que les voyants s'allument un instant l'un après l'autre au démarrage : seul celui qui RESTE allumé compte. Attends 5 minutes la première fois (PC neuf, nouvelle mémoire).",
+      "Reponses": [
+        {
+          "Texte": "CPU (le processeur)",
+          "Garde": [
+            "cablecpu",
+            "biosincompatible",
+            "cpuplace"
+          ],
+          "Note": "led-cpu",
+          "Preuve": "Le voyant CPU reste allumé : la carte mère ne lance pas le processeur"
+        },
+        {
+          "Texte": "DRAM (la mémoire)",
+          "Garde": [
+            "profilmemoire",
+            "slotsmemoire",
+            "memoire",
+            "cpuplace"
+          ],
+          "Note": "led-dram",
+          "Preuve": "Le voyant DRAM reste allumé : la carte mère ne trouve pas la mémoire"
+        },
+        {
+          "Texte": "VGA (la carte graphique)",
+          "Garde": [
+            "cablegpu",
+            "gpuplace",
+            "gpu"
+          ],
+          "Note": "led-vga",
+          "Preuve": "Le voyant VGA reste allumé : la carte mère ne trouve pas la carte graphique"
+        },
+        {
+          "Texte": "BOOT (le démarrage)",
+          "Garde": [
+            "cabledisque",
+            "ordredemarrage",
+            "disque"
+          ],
+          "Note": "led-boot",
+          "Preuve": "Le voyant BOOT reste allumé : la carte mère ne trouve pas de quoi démarrer"
+        }
+      ]
+    },
+    "q-qcode": {
+      "Type": "question",
+      "Court": "Le code affiché",
+      "Texte": "Sur quel code l'afficheur de la carte mère s'arrête-t-il ?",
+      "Aide": "Ces codes viennent du tableau d'ASUS ; MSI, Gigabyte et ASRock utilisent les mêmes à peu près. Le manuel de ta carte mère (chapitre « Q-Code » ou « Debug code ») a la liste complète.",
+      "Reponses": [
+        {
+          "Texte": "00, D0 à D7, 19 ou 30 (le processeur)",
+          "Garde": [
+            "cablecpu",
+            "biosincompatible",
+            "cpuplace"
+          ],
+          "Preuve": "Le code désigne le processeur"
+        },
+        {
+          "Texte": "53, 55 ou d'autres codes de mémoire du manuel",
+          "Garde": [
+            "profilmemoire",
+            "slotsmemoire",
+            "memoire",
+            "cpuplace"
+          ],
+          "Preuve": "Le code désigne la mémoire"
+        },
+        {
+          "Texte": "D6 (la carte graphique)",
+          "Garde": [
+            "cablegpu",
+            "gpuplace",
+            "gpu"
+          ],
+          "Preuve": "Le code désigne la carte graphique"
+        },
+        {
+          "Texte": "A0 ou A2 avec un écran noir (le disque de démarrage)",
+          "Garde": [
+            "cabledisque",
+            "ordredemarrage",
+            "disque"
+          ],
+          "Preuve": "Le code désigne le disque de démarrage"
+        },
+        {
+          "Texte": "B2 (un appareil branché)",
+          "Garde": [
+            "peripheriqueexterne"
+          ],
+          "Preuve": "Le code désigne un appareil branché"
+        },
+        {
+          "Texte": "AA, A0 ou 40, et le PC marche bien",
+          "Confirme": "qcodenormal",
+          "Preuve": "Le code reste affiché alors que tout marche"
+        }
+      ]
+    },
+    "test-hp-bios": {
+      "Type": "test",
+      "Court": "Réparer le BIOS (HP)",
+      "Pour": [
+        "biosabimehp"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Lance la réparation du BIOS du portable HP",
+      "Gestes": [
+        "Éteins le portable (appui long sur le bouton) et branche son chargeur.",
+        "Appuie sur les touches Windows et B ensemble, et garde-les enfoncées.",
+        "En les gardant, appuie 1 seconde sur le bouton d'allumage, puis lâche le bouton (garde Windows + B) : un écran « HP BIOS Update » ou des bips arrivent. Lâche alors Windows + B et laisse faire, sans débrancher."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La réparation s'est lancée et il démarre",
+          "Confirme": "biosabimehp",
+          "Preuve": "La récupération du BIOS a réparé le portable"
+        },
+        {
+          "Texte": "Rien ne se passe",
+          "Ecarte": [
+            "biosabimehp"
+          ],
+          "Preuve": "La récupération du BIOS ne se lance pas"
+        }
+      ]
+    },
+    "q-hp-code": {
+      "Type": "question",
+      "Court": "Le code HP",
+      "Texte": "Compte les clignotements de Verr. Maj (ou du voyant) : d'abord des longs (souvent rouges), puis des courts (blancs). Quel code ?",
+      "Aide": "Exemple : 3 longs puis 2 courts, une pause, et ça recommence = 3.2.",
+      "Reponses": [
+        {
+          "Texte": "2 longs et 2 courts (2.2) : le BIOS",
+          "Garde": [
+            "biosabimehp"
+          ],
+          "Preuve": "Code HP 2.2 : le BIOS est abîmé"
+        },
+        {
+          "Texte": "2.3 ou 2.4, ou 5 longs (5.2, 5.3, 5.4)",
+          "Garde": [
+            "residuelle",
+            "cartemere"
+          ],
+          "Preuve": "Code HP du contrôleur de la carte mère"
+        },
+        {
+          "Texte": "3 longs et 2 courts (3.2) : la mémoire",
+          "Garde": [
+            "residuelle",
+            "memoire"
+          ],
+          "Preuve": "Code HP 3.2 : la mémoire"
+        },
+        {
+          "Texte": "3.3 (graphique) ou 3.5 (processeur)",
+          "Garde": [
+            "cartemere"
+          ],
+          "Preuve": "Code HP 3.3 ou 3.5 : une puce de la carte mère"
+        },
+        {
+          "Texte": "3.4 : l'alimentation",
+          "Garde": [
+            "chargeur",
+            "cartemere"
+          ],
+          "Preuve": "Code HP 3.4 : l'alimentation"
+        },
+        {
+          "Texte": "4 longs (4.2, 4.3, 4.4) : la chaleur",
+          "Garde": [
+            "surchauffe"
+          ],
+          "Preuve": "Code HP 4.x : la chaleur"
+        }
+      ]
+    },
+    "test-chargeur-hp": {
+      "Type": "test",
+      "Court": "Le chargeur",
+      "Pour": [
+        "chargeur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie le chargeur d'origine, bien branché",
+      "Gestes": [
+        "Branche le chargeur d'origine (la même puissance en « W »), directement au mur, et vérifie l'embout.",
+        "Rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "chargeur",
+          "Preuve": "Avec le bon chargeur, il démarre"
+        },
+        {
+          "Texte": "Toujours le code",
+          "Ecarte": [
+            "chargeur"
+          ],
+          "Preuve": "Le chargeur n'y était pour rien"
+        }
+      ]
+    },
+    "test-refroidir": {
+      "Type": "test",
+      "Court": "Laisser refroidir",
+      "Pour": [
+        "surchauffe"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Laisse-le refroidir, grilles dégagées",
+      "Gestes": [
+        "Éteins-le et laisse-le refroidir une demi-heure, posé sur une table (jamais sur un lit ou un coussin).",
+        "Souffle doucement dans les grilles d'aération (une bombe d'air sec, par petits coups).",
+        "Rallume, toujours sur une table dure."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "surchauffe",
+          "Preuve": "Refroidi, il démarre : c'était la chaleur"
+        },
+        {
+          "Texte": "Toujours le code",
+          "Ecarte": [
+            "surchauffe"
+          ],
+          "Preuve": "Refroidi, toujours le code"
+        }
+      ]
+    },
+    "test-dell-bios": {
+      "Type": "test",
+      "Court": "Réparer le BIOS (Dell)",
+      "Pour": [
+        "biosabimedell"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Lance la réparation du BIOS du PC Dell",
+      "Gestes": [
+        "Éteins le PC et branche le chargeur (ou le câble électrique).",
+        "Appuie sur Ctrl et Échap ensemble et garde-les enfoncées.",
+        "En les gardant, appuie sur le bouton d'allumage, puis lâche tout quand l'écran « BIOS Recovery » apparaît. Choisis « Recover BIOS » et laisse faire."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La réparation s'est lancée et il démarre",
+          "Confirme": "biosabimedell",
+          "Preuve": "La récupération du BIOS a réparé le PC"
+        },
+        {
+          "Texte": "Rien ne se passe",
+          "Ecarte": [
+            "biosabimedell"
+          ],
+          "Preuve": "La récupération du BIOS ne se lance pas"
+        }
+      ]
+    },
+    "q-dell-code": {
+      "Type": "question",
+      "Court": "Le code Dell",
+      "Texte": "Compte les clignotements : d'abord orange, puis blancs. Quel code ?",
+      "Aide": "Le voyant clignote un groupe orange, une pause, un groupe blanc, puis recommence. Exemple : 2 orange et 3 blancs = 2,3.",
+      "Reponses": [
+        {
+          "Texte": "2 orange, 1 blanc (2,1) : le processeur",
+          "Garde": [
+            "cartemere"
+          ],
+          "Preuve": "Code Dell 2,1 : le processeur"
+        },
+        {
+          "Texte": "2,2 : le BIOS",
+          "Garde": [
+            "biosabimedell",
+            "cartemere"
+          ],
+          "Preuve": "Code Dell 2,2 : le BIOS"
+        },
+        {
+          "Texte": "2,3, 2,4 ou 2,5 : la mémoire",
+          "Garde": [
+            "residuelle",
+            "memoire"
+          ],
+          "Preuve": "Code Dell 2,3 à 2,5 : la mémoire"
+        },
+        {
+          "Texte": "2,7 : l'écran du portable",
+          "Garde": [
+            "ecranportable"
+          ],
+          "Preuve": "Code Dell 2,7 : l'écran"
+        },
+        {
+          "Texte": "3,1 : la pile du BIOS",
+          "Garde": [
+            "pilebios"
+          ],
+          "Preuve": "Code Dell 3,1 : la pile du BIOS"
+        },
+        {
+          "Texte": "3,2 : la carte ou la puce graphique",
+          "Garde": [
+            "cablegpu",
+            "gpuplace",
+            "cartemere"
+          ],
+          "Preuve": "Code Dell 3,2 : le graphique"
+        },
+        {
+          "Texte": "4,2 : le câble du processeur (PC fixe)",
+          "Garde": [
+            "cablecpu"
+          ],
+          "Preuve": "Code Dell 4,2 : le câble du processeur"
+        },
+        {
+          "Texte": "Orange et blanc qui alternent, chargeur branché",
+          "Garde": [
+            "chargeur"
+          ],
+          "Preuve": "Dell : chargeur non reconnu"
+        },
+        {
+          "Texte": "Orange qui clignote sans arrêt, chargeur branché",
+          "Garde": [
+            "batterieusee"
+          ],
+          "Preuve": "Dell : batterie en panne"
+        }
+      ]
+    },
+    "test-cable-box": {
+      "Type": "test",
+      "Court": "Le câble de la box",
+      "Pour": [
+        "cableligne"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Vérifie le câble fibre ou téléphone de la box",
+      "Gestes": [
+        "Suis le câble qui va de la box au mur : il doit être enfoncé jusqu'au clic des deux côtés, sans pli ni nœud.",
+        "Câble fibre : ne regarde jamais dans l'embout (la lumière est invisible mais dangereuse pour les yeux).",
+        "Redémarre la box et attends 5 minutes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le voyant redevient normal",
+          "Confirme": "cableligne",
+          "Preuve": "Câble rebranché, la box remarche"
+        },
+        {
+          "Texte": "Toujours rouge",
+          "Ecarte": [
+            "cableligne"
+          ],
+          "Preuve": "Le câble était bien branché"
+        }
+      ]
+    },
+    "test-autre-port-box": {
+      "Type": "test",
+      "Court": "Une autre prise de la box",
+      "Pour": [
+        "portbox"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche le câble sur une autre prise de la box",
+      "Gestes": [
+        "Débranche le câble réseau de la box et branche-le sur une autre prise de la box (pas celle marquée « TV »)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les voyants s'allument",
+          "Confirme": "portbox",
+          "Preuve": "Sur une autre prise de la box, ça marche"
+        },
+        {
+          "Texte": "Toujours éteints",
+          "Ecarte": [
+            "portbox"
+          ],
+          "Preuve": "La prise de la box n'y était pour rien"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -12457,7 +13277,7 @@
     },
     {
       "Id": "bipsdemarrage",
-      "Famille": "allumage",
+      "Famille": "voyants",
       "Titre": "Des bips au démarrage",
       "Phrase": "Il bipe (ou une lumière clignote) et rien ne s'affiche",
       "Mots": [
@@ -13029,7 +13849,7 @@
     },
     {
       "Id": "voyantclignote",
-      "Famille": "allumage",
+      "Famille": "voyants",
       "Titre": "Le voyant clignote mais rien ne démarre (portable)",
       "Phrase": "Une petite lumière clignote, l'écran reste noir",
       "Mots": [
@@ -13039,7 +13859,13 @@
         "clignote orange",
         "clignote blanc",
         "code de clignotement",
-        "caps lock clignote"
+        "caps lock clignote",
+        "lenovo",
+        "acer",
+        "asus",
+        "msi",
+        "voyant de charge clignote",
+        "voyant d'alimentation clignote"
       ],
       "Suspects": [
         "batteriezero",
@@ -13056,6 +13882,295 @@
         },
         {
           "Ref": "choc"
+        }
+      ]
+    },
+    {
+      "Id": "capslockhp",
+      "Famille": "voyants",
+      "Titre": "Verr. Maj (ou le voyant) clignote et le portable HP ne démarre pas",
+      "Phrase": "Écran noir, et une lumière clignote selon un rythme : des longs puis des courts",
+      "Mots": [
+        "caps lock clignote",
+        "verr maj clignote",
+        "verrouillage majuscule clignote",
+        "hp clignote",
+        "hp écran noir",
+        "code hp",
+        "touche majuscule clignote",
+        "clignote rouge blanc"
+      ],
+      "Suspects": [
+        "biosabimehp",
+        "residuelle",
+        "memoire",
+        "chargeur",
+        "surchauffe",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-hp-code"
+        },
+        {
+          "Ref": "test-hp-bios"
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-chargeur-hp"
+        },
+        {
+          "Ref": "test-refroidir"
+        }
+      ]
+    },
+    {
+      "Id": "voyantdell",
+      "Famille": "voyants",
+      "Titre": "Le voyant clignote orange et blanc (PC Dell)",
+      "Phrase": "Le voyant d'alimentation ou de batterie clignote selon un code, et le PC ne démarre pas",
+      "Mots": [
+        "dell",
+        "orange et blanc",
+        "ambre",
+        "clignote orange",
+        "voyant orange",
+        "code dell",
+        "2,3",
+        "2 3",
+        "voyant batterie clignote"
+      ],
+      "Suspects": [
+        "biosabimedell",
+        "residuelle",
+        "memoire",
+        "pilebios",
+        "ecranportable",
+        "cablecpu",
+        "cablegpu",
+        "gpuplace",
+        "chargeur",
+        "batterieusee",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-dell-code"
+        },
+        {
+          "Ref": "test-dell-bios"
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-memoire-reinserer",
+          "SiNote": null
+        },
+        {
+          "Ref": "test-cable-cpu"
+        },
+        {
+          "Ref": "test-cables-gpu"
+        },
+        {
+          "Ref": "test-gpu-renfoncer"
+        },
+        {
+          "Ref": "test-chargeur-hp"
+        }
+      ]
+    },
+    {
+      "Id": "ledcartemere",
+      "Famille": "voyants",
+      "Titre": "Un voyant reste allumé sur la carte mère (CPU, DRAM, VGA ou BOOT)",
+      "Phrase": "Une petite lumière rouge, orange ou blanche reste allumée, et rien ne s'affiche",
+      "Mots": [
+        "voyant carte mère",
+        "lumière carte mère",
+        "lumière rouge",
+        "led rouge",
+        "led cpu",
+        "led dram",
+        "led vga",
+        "led boot",
+        "q-led",
+        "ez debug",
+        "debug led",
+        "status led",
+        "voyant cpu",
+        "voyant dram",
+        "voyant vga",
+        "voyant boot",
+        "lumière orange",
+        "loupiotte"
+      ],
+      "Suspects": [
+        "cablecpu",
+        "biosincompatible",
+        "cpuplace",
+        "profilmemoire",
+        "slotsmemoire",
+        "memoire",
+        "cablegpu",
+        "gpuplace",
+        "gpu",
+        "cabledisque",
+        "ordredemarrage",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-led-cm"
+        },
+        {
+          "Ref": "test-cable-cpu"
+        },
+        {
+          "Ref": "q-cpu-neuf"
+        },
+        {
+          "Ref": "test-clear-cmos"
+        },
+        {
+          "Ref": "test-slots-memoire"
+        },
+        {
+          "Ref": "test-memoire-reinserer",
+          "SiNote": null
+        },
+        {
+          "Ref": "test-memoire-demarrage"
+        },
+        {
+          "Ref": "test-cables-gpu"
+        },
+        {
+          "Ref": "test-gpu-renfoncer"
+        },
+        {
+          "Ref": "test-sans-gpu"
+        },
+        {
+          "Ref": "test-cables-disque"
+        },
+        {
+          "Ref": "test-ordre-boot"
+        }
+      ]
+    },
+    {
+      "Id": "qcode",
+      "Famille": "voyants",
+      "Titre": "Deux chiffres ou lettres s'affichent sur la carte mère (Q-Code, Debug)",
+      "Phrase": "Un petit afficheur montre un code (00, 55, D6, A2...) et le PC ne démarre pas",
+      "Mots": [
+        "q-code",
+        "qcode",
+        "debug code",
+        "code erreur carte mère",
+        "afficheur carte mère",
+        "dr debug",
+        "code 55",
+        "code 00",
+        "code d6",
+        "code a2",
+        "code b2",
+        "code d0",
+        "chiffres sur la carte mère"
+      ],
+      "Suspects": [
+        "cablecpu",
+        "biosincompatible",
+        "cpuplace",
+        "profilmemoire",
+        "slotsmemoire",
+        "memoire",
+        "cablegpu",
+        "gpuplace",
+        "gpu",
+        "cabledisque",
+        "ordredemarrage",
+        "disque",
+        "peripheriqueexterne",
+        "qcodenormal"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-qcode"
+        },
+        {
+          "Ref": "test-cable-cpu"
+        },
+        {
+          "Ref": "q-cpu-neuf"
+        },
+        {
+          "Ref": "test-clear-cmos"
+        },
+        {
+          "Ref": "test-slots-memoire"
+        },
+        {
+          "Ref": "test-memoire-reinserer",
+          "SiNote": null
+        },
+        {
+          "Ref": "test-memoire-demarrage"
+        },
+        {
+          "Ref": "test-cables-gpu"
+        },
+        {
+          "Ref": "test-gpu-renfoncer"
+        },
+        {
+          "Ref": "test-sans-gpu"
+        },
+        {
+          "Ref": "test-cables-disque"
+        },
+        {
+          "Ref": "test-ordre-boot"
+        },
+        {
+          "Ref": "test-debrancher-tout"
+        }
+      ]
+    },
+    {
+      "Id": "ledgpu",
+      "Famille": "voyants",
+      "Titre": "Une lumière rouge sur la carte graphique",
+      "Phrase": "Un petit voyant rouge près des prises de courant de la carte graphique",
+      "Mots": [
+        "lumière rouge carte graphique",
+        "led carte graphique",
+        "voyant carte graphique",
+        "carte graphique rouge",
+        "gpu led rouge"
+      ],
+      "Suspects": [
+        "cablegpu",
+        "gpuplace",
+        "alimentation",
+        "gpu"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cables-gpu"
+        },
+        {
+          "Ref": "test-gpu-renfoncer"
+        },
+        {
+          "Ref": "test-bist"
+        },
+        {
+          "Ref": "test-sans-gpu"
         }
       ]
     },
@@ -14103,7 +15218,15 @@
         "signal",
         "entrée",
         "hdmi",
-        "displayport"
+        "displayport",
+        "voyant orange écran",
+        "écran orange",
+        "voyant de l'écran clignote",
+        "écran en veille",
+        "le voyant de l'écran est orange",
+        "voyant de l'écran orange",
+        "écran voyant orange",
+        "l'écran clignote orange"
       ],
       "Suspects": [
         "cable",
@@ -15393,7 +16516,10 @@
         "100 %",
         "disque à fond",
         "utilisation du disque",
-        "disque plein usage"
+        "disque plein usage",
+        "voyant du disque",
+        "lumière du disque allumée",
+        "led disque"
       ],
       "Suspects": [
         "majencours",
@@ -16991,6 +18117,65 @@
         },
         {
           "Ref": "test-pilote-res"
+        }
+      ]
+    },
+    {
+      "Id": "voyantbox",
+      "Famille": "internet",
+      "Titre": "Un voyant de la box est rouge ou clignote",
+      "Phrase": "Le voyant internet, fibre ou @ est rouge, orange ou clignote",
+      "Mots": [
+        "voyant box",
+        "box rouge",
+        "voyant rouge box",
+        "livebox",
+        "freebox",
+        "bbox",
+        "box sfr",
+        "@ rouge",
+        "fibre rouge",
+        "box clignote",
+        "voyant internet"
+      ],
+      "Suspects": [
+        "box",
+        "cableligne",
+        "operateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-box"
+        },
+        {
+          "Ref": "test-cable-box"
+        }
+      ]
+    },
+    {
+      "Id": "ledreseau",
+      "Famille": "internet",
+      "Titre": "Les petites lumières de la prise réseau du PC sont éteintes",
+      "Phrase": "Câble branché, mais aucune lumière à côté de la prise réseau du PC ou de la box",
+      "Mots": [
+        "lumière prise réseau",
+        "voyant ethernet",
+        "led réseau éteinte",
+        "prise réseau éteinte",
+        "câble branché pas de lumière",
+        "voyant rj45"
+      ],
+      "Suspects": [
+        "cableres",
+        "portbox",
+        "carteeth"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cable-cat"
+        },
+        {
+          "Ref": "test-autre-port-box"
         }
       ]
     },
