@@ -2816,6 +2816,310 @@
         "Lis la raison donnée par « Contrôle d'intégrité du PC » : libérer de la place suffit parfois."
       ],
       "Pro": "Un réparateur peut ajouter de la mémoire ou changer le disque."
+    },
+    "accelmateriel": {
+      "Titre": "L'accélération graphique du navigateur",
+      "Trouve": "L'accélération graphique du navigateur s'entendait mal avec la carte graphique",
+      "Pourquoi": "Le navigateur utilise la carte graphique pour aller plus vite. Avec certains pilotes, ça donne des clignotements, des carrés noirs ou des vidéos vertes.",
+      "AFaire": [
+        "Garde l'accélération coupée, ou réessaie après la prochaine mise à jour du pilote graphique."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "dpiprogramme": {
+      "Titre": "La mise à l'échelle du programme",
+      "Trouve": "Ce programme gérait mal la mise à l'échelle de Windows",
+      "Pourquoi": "Les vieux programmes ne savent pas s'agrandir : Windows les étire (flou) ou les laisse minuscules sur les écrans à grande résolution.",
+      "AFaire": [
+        "Garde le réglage trouvé dans « Compatibilité »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ordreecrans": {
+      "Titre": "La place des écrans",
+      "Trouve": "Windows ne savait pas où était placé chaque écran",
+      "Pourquoi": "Windows a besoin de savoir où sont les écrans l'un par rapport à l'autre : sinon la souris sort du mauvais côté.",
+      "AFaire": [
+        "Dans « Paramètres d'affichage », fais glisser les rectangles 1 et 2 comme sur ton bureau."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "veilleecran": {
+      "Titre": "La veille de l'écran",
+      "Trouve": "L'écran se mettait en veille et cherchait une autre entrée",
+      "Pourquoi": "Certains écrans, quand le signal faiblit un instant, cherchent une autre entrée (« recherche automatique »), puis reviennent : quelques secondes de noir.",
+      "AFaire": [
+        "Dans le menu de l'écran : coupe la « recherche automatique d'entrée » (Auto Input Source) et choisis l'entrée à la main."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "hdr": {
+      "Titre": "Le HDR",
+      "Trouve": "Le HDR de Windows rendait les couleurs ternes",
+      "Pourquoi": "Le HDR donne de belles couleurs aux jeux et vidéos prévus pour, mais rend souvent le Bureau et les vidéos normales ternes et délavés.",
+      "AFaire": [
+        "Coupe le HDR pour l'usage de tous les jours (touche Windows + Alt + B le bascule)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "javamanquant": {
+      "Titre": "Java",
+      "Trouve": "Java n'est pas installé",
+      "Pourquoi": "Certains programmes et jeux (Minecraft Java avec des mods, des outils .jar) ont besoin de Java pour s'ouvrir.",
+      "AFaire": [
+        "Installe Java depuis un site officiel : adoptium.net (« Temurin », gratuit) ou java.com.",
+        "Ensuite : clic droit sur le fichier .jar, « Ouvrir avec », « Java »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "netframework": {
+      "Titre": ".NET Framework",
+      "Trouve": "Il manquait « .NET » de Microsoft",
+      "Pourquoi": "Beaucoup de programmes ont besoin de « .NET » de Microsoft : l'ancien (.NET Framework 3.5) s'active dans Windows, les récents (.NET 6, 8...) se téléchargent.",
+      "AFaire": [
+        "C'est réglé. Installe toujours .NET depuis Windows ou depuis le site de Microsoft (dotnet.microsoft.com)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "memoirevideo": {
+      "Titre": "La mémoire de la carte graphique",
+      "Trouve": "Le jeu demandait plus de mémoire vidéo que la carte graphique n'en a",
+      "Pourquoi": "Les textures en « Ultra » et les grandes résolutions remplissent la mémoire de la carte graphique : le jeu saccade ou plante (« Out of video memory »).",
+      "AFaire": [
+        "Baisse « Qualité des textures » d'un cran, et la résolution ou le « ray tracing » si besoin."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "bailip": {
+      "Titre": "L'adresse donnée par la box",
+      "Trouve": "Le PC n'avait pas reçu une adresse valable de la box",
+      "Pourquoi": "La box donne une adresse (IP) à chaque appareil. Si le PC garde une vieille adresse, ou en reçoit une déjà prise, il n'a pas internet.",
+      "AFaire": [
+        "C'est réglé. Si ça revient, refais les mêmes commandes."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "btdisparu": {
+      "Titre": "Le Bluetooth endormi",
+      "Trouve": "Le Bluetooth s'était endormi et ne se réveillait plus",
+      "Pourquoi": "Après une veille ou une mise à jour, la carte Bluetooth peut ne plus répondre : l'interrupteur Bluetooth disparaît des paramètres.",
+      "AFaire": [
+        "Si ça revient : éteins le PC (pas « Redémarrer »), débranche-le 30 secondes, puis rallume."
+      ],
+      "Pro": "Si ça revient souvent, un réparateur peut vérifier la carte Wi-Fi et Bluetooth."
+    },
+    "gestespave": {
+      "Titre": "Les réglages du pavé tactile",
+      "Trouve": "Les gestes du pavé tactile étaient coupés",
+      "Pourquoi": "Le défilement à deux doigts, le clic par appui et les autres gestes se règlent dans Windows ; une mise à jour peut les couper.",
+      "AFaire": [
+        "Garde-les activés dans les réglages du pavé tactile."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "vitessepointeur": {
+      "Titre": "La vitesse du pointeur",
+      "Trouve": "La vitesse de la souris était mal réglée",
+      "Pourquoi": "La vitesse du curseur se règle dans Windows (et souvent sur la souris, avec un bouton « DPI »).",
+      "AFaire": [
+        "Garde la vitesse qui te convient ; « Améliorer la précision du pointeur » change aussi la sensation."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "prisecombo": {
+      "Titre": "La prise du casque à 4 anneaux",
+      "Trouve": "Le casque a une seule prise (micro et son ensemble), la tour en attend deux",
+      "Pourquoi": "Les casques de téléphone ou de console ont une seule prise jack (avec 3 petits anneaux noirs) pour le son et le micro. Les tours ont deux prises séparées : le micro n'est pas vu.",
+      "AFaire": [
+        "Achète un petit adaptateur « jack 4 pôles vers 2 jacks » (un câble en Y, quelques euros) : sa prise rose va dans le micro, la verte dans le son.",
+        "Ou branche le casque sur la prise jack en façade si elle a un petit casque avec micro dessiné."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "sonie": {
+      "Titre": "L'égalisation de la sonie",
+      "Trouve": "Le son était trop faible sans « égalisation de la sonie »",
+      "Pourquoi": "Certaines vidéos et certains haut-parleurs sont faibles même à fond. Windows peut remonter le son faible (« Égalisation de la sonie »).",
+      "AFaire": [
+        "Garde « Égalisation de la sonie » cochée pour ce casque ou ces haut-parleurs."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pilotebatterie": {
+      "Titre": "Le pilote de la batterie",
+      "Trouve": "Le pilote de la batterie était bloqué",
+      "Pourquoi": "Windows lit la batterie grâce à un pilote (« Batterie à méthode de contrôle compatible ACPI ») : bloqué, il affiche 0 % ou « aucune batterie ».",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Si ça revient, un réparateur peut tester la batterie.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "fuitememoire": {
+      "Titre": "Un programme qui grossit",
+      "Trouve": "Un programme prenait de plus en plus de mémoire",
+      "Pourquoi": "Certains programmes (souvent un navigateur avec beaucoup d'onglets, ou un jeu) prennent un peu plus de mémoire d'heure en heure sans la rendre.",
+      "AFaire": [
+        "Ferme-le et relance-le de temps en temps, et mets-le à jour.",
+        "Dans le navigateur, ferme les onglets inutiles."
+      ],
+      "Pro": "Si c'est toujours le même programme, son site a souvent une mise à jour qui corrige ça."
+    },
+    "extensionmenu": {
+      "Titre": "Un ajout au menu du clic droit",
+      "Trouve": "Un programme ajouté au clic droit le ralentissait",
+      "Pourquoi": "Les programmes ajoutent des lignes au menu du clic droit (antivirus, archiveurs, cloud) : l'un d'eux peut le ralentir à chaque ouverture.",
+      "AFaire": [
+        "Désinstalle le programme fautif, ou cherche dans ses réglages l'option « intégration au menu contextuel »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "programmesdemarrage": {
+      "Titre": "Les programmes au démarrage",
+      "Trouve": "Des programmes étaient réglés pour se lancer au démarrage",
+      "Pourquoi": "Beaucoup de programmes s'ajoutent au démarrage de Windows (Spotify, Discord, Steam, Teams...) : ils s'ouvrent tout seuls et ralentissent le démarrage.",
+      "AFaire": [
+        "Gestionnaire des tâches (Ctrl + Maj + Échap), onglet « Applications de démarrage » : clic droit, « Désactiver » sur ce qui ne sert pas tout de suite."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "officecompte": {
+      "Titre": "Le compte Office",
+      "Trouve": "Office n'était pas connecté au compte qui a la licence",
+      "Pourquoi": "Office (Word, Excel) vérifie sa licence avec un compte Microsoft : connecté au mauvais compte, ou pas connecté, il passe en « produit sans licence ».",
+      "AFaire": [
+        "Dans Word : « Fichier », « Compte », « Se déconnecter », puis connecte-toi avec le compte qui a acheté Office (ou celui de l'école, du travail)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "officefin": {
+      "Titre": "L'abonnement ou l'essai terminé",
+      "Trouve": "L'abonnement Office (ou l'essai) est terminé",
+      "Pourquoi": "Beaucoup de PC sont vendus avec un essai d'Office d'un mois. Sans abonnement ni licence, Word et Excel ne permettent plus que de lire.",
+      "AFaire": [
+        "Pour continuer gratuitement : office.com (Word et Excel en ligne, gratuits avec un compte Microsoft), ou LibreOffice (libreoffice.org) qui ouvre et enregistre les fichiers Word et Excel."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "recupauto": {
+      "Titre": "La récupération automatique de Word",
+      "Trouve": "Word avait gardé une copie de secours",
+      "Pourquoi": "Word (et Excel) enregistrent une copie de secours toutes les quelques minutes : un document fermé sans enregistrer peut souvent être récupéré.",
+      "AFaire": [
+        "Enregistre tout de suite le document récupéré (Fichier, « Enregistrer sous »).",
+        "Active l'enregistrement automatique (en haut à gauche) si tu utilises OneDrive."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "perdudefinitif": {
+      "Titre": "Le document perdu",
+      "Trouve": "Le document n'a pas pu être retrouvé",
+      "Pourquoi": "Sans copie de secours ni enregistrement, le document n'a pas été gardé.",
+      "AFaire": [
+        "Pour la prochaine fois : Fichier, « Options », « Enregistrement » : enregistrement automatique toutes les 5 minutes."
+      ],
+      "Pro": "Un réparateur ne pourra pas faire mieux sans fichier enregistré."
+    },
+    "archive": {
+      "Titre": "Le programme pour les archives",
+      "Trouve": "Il manquait un programme pour ouvrir ce type d'archive",
+      "Pourquoi": "Windows ouvre les .zip, mais pas toujours les .rar et .7z, ni les archives protégées ou coupées en plusieurs morceaux.",
+      "AFaire": [
+        "Installe 7-Zip (7-zip.org, gratuit) : clic droit sur l'archive, « 7-Zip », « Extraire ici »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appdefaut": {
+      "Titre": "Le programme par défaut",
+      "Trouve": "Le mauvais programme était choisi pour ce type de fichier",
+      "Pourquoi": "Windows ouvre chaque type de fichier (.pdf, .jpg, .mp4...) avec un programme « par défaut ». Une installation peut le changer.",
+      "AFaire": [
+        "Clic droit sur un fichier de ce type, « Ouvrir avec », « Choisir une autre application », coche « Toujours utiliser cette application »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "motw": {
+      "Titre": "Le fichier venu d'internet",
+      "Trouve": "Windows bloquait un fichier venu d'internet",
+      "Pourquoi": "Les fichiers téléchargés gardent une marque « vient d'un autre ordinateur » : Windows et Office les ouvrent en mode protégé, ou les bloquent.",
+      "AFaire": [
+        "Ne débloque que les fichiers dont tu es sûr (envoyés par quelqu'un de confiance, site officiel)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "langueaffichage": {
+      "Titre": "La langue d'affichage",
+      "Trouve": "La langue d'affichage de Windows avait changé",
+      "Pourquoi": "Windows peut avoir plusieurs langues installées ; une mise à jour ou un compte peut en choisir une autre pour les menus.",
+      "AFaire": [
+        "Garde « Français (France) » en premier dans « Langue d'affichage de Windows »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "barremasquee": {
+      "Titre": "La barre des tâches masquée",
+      "Trouve": "La barre des tâches se masquait toute seule",
+      "Pourquoi": "Un réglage cache la barre des tâches tant que la souris n'est pas en bas de l'écran ; sur Windows 10, elle peut aussi être déplacée sur un côté.",
+      "AFaire": [
+        "Clic droit sur la barre (ou Paramètres, « Personnalisation », « Barre des tâches ») : décoche « Masquer automatiquement la barre des tâches »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "nepasderanger": {
+      "Titre": "Le mode « Ne pas déranger »",
+      "Trouve": "Le mode « Ne pas déranger » cachait les notifications",
+      "Pourquoi": "« Ne pas déranger » (ou l'« Assistant de concentration ») coupe les notifications, parfois automatiquement en jeu ou le soir.",
+      "AFaire": [
+        "Désactive « Ne pas déranger », ou règle ses heures automatiques."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "delaiverrou": {
+      "Titre": "Le délai de verrouillage",
+      "Trouve": "Le PC se verrouillait trop vite (ou jamais)",
+      "Pourquoi": "Windows verrouille le PC après la mise en veille de l'écran, ou après l'écran de veille ; ces délais se règlent.",
+      "AFaire": [
+        "Règle « Écran et veille » et, dans « Options de connexion », « Si vous vous êtes absenté, quand Windows doit-il vous demander de vous reconnecter »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "phishingdonnees": {
+      "Titre": "Des informations données",
+      "Trouve": "Danger : tu as donné des informations sur un faux site",
+      "Pourquoi": "Les faux SMS et e-mails (colis, amende, impôts, banque, Ameli) mènent à un faux site qui vole les mots de passe et les cartes bancaires.",
+      "AFaire": [
+        "Carte bancaire tapée : appelle tout de suite ta banque pour faire opposition.",
+        "Mot de passe tapé : change-le tout de suite (depuis le vrai site), et partout où tu l'utilises.",
+        "Signale le message au 33700 (SMS) ou sur signal-spam.fr.",
+        "Aide gratuite : cybermalveillance.gouv.fr."
+      ],
+      "Pro": "Ta banque et cybermalveillance.gouv.fr peuvent t'aider.",
+      "Urgent": true
+    },
+    "phishingclic": {
+      "Titre": "Un simple clic",
+      "Trouve": "Seulement un clic, sans rien taper : peu de risque",
+      "Pourquoi": "Ouvrir un faux site sans rien y taper ni télécharger est rarement grave sur un PC à jour.",
+      "AFaire": [
+        "Ferme la page, supprime le message, et fais une analyse avec Sécurité Windows par précaution."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "sextorsion": {
+      "Titre": "Un chantage par e-mail (arnaque)",
+      "Trouve": "C'est une arnaque très répandue : personne ne t'a filmé",
+      "Pourquoi": "Ces e-mails sont envoyés à des millions de personnes. Ils citent parfois un ancien mot de passe (volé sur un site), mais n'ont aucune vidéo.",
+      "AFaire": [
+        "Ne paie pas, ne réponds pas, supprime le message.",
+        "Si l'e-mail cite un vrai mot de passe : change-le partout où tu l'utilises.",
+        "Tu peux le signaler sur signal-spam.fr."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -5584,7 +5888,8 @@
           "Garde": [
             "cable",
             "pilote",
-            "ecranhs"
+            "ecranhs",
+            "hdr"
           ],
           "Preuve": "Une couleur domine ou c'est délavé"
         }
@@ -9034,6 +9339,754 @@
           "Preuve": "Une autre condition manque"
         }
       ]
+    },
+    "test-accel-nav": {
+      "Type": "test",
+      "Court": "L'accélération graphique",
+      "Pour": [
+        "accelmateriel"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe l'accélération graphique du navigateur",
+      "Gestes": [
+        "Chrome : trois points, « Paramètres », « Système », désactive « Utiliser l'accélération graphique si disponible ». Edge : « Paramètres », « Système et performances », même réglage. Firefox : « Paramètres », « Performances », décoche les deux cases, puis « Utiliser l'accélération graphique ».",
+        "Relance le navigateur."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "accelmateriel",
+          "Preuve": "Sans l'accélération graphique, le navigateur s'affiche bien"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "accelmateriel"
+          ],
+          "Preuve": "L'accélération graphique n'y était pour rien"
+        }
+      ]
+    },
+    "test-dpi-programme": {
+      "Type": "test",
+      "Court": "La compatibilité",
+      "Pour": [
+        "dpiprogramme"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Change la mise à l'échelle de ce programme",
+      "Gestes": [
+        "Clic droit sur le raccourci du programme, « Propriétés », onglet « Compatibilité ».",
+        "Clique sur « Modifier les paramètres PPP élevés », coche « Remplacer le comportement de mise à l'échelle PPP élevée », choisis « Système (avancé) » (ou « Application »). OK.",
+        "Relance le programme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il est net et à la bonne taille",
+          "Confirme": "dpiprogramme",
+          "Preuve": "Avec ce réglage, le programme est net"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "dpiprogramme"
+          ],
+          "Preuve": "La mise à l'échelle du programme n'y était pour rien"
+        }
+      ]
+    },
+    "test-ordre-ecrans": {
+      "Type": "test",
+      "Court": "La place des écrans",
+      "Pour": [
+        "ordreecrans"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Place les écrans comme sur ton bureau",
+      "Gestes": [
+        "Clic droit sur le Bureau, « Paramètres d'affichage ».",
+        "Clique sur « Identifier » : un grand chiffre s'affiche sur chaque écran.",
+        "Fais glisser les rectangles 1 et 2 pour qu'ils soient placés comme les vrais écrans, puis « Appliquer »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La souris passe du bon côté",
+          "Confirme": "ordreecrans",
+          "Preuve": "Les écrans bien placés, la souris passe du bon côté"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "ordreecrans"
+          ],
+          "Preuve": "La place des écrans n'y était pour rien"
+        }
+      ]
+    },
+    "test-hdr": {
+      "Type": "test",
+      "Court": "Le HDR",
+      "Pour": [
+        "hdr"
+      ],
+      "Duree": "une minute",
+      "Texte": "Coupe le HDR",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows, Alt et B (ou : Paramètres, « Système », « Écran », « Utiliser HDR » : désactivé)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les couleurs sont normales",
+          "Confirme": "hdr",
+          "Preuve": "Sans le HDR, les couleurs sont normales"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "hdr"
+          ],
+          "Preuve": "Le HDR n'était pas activé"
+        }
+      ]
+    },
+    "test-java": {
+      "Type": "test",
+      "Court": "Installer Java",
+      "Pour": [
+        "javamanquant"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Installe Java",
+      "Aide": "Si la commande n'est pas reconnue : télécharge « Temurin » sur adoptium.net et installe-le.",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ».",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Si on te demande d'accepter, tape O (ou Y) puis Entrée ; Windows peut demander une autorisation : accepte.",
+        "Relance le programme (ou double-clique sur le fichier .jar)."
+      ],
+      "Commande": {
+        "Admin": false,
+        "Lignes": [
+          "winget install EclipseAdoptium.Temurin.21.JRE"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre",
+          "Confirme": "javamanquant",
+          "Preuve": "Avec Java, il s'ouvre"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "javamanquant"
+          ],
+          "Preuve": "Installer Java n'a rien changé"
+        }
+      ]
+    },
+    "test-netfx": {
+      "Type": "test",
+      "Court": ".NET Framework",
+      "Pour": [
+        "netframework"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Active ou installe .NET",
+      "Gestes": [
+        "Si le message parle de « .NET Framework 3.5 » (ou 2.0) : touche Windows, tape « Activer ou désactiver des fonctionnalités Windows », coche « .NET Framework 3.5 », OK (Windows le télécharge).",
+        "Si le message parle de « .NET 6 », « .NET 8 » ou « .NET Desktop Runtime » : sur dotnet.microsoft.com, télécharge le « .NET Desktop Runtime » de la même version, et installe-le.",
+        "Relance le programme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre",
+          "Confirme": "netframework",
+          "Preuve": "Avec .NET, le programme s'ouvre"
+        },
+        {
+          "Texte": "Toujours le message",
+          "Ecarte": [
+            "netframework"
+          ],
+          "Preuve": ".NET n'a rien changé"
+        }
+      ]
+    },
+    "test-textures": {
+      "Type": "test",
+      "Court": "La qualité des textures",
+      "Pour": [
+        "memoirevideo"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Baisse la qualité des textures",
+      "Gestes": [
+        "Dans les options graphiques du jeu, baisse « Qualité des textures » d'un ou deux crans (et coupe le ray tracing s'il est activé).",
+        "Relance une partie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne plante plus",
+          "Confirme": "memoirevideo",
+          "Preuve": "Textures baissées, le jeu ne plante plus"
+        },
+        {
+          "Texte": "Il plante encore",
+          "Ecarte": [
+            "memoirevideo"
+          ],
+          "Preuve": "Les textures n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-ipconfig": {
+      "Type": "test",
+      "Court": "Redemander une adresse",
+      "Pour": [
+        "bailip"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Demande une nouvelle adresse à la box",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Fais-le pour les deux lignes, dans l'ordre (internet se coupe un instant entre les deux).",
+        "Réessaie internet."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "ipconfig /release",
+          "ipconfig /renew"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Internet revient",
+          "Confirme": "bailip",
+          "Preuve": "Avec une nouvelle adresse, internet revient"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "bailip"
+          ],
+          "Preuve": "Une nouvelle adresse n'a rien changé"
+        }
+      ]
+    },
+    "test-bt-reveil": {
+      "Type": "test",
+      "Court": "Réveiller le Bluetooth",
+      "Pour": [
+        "btdisparu"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Éteins et vide le PC de son électricité",
+      "Gestes": [
+        "Fais « Arrêter » en maintenant la touche Maj enfoncée (arrêt complet).",
+        "Débranche le câble électrique ou le chargeur 30 secondes, puis rebranche et rallume.",
+        "Regarde si l'interrupteur Bluetooth est revenu (touche Windows + A)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le Bluetooth est revenu",
+          "Confirme": "btdisparu",
+          "Preuve": "Après un arrêt complet, le Bluetooth est revenu"
+        },
+        {
+          "Texte": "Toujours absent",
+          "Ecarte": [
+            "btdisparu"
+          ],
+          "Preuve": "Un arrêt complet n'a rien changé"
+        }
+      ]
+    },
+    "test-gestes-pave": {
+      "Type": "test",
+      "Court": "Les gestes",
+      "Pour": [
+        "gestespave"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Réactive les gestes du pavé tactile",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Bluetooth et appareils », puis « Pavé tactile ».",
+        "Active le pavé tactile, puis dans « Défilement et zoom » coche « Faire glisser deux doigts pour faire défiler », et dans « Appuis », « Appuyer avec un seul doigt pour cliquer »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les gestes remarchent",
+          "Confirme": "gestespave",
+          "Preuve": "Les gestes réactivés, ils remarchent"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "gestespave"
+          ],
+          "Preuve": "Les gestes étaient déjà activés"
+        }
+      ]
+    },
+    "test-vitesse-souris": {
+      "Type": "test",
+      "Court": "La vitesse",
+      "Pour": [
+        "vitessepointeur"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle la vitesse de la souris",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Bluetooth et appareils », puis « Souris ».",
+        "Déplace « Vitesse du pointeur de la souris » ; essaie aussi de cocher ou décocher « Améliorer la précision du pointeur » (dans « Paramètres de souris supplémentaires », onglet « Options du pointeur »).",
+        "Si la souris a un bouton « DPI » (sous la molette), appuie dessus pour changer de vitesse."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est mieux",
+          "Confirme": "vitessepointeur",
+          "Preuve": "La vitesse réglée, c'est mieux"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "vitessepointeur"
+          ],
+          "Preuve": "La vitesse n'y était pour rien"
+        }
+      ]
+    },
+    "q-anneaux": {
+      "Type": "question",
+      "Court": "La prise du casque",
+      "Texte": "La prise du casque a-t-elle trois petits anneaux noirs (une seule prise pour le son et le micro) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, une seule prise avec 3 anneaux",
+          "Confirme": "prisecombo",
+          "Preuve": "Le casque a une seule prise pour le son et le micro"
+        },
+        {
+          "Texte": "Non, deux prises (verte et rose), ou USB",
+          "Ecarte": [
+            "prisecombo"
+          ],
+          "Preuve": "Le casque a des prises séparées"
+        }
+      ]
+    },
+    "test-sonie": {
+      "Type": "test",
+      "Court": "L'égalisation de la sonie",
+      "Pour": [
+        "sonie"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Active l'égalisation de la sonie",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Panneau de configuration du son » et ouvre-le (ou « Paramètres du son », puis « Plus de paramètres de son »).",
+        "Onglet « Lecture » : double-clique sur tes haut-parleurs ou ton casque, onglet « Améliorations » (ou « Enhancements »).",
+        "Coche « Égalisation de la sonie » (ou « Loudness Equalization »), puis OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est plus fort",
+          "Confirme": "sonie",
+          "Preuve": "Avec l'égalisation de la sonie, c'est plus fort"
+        },
+        {
+          "Texte": "Pas d'option, ou pareil",
+          "Ecarte": [
+            "sonie"
+          ],
+          "Preuve": "L'égalisation de la sonie n'y change rien"
+        }
+      ]
+    },
+    "test-pilote-batterie": {
+      "Type": "test",
+      "Court": "Le pilote de la batterie",
+      "Pour": [
+        "pilotebatterie"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Réinstalle le pilote de la batterie",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Batteries » : clic droit sur « Batterie à méthode de contrôle compatible ACPI Microsoft », « Désinstaller l'appareil », confirme (Windows peut demander une autorisation : accepte).",
+        "Redémarre : Windows le réinstalle tout seul."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La batterie est revenue",
+          "Confirme": "pilotebatterie",
+          "Preuve": "Le pilote réinstallé, la batterie est revenue"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "pilotebatterie"
+          ],
+          "Preuve": "Le pilote de la batterie n'y était pour rien"
+        }
+      ]
+    },
+    "test-fuite": {
+      "Type": "test",
+      "Court": "La mémoire au fil des heures",
+      "Pour": [
+        "fuitememoire"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Regarde qui prend la mémoire quand ça rame",
+      "Gestes": [
+        "Appuie en même temps sur Ctrl + Maj + Échap : le Gestionnaire des tâches s'ouvre.",
+        "Quand ça rame, clique sur la colonne « Mémoire » : le plus gourmand passe en haut.",
+        "Un programme prend-il beaucoup plus que les autres (plus de 2 Go) ? Ferme-le et relance-le."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui, et le fermer règle tout",
+          "Confirme": "fuitememoire",
+          "Preuve": "Un programme grossissait au fil des heures"
+        },
+        {
+          "Texte": "Rien de spécial",
+          "Ecarte": [
+            "fuitememoire"
+          ],
+          "Preuve": "Aucun programme ne grossit"
+        }
+      ]
+    },
+    "test-clic-droit-sans": {
+      "Type": "test",
+      "Court": "Démarrage minimal",
+      "Pour": [
+        "extensionmenu"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Essaie le clic droit sans les programmes ajoutés",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « msconfig », ouvre « Configuration du système ».",
+        "Onglet « Services » : coche « Masquer tous les services Microsoft », puis « Désactiver tout ». OK, redémarre.",
+        "Essaie le clic droit. Ensuite, retourne dans msconfig et clique « Activer tout » pour tout remettre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le clic droit est rapide",
+          "Confirme": "extensionmenu",
+          "Preuve": "Sans les programmes ajoutés, le clic droit est rapide"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "extensionmenu"
+          ],
+          "Preuve": "Les programmes ajoutés n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-apps-demarrage": {
+      "Type": "test",
+      "Court": "Les applications de démarrage",
+      "Pour": [
+        "programmesdemarrage"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Désactive les programmes au démarrage",
+      "Gestes": [
+        "Appuie en même temps sur Ctrl + Maj + Échap : le Gestionnaire des tâches s'ouvre.",
+        "Onglet « Applications de démarrage » (l'icône en forme de compteur à gauche).",
+        "Clic droit sur chaque programme qui ne doit pas s'ouvrir tout seul : « Désactiver ». Ne touche pas aux pilotes (Realtek, Intel, NVIDIA, AMD).",
+        "Redémarre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ils ne s'ouvrent plus",
+          "Confirme": "programmesdemarrage",
+          "Preuve": "Désactivés, ils ne s'ouvrent plus au démarrage"
+        },
+        {
+          "Texte": "Ils s'ouvrent encore",
+          "Ecarte": [
+            "programmesdemarrage"
+          ],
+          "Preuve": "Ce n'étaient pas des applications de démarrage"
+        }
+      ]
+    },
+    "test-compte-office": {
+      "Type": "test",
+      "Court": "Le compte Office",
+      "Pour": [
+        "officecompte"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Connecte Office au bon compte",
+      "Gestes": [
+        "Ouvre Word, puis « Fichier », « Compte ».",
+        "Regarde quel compte est connecté : si ce n'est pas celui qui a acheté Office, « Se déconnecter », puis connecte-toi avec le bon.",
+        "Ferme et rouvre Word."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Office est activé",
+          "Confirme": "officecompte",
+          "Preuve": "Avec le bon compte, Office est activé"
+        },
+        {
+          "Texte": "Toujours « sans licence »",
+          "Ecarte": [
+            "officecompte"
+          ],
+          "Preuve": "Le compte n'y était pour rien"
+        }
+      ]
+    },
+    "test-recup-word": {
+      "Type": "test",
+      "Court": "Récupérer le document",
+      "Pour": [
+        "recupauto"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Récupère le document non enregistré",
+      "Gestes": [
+        "Ouvre Word (ou Excel), puis « Fichier », « Informations ».",
+        "Clique sur « Gérer le document » (ou « Gérer le classeur »), puis « Récupérer les documents non enregistrés ».",
+        "Ouvre le fichier le plus récent, puis enregistre-le tout de suite. Regarde aussi la liste « Récupération de document » à gauche quand Word se rouvre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je l'ai retrouvé",
+          "Confirme": "recupauto",
+          "Preuve": "Word avait gardé une copie de secours"
+        },
+        {
+          "Texte": "Rien dans la liste",
+          "Ecarte": [
+            "recupauto"
+          ],
+          "Preuve": "Aucune copie de secours"
+        }
+      ]
+    },
+    "test-7zip": {
+      "Type": "test",
+      "Court": "Avec 7-Zip",
+      "Pour": [
+        "archive"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Ouvre l'archive avec 7-Zip",
+      "Gestes": [
+        "Télécharge 7-Zip sur 7-zip.org (le site officiel) et installe-le.",
+        "Clic droit sur l'archive, « Afficher d'autres options » si besoin, puis « 7-Zip », « Extraire ici »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça s'ouvre",
+          "Confirme": "archive",
+          "Preuve": "Avec 7-Zip, l'archive s'ouvre"
+        },
+        {
+          "Texte": "Erreur : archive endommagée ou incomplète",
+          "Ecarte": [
+            "archive"
+          ],
+          "Preuve": "L'archive elle-même est abîmée"
+        }
+      ]
+    },
+    "test-ouvrir-avec-defaut": {
+      "Type": "test",
+      "Court": "Le programme par défaut",
+      "Pour": [
+        "appdefaut"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis le programme qui ouvre ces fichiers",
+      "Gestes": [
+        "Clic droit sur un fichier de ce type, « Ouvrir avec », puis « Choisir une autre application ».",
+        "Choisis le bon programme, coche « Toujours utiliser cette application » (ou clique sur « Toujours »)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça s'ouvre avec le bon programme",
+          "Confirme": "appdefaut",
+          "Preuve": "Le programme par défaut changé, c'est réglé"
+        },
+        {
+          "Texte": "Toujours le mauvais",
+          "Ecarte": [
+            "appdefaut"
+          ],
+          "Preuve": "Le programme par défaut n'y était pour rien"
+        }
+      ]
+    },
+    "test-debloquer": {
+      "Type": "test",
+      "Court": "Débloquer le fichier",
+      "Pour": [
+        "motw"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Débloque le fichier",
+      "Gestes": [
+        "Clic droit sur le fichier, « Propriétés ».",
+        "En bas de l'onglet « Général », coche « Débloquer » (« Ce fichier provient d'un autre ordinateur »), puis OK.",
+        "Rouvre le fichier."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre normalement",
+          "Confirme": "motw",
+          "Preuve": "Débloqué, le fichier s'ouvre normalement"
+        },
+        {
+          "Texte": "Pas de case « Débloquer », ou pareil",
+          "Ecarte": [
+            "motw"
+          ],
+          "Preuve": "Le fichier n'était pas bloqué"
+        }
+      ]
+    },
+    "test-langue": {
+      "Type": "test",
+      "Court": "La langue",
+      "Pour": [
+        "langueaffichage"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Remets Windows en français",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent. (Settings)",
+        "Va dans « Heure et langue » (Time & language), puis « Langue et région » (Language & region).",
+        "« Langue d'affichage de Windows » (Windows display language) : choisis « Français (France) » (ajoute-le avec « Ajouter une langue » s'il manque), puis déconnecte-toi et reconnecte-toi."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows est en français",
+          "Confirme": "langueaffichage",
+          "Preuve": "La langue d'affichage remise en français"
+        },
+        {
+          "Texte": "Toujours en anglais",
+          "Ecarte": [
+            "langueaffichage"
+          ],
+          "Preuve": "La langue d'affichage n'y était pour rien"
+        }
+      ]
+    },
+    "test-barre-masquee": {
+      "Type": "test",
+      "Court": "Afficher la barre",
+      "Pour": [
+        "barremasquee"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Empêche la barre des tâches de se masquer",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Personnalisation », « Barre des tâches », puis « Comportements de la barre des tâches ».",
+        "Décoche « Masquer automatiquement la barre des tâches » ; choisis l'alignement voulu (au centre ou à gauche)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La barre est revenue",
+          "Confirme": "barremasquee",
+          "Preuve": "La barre des tâches ne se masque plus"
+        },
+        {
+          "Texte": "Toujours absente",
+          "Ecarte": [
+            "barremasquee"
+          ],
+          "Preuve": "Elle n'était pas masquée"
+        }
+      ]
+    },
+    "test-ne-pas-deranger": {
+      "Type": "test",
+      "Court": "Ne pas déranger",
+      "Pour": [
+        "nepasderanger"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe le mode « Ne pas déranger »",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Notifications ».",
+        "Désactive « Ne pas déranger », et ouvre « Activer automatiquement Ne pas déranger » : décoche ce qui ne te convient pas. Vérifie que « Notifications » est activé."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les notifications reviennent",
+          "Confirme": "nepasderanger",
+          "Preuve": "Sans « Ne pas déranger », les notifications reviennent"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "nepasderanger"
+          ],
+          "Preuve": "« Ne pas déranger » n'était pas activé"
+        }
+      ]
+    },
+    "test-delai-verrou": {
+      "Type": "test",
+      "Court": "Le délai",
+      "Pour": [
+        "delaiverrou"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle quand Windows se verrouille",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "« Système », « Alimentation » (ou « Alimentation et batterie »), « Écran et veille » : choisis des délais plus longs (ou plus courts).",
+        "Puis « Comptes », « Options de connexion » : à « Si vous vous êtes absenté... », choisis « Lorsque le PC sort de veille » ou « Jamais »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "delaiverrou",
+          "Preuve": "Les délais réglés, c'est réglé"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "delaiverrou"
+          ],
+          "Preuve": "Les délais n'y étaient pour rien"
+        }
+      ]
+    },
+    "q-phishing": {
+      "Type": "question",
+      "Court": "Qu'as-tu fait sur le site ?",
+      "Texte": "Sur le site ouvert par le lien, as-tu tapé un mot de passe, ta carte bancaire, ou téléchargé un fichier ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, ou je ne sais plus",
+          "Confirme": "phishingdonnees",
+          "Preuve": "Des informations ont été données sur un faux site"
+        },
+        {
+          "Texte": "Non, j'ai juste ouvert la page",
+          "Ecarte": [
+            "phishingdonnees"
+          ],
+          "Preuve": "Rien n'a été tapé ni téléchargé"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -9921,6 +10974,61 @@
         },
         {
           "Ref": "test-directx"
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "java",
+      "Famille": "plantages",
+      "Titre": "« Java introuvable » ou un fichier .jar ne s'ouvre pas",
+      "Phrase": "Un programme demande Java, ou un .jar s'ouvre comme une archive",
+      "Mots": [
+        "java",
+        "jar",
+        ".jar",
+        "jre",
+        "jdk",
+        "minecraft java",
+        "java introuvable",
+        "java not found"
+      ],
+      "Suspects": [
+        "javamanquant",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-java"
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "dotnet",
+      "Famille": "plantages",
+      "Titre": "Un programme demande « .NET Framework » ou « .NET Runtime »",
+      "Phrase": "« Pour exécuter cette application, vous devez installer .NET »",
+      "Mots": [
+        ".net",
+        "net framework",
+        "dotnet",
+        ".net framework 3.5",
+        "desktop runtime",
+        "net runtime",
+        "framework"
+      ],
+      "Suspects": [
+        "netframework",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-netfx"
         },
         {
           "Ref": "test-reinstaller"
@@ -11220,7 +12328,12 @@
         "diagnostic de votre pc",
         "n'a pas démarré correctement",
         "réparation automatique",
-        "préparation de la réparation"
+        "préparation de la réparation",
+        "0xc000000e",
+        "0xc0000225",
+        "votre pc doit être réparé",
+        "your pc needs to be repaired",
+        "your device needs to be repaired"
       ],
       "Suspects": [
         "cleusb",
@@ -12453,6 +13566,96 @@
       ]
     },
     {
+      "Id": "signalcoupe",
+      "Famille": "ecran",
+      "Titre": "L'écran perd le signal quelques secondes, puis revient",
+      "Phrase": "Noir quelques secondes, parfois « Pas de signal », puis tout revient",
+      "Mots": [
+        "perd le signal",
+        "noir quelques secondes",
+        "coupe quelques secondes",
+        "écran se coupe",
+        "signal perdu",
+        "s'éteint et se rallume"
+      ],
+      "Suspects": [
+        "cable",
+        "cablefrequence",
+        "veilleecran",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cable-couleur",
+          "Pour": [
+            "cable"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Ça ne coupe plus",
+              "Confirme": "cable",
+              "Preuve": "Câble rebranché, ça ne coupe plus"
+            },
+            {
+              "Texte": "Ça coupe encore",
+              "Ecarte": [
+                "cable"
+              ],
+              "Preuve": "Le câble n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        },
+        {
+          "Ref": "test-cable-hz",
+          "Reponses": [
+            {
+              "Texte": "Ça ne coupe plus",
+              "Confirme": "cablefrequence",
+              "Preuve": "Avec le câble fourni, ça ne coupe plus"
+            },
+            {
+              "Texte": "Ça coupe encore",
+              "Ecarte": [
+                "cablefrequence"
+              ],
+              "Preuve": "Le câble fourni n'y change rien"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "navclignote",
+      "Famille": "ecran",
+      "Titre": "Le navigateur clignote ou affiche des carrés noirs",
+      "Phrase": "Seulement dans Chrome, Edge ou Firefox : clignotements, zones noires, vidéos vertes",
+      "Mots": [
+        "navigateur clignote",
+        "chrome clignote",
+        "carrés noirs",
+        "vidéo verte",
+        "youtube vert",
+        "écran noir navigateur",
+        "edge clignote",
+        "scintille navigateur"
+      ],
+      "Suspects": [
+        "accelmateriel",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-accel-nav"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
       "Id": "artefacts",
       "Famille": "ecran",
       "Titre": "Des traits, des carrés ou des couleurs bizarres",
@@ -12682,9 +13885,15 @@
         "délavé",
         "rose",
         "vert",
-        "contraste"
+        "contraste",
+        "terne",
+        "ternes",
+        "délavées",
+        "hdr",
+        "fade"
       ],
       "Suspects": [
+        "hdr",
         "veilleuse",
         "filtrecouleur",
         "contraste",
@@ -12693,6 +13902,9 @@
         "ecranhs"
       ],
       "Etapes": [
+        {
+          "Ref": "test-hdr"
+        },
         {
           "Ref": "q-couleurs"
         },
@@ -12747,6 +13959,33 @@
         },
         {
           "Ref": "test-echelle"
+        }
+      ]
+    },
+    {
+      "Id": "dpiprog",
+      "Famille": "ecran",
+      "Titre": "Un seul programme est flou ou minuscule",
+      "Phrase": "Tout est net, sauf un programme flou ou écrit tout petit",
+      "Mots": [
+        "un seul programme flou",
+        "programme flou",
+        "programme minuscule",
+        "texte minuscule",
+        "flou dans un logiciel",
+        "ppp",
+        "dpi"
+      ],
+      "Suspects": [
+        "dpiprogramme",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-dpi-programme"
+        },
+        {
+          "Ref": "test-reinstaller"
         }
       ]
     },
@@ -13024,6 +14263,30 @@
         },
         {
           "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "ordreecrans",
+      "Famille": "ecran",
+      "Titre": "Avec deux écrans, la souris passe du mauvais côté",
+      "Phrase": "Pour aller sur l'écran de droite, il faut sortir à gauche (ou en haut)",
+      "Mots": [
+        "deux écrans",
+        "souris passe",
+        "mauvais côté",
+        "écran de droite",
+        "écran de gauche",
+        "ordre des écrans",
+        "inverser les écrans"
+      ],
+      "Suspects": [
+        "ordreecrans",
+        "projection"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ordre-ecrans"
         }
       ]
     },
@@ -13430,6 +14693,78 @@
         },
         {
           "Ref": "test-type-dossier"
+        }
+      ]
+    },
+    {
+      "Id": "rameheures",
+      "Famille": "lenteur",
+      "Titre": "Il rame au bout de quelques heures",
+      "Phrase": "Au démarrage tout va bien, puis ça ralentit petit à petit",
+      "Mots": [
+        "au bout de quelques heures",
+        "après quelques heures",
+        "ralentit petit à petit",
+        "rame après",
+        "de plus en plus lent",
+        "ralentit avec le temps"
+      ],
+      "Suspects": [
+        "fuitememoire",
+        "surchauffe",
+        "memoirepeu"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fuite"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-memoire-pleine"
+        }
+      ]
+    },
+    {
+      "Id": "clicdroitlent",
+      "Famille": "lenteur",
+      "Titre": "Le clic droit met longtemps à s'ouvrir",
+      "Phrase": "Le menu du clic droit (sur un fichier ou le Bureau) tarde ou bloque",
+      "Mots": [
+        "clic droit lent",
+        "menu contextuel",
+        "clic droit bloque",
+        "clic droit met du temps",
+        "clic droit ne s'ouvre pas"
+      ],
+      "Suspects": [
+        "extensionmenu",
+        "explorateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-clic-droit-sans"
+        },
+        {
+          "Ref": "test-explorateur-redem",
+          "Reponses": [
+            {
+              "Texte": "Le clic droit est rapide",
+              "Confirme": "explorateur",
+              "Preuve": "Après le redémarrage de l'Explorateur, le clic droit est rapide"
+            },
+            {
+              "Texte": "Toujours lent",
+              "Ecarte": [
+                "explorateur"
+              ],
+              "Preuve": "Redémarrer l'Explorateur n'a rien changé"
+            }
+          ]
         }
       ]
     },
@@ -14113,6 +15448,41 @@
       ]
     },
     {
+      "Id": "sonfaible",
+      "Famille": "son",
+      "Titre": "Le son est trop faible, même à fond",
+      "Phrase": "Tout est à 100 % et on entend à peine",
+      "Mots": [
+        "son faible",
+        "trop faible",
+        "pas assez fort",
+        "volume faible",
+        "même à fond",
+        "à 100 %",
+        "son bas"
+      ],
+      "Suspects": [
+        "volumeappli",
+        "sonie",
+        "pilotesson",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mixer"
+        },
+        {
+          "Ref": "test-sonie"
+        },
+        {
+          "Ref": "test-depanneur-son"
+        },
+        {
+          "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
       "Id": "sonunseul",
       "Famille": "son",
       "Titre": "Le son manque dans un seul programme ou jeu",
@@ -14328,6 +15698,84 @@
         },
         {
           "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "microjack",
+      "Famille": "son",
+      "Titre": "Le micro du casque n'est pas reconnu sur la tour",
+      "Phrase": "Le son marche dans le casque, mais personne ne t'entend",
+      "Mots": [
+        "micro casque",
+        "micro non détecté",
+        "micro pas reconnu",
+        "jack micro",
+        "casque de téléphone",
+        "casque de console",
+        "prise rose"
+      ],
+      "Suspects": [
+        "prisecombo",
+        "micropermission",
+        "microchoix"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "q-anneaux"
+        },
+        {
+          "Id": "test-acces-micro",
+          "Type": "test",
+          "Court": "L'accès au micro",
+          "Duree": "deux minutes",
+          "Texte": "Autorise l'accès au micro",
+          "Gestes": [
+            "Appuie sur la touche Windows du clavier, tape « confidentialité du microphone » et ouvre-le.",
+            "Active « Accès au microphone », « Autoriser les applications à accéder au microphone », et l'appli concernée."
+          ],
+          "Reponses": [
+            {
+              "Texte": "On m'entend",
+              "Confirme": "micropermission",
+              "Preuve": "Avec l'accès autorisé, on t'entend"
+            },
+            {
+              "Texte": "Tout était déjà activé",
+              "Ecarte": [
+                "micropermission"
+              ],
+              "Preuve": "L'accès au micro était déjà autorisé"
+            }
+          ]
+        },
+        {
+          "Id": "test-choix-micro",
+          "Type": "test",
+          "Court": "Le bon micro",
+          "Duree": "deux minutes",
+          "Texte": "Choisis le bon micro",
+          "Gestes": [
+            "Touche Windows, tape « Paramètres du son » : dans « Entrée », choisis le micro de ton casque et parle : la barre doit bouger.",
+            "Dans l'appli (Discord, Teams...), choisis le même micro."
+          ],
+          "Reponses": [
+            {
+              "Texte": "La barre bouge, on m'entend",
+              "Confirme": "microchoix",
+              "Preuve": "Avec le bon micro choisi, on t'entend"
+            },
+            {
+              "Texte": "La barre ne bouge pas",
+              "Ecarte": [
+                "microchoix"
+              ],
+              "Preuve": "Même bien choisi, le micro ne capte rien"
+            }
+          ]
         }
       ]
     },
@@ -14643,6 +16091,38 @@
       ]
     },
     {
+      "Id": "conflitip",
+      "Famille": "internet",
+      "Titre": "« Aucune configuration IP valide » ou « conflit d'adresse IP »",
+      "Phrase": "Connecté, mais sans internet, avec un message sur l'adresse IP",
+      "Mots": [
+        "adresse ip",
+        "ip valide",
+        "configuration ip",
+        "conflit d'adresse",
+        "conflit ip",
+        "169.254",
+        "pas de configuration ip",
+        "dhcp"
+      ],
+      "Suspects": [
+        "bailip",
+        "box",
+        "reseauwindows"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ipconfig"
+        },
+        {
+          "Ref": "test-box"
+        },
+        {
+          "Ref": "test-reinit-reseau"
+        }
+      ]
+    },
+    {
       "Id": "wifiabsent",
       "Famille": "internet",
       "Titre": "Le Wi-Fi n'apparaît plus",
@@ -14760,7 +16240,9 @@
         "toutes les 5 minutes",
         "toutes les 10 minutes",
         "se coupe tout le temps",
-        "wifi instable"
+        "wifi instable",
+        "après la veille",
+        "sortie de veille"
       ],
       "Suspects": [
         "signal",
@@ -15337,7 +16819,9 @@
         "clavier anglais",
         "langue du clavier",
         "lettres inversées",
-        "a et q"
+        "a et q",
+        "chiffres au lieu de lettres",
+        "écrit des chiffres"
       ],
       "Suspects": [
         "verrou",
@@ -15614,6 +17098,36 @@
       ]
     },
     {
+      "Id": "pavegestes",
+      "Famille": "peripheriques",
+      "Titre": "Le pavé tactile ne défile plus (ou ne clique plus d'un appui)",
+      "Phrase": "Le défilement à deux doigts ou le clic en tapotant ne marchent plus",
+      "Mots": [
+        "deux doigts",
+        "défilement",
+        "pavé tactile",
+        "touchpad",
+        "tapoter",
+        "scroll",
+        "gestes"
+      ],
+      "Suspects": [
+        "gestespave",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-gestes-pave"
+        },
+        {
+          "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
       "Id": "doubleclic",
       "Famille": "peripheriques",
       "Titre": "La souris fait des doubles clics toute seule",
@@ -15672,6 +17186,33 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "vitessesouris",
+      "Famille": "peripheriques",
+      "Titre": "La souris est trop lente ou trop rapide",
+      "Phrase": "Le curseur est lent, trop rapide, ou accélère bizarrement",
+      "Mots": [
+        "souris lente",
+        "souris trop rapide",
+        "vitesse de la souris",
+        "curseur lent",
+        "sensibilité",
+        "dpi",
+        "accélération souris"
+      ],
+      "Suspects": [
+        "vitessepointeur",
+        "surfacesouris"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-vitesse-souris"
+        },
+        {
+          "Ref": "test-surface-souris"
         }
       ]
     },
@@ -15837,6 +17378,32 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "bluetoothdisparu",
+      "Famille": "peripheriques",
+      "Titre": "Le Bluetooth a disparu (plus d'interrupteur Bluetooth)",
+      "Phrase": "Le bouton Bluetooth n'est plus dans Windows",
+      "Mots": [
+        "bluetooth disparu",
+        "plus de bluetooth",
+        "bouton bluetooth",
+        "bluetooth n'apparaît plus",
+        "interrupteur bluetooth"
+      ],
+      "Suspects": [
+        "btdisparu",
+        "piloteperiph",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-bt-reveil"
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
@@ -16072,7 +17639,10 @@
         "couleur manque",
         "impression floue",
         "lignes blanches",
-        "imprime blanc"
+        "imprime blanc",
+        "pages blanches",
+        "page blanche",
+        "caractères bizarres"
       ],
       "Suspects": [
         "imprimanteconso",
@@ -16131,6 +17701,33 @@
         },
         {
           "Ref": "auto-usure"
+        }
+      ]
+    },
+    {
+      "Id": "batterie0",
+      "Famille": "batterie",
+      "Titre": "« Aucune batterie détectée » ou bloqué à 0 %",
+      "Phrase": "Le portable marche sur secteur mais ne voit plus sa batterie",
+      "Mots": [
+        "aucune batterie",
+        "batterie détectée",
+        "0 %",
+        "batterie introuvable",
+        "croix rouge batterie",
+        "batterie non détectée"
+      ],
+      "Suspects": [
+        "residuelle",
+        "pilotebatterie",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-pilote-batterie"
         }
       ]
     },
@@ -16258,7 +17855,10 @@
         "reste de la batterie",
         "pourcentage",
         "s'éteint à",
-        "coupe sur batterie"
+        "coupe sur batterie",
+        "s'éteint quand je débranche",
+        "débranche le chargeur",
+        "sans chargeur s'éteint"
       ],
       "Suspects": [
         "batteriegonflee",
@@ -16626,6 +18226,80 @@
               "Confirme": "arnaque",
               "Detail": "rien de grave si rien n'a été fait",
               "Preuve": "Un faux support Microsoft"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "phishing",
+      "Famille": "virus",
+      "Titre": "J'ai cliqué sur un lien suspect (colis, amende, banque)",
+      "Phrase": "Un SMS ou un e-mail bizarre, j'ai cliqué dessus",
+      "Mots": [
+        "lien",
+        "cliqué",
+        "sms",
+        "colis",
+        "amende",
+        "faux site",
+        "phishing",
+        "hameçonnage",
+        "ameli",
+        "impôts",
+        "banque",
+        "mail suspect"
+      ],
+      "Suspects": [
+        "phishingdonnees",
+        "phishingclic"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-phishing"
+        }
+      ]
+    },
+    {
+      "Id": "chantage",
+      "Famille": "virus",
+      "Titre": "Un e-mail dit que j'ai été filmé et demande de l'argent",
+      "Phrase": "Chantage, menace de diffuser une vidéo, paiement en bitcoins",
+      "Mots": [
+        "chantage",
+        "filmé",
+        "webcam",
+        "bitcoin",
+        "vidéo compromettante",
+        "sextorsion",
+        "menace",
+        "piraté ta webcam"
+      ],
+      "Suspects": [
+        "sextorsion",
+        "motdepassevole"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-mdp-cite",
+          "Type": "question",
+          "Court": "Un mot de passe ?",
+          "Pour": [
+            "motdepassevole"
+          ],
+          "Texte": "L'e-mail cite-t-il un de tes vrais mots de passe ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Confirme": "motdepassevole",
+              "Preuve": "L'e-mail cite un vrai mot de passe, volé sur un site"
+            },
+            {
+              "Texte": "Non",
+              "Ecarte": [
+                "motdepassevole"
+              ],
+              "Preuve": "L'e-mail ne cite aucun vrai mot de passe"
             }
           ]
         }
@@ -17289,6 +18963,140 @@
       ]
     },
     {
+      "Id": "office",
+      "Famille": "fichiers",
+      "Titre": "Word ou Excel demande une activation (« Produit sans licence »)",
+      "Phrase": "Office passe en lecture seule, ou demande d'acheter ou d'activer",
+      "Mots": [
+        "office",
+        "word",
+        "excel",
+        "sans licence",
+        "produit sans licence",
+        "activer office",
+        "abonnement",
+        "lecture seule",
+        "fonctions réduites",
+        "365"
+      ],
+      "Suspects": [
+        "officecompte",
+        "officefin"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-compte-office"
+        }
+      ]
+    },
+    {
+      "Id": "wordperdu",
+      "Famille": "fichiers",
+      "Titre": "J'ai fermé Word (ou Excel) sans enregistrer",
+      "Phrase": "Le document n'a pas été enregistré, ou Word a planté",
+      "Mots": [
+        "sans enregistrer",
+        "pas enregistré",
+        "word fermé",
+        "document perdu",
+        "fichier non enregistré",
+        "word a planté",
+        "récupérer document"
+      ],
+      "Suspects": [
+        "recupauto",
+        "onedrive",
+        "perdudefinitif"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-recup-word"
+        },
+        {
+          "Ref": "test-onedrive",
+          "Pour": [
+            "onedrive"
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "zip",
+      "Famille": "fichiers",
+      "Titre": "Une archive (ZIP, RAR, 7z) ne s'ouvre pas",
+      "Phrase": "« Le dossier compressé n'est pas valide », ou un .rar que Windows ne connaît pas",
+      "Mots": [
+        "zip",
+        "rar",
+        "7z",
+        "archive",
+        "dossier compressé",
+        "extraire",
+        "décompresser",
+        "winrar"
+      ],
+      "Suspects": [
+        "archive",
+        "fichierabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-7zip"
+        }
+      ]
+    },
+    {
+      "Id": "mauvaisprogramme",
+      "Famille": "fichiers",
+      "Titre": "Les fichiers s'ouvrent avec le mauvais programme",
+      "Phrase": "Les PDF s'ouvrent dans le navigateur, les photos dans un programme bizarre...",
+      "Mots": [
+        "mauvais programme",
+        "s'ouvre avec",
+        "ouvrir avec",
+        "programme par défaut",
+        "pdf dans le navigateur",
+        "application par défaut",
+        "s'ouvre dans edge"
+      ],
+      "Suspects": [
+        "appdefaut",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ouvrir-avec-defaut"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
+      "Id": "fichierbloque",
+      "Famille": "fichiers",
+      "Titre": "Un fichier téléchargé est bloqué ou en « mode protégé »",
+      "Phrase": "« Ce fichier provient d'un autre ordinateur », bandeau jaune ou rouge dans Word ou Excel",
+      "Mots": [
+        "bloqué",
+        "mode protégé",
+        "provient d'un autre ordinateur",
+        "bandeau jaune",
+        "macros bloquées",
+        "fichier téléchargé",
+        "risque de sécurité"
+      ],
+      "Suspects": [
+        "motw",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-debloquer"
+        }
+      ]
+    },
+    {
       "Id": "heic",
       "Famille": "fichiers",
       "Titre": "Les photos de l'iPhone ne s'ouvrent pas (fichiers HEIC)",
@@ -17473,6 +19281,29 @@
       ]
     },
     {
+      "Id": "langue",
+      "Famille": "windows",
+      "Titre": "Windows est en anglais (ou dans une autre langue)",
+      "Phrase": "Les menus et les messages ne sont plus en français",
+      "Mots": [
+        "anglais",
+        "en anglais",
+        "langue",
+        "english",
+        "pas en français",
+        "autre langue",
+        "language"
+      ],
+      "Suspects": [
+        "langueaffichage"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-langue"
+        }
+      ]
+    },
+    {
       "Id": "mdpoublie",
       "Famille": "windows",
       "Titre": "Mot de passe ou code PIN oublié",
@@ -17595,6 +19426,112 @@
               "Preuve": "La réparation des fichiers de Windows n'a rien changé"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "barredisparue",
+      "Famille": "windows",
+      "Titre": "La barre des tâches a disparu ou a changé de place",
+      "Phrase": "Plus de barre en bas, elle est sur un côté, ou ses icônes ont bougé",
+      "Mots": [
+        "barre des tâches disparue",
+        "plus de barre",
+        "barre sur le côté",
+        "barre en haut",
+        "icônes centrées",
+        "barre cachée",
+        "taskbar"
+      ],
+      "Suspects": [
+        "barremasquee",
+        "explorateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-barre-masquee"
+        },
+        {
+          "Ref": "test-explorateur-redem"
+        }
+      ]
+    },
+    {
+      "Id": "notifications",
+      "Famille": "windows",
+      "Titre": "Les notifications ne s'affichent plus",
+      "Phrase": "Plus aucune notification en bas à droite (messages, mails, rappels)",
+      "Mots": [
+        "notifications",
+        "plus de notifications",
+        "pas de notification",
+        "ne pas déranger",
+        "assistant de concentration",
+        "alertes"
+      ],
+      "Suspects": [
+        "nepasderanger",
+        "explorateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ne-pas-deranger"
+        },
+        {
+          "Ref": "test-explorateur-redem"
+        }
+      ]
+    },
+    {
+      "Id": "verrouillage",
+      "Famille": "windows",
+      "Titre": "Le PC se verrouille trop vite (ou ne se verrouille jamais)",
+      "Phrase": "Il faut retaper le mot de passe sans arrêt, ou il reste ouvert",
+      "Mots": [
+        "verrouille",
+        "se verrouille",
+        "écran de verrouillage",
+        "mot de passe tout le temps",
+        "verrouillage automatique",
+        "se bloque tout seul"
+      ],
+      "Suspects": [
+        "delaiverrou",
+        "reglagesveille"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-delai-verrou"
+        },
+        {
+          "Ref": "test-veille-ecran"
+        }
+      ]
+    },
+    {
+      "Id": "demarrageprogs",
+      "Famille": "windows",
+      "Titre": "Des programmes s'ouvrent tout seuls au démarrage",
+      "Phrase": "Spotify, Discord, Teams, Edge... s'ouvrent à chaque démarrage",
+      "Mots": [
+        "s'ouvrent tout seuls",
+        "au démarrage",
+        "se lance au démarrage",
+        "spotify",
+        "teams",
+        "démarre avec windows",
+        "programmes au démarrage"
+      ],
+      "Suspects": [
+        "programmesdemarrage",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-apps-demarrage"
+        },
+        {
+          "Ref": "test-analyse"
         }
       ]
     },
@@ -18525,6 +20462,38 @@
         },
         {
           "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
+      "Id": "memoirevideojeu",
+      "Famille": "jeux",
+      "Titre": "« Out of video memory » ou le jeu manque de mémoire vidéo",
+      "Phrase": "Le jeu plante en parlant de mémoire vidéo (VRAM), ou saccade fort en Ultra",
+      "Mots": [
+        "out of video memory",
+        "vram",
+        "mémoire vidéo",
+        "video memory",
+        "textures",
+        "ultra",
+        "d3d",
+        "dxgi"
+      ],
+      "Suspects": [
+        "memoirevideo",
+        "pilotegraphique",
+        "memoirevirtuelle"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-textures"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        },
+        {
+          "Ref": "test-memvirt"
         }
       ]
     }
