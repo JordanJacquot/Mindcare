@@ -2565,6 +2565,257 @@
         "N'utilise plus cette prise, et fais-la vérifier par un électricien."
       ],
       "Pro": "Un électricien doit vérifier la prise."
+    },
+    "priseenmain": {
+      "Titre": "Une prise en main à distance",
+      "Trouve": "Danger : un inconnu a eu accès à ton PC",
+      "Pourquoi": "Les faux techniciens (« support Microsoft », « ta banque ») font installer AnyDesk, TeamViewer ou UltraViewer pour prendre la main sur le PC, voler des mots de passe et faire des virements.",
+      "AFaire": [
+        "Coupe internet tout de suite (mode avion, ou débranche le câble de la box).",
+        "Désinstalle AnyDesk, TeamViewer, UltraViewer ou tout programme qu'ils t'ont fait installer.",
+        "Depuis un autre appareil : appelle ta banque (fais opposition si tu as tapé des codes), et change tes mots de passe (e-mail d'abord).",
+        "Fais une analyse complète avec Sécurité Windows.",
+        "Tu peux être aidé gratuitement sur cybermalveillance.gouv.fr."
+      ],
+      "Pro": "Un réparateur peut vérifier qu'il ne reste rien sur le PC.",
+      "Urgent": true
+    },
+    "logicielacces": {
+      "Titre": "Un programme de prise en main installé",
+      "Trouve": "Un programme de prise en main est installé, sans dégât visible",
+      "Pourquoi": "AnyDesk, TeamViewer et UltraViewer sont des programmes normaux, mais les arnaqueurs s'en servent. Installé à leur demande, il faut l'enlever.",
+      "AFaire": [
+        "Désinstalle-le (touche Windows, « Ajouter ou supprimer des programmes »).",
+        "Ne donne jamais de code à quelqu'un qui t'appelle : Microsoft et les banques n'appellent jamais pour ça."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "autreantivirus": {
+      "Titre": "Un autre antivirus",
+      "Trouve": "Un autre antivirus protège le PC (c'est normal)",
+      "Pourquoi": "Quand un autre antivirus est installé (Avast, Norton, McAfee...), Sécurité Windows se met en retrait et affiche sa protection coupée.",
+      "AFaire": [
+        "C'est normal, tant que l'autre antivirus est à jour. Un seul suffit : celui de Windows protège déjà bien."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "majdefender": {
+      "Titre": "La mise à jour de la protection",
+      "Trouve": "La protection de Windows attendait une mise à jour",
+      "Pourquoi": "Sécurité Windows a besoin de ses mises à jour de protection ; sans elles, elle peut rester coupée.",
+      "AFaire": [
+        "C'est réglé. Laisse Windows Update faire ses mises à jour."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "logicielpeur": {
+      "Titre": "Un faux logiciel de nettoyage",
+      "Trouve": "Un programme fait peur pour vendre un faux nettoyage",
+      "Pourquoi": "Des programmes (« PC Cleaner », « Driver Updater », « Optimizer »...) inventent des centaines de problèmes pour faire payer leur version complète. Windows n'en a pas besoin.",
+      "AFaire": [
+        "Désinstalle-le (touche Windows, « Ajouter ou supprimer des programmes »). Ne paie rien.",
+        "Si tu as déjà payé, demande un remboursement à ta banque."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "motdepassevole": {
+      "Titre": "Un mot de passe volé",
+      "Trouve": "Ton mot de passe a fuité (souvent réutilisé sur un autre site)",
+      "Pourquoi": "Quand un site se fait voler sa base de données, les pirates essaient le même mot de passe partout : un mot de passe réutilisé ouvre tous tes comptes.",
+      "AFaire": [
+        "Depuis un appareil sûr : change le mot de passe de ton e-mail en premier, puis des autres comptes (un mot de passe différent par site).",
+        "Active la « validation en deux étapes » (code par SMS ou appli).",
+        "Le site haveibeenpwned.com dit si ton adresse a fuité."
+      ],
+      "Pro": "Le site du service (Google, Microsoft, Facebook...) a une page de récupération de compte."
+    },
+    "virusraccourci": {
+      "Titre": "Un virus de clé USB",
+      "Trouve": "Un virus de clé a caché tes fichiers et mis des raccourcis à leur place",
+      "Pourquoi": "Ce virus, attrapé sur un autre PC, cache les vrais fichiers de la clé et les remplace par des raccourcis piégés. Tes fichiers sont toujours là.",
+      "AFaire": [
+        "N'ouvre pas les raccourcis.",
+        "Clic droit sur la clé, « Analyser avec Microsoft Defender ».",
+        "Affiche les éléments masqués, copie tes fichiers sur le PC, puis formate la clé (clic droit, « Formater »)."
+      ],
+      "Pro": "Un réparateur peut récupérer les fichiers si besoin."
+    },
+    "fat32": {
+      "Titre": "Le format de la clé (FAT32)",
+      "Trouve": "La clé est au format FAT32, limité à 4 Go par fichier",
+      "Pourquoi": "Beaucoup de clés sont vendues au format « FAT32 », qui n'accepte pas de fichier de plus de 4 Go (films, sauvegardes, images de jeux).",
+      "AFaire": [
+        "Copie d'abord ce qu'il y a sur la clé ailleurs : formater efface tout.",
+        "Clic droit sur la clé dans l'Explorateur, « Formater », système de fichiers « exFAT », puis « Démarrer »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "placecle": {
+      "Titre": "La place sur la clé",
+      "Trouve": "La clé n'a plus assez de place",
+      "Pourquoi": "La clé (ou la carte) est presque pleine : le fichier ne rentre pas.",
+      "AFaire": [
+        "Libère de la place sur la clé, ou utilise une clé plus grande."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "codecheic": {
+      "Titre": "Le lecteur de photos HEIC",
+      "Trouve": "Il manquait de quoi lire les photos de l'iPhone (HEIC)",
+      "Pourquoi": "Les iPhone prennent les photos au format « HEIC ». Windows a besoin d'une petite extension gratuite pour les ouvrir.",
+      "AFaire": [
+        "C'est réglé. Pour les prochaines : sur l'iPhone, Réglages, « Photos », « Transférer sur Mac ou PC » : « Automatique » (elles arrivent en JPG)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "formatiphone": {
+      "Titre": "Le réglage de l'iPhone",
+      "Trouve": "L'iPhone enregistre ses photos dans un format peu compatible",
+      "Pourquoi": "L'iPhone peut enregistrer en « Haute efficacité » : des fichiers plus petits, mais que beaucoup de PC et de sites lisent mal.",
+      "AFaire": [
+        "Sur l'iPhone : Réglages, « Appareil photo », « Formats », « Le plus compatible ».",
+        "Et Réglages, « Photos », « Transférer sur Mac ou PC » : « Automatique »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "codecvideo": {
+      "Titre": "Le lecteur vidéo",
+      "Trouve": "Le lecteur vidéo de Windows ne connaissait pas ce format",
+      "Pourquoi": "Le lecteur de Windows ne lit pas tous les formats (MKV, HEVC, certains sons) : image noire, son absent, ou message d'erreur.",
+      "AFaire": [
+        "Installe VLC (videolan.org, gratuit) : il lit presque tout. Clic droit sur la vidéo, « Ouvrir avec », « VLC »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "lettremanquante": {
+      "Titre": "La lettre du disque",
+      "Trouve": "Le disque n'avait plus de lettre (D:, E:...)",
+      "Pourquoi": "Windows montre un disque dans « Ce PC » grâce à sa lettre. Après une mise à jour ou un changement, elle peut disparaître : le disque est là, mais invisible.",
+      "AFaire": [
+        "C'est réglé : le disque a de nouveau sa lettre."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "onedriveplein": {
+      "Titre": "Le stockage OneDrive plein",
+      "Trouve": "Ton espace OneDrive est plein",
+      "Pourquoi": "OneDrive gratuit offre 5 Go : avec le Bureau, les Documents et les Images sauvegardés dedans, il se remplit vite et arrête de synchroniser.",
+      "AFaire": [
+        "Arrête de sauvegarder certains dossiers : clic sur le nuage OneDrive près de l'heure, roue dentée, « Paramètres », « Synchronisation et sauvegarde », « Gérer la sauvegarde ».",
+        "Ou libère de la place sur onedrive.com (vide aussi sa corbeille)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "sauvegardedossiers": {
+      "Titre": "La sauvegarde de dossiers par OneDrive",
+      "Trouve": "OneDrive a pris en charge tes dossiers (Bureau, Documents, Images)",
+      "Pourquoi": "OneDrive propose de « sauvegarder » le Bureau et les Documents : ils sont déplacés dans OneDrive, et ce qui est enlevé en ligne disparaît aussi du PC.",
+      "AFaire": [
+        "Tes fichiers sont sur onedrive.com et dans le dossier « OneDrive » de l'Explorateur.",
+        "Pour arrêter : nuage OneDrive près de l'heure, roue dentée, « Paramètres », « Synchronisation et sauvegarde », « Gérer la sauvegarde », puis arrête la sauvegarde des dossiers (choisis de garder une copie sur le PC)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "iconesmasquees": {
+      "Titre": "Les icônes masquées",
+      "Trouve": "Les icônes du Bureau étaient masquées",
+      "Pourquoi": "Un simple réglage (clic droit sur le Bureau) cache toutes les icônes du Bureau.",
+      "AFaire": [
+        "Clic droit sur le Bureau, « Affichage », « Afficher les icônes du Bureau »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "comptestandard": {
+      "Titre": "Un compte sans droits",
+      "Trouve": "Ton compte n'est pas administrateur",
+      "Pourquoi": "Un compte « standard » ne peut pas installer ni modifier certaines choses : Windows demande le mot de passe d'un administrateur.",
+      "AFaire": [
+        "Demande à la personne qui a le compte administrateur de taper son mot de passe, ou de rendre ton compte administrateur (Paramètres, « Comptes », « Autres utilisateurs »)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "dossiersysteme": {
+      "Titre": "Un dossier protégé",
+      "Trouve": "C'est un dossier protégé par Windows (c'est normal)",
+      "Pourquoi": "Certains dossiers (Windows, Program Files, ceux des autres comptes) sont protégés : même un administrateur doit confirmer, et il vaut mieux ne pas y toucher.",
+      "AFaire": [
+        "Enregistre plutôt tes fichiers dans « Documents », ou confirme l'autorisation si tu es sûr de toi."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "heuresactivite": {
+      "Titre": "Les heures d'activité",
+      "Trouve": "Windows redémarrait en dehors de tes heures d'activité",
+      "Pourquoi": "Windows redémarre pour ses mises à jour en dehors des « heures d'activité » : mal réglées, il redémarre pendant que tu t'en sers (ou le laisses allumé).",
+      "AFaire": [
+        "Garde des heures d'activité larges, et « Me prévenir quand un redémarrage est nécessaire » activé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appparametres": {
+      "Titre": "L'appli Paramètres",
+      "Trouve": "L'appli Paramètres de Windows était déréglée",
+      "Pourquoi": "Les Paramètres sont une appli de Windows : abîmée, elle ne s'ouvre plus ou se ferme tout de suite. Windows sait la remettre à zéro.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Si ça revient, un réparateur peut réparer Windows sans perdre tes fichiers."
+    },
+    "helloreconf": {
+      "Titre": "L'enregistrement du visage ou de l'empreinte",
+      "Trouve": "Le visage ou l'empreinte enregistrés ne correspondaient plus",
+      "Pourquoi": "Windows Hello compare ton visage ou ton doigt à ce qu'il a enregistré : après une mise à jour, des lunettes, ou un capteur sale, il ne reconnaît plus.",
+      "AFaire": [
+        "C'est réglé. Nettoie le capteur d'empreinte ou la caméra de temps en temps."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "optionminiatures": {
+      "Titre": "Le réglage des miniatures",
+      "Trouve": "L'Explorateur était réglé pour ne jamais afficher d'aperçu",
+      "Pourquoi": "Une option de l'Explorateur (« Toujours afficher des icônes, jamais de miniatures ») remplace les aperçus des photos et vidéos par des icônes.",
+      "AFaire": [
+        "Garde cette option décochée."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cacheminiatures": {
+      "Titre": "Les aperçus enregistrés",
+      "Trouve": "Les aperçus enregistrés par Windows étaient abîmés",
+      "Pourquoi": "Windows garde les aperçus des images pour aller plus vite. Abîmés, ils restent noirs ou faux.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "tpmoff": {
+      "Titre": "Le TPM ou le démarrage sécurisé",
+      "Trouve": "Le TPM ou le « Secure Boot » sont coupés dans le BIOS",
+      "Pourquoi": "Windows 11 demande deux réglages du BIOS : le TPM (une puce de sécurité, souvent présente mais coupée) et le « Secure Boot ».",
+      "AFaire": [
+        "Dans le BIOS : active « TPM » (chez AMD : « fTPM », chez Intel : « PTT » ou « Platform Trust Technology »), et « Secure Boot ». F10 pour enregistrer.",
+        "Relance « Contrôle d'intégrité du PC »."
+      ],
+      "Pro": "Un réparateur peut activer ces réglages sans risque pour tes fichiers."
+    },
+    "processeurvieux": {
+      "Titre": "Le processeur",
+      "Trouve": "Le processeur est trop ancien pour Windows 11",
+      "Pourquoi": "Microsoft n'accepte Windows 11 que sur les processeurs récents (en gros, après 2018). Windows 10 continue de marcher, mais sans mises à jour de sécurité gratuites.",
+      "AFaire": [
+        "Garde Windows 10 en sécurité : sur Windows Update, inscris-toi aux « mises à jour de sécurité étendues » si Windows te le propose.",
+        "Ou passe à un PC plus récent."
+      ],
+      "Pro": "Un réparateur peut te conseiller."
+    },
+    "autrecondition": {
+      "Titre": "Une autre condition",
+      "Trouve": "Une autre condition de Windows 11 manque (place, mémoire)",
+      "Pourquoi": "Windows 11 demande aussi 4 Go de mémoire et 64 Go de place.",
+      "AFaire": [
+        "Lis la raison donnée par « Contrôle d'intégrité du PC » : libérer de la place suffit parfois."
+      ],
+      "Pro": "Un réparateur peut ajouter de la mémoire ou changer le disque."
     }
   },
   "Tests": {
@@ -8302,6 +8553,485 @@
             "consommation"
           ],
           "Preuve": "Même éteint, il charge à peine"
+        }
+      ]
+    },
+    "q-acces-donne": {
+      "Type": "question",
+      "Court": "Qu'est-ce qu'ils ont vu ?",
+      "Texte": "As-tu donné un code de connexion, ouvert ton compte en banque, ou tapé un mot de passe pendant qu'ils voyaient ton écran ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, ou je ne sais pas",
+          "Confirme": "priseenmain",
+          "Preuve": "Un inconnu a eu accès au PC pendant que tu utilisais tes comptes"
+        },
+        {
+          "Texte": "Non, rien de tout ça",
+          "Ecarte": [
+            "priseenmain"
+          ],
+          "Preuve": "L'inconnu n'a rien vu d'important"
+        }
+      ]
+    },
+    "q-autre-antivirus": {
+      "Type": "question",
+      "Court": "Un autre antivirus ?",
+      "Texte": "Un autre antivirus est-il installé (Avast, AVG, Norton, McAfee, Kaspersky, Bitdefender...) ?",
+      "Pour": [
+        "autreantivirus"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "autreantivirus",
+          "Preuve": "Un autre antivirus est installé"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "autreantivirus"
+          ],
+          "Preuve": "Aucun autre antivirus"
+        }
+      ]
+    },
+    "test-maj-defender": {
+      "Type": "test",
+      "Court": "Mettre à jour la protection",
+      "Pour": [
+        "majdefender"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Mets à jour et rallume la protection",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Sécurité Windows » et ouvre-le.",
+        "« Protection contre les virus et menaces », puis « Mises à jour de la protection », « Rechercher des mises à jour ».",
+        "Reviens en arrière et clique sur « Activer » s'il apparaît."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La protection est revenue",
+          "Confirme": "majdefender",
+          "Preuve": "Mise à jour, la protection est revenue"
+        },
+        {
+          "Texte": "Elle se recoupe ou reste grisée",
+          "Ecarte": [
+            "majdefender"
+          ],
+          "Preuve": "La mise à jour n'a rien changé"
+        }
+      ]
+    },
+    "q-faux-nettoyage": {
+      "Type": "question",
+      "Court": "Il vend quelque chose ?",
+      "Texte": "Le programme propose de payer pour « nettoyer », « optimiser » ou « mettre à jour les pilotes » ?",
+      "Pour": [
+        "logicielpeur"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "logicielpeur",
+          "Preuve": "Le programme vend un nettoyage"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "logicielpeur"
+          ],
+          "Preuve": "Le programme ne vend rien"
+        }
+      ]
+    },
+    "test-elements-masques": {
+      "Type": "test",
+      "Court": "Les éléments masqués",
+      "Pour": [
+        "virusraccourci"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Affiche les éléments masqués de la clé",
+      "Gestes": [
+        "Ouvre l'Explorateur de fichiers (touche Windows + E).",
+        "En haut : « Affichage », puis « Afficher », puis coche « Éléments masqués » (Windows 10 : onglet « Affichage », case « Éléments masqués »).",
+        "Ouvre la clé."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Mes fichiers réapparaissent (un peu transparents)",
+          "Confirme": "virusraccourci",
+          "Preuve": "Les fichiers étaient cachés sur la clé"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "virusraccourci"
+          ],
+          "Preuve": "Aucun fichier caché sur la clé"
+        }
+      ]
+    },
+    "q-plus-4go": {
+      "Type": "question",
+      "Court": "Gros fichier ?",
+      "Texte": "Le fichier à copier fait-il plus de 4 Go (clic droit, « Propriétés », « Taille ») ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "fat32",
+          "Preuve": "Le fichier dépasse 4 Go, la limite du FAT32"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "fat32"
+          ],
+          "Preuve": "Le fichier fait moins de 4 Go"
+        }
+      ]
+    },
+    "test-heif": {
+      "Type": "test",
+      "Court": "L'extension HEIF",
+      "Pour": [
+        "codecheic"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Installe l'extension pour les photos HEIC",
+      "Gestes": [
+        "Ouvre le Microsoft Store et cherche « Extensions d'image HEIF » (gratuite, de Microsoft).",
+        "Installe-la (et « Extensions vidéo HEVC » si on te la propose), puis rouvre la photo."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les photos s'ouvrent",
+          "Confirme": "codecheic",
+          "Preuve": "Avec l'extension HEIF, les photos s'ouvrent"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "codecheic"
+          ],
+          "Preuve": "L'extension HEIF n'a rien changé"
+        }
+      ]
+    },
+    "test-vlc": {
+      "Type": "test",
+      "Court": "Avec VLC",
+      "Pour": [
+        "codecvideo"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Ouvre la vidéo avec VLC",
+      "Gestes": [
+        "Télécharge VLC sur videolan.org (le site officiel, gratuit) et installe-le.",
+        "Clic droit sur la vidéo, « Ouvrir avec », « VLC media player »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle se lit",
+          "Confirme": "codecvideo",
+          "Preuve": "Avec VLC, la vidéo se lit"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "codecvideo"
+          ],
+          "Preuve": "Même VLC ne la lit pas"
+        }
+      ]
+    },
+    "test-lettre-disque": {
+      "Type": "test",
+      "Court": "La lettre du disque",
+      "Pour": [
+        "lettremanquante"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Redonne une lettre au disque",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer, puis « Gestion des disques » (Windows peut demander une autorisation : accepte).",
+        "Cherche le disque qui manque : sa partie n'a pas de lettre (ni D:, ni E:...).",
+        "Clic droit sur cette partie, « Modifier la lettre de lecteur et les chemins », « Ajouter », choisis une lettre, OK. Ne touche à rien d'autre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le disque est revenu",
+          "Confirme": "lettremanquante",
+          "Preuve": "Avec sa lettre, le disque est revenu"
+        },
+        {
+          "Texte": "Il n'y est pas, ou il a déjà sa lettre",
+          "Ecarte": [
+            "lettremanquante"
+          ],
+          "Preuve": "La lettre n'y était pour rien"
+        }
+      ]
+    },
+    "q-onedrive-plein": {
+      "Type": "question",
+      "Court": "Stockage plein ?",
+      "Texte": "OneDrive (le nuage près de l'heure, ou un message) dit-il que ton stockage est plein ?",
+      "Pour": [
+        "onedriveplein"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "onedriveplein",
+          "Preuve": "OneDrive dit que son stockage est plein"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "onedriveplein"
+          ],
+          "Preuve": "OneDrive ne dit pas être plein"
+        }
+      ]
+    },
+    "test-icones-bureau": {
+      "Type": "test",
+      "Court": "Afficher les icônes",
+      "Pour": [
+        "iconesmasquees"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Affiche les icônes du Bureau",
+      "Gestes": [
+        "Clic droit sur un endroit vide du Bureau.",
+        "« Affichage », puis coche « Afficher les icônes du Bureau »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elles sont revenues",
+          "Confirme": "iconesmasquees",
+          "Preuve": "Les icônes du Bureau étaient masquées"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "iconesmasquees"
+          ],
+          "Preuve": "Les icônes n'étaient pas masquées"
+        }
+      ]
+    },
+    "q-onedrive-bureau": {
+      "Type": "question",
+      "Court": "OneDrive ?",
+      "Texte": "OneDrive (le nuage près de l'heure) a-t-il proposé de « sauvegarder » ton Bureau, ou y a-t-il un dossier « OneDrive » dans l'Explorateur avec un Bureau dedans ?",
+      "Pour": [
+        "sauvegardedossiers"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "sauvegardedossiers",
+          "Preuve": "Le Bureau a été déplacé dans OneDrive"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "sauvegardedossiers"
+          ],
+          "Preuve": "OneDrive n'a pas pris le Bureau"
+        }
+      ]
+    },
+    "q-admin": {
+      "Type": "question",
+      "Court": "Ton compte",
+      "Texte": "Ton compte est-il « Administrateur » ? (Touche Windows + I, « Comptes », « Tes informations » : c'est écrit sous ton nom.)",
+      "Reponses": [
+        {
+          "Texte": "Non, « Compte standard » ou « Utilisateur standard »",
+          "Confirme": "comptestandard",
+          "Preuve": "Le compte n'est pas administrateur"
+        },
+        {
+          "Texte": "Oui, « Administrateur »",
+          "Ecarte": [
+            "comptestandard"
+          ],
+          "Preuve": "Le compte est administrateur"
+        }
+      ]
+    },
+    "test-heures-activite": {
+      "Type": "test",
+      "Court": "Les heures d'activité",
+      "Pour": [
+        "heuresactivite"
+      ],
+      "Duree": "deux minutes, puis quelques jours",
+      "Texte": "Règle les heures d'activité",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Windows Update » et ouvre-le, puis « Options avancées ».",
+        "« Heures d'activité » : « Manuellement », de 8 h à 23 h (ou tes heures).",
+        "Active « Me prévenir quand un redémarrage est nécessaire pour terminer la mise à jour »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne redémarre plus quand je m'en sers",
+          "Confirme": "heuresactivite",
+          "Preuve": "Avec les bonnes heures d'activité, plus de redémarrage gênant"
+        },
+        {
+          "Texte": "Il redémarre encore",
+          "Ecarte": [
+            "heuresactivite"
+          ],
+          "Preuve": "Les heures d'activité n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-reset-parametres": {
+      "Type": "test",
+      "Court": "Remettre les Paramètres à zéro",
+      "Pour": [
+        "appparametres"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Remets l'appli Paramètres à zéro",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée.",
+        "Redémarre le PC, puis ouvre les Paramètres (touche Windows + I)."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "Get-AppxPackage *immersivecontrolpanel* | Reset-AppxPackage"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Ils s'ouvrent",
+          "Confirme": "appparametres",
+          "Preuve": "Remis à zéro, les Paramètres s'ouvrent"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "appparametres"
+          ],
+          "Preuve": "Remettre les Paramètres à zéro n'a rien changé"
+        }
+      ]
+    },
+    "test-hello": {
+      "Type": "test",
+      "Court": "Réenregistrer",
+      "Pour": [
+        "helloreconf"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Enregistre de nouveau ton visage ou ton empreinte",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Comptes », puis « Options de connexion ».",
+        "Ouvre « Reconnaissance faciale » ou « Reconnaissance d'empreintes digitales » : « Supprimer », puis « Configurer » et suis les étapes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il me reconnaît",
+          "Confirme": "helloreconf",
+          "Preuve": "Réenregistré, Windows Hello te reconnaît"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "helloreconf"
+          ],
+          "Preuve": "Réenregistrer n'a rien changé"
+        }
+      ]
+    },
+    "test-option-miniatures": {
+      "Type": "test",
+      "Court": "L'option des miniatures",
+      "Pour": [
+        "optionminiatures"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Réactive les aperçus",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Options de l'Explorateur de fichiers » et ouvre-le.",
+        "Onglet « Affichage » : décoche « Toujours afficher des icônes, jamais de miniatures ». OK."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les aperçus reviennent",
+          "Confirme": "optionminiatures",
+          "Preuve": "L'option décochée, les aperçus reviennent"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "optionminiatures"
+          ],
+          "Preuve": "Cette option était déjà décochée"
+        }
+      ]
+    },
+    "test-cache-miniatures": {
+      "Type": "test",
+      "Court": "Vider les aperçus",
+      "Pour": [
+        "cacheminiatures"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vide les aperçus enregistrés",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Nettoyage de disque » et ouvre-le (disque C:).",
+        "Coche seulement « Miniatures », puis OK et « Supprimer les fichiers ».",
+        "Rouvre le dossier."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les aperçus reviennent",
+          "Confirme": "cacheminiatures",
+          "Preuve": "Les aperçus vidés, ils reviennent"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "cacheminiatures"
+          ],
+          "Preuve": "Vider les aperçus n'a rien changé"
+        }
+      ]
+    },
+    "q-raison-w11": {
+      "Type": "question",
+      "Court": "La raison",
+      "Texte": "Installe « Contrôle d'intégrité du PC » (PC Health Check, sur le site de Microsoft) et lance la vérification Windows 11. Que dit-il ?",
+      "Reponses": [
+        {
+          "Texte": "Le TPM 2.0 ou le démarrage sécurisé",
+          "Confirme": "tpmoff",
+          "Preuve": "Le TPM ou le démarrage sécurisé manque"
+        },
+        {
+          "Texte": "Le processeur n'est pas pris en charge",
+          "Confirme": "processeurvieux",
+          "Preuve": "Le processeur n'est pas accepté par Windows 11"
+        },
+        {
+          "Texte": "Autre chose (place, mémoire)",
+          "Garde": [
+            "autrecondition"
+          ],
+          "Preuve": "Une autre condition manque"
         }
       ]
     }
@@ -14601,7 +15331,13 @@
         "a et q",
         "inversé",
         "pavé numérique",
-        "lettre"
+        "lettre",
+        "qwerty",
+        "azerty",
+        "clavier anglais",
+        "langue du clavier",
+        "lettres inversées",
+        "a et q"
       ],
       "Suspects": [
         "verrou",
@@ -15896,6 +16632,117 @@
       ]
     },
     {
+      "Id": "accesdistance",
+      "Famille": "virus",
+      "Titre": "Quelqu'un a pris la main sur mon PC (AnyDesk, TeamViewer)",
+      "Phrase": "Après un appel ou un message, un inconnu a fait installer un programme et a bougé la souris",
+      "Mots": [
+        "anydesk",
+        "teamviewer",
+        "ultraviewer",
+        "prise en main",
+        "à distance",
+        "il a pris le contrôle",
+        "faux technicien",
+        "faux conseiller",
+        "contrôle à distance"
+      ],
+      "Suspects": [
+        "priseenmain",
+        "logicielacces"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-acces-donne"
+        }
+      ]
+    },
+    {
+      "Id": "antivirusoff",
+      "Famille": "virus",
+      "Titre": "La protection contre les virus est coupée et ne se rallume pas",
+      "Phrase": "Sécurité Windows affiche une croix rouge, ou ses réglages sont grisés",
+      "Mots": [
+        "protection désactivée",
+        "antivirus désactivé",
+        "defender désactivé",
+        "sécurité windows",
+        "croix rouge",
+        "protection coupée",
+        "grisé",
+        "géré par votre organisation"
+      ],
+      "Suspects": [
+        "autreantivirus",
+        "majdefender",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-autre-antivirus"
+        },
+        {
+          "Ref": "test-maj-defender"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
+      "Id": "fauxnettoyage",
+      "Famille": "virus",
+      "Titre": "Un programme dit que le PC est infecté et demande de payer",
+      "Phrase": "Des centaines de « problèmes » trouvés, à réparer contre de l'argent",
+      "Mots": [
+        "pc cleaner",
+        "driver updater",
+        "optimizer",
+        "nettoyeur",
+        "erreurs trouvées",
+        "payer pour réparer",
+        "faux antivirus",
+        "registre",
+        "problèmes détectés"
+      ],
+      "Suspects": [
+        "logicielpeur",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-faux-nettoyage"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
+      "Id": "comptepirate",
+      "Famille": "virus",
+      "Titre": "Un compte (e-mail, réseau social, jeu) a été piraté",
+      "Phrase": "Des messages envoyés à ta place, un mot de passe qui ne marche plus",
+      "Mots": [
+        "piraté",
+        "hacké",
+        "compte volé",
+        "mot de passe changé",
+        "messages envoyés à ma place",
+        "compte hacké",
+        "on a volé mon compte"
+      ],
+      "Suspects": [
+        "indesirables",
+        "motdepassevole"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
       "Id": "disqueplein",
       "Famille": "fichiers",
       "Titre": "Le disque est plein",
@@ -16211,6 +17058,57 @@
       ]
     },
     {
+      "Id": "cleraccourcis",
+      "Famille": "fichiers",
+      "Titre": "Les fichiers de la clé USB ont disparu (remplacés par des raccourcis)",
+      "Phrase": "La clé est pleine mais semble vide, ou ne montre que des raccourcis",
+      "Mots": [
+        "raccourcis",
+        "clé vide",
+        "fichiers cachés",
+        "clé pleine mais vide",
+        "disparus de la clé",
+        "raccourci clé usb",
+        "virus clé"
+      ],
+      "Suspects": [
+        "virusraccourci",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-elements-masques"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "trop4go",
+      "Famille": "fichiers",
+      "Titre": "« Le fichier est trop volumineux » pour la clé",
+      "Phrase": "Impossible de copier un gros fichier, alors qu'il reste de la place",
+      "Mots": [
+        "trop volumineux",
+        "fichier trop gros",
+        "4 go",
+        "4go",
+        "fat32",
+        "volumineux pour le système de fichiers",
+        "ne copie pas le film"
+      ],
+      "Suspects": [
+        "fat32",
+        "placecle"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-plus-4go"
+        }
+      ]
+    },
+    {
       "Id": "erreursdisque",
       "Famille": "fichiers",
       "Titre": "Le disque fait des erreurs",
@@ -16391,6 +17289,57 @@
       ]
     },
     {
+      "Id": "heic",
+      "Famille": "fichiers",
+      "Titre": "Les photos de l'iPhone ne s'ouvrent pas (fichiers HEIC)",
+      "Phrase": "Les photos copiées depuis un iPhone sont illisibles sur le PC",
+      "Mots": [
+        "heic",
+        "heif",
+        "photos iphone",
+        "photo ne s'ouvre pas",
+        "format photo",
+        "iphone photos pc",
+        "image illisible"
+      ],
+      "Suspects": [
+        "codecheic",
+        "formatiphone"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-heif"
+        }
+      ]
+    },
+    {
+      "Id": "video",
+      "Famille": "fichiers",
+      "Titre": "Une vidéo ne se lit pas (ou sans image, ou sans son)",
+      "Phrase": "« Format non pris en charge », écran noir, ou son absent dans une vidéo",
+      "Mots": [
+        "vidéo ne se lit pas",
+        "vidéo",
+        "film",
+        "mkv",
+        "mp4",
+        "hevc",
+        "codec",
+        "pas d'image vidéo",
+        "format non pris en charge",
+        "0xc00d"
+      ],
+      "Suspects": [
+        "codecvideo",
+        "fichierabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-vlc"
+        }
+      ]
+    },
+    {
       "Id": "disquedisparait",
       "Famille": "fichiers",
       "Titre": "Un disque qui disparaît par moments",
@@ -16430,6 +17379,63 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "disquedisparu",
+      "Famille": "fichiers",
+      "Titre": "Un disque (D:, E:) a disparu de « Ce PC »",
+      "Phrase": "Un deuxième disque interne n'apparaît plus dans l'Explorateur",
+      "Mots": [
+        "disque d",
+        "d:",
+        "e:",
+        "disque disparu",
+        "deuxième disque",
+        "disque introuvable",
+        "lecteur disparu",
+        "ce pc"
+      ],
+      "Suspects": [
+        "lettremanquante",
+        "cableinterne",
+        "disquenondetecte"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-lettre-disque"
+        },
+        {
+          "Ref": "test-cables-internes"
+        }
+      ]
+    },
+    {
+      "Id": "onedrive",
+      "Famille": "fichiers",
+      "Titre": "OneDrive est plein, ou des fichiers y partent tout seuls",
+      "Phrase": "Message « stockage OneDrive plein », fichiers déplacés dans OneDrive, nuages rouges",
+      "Mots": [
+        "onedrive",
+        "stockage plein",
+        "one drive",
+        "nuage",
+        "synchronisation",
+        "5 go",
+        "fichiers dans onedrive",
+        "sauvegarde onedrive"
+      ],
+      "Suspects": [
+        "onedriveplein",
+        "sauvegardedossiers"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-onedrive-plein"
         }
       ]
     },
@@ -16494,6 +17500,33 @@
         },
         {
           "Ref": "q-type-compte"
+        }
+      ]
+    },
+    {
+      "Id": "hello",
+      "Famille": "windows",
+      "Titre": "Windows Hello (visage ou empreinte) ne marche plus",
+      "Phrase": "La connexion par le visage ou le doigt ne reconnaît plus, ou n'est plus proposée",
+      "Mots": [
+        "windows hello",
+        "empreinte",
+        "visage",
+        "reconnaissance faciale",
+        "lecteur d'empreinte",
+        "hello"
+      ],
+      "Suspects": [
+        "helloreconf",
+        "piloteperiph",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-hello"
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
@@ -16566,6 +17599,92 @@
       ]
     },
     {
+      "Id": "iconesbureau",
+      "Famille": "windows",
+      "Titre": "Les icônes du Bureau ont disparu",
+      "Phrase": "Le Bureau est vide : plus de raccourcis ni de fichiers",
+      "Mots": [
+        "icônes disparues",
+        "bureau vide",
+        "plus d'icônes",
+        "icônes du bureau",
+        "raccourcis disparus",
+        "fichiers du bureau"
+      ],
+      "Suspects": [
+        "iconesmasquees",
+        "sauvegardedossiers",
+        "profilabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-icones-bureau"
+        },
+        {
+          "Ref": "q-onedrive-bureau"
+        }
+      ]
+    },
+    {
+      "Id": "copiercoller",
+      "Famille": "windows",
+      "Titre": "Le copier-coller ne marche plus",
+      "Phrase": "Ctrl + C puis Ctrl + V ne collent rien, ou collent autre chose",
+      "Mots": [
+        "copier coller",
+        "copier-coller",
+        "ctrl c",
+        "ctrl v",
+        "presse-papiers",
+        "coller ne marche pas",
+        "copier ne marche pas"
+      ],
+      "Suspects": [
+        "explorateur",
+        "redemarrage",
+        "programme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-explorateur-redem",
+          "Reponses": [
+            {
+              "Texte": "Le copier-coller remarche",
+              "Confirme": "explorateur",
+              "Preuve": "Après le redémarrage de l'Explorateur, le copier-coller remarche"
+            },
+            {
+              "Texte": "Toujours pas",
+              "Ecarte": [
+                "explorateur"
+              ],
+              "Preuve": "Redémarrer l'Explorateur n'a rien changé"
+            }
+          ]
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Le copier-coller remarche",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, le copier-coller remarche"
+            },
+            {
+              "Texte": "Toujours pas",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, ça ne marche pas"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "majerreur",
       "Famille": "windows",
       "Titre": "Les mises à jour de Windows échouent",
@@ -16620,6 +17739,29 @@
       ]
     },
     {
+      "Id": "majredemarre",
+      "Famille": "windows",
+      "Titre": "Windows redémarre tout seul pour les mises à jour",
+      "Phrase": "Il redémarre pendant que je travaille, ou la nuit en perdant mon travail",
+      "Mots": [
+        "redémarre pour les mises à jour",
+        "mise à jour redémarre",
+        "redémarré tout seul la nuit",
+        "perdu mon travail",
+        "redémarrage automatique",
+        "update redémarre"
+      ],
+      "Suspects": [
+        "heuresactivite",
+        "majnuit"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-heures-activite"
+        }
+      ]
+    },
+    {
       "Id": "activation",
       "Famille": "windows",
       "Titre": "Windows n'est pas activé",
@@ -16647,6 +17789,33 @@
         },
         {
           "Ref": "test-activ-cle"
+        }
+      ]
+    },
+    {
+      "Id": "windows11",
+      "Famille": "windows",
+      "Titre": "Impossible de passer à Windows 11",
+      "Phrase": "« Ce PC ne répond pas à la configuration requise », ou la mise à niveau n'est pas proposée",
+      "Mots": [
+        "windows 11",
+        "w11",
+        "passer à windows 11",
+        "configuration requise",
+        "tpm",
+        "fin de support",
+        "windows 10",
+        "mise à niveau",
+        "pc health check"
+      ],
+      "Suspects": [
+        "tpmoff",
+        "processeurvieux",
+        "autrecondition"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-raison-w11"
         }
       ]
     },
@@ -16719,6 +17888,33 @@
       ]
     },
     {
+      "Id": "parametres",
+      "Famille": "windows",
+      "Titre": "Les Paramètres de Windows ne s'ouvrent pas",
+      "Phrase": "Touche Windows + I ne fait rien, ou les Paramètres se ferment tout de suite",
+      "Mots": [
+        "paramètres ne s'ouvrent pas",
+        "paramètres",
+        "settings",
+        "réglages windows",
+        "paramètres se ferment",
+        "windows i"
+      ],
+      "Suspects": [
+        "appparametres",
+        "fichierssysteme",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-reset-parametres"
+        },
+        {
+          "Ref": "test-sfc"
+        }
+      ]
+    },
+    {
       "Id": "recherchewin",
       "Famille": "windows",
       "Titre": "La recherche de Windows ne trouve plus rien",
@@ -16767,6 +17963,36 @@
       ]
     },
     {
+      "Id": "miniatures",
+      "Famille": "windows",
+      "Titre": "Les photos n'ont plus d'aperçu dans les dossiers",
+      "Phrase": "On ne voit plus les images en petit, seulement des icônes",
+      "Mots": [
+        "aperçu",
+        "miniatures",
+        "vignettes",
+        "pas d'aperçu photos",
+        "icônes au lieu des images",
+        "thumbnails"
+      ],
+      "Suspects": [
+        "optionminiatures",
+        "cacheminiatures",
+        "codecheic"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-option-miniatures"
+        },
+        {
+          "Ref": "test-cache-miniatures"
+        },
+        {
+          "Ref": "test-heif"
+        }
+      ]
+    },
+    {
       "Id": "installation",
       "Famille": "windows",
       "Titre": "Un programme ne s'installe pas",
@@ -16797,6 +18023,31 @@
         },
         {
           "Ref": "test-retelecharger"
+        }
+      ]
+    },
+    {
+      "Id": "accesrefuse",
+      "Famille": "windows",
+      "Titre": "« Accès refusé » ou « Tu as besoin de l'autorisation d'un administrateur »",
+      "Phrase": "Impossible d'installer, de supprimer ou de modifier quelque chose",
+      "Mots": [
+        "accès refusé",
+        "administrateur",
+        "autorisation",
+        "droits",
+        "permission",
+        "admin",
+        "tu as besoin d'une autorisation",
+        "refusé"
+      ],
+      "Suspects": [
+        "comptestandard",
+        "dossiersysteme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-admin"
         }
       ]
     },
