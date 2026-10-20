@@ -238,19 +238,8 @@ function Update-Accueil {
         $b
     }
     Add-EnGrille $z @($tuiles) 4
-
-    # Les enquêtes terminées : un clic pour revoir la réponse (une enquête pas finie se reprend par le bandeau du haut)
-    $gardes = @(foreach ($d in ($script:Historique | Where-Object { $_.Fini } | Select-Object -First 5)) { $i = Get-DiagnosticInfo $d; if ($i.Panne) { [pscustomobject]@{ D = $d; I = $i } } })
-    if (-not $gardes) { return }
-    Add-Titre $z 'Tes enquêtes terminées' 'H2' '4,10,0,4'
-    foreach ($g in $gardes) {
-        $sp = New-Object System.Windows.Controls.DockPanel
-        $quand = New-Text "le $(Format-Date ([string]$g.D.Debut))" 12 '#7E78A0'; $quand.VerticalAlignment = 'Center'; $quand.Margin = '14,0,0,0'
-        [System.Windows.Controls.DockPanel]::SetDock($quand, 'Right'); [void]$sp.Children.Add($quand)
-        [void]$sp.Children.Add((New-Text "$($g.I.Panne.Titre) : $($g.I.Phrase)" 14 $(if ($g.D.Fini) { '#EEEBF7' } else { '#00E5FF' })))
-        $b = Add-ChoixBouton $z $sp ([string]$g.D.Id) { param($s) Open-Diagnostic ([string]$s.Tag) }
-        $b.Padding = '16,9'; $b.Margin = '0,6,0,0'; $b.HorizontalContentAlignment = 'Stretch'
-    }
+    # (pas de liste des enquêtes passées : rejouer les mêmes réponses redonne la même réponse ; seule l'enquête en
+    # cours se reprend, par le bandeau du haut)
 }
 
 # Un bouton de panne : son nom et sa phrase (et sa famille, dans les résultats d'une recherche)

@@ -31,6 +31,12 @@
       "Icone": "famille-plantages"
     },
     {
+      "Id": "jeux",
+      "Titre": "Jeux vidéo",
+      "Phrase": "Le jeu ne se lance pas, saccade, lague en ligne",
+      "Icone": "famille-jeux"
+    },
+    {
       "Id": "lenteur",
       "Titre": "Lenteur",
       "Phrase": "Tout rame, démarrage long, jeux qui saccadent",
@@ -1824,6 +1830,286 @@
       "Pourquoi": "Le volet d'aperçu de l'Explorateur ouvre le fichier pour le montrer, ce qui l'empêche d'être supprimé.",
       "AFaire": [
         "Ferme le volet d'aperçu (Alt + P) si ça revient."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "entrainementram": {
+      "Titre": "La mise en route de la mémoire",
+      "Trouve": "Le PC apprenait sa mémoire (c'est normal la première fois)",
+      "Pourquoi": "Au premier démarrage d'un PC neuf, ou après un changement de mémoire, le PC teste et règle sa mémoire. L'écran reste noir jusqu'à plusieurs minutes, ensuite il démarre normalement.",
+      "AFaire": [
+        "Rien d'autre à faire : les démarrages suivants sont rapides.",
+        "Si ça recommence à chaque fois, réessaie après une mise à jour du BIOS (site du fabricant de la carte mère)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ventilocpu": {
+      "Titre": "Le ventilateur du processeur",
+      "Trouve": "Le ventilateur du processeur ne tourne pas (ou n'est pas branché)",
+      "Pourquoi": "Le processeur chauffe très vite sans son ventilateur : le PC prévient par « CPU Fan Error ».",
+      "AFaire": [
+        "N'utilise pas le PC tant que ce ventilateur ne tourne pas.",
+        "PC fixe, éteint et débranché : vérifie que le petit câble du ventilateur est enfoncé sur la prise « CPU_FAN » de la carte mère, et que rien ne le bloque.",
+        "S'il ne tourne toujours pas, il faut le changer."
+      ],
+      "Pro": "Un réparateur change un ventilateur de processeur rapidement."
+    },
+    "reglageventilo": {
+      "Titre": "Un réglage du BIOS",
+      "Trouve": "Le BIOS surveillait mal le ventilateur",
+      "Pourquoi": "Le ventilateur tourne, mais trop lentement pour le BIOS, ou il est branché sur une autre prise que « CPU_FAN ».",
+      "AFaire": [
+        "Dans le BIOS, partie « Monitor » ou « Hardware Monitor » : règle « CPU Fan Speed Low Limit » (ou « CPU Fan Warning ») sur une valeur plus basse ou « Ignore ».",
+        "Ou branche le ventilateur sur la prise « CPU_FAN » de la carte mère."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cableinterne": {
+      "Titre": "Un câble à l'intérieur",
+      "Trouve": "Un câble à l'intérieur du PC s'était débranché",
+      "Pourquoi": "En déplaçant ou en nettoyant une tour, un câble de l'alimentation peut sortir un peu de sa prise : la carte mère ne reçoit plus le courant.",
+      "AFaire": [
+        "Si ça recommence, vérifie que les deux gros câbles sont bien enfoncés jusqu'au clic."
+      ],
+      "Pro": "Un réparateur peut vérifier tous les branchements.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "reglagecourant": {
+      "Titre": "Un réglage du BIOS",
+      "Trouve": "Le BIOS rallume le PC dès que le courant revient",
+      "Pourquoi": "Un réglage du BIOS (« Restore on AC Power Loss ») rallume le PC dès qu'il reçoit du courant : en branchant la prise ou en allumant la multiprise.",
+      "AFaire": [
+        "Garde ce réglage sur « Power Off »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "batteriezero": {
+      "Titre": "La batterie vide à zéro",
+      "Trouve": "La batterie était vidée jusqu'au bout",
+      "Pourquoi": "Une batterie complètement vide doit se recharger un peu avant que le portable accepte de démarrer : le voyant clignote en attendant.",
+      "AFaire": [
+        "Ne laisse pas la batterie se vider complètement trop souvent."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "entreeboot": {
+      "Titre": "Une ancienne entrée de démarrage",
+      "Trouve": "Une ancienne installation de Windows restait dans le menu de démarrage",
+      "Pourquoi": "Après une réinstallation ou une grosse mise à jour, le PC peut garder une entrée vers un ancien Windows : il demande lequel démarrer.",
+      "AFaire": [
+        "C'est réglé : seule l'entrée qui marche reste."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "arretbrutal": {
+      "Titre": "Des arrêts brutaux",
+      "Trouve": "Le disque gardait la trace d'arrêts brutaux",
+      "Pourquoi": "Couper le PC en appuyant longtemps sur le bouton, ou une coupure de courant, laisse le disque « à vérifier » : Windows le vérifie au démarrage suivant.",
+      "AFaire": [
+        "Éteins toujours par le menu Démarrer.",
+        "Laisse la vérification aller au bout si elle revient."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "profilabime": {
+      "Titre": "Ton profil Windows",
+      "Trouve": "Ton profil Windows (tes réglages et ton Bureau) était abîmé",
+      "Pourquoi": "Windows garde tes réglages, ton Bureau et tes documents dans ton profil. S'il n'arrive pas à l'ouvrir, il te connecte avec un profil vide, temporaire.",
+      "AFaire": [
+        "Tes fichiers sont sans doute encore là : dans l'Explorateur, « Ce PC », « Disque local (C:) », « Utilisateurs », puis le dossier à ton nom.",
+        "Copie-les sur une clé USB avant tout."
+      ],
+      "Pro": "Un réparateur peut recréer ton profil et y remettre tes fichiers."
+    },
+    "sansechec": {
+      "Titre": "Le démarrage sécurisé",
+      "Trouve": "Windows restait réglé pour démarrer en mode sans échec",
+      "Pourquoi": "Le mode sans échec se règle dans la configuration du système : tant que la case reste cochée, Windows y redémarre à chaque fois.",
+      "AFaire": [
+        "C'est réglé : la case « Démarrage sécurisé » est décochée."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "vcredist": {
+      "Titre": "Les fichiers « Visual C++ » de Microsoft",
+      "Trouve": "Il manquait les fichiers « Visual C++ » de Microsoft",
+      "Pourquoi": "Beaucoup de jeux et de programmes ont besoin de petits fichiers de Microsoft (« Visual C++ ») : sans eux, un message parle d'un fichier « .dll » introuvable.",
+      "AFaire": [
+        "C'est réglé. Ne télécharge jamais un fichier « .dll » seul sur un site inconnu : installe-les toujours depuis Microsoft."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "directxruntime": {
+      "Titre": "Les anciens fichiers DirectX",
+      "Trouve": "Il manquait d'anciens fichiers DirectX",
+      "Pourquoi": "Les jeux un peu anciens ont besoin de fichiers DirectX que Windows n'installe plus tout seul (d3dx9, xinput, XAudio...).",
+      "AFaire": [
+        "C'est réglé. Ne télécharge jamais un fichier « .dll » seul sur un site inconnu."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pilotegraphique": {
+      "Titre": "Le pilote de la carte graphique",
+      "Trouve": "Le pilote de la carte graphique était abîmé ou trop vieux",
+      "Pourquoi": "Le pilote graphique est le programme qui fait marcher la carte graphique. Abîmé ou trop vieux, il plante : écran noir quelques secondes, jeux qui se ferment, image bizarre.",
+      "AFaire": [
+        "Garde le pilote à jour depuis le site de la marque (NVIDIA, AMD ou Intel)."
+      ],
+      "Pro": "Si ça continue avec le dernier pilote, un réparateur peut tester la carte graphique."
+    },
+    "blocagefond": {
+      "Titre": "Le programme bloqué en arrière-plan",
+      "Trouve": "Le programme restait bloqué en arrière-plan",
+      "Pourquoi": "Un programme mal fermé reste parfois ouvert sans fenêtre : le relancer ne fait plus rien tant qu'il n'est pas vraiment fermé.",
+      "AFaire": [
+        "Si ça recommence : Gestionnaire des tâches (Ctrl + Maj + Échap), clic droit sur le programme, « Fin de tâche »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "peripheriquebranche": {
+      "Titre": "Un appareil branché",
+      "Trouve": "Un appareil branché faisait figer le PC",
+      "Pourquoi": "Un appareil USB qui se débranche et se rebranche tout seul (câble usé, hub) fait figer Windows un instant à chaque fois, souvent avec le son de branchement.",
+      "AFaire": [
+        "Change le câble de cet appareil, ou branche-le directement sur le PC (pas sur un hub)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ecransurcartemere": {
+      "Titre": "L'écran branché au mauvais endroit",
+      "Trouve": "L'écran était branché sur la carte mère au lieu de la carte graphique",
+      "Pourquoi": "Une tour a souvent deux endroits pour brancher l'écran : en haut (la carte mère) et plus bas (la carte graphique). Branché en haut, les jeux tournent sur la petite puce de la carte mère et saccadent.",
+      "AFaire": [
+        "Laisse l'écran branché sur la prise du bas, celle de la carte graphique."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "gpuintegre": {
+      "Titre": "La petite carte graphique du portable",
+      "Trouve": "Le jeu tournait sur la petite carte graphique du portable",
+      "Pourquoi": "Beaucoup de portables ont deux cartes graphiques : une petite qui économise la batterie, une puissante pour les jeux. Windows peut lancer le jeu sur la petite.",
+      "AFaire": [
+        "Garde le réglage « Hautes performances » pour tes jeux."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "jeufichiers": {
+      "Titre": "Les fichiers du jeu",
+      "Trouve": "Des fichiers du jeu étaient abîmés ou manquants",
+      "Pourquoi": "Un téléchargement coupé, un antivirus ou une mise à jour ratée peuvent abîmer un fichier du jeu : il ne se lance plus.",
+      "AFaire": [
+        "Si ça recommence, refais « Vérifier l'intégrité des fichiers »."
+      ],
+      "Pro": "Le site du jeu a souvent une aide pour son problème."
+    },
+    "dossiersproteges": {
+      "Titre": "La protection des dossiers",
+      "Trouve": "La protection de Windows empêchait le jeu d'écrire ses fichiers",
+      "Pourquoi": "La protection « Dispositif d'accès contrôlé aux dossiers » de Sécurité Windows bloque les programmes qui écrivent dans Documents : certains jeux ne démarrent plus.",
+      "AFaire": [
+        "Garde le jeu dans la liste des applications autorisées."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "configmini": {
+      "Titre": "La puissance du PC",
+      "Trouve": "Le PC est trop juste pour ce jeu",
+      "Pourquoi": "Chaque jeu demande une puissance minimale (processeur, carte graphique, mémoire, version de Windows). En dessous, il ne se lance pas ou plante.",
+      "AFaire": [
+        "Compare la « configuration minimale » du jeu (sur sa page Steam ou son site) avec ton PC : touche Windows + Pause, ou Paramètres, « Système », « Informations système »."
+      ],
+      "Pro": "Un réparateur peut te dire quelle pièce changer pour ce jeu, ou si ça ne vaut pas le coup."
+    },
+    "anticheat": {
+      "Titre": "L'anti-triche du jeu",
+      "Trouve": "L'anti-triche du jeu était abîmé",
+      "Pourquoi": "Les jeux en ligne installent un anti-triche (EasyAntiCheat, BattlEye, Vanguard...). S'il est abîmé ou bloqué, le jeu refuse de démarrer.",
+      "AFaire": [
+        "Si ça recommence, répare-le de la même façon."
+      ],
+      "Pro": "Le site du jeu a une aide pour chaque message de l'anti-triche."
+    },
+    "tpmjeu": {
+      "Titre": "Le TPM et le démarrage sécurisé",
+      "Trouve": "Le jeu demande le TPM et le « Secure Boot », coupés dans le BIOS",
+      "Pourquoi": "Certains anti-triche (Vanguard de Valorant, celui de Battlefield...) exigent deux réglages du BIOS : le TPM (une puce de sécurité) et le « Secure Boot ».",
+      "AFaire": [
+        "Dans le BIOS : active « TPM » (chez AMD : « fTPM », chez Intel : « PTT ») et « Secure Boot ». F10 pour enregistrer.",
+        "Si Windows ne démarre plus après le Secure Boot, remets-le comme avant : il faut d'abord convertir le disque, demande à un réparateur."
+      ],
+      "Pro": "Un réparateur peut activer ces réglages sans risque pour tes fichiers."
+    },
+    "wifijeu": {
+      "Titre": "Le Wi-Fi",
+      "Trouve": "Le Wi-Fi faisait laguer le jeu en ligne",
+      "Pourquoi": "Le Wi-Fi perd de petits morceaux de données (murs, voisins, micro-ondes) : en jeu, ça donne des sauts et un ping qui grimpe. Un câble est bien plus stable.",
+      "AFaire": [
+        "Pour jouer en ligne, branche le PC à la box avec un câble réseau (ou un boîtier CPL qui passe par les prises électriques)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "serveurjeu": {
+      "Titre": "Les serveurs du jeu",
+      "Trouve": "Les serveurs du jeu avaient un problème",
+      "Pourquoi": "Le lag vient parfois des serveurs du jeu, surchargés ou en panne : tout le monde lague en même temps.",
+      "AFaire": [
+        "Attends que le jeu règle son problème ; choisis un serveur proche (Europe) dans les options si tu peux."
+      ],
+      "Pro": "Rien à réparer de ton côté."
+    },
+    "limitesteam": {
+      "Titre": "La limite de vitesse du lanceur",
+      "Trouve": "Le lanceur était réglé pour télécharger lentement",
+      "Pourquoi": "Steam et les autres lanceurs peuvent limiter leur vitesse de téléchargement : un réglage oublié rend tout très lent.",
+      "AFaire": [
+        "Laisse la limite décochée."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "cachesteam": {
+      "Titre": "Le cache du lanceur",
+      "Trouve": "Le cache de téléchargement du lanceur était encombré",
+      "Pourquoi": "Le lanceur garde des morceaux de téléchargements. Abîmés, ils ralentissent ou bloquent les téléchargements.",
+      "AFaire": [
+        "C'est réglé. Si ça revient, vide de nouveau le cache."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "regionsteam": {
+      "Titre": "Le serveur de téléchargement",
+      "Trouve": "Le serveur de téléchargement choisi était lent",
+      "Pourquoi": "Steam télécharge depuis un serveur proche ; le serveur choisi peut être surchargé ou loin.",
+      "AFaire": [
+        "Garde une région proche qui marche bien (par exemple une autre grande ville de France)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pleinecran": {
+      "Titre": "Le mode plein écran",
+      "Trouve": "Le plein écran du jeu ne convenait pas à l'écran",
+      "Pourquoi": "En plein écran, le jeu change la résolution ou la fréquence de l'écran : si l'écran ne les accepte pas, il reste noir.",
+      "AFaire": [
+        "Dans les options du jeu, choisis « Fenêtré sans bordure » (ou « Borderless »), ou la résolution et la fréquence de ton écran."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "jeuautreecran": {
+      "Titre": "Un autre écran",
+      "Trouve": "Le jeu s'affichait sur un autre écran",
+      "Pourquoi": "Avec deux écrans (ou une télé branchée), un jeu peut s'ouvrir sur celui qu'on ne regarde pas, ou sur un écran éteint.",
+      "AFaire": [
+        "Pour le ramener : touche Windows + Maj + flèche gauche ou droite."
       ],
       "Pro": "Rien à réparer."
     }
@@ -5615,6 +5901,880 @@
           "Preuve": "L'aperçu n'y était pour rien"
         }
       ]
+    },
+    "q-ram-neuve": {
+      "Type": "question",
+      "Court": "Neuf ou nouvelle mémoire ?",
+      "Texte": "Le PC est-il neuf, ou viens-tu d'ajouter ou de changer de la mémoire (RAM) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Garde": [
+            "entrainementram",
+            "memoire",
+            "cartemere"
+          ],
+          "Preuve": "Le PC est neuf, ou sa mémoire vient de changer"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "entrainementram"
+          ],
+          "Preuve": "Ni PC neuf ni mémoire changée"
+        }
+      ]
+    },
+    "test-attendre-ram": {
+      "Type": "test",
+      "Court": "Attendre",
+      "Pour": [
+        "entrainementram"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Laisse-le allumé sans toucher pendant 10 minutes",
+      "Gestes": [
+        "Allume le PC et ne touche à rien pendant 10 minutes, même si l'écran reste noir.",
+        "Ne l'éteins pas en cours de route."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il a fini par démarrer",
+          "Confirme": "entrainementram",
+          "Preuve": "Après quelques minutes d'écran noir, il a démarré"
+        },
+        {
+          "Texte": "Toujours noir après 10 minutes",
+          "Ecarte": [
+            "entrainementram"
+          ],
+          "Preuve": "Même après 10 minutes, rien"
+        }
+      ]
+    },
+    "q-ventilo-cpu": {
+      "Type": "question",
+      "Court": "Le ventilateur tourne ?",
+      "Texte": "PC allumé, le ventilateur posé sur le processeur (au milieu de la carte mère) tourne-t-il ?",
+      "Aide": "Regarde par la vitre ou par les grilles du côté de la tour, sans rien ouvrir pendant qu'il est allumé.",
+      "Reponses": [
+        {
+          "Texte": "Non, il ne tourne pas",
+          "Confirme": "ventilocpu",
+          "Preuve": "Le ventilateur du processeur ne tourne pas"
+        },
+        {
+          "Texte": "Oui, il tourne",
+          "Ecarte": [
+            "ventilocpu"
+          ],
+          "Preuve": "Le ventilateur du processeur tourne"
+        }
+      ]
+    },
+    "test-prise-murale": {
+      "Type": "test",
+      "Court": "Une autre prise",
+      "Pour": [
+        "prise"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche le PC sur une autre prise murale",
+      "Gestes": [
+        "Débranche la multiprise : branche le PC directement sur une autre prise du mur, avec son câble.",
+        "Si tu as un autre câble électrique (le même que celui de l'écran, souvent), essaie-le aussi.",
+        "Rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'allume",
+          "Confirme": "prise",
+          "Preuve": "Sur une autre prise, il s'allume"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "prise"
+          ],
+          "Preuve": "Même sur une autre prise, rien"
+        }
+      ]
+    },
+    "test-cables-internes": {
+      "Type": "test",
+      "Court": "Les câbles à l'intérieur",
+      "Pour": [
+        "cableinterne"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Renfonce les câbles de l'alimentation dans la tour",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique.",
+        "Ouvre le panneau de côté de la tour (souvent deux vis à l'arrière).",
+        "Appuie sur le gros câble large (24 fils) branché sur le bord de la carte mère, jusqu'au clic.",
+        "Fais pareil avec le câble en haut à gauche de la carte mère (4 ou 8 fils, écrit « CPU »).",
+        "Referme, rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'allume",
+          "Confirme": "cableinterne",
+          "Preuve": "Câbles renfoncés, il s'allume"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "cableinterne"
+          ],
+          "Preuve": "Les câbles étaient bien en place"
+        }
+      ]
+    },
+    "test-memoire-reinserer": {
+      "Type": "test",
+      "Court": "Remettre la mémoire",
+      "Pour": [
+        "memoire"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Enlève et remets les barrettes de mémoire",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique.",
+        "Ouvre le panneau de côté, touche une partie métallique de la tour.",
+        "Écarte les petits clips au bout de chaque barrette de mémoire, sors-la, puis remets-la bien droite jusqu'à ce que les clips se referment tout seuls (clic).",
+        "Referme, rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'allume",
+          "Confirme": "memoire",
+          "Preuve": "Mémoire remise en place, il s'allume"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "memoire"
+          ],
+          "Preuve": "Remettre la mémoire n'a rien changé"
+        }
+      ],
+      "SiNote": [
+        "fixe"
+      ]
+    },
+    "test-bios-courant": {
+      "Type": "test",
+      "Court": "Le réglage du BIOS",
+      "Pour": [
+        "reglagecourant"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Change le réglage « après une coupure » du BIOS",
+      "Gestes": [
+        "Allume le PC et appuie plusieurs fois sur Suppr (ou F2) dès qu'il démarre : le BIOS s'ouvre.",
+        "Cherche « Restore on AC Power Loss » (ou « AC Back », « After Power Failure », « State after G3 »), souvent dans « Advanced » ou « Power ».",
+        "Choisis « Power Off » (ou « Stay Off »), puis appuie sur F10 et confirme."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne s'allume plus tout seul",
+          "Confirme": "reglagecourant",
+          "Preuve": "Avec ce réglage, il ne s'allume plus tout seul"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "reglagecourant"
+          ],
+          "Preuve": "Ce réglage n'y était pour rien"
+        }
+      ]
+    },
+    "test-charger-30": {
+      "Type": "test",
+      "Court": "Charger 30 minutes",
+      "Pour": [
+        "batteriezero"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Laisse-le charger 30 minutes sans l'allumer",
+      "Gestes": [
+        "Branche le chargeur d'origine.",
+        "Attends 30 minutes sans appuyer sur le bouton.",
+        "Rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "batteriezero",
+          "Preuve": "Après 30 minutes de charge, il démarre"
+        },
+        {
+          "Texte": "Toujours le voyant qui clignote",
+          "Ecarte": [
+            "batteriezero"
+          ],
+          "Preuve": "Même chargé, il ne démarre pas"
+        }
+      ]
+    },
+    "test-msconfig-entree": {
+      "Type": "test",
+      "Court": "Le menu de démarrage",
+      "Pour": [
+        "entreeboot"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Retire l'ancienne entrée du menu de démarrage",
+      "Gestes": [
+        "Démarre Windows (choisis l'entrée qui marche).",
+        "Appuie sur la touche Windows, tape « msconfig » et ouvre « Configuration du système » (Windows peut demander une autorisation : accepte).",
+        "Onglet « Démarrer » : clique sur la ligne qui n'est PAS marquée « Système d'exploitation actuel », puis « Supprimer », puis OK.",
+        "Redémarre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le menu ne s'affiche plus",
+          "Confirme": "entreeboot",
+          "Preuve": "L'ancienne entrée retirée, le menu ne s'affiche plus"
+        },
+        {
+          "Texte": "Il revient, ou je n'ai qu'une ligne",
+          "Ecarte": [
+            "entreeboot"
+          ],
+          "Preuve": "Ce n'était pas une ancienne entrée"
+        }
+      ]
+    },
+    "test-laisser-verifier": {
+      "Type": "test",
+      "Court": "Laisser finir",
+      "Pour": [
+        "arretbrutal"
+      ],
+      "Duree": "jusqu'à une heure",
+      "Texte": "Laisse la vérification aller jusqu'au bout",
+      "Gestes": [
+        "Au prochain démarrage, laisse la vérification du disque finir, sans appuyer sur une touche (ça peut prendre une heure).",
+        "Une fois sur Windows, éteins par le menu Démarrer, puis rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle ne revient plus",
+          "Confirme": "arretbrutal",
+          "Preuve": "Après une vérification complète, elle ne revient plus"
+        },
+        {
+          "Texte": "Elle revient à chaque fois",
+          "Ecarte": [
+            "arretbrutal"
+          ],
+          "Preuve": "La vérification revient à chaque démarrage"
+        }
+      ]
+    },
+    "test-sans-echec": {
+      "Type": "test",
+      "Court": "Le mode sans échec",
+      "Pour": [
+        "sansechec"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Décoche le démarrage sécurisé",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « msconfig » et ouvre « Configuration du système ».",
+        "Onglet « Démarrer » : décoche « Démarrage sécurisé », puis OK.",
+        "Redémarre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre normalement",
+          "Confirme": "sansechec",
+          "Preuve": "Sans le démarrage sécurisé, Windows démarre normalement"
+        },
+        {
+          "Texte": "Toujours en mode sans échec",
+          "Ecarte": [
+            "sansechec"
+          ],
+          "Preuve": "La case n'était pas cochée"
+        }
+      ]
+    },
+    "q-dll": {
+      "Type": "question",
+      "Court": "Le fichier manquant",
+      "Texte": "Le nom du fichier « .dll » introuvable commence par :",
+      "Reponses": [
+        {
+          "Texte": "VCRUNTIME, MSVCP ou api-ms-win",
+          "Garde": [
+            "vcredist",
+            "leprogramme"
+          ],
+          "Preuve": "Le fichier manquant est un fichier « Visual C++ »"
+        },
+        {
+          "Texte": "d3dx, xinput, XAudio, D3DCompiler ou X3DAudio",
+          "Garde": [
+            "directxruntime",
+            "leprogramme"
+          ],
+          "Preuve": "Le fichier manquant est un ancien fichier DirectX"
+        },
+        {
+          "Texte": "Autre chose",
+          "Garde": [
+            "leprogramme"
+          ],
+          "Preuve": "Le fichier manquant vient du programme lui-même"
+        }
+      ]
+    },
+    "test-vcredist": {
+      "Type": "test",
+      "Court": "Les fichiers Visual C++",
+      "Pour": [
+        "vcredist"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Installe les fichiers Visual C++ de Microsoft",
+      "Aide": "Si la commande n'est pas reconnue : cherche « Visual C++ Redistributable » sur le site de Microsoft (microsoft.com) et installe les versions x64 et x86.",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ».",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée. Fais-le pour les deux lignes. Si on te demande d'accepter, tape O (ou Y) puis Entrée ; Windows peut demander une autorisation : accepte.",
+        "Redémarre, puis relance le programme."
+      ],
+      "Commande": {
+        "Admin": false,
+        "Lignes": [
+          "winget install Microsoft.VCRedist.2015+.x64",
+          "winget install Microsoft.VCRedist.2015+.x86"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Il se lance",
+          "Confirme": "vcredist",
+          "Preuve": "Avec les fichiers Visual C++, il se lance"
+        },
+        {
+          "Texte": "Toujours le message",
+          "Ecarte": [
+            "vcredist"
+          ],
+          "Preuve": "Les fichiers Visual C++ n'ont rien changé"
+        }
+      ]
+    },
+    "test-directx": {
+      "Type": "test",
+      "Court": "Les fichiers DirectX",
+      "Pour": [
+        "directxruntime"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Installe les anciens fichiers DirectX",
+      "Gestes": [
+        "Sur le site de Microsoft (microsoft.com), cherche « DirectX End-User Runtime Web Installer » et télécharge-le.",
+        "Lance-le et suis les étapes (décoche la barre de recherche qu'il propose en plus).",
+        "Relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il se lance",
+          "Confirme": "directxruntime",
+          "Preuve": "Avec les fichiers DirectX, il se lance"
+        },
+        {
+          "Texte": "Toujours le message",
+          "Ecarte": [
+            "directxruntime"
+          ],
+          "Preuve": "Les fichiers DirectX n'ont rien changé"
+        }
+      ]
+    },
+    "test-pilote-gpu": {
+      "Type": "test",
+      "Court": "Le pilote graphique",
+      "Pour": [
+        "pilotegraphique"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Installe le dernier pilote de la carte graphique",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Gestionnaire de périphériques ».",
+        "Ouvre « Cartes graphiques » : note la marque (NVIDIA, AMD ou Intel).",
+        "Sur le site de la marque, installe le dernier pilote : application « NVIDIA App » (nvidia.com), « AMD Software Adrenalin » (amd.com) ou « Intel Driver & Support Assistant » (intel.com).",
+        "Redémarre, puis sers-toi du PC comme d'habitude."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le problème a disparu",
+          "Confirme": "pilotegraphique",
+          "Preuve": "Avec le dernier pilote graphique, le problème a disparu"
+        },
+        {
+          "Texte": "Le problème continue",
+          "Ecarte": [
+            "pilotegraphique"
+          ],
+          "Preuve": "Le dernier pilote graphique n'a rien changé"
+        }
+      ]
+    },
+    "test-fin-tache": {
+      "Type": "test",
+      "Court": "Fin de tâche",
+      "Pour": [
+        "blocagefond"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Ferme vraiment le programme, puis relance-le",
+      "Gestes": [
+        "Appuie en même temps sur Ctrl + Maj + Échap : le Gestionnaire des tâches s'ouvre.",
+        "Cherche le programme dans la liste (onglet « Processus »).",
+        "Clic droit dessus, puis « Fin de tâche ». Relance-le."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre",
+          "Confirme": "blocagefond",
+          "Preuve": "Vraiment fermé puis relancé, il s'ouvre"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "blocagefond"
+          ],
+          "Preuve": "Le programme n'était pas bloqué en arrière-plan, ou n'est pas dans la liste"
+        }
+      ]
+    },
+    "test-sans-usb": {
+      "Type": "test",
+      "Court": "Sans les appareils",
+      "Pour": [
+        "peripheriquebranche"
+      ],
+      "Duree": "une heure",
+      "Texte": "Débranche tout ce qui ne sert pas",
+      "Gestes": [
+        "Débranche tout ce qui est branché en USB sauf le clavier et la souris : clés, disques, manettes, casques, hubs, chargeurs de téléphone.",
+        "Sers-toi du PC une heure."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne se fige plus",
+          "Confirme": "peripheriquebranche",
+          "Preuve": "Sans les appareils USB, il ne se fige plus"
+        },
+        {
+          "Texte": "Il se fige encore",
+          "Ecarte": [
+            "peripheriquebranche"
+          ],
+          "Preuve": "Les appareils USB n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-prise-gpu": {
+      "Type": "test",
+      "Court": "La bonne prise",
+      "Pour": [
+        "ecransurcartemere"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche l'écran sur la carte graphique",
+      "Gestes": [
+        "Regarde derrière la tour : l'écran est-il branché en haut, près des prises USB ? Si oui, c'est la carte mère.",
+        "Éteins, et branche le câble de l'écran sur une prise de la plaque plus bas (horizontale), celle de la carte graphique.",
+        "Rallume et relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est bien plus fluide",
+          "Confirme": "ecransurcartemere",
+          "Preuve": "Branché sur la carte graphique, le jeu est fluide"
+        },
+        {
+          "Texte": "Il était déjà sur la carte graphique",
+          "Ecarte": [
+            "ecransurcartemere"
+          ],
+          "Preuve": "L'écran était déjà sur la carte graphique"
+        }
+      ]
+    },
+    "test-gpu-jeu": {
+      "Type": "test",
+      "Court": "La carte graphique du jeu",
+      "Pour": [
+        "gpuintegre"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Fais tourner le jeu sur la carte graphique puissante",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Écran », puis « Graphiques ».",
+        "Choisis le jeu dans la liste (ou « Parcourir » pour l'ajouter), puis « Options » ou la liste déroulante : « Hautes performances ».",
+        "Branche le chargeur et relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est bien plus fluide",
+          "Confirme": "gpuintegre",
+          "Preuve": "Sur la carte graphique puissante, le jeu est fluide"
+        },
+        {
+          "Texte": "Ça ne change rien",
+          "Ecarte": [
+            "gpuintegre"
+          ],
+          "Preuve": "La carte graphique n'y était pour rien"
+        }
+      ]
+    },
+    "test-verifier-jeu": {
+      "Type": "test",
+      "Court": "Vérifier les fichiers",
+      "Pour": [
+        "jeufichiers"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Fais vérifier les fichiers du jeu par son lanceur",
+      "Gestes": [
+        "Steam : clic droit sur le jeu, « Propriétés », « Fichiers installés », « Vérifier l'intégrité des fichiers du jeu ».",
+        "Epic Games : les trois points à côté du jeu, « Gérer », « Vérifier ». Battle.net, EA, Ubisoft : roue dentée ou « Réparer ».",
+        "Relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il se lance",
+          "Confirme": "jeufichiers",
+          "Preuve": "Ses fichiers réparés, le jeu se lance"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "jeufichiers"
+          ],
+          "Preuve": "Les fichiers du jeu étaient bons"
+        }
+      ]
+    },
+    "test-dossiers-proteges": {
+      "Type": "test",
+      "Court": "La protection des dossiers",
+      "Pour": [
+        "dossiersproteges"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Autorise le jeu dans Sécurité Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Protection contre les ransomware » et ouvre-le.",
+        "Si « Dispositif d'accès contrôlé aux dossiers » est activé : clique sur « Autoriser une application via l'Accès contrôlé aux dossiers », puis ajoute le jeu (son .exe).",
+        "Relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il se lance",
+          "Confirme": "dossiersproteges",
+          "Preuve": "Autorisé, le jeu se lance"
+        },
+        {
+          "Texte": "Toujours pas, ou c'était désactivé",
+          "Ecarte": [
+            "dossiersproteges"
+          ],
+          "Preuve": "La protection des dossiers n'y était pour rien"
+        }
+      ]
+    },
+    "test-reparer-anticheat": {
+      "Type": "test",
+      "Court": "Réparer l'anti-triche",
+      "Pour": [
+        "anticheat"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Répare l'anti-triche du jeu",
+      "Gestes": [
+        "Steam : clic droit sur le jeu, « Gérer », « Parcourir les fichiers locaux ».",
+        "Ouvre le dossier « EasyAntiCheat » (ou « BattlEye ») et lance le fichier « ..._Setup.exe » ou « Install_... ».",
+        "Choisis le jeu puis « Réparer » (ou désinstalle puis réinstalle l'anti-triche). Redémarre le PC."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le jeu se lance",
+          "Confirme": "anticheat",
+          "Preuve": "L'anti-triche réparé, le jeu se lance"
+        },
+        {
+          "Texte": "Toujours l'erreur",
+          "Ecarte": [
+            "anticheat"
+          ],
+          "Preuve": "Réparer l'anti-triche n'a rien changé"
+        }
+      ]
+    },
+    "q-tpm": {
+      "Type": "question",
+      "Court": "TPM ou Secure Boot ?",
+      "Texte": "Le message parle de « TPM », de « Secure Boot » ou de « VAN 9001 » / « VAN 9003 » ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "tpmjeu",
+          "Preuve": "Le message demande le TPM ou le Secure Boot"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "tpmjeu"
+          ],
+          "Preuve": "Le message ne parle ni de TPM ni de Secure Boot"
+        }
+      ]
+    },
+    "test-cable-jeu": {
+      "Type": "test",
+      "Court": "Avec un câble",
+      "Pour": [
+        "wifijeu"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Joue avec un câble réseau",
+      "Gestes": [
+        "Branche le PC directement à la box avec un câble réseau (Ethernet).",
+        "Joue une partie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus de lag",
+          "Confirme": "wifijeu",
+          "Preuve": "Avec un câble, plus de lag"
+        },
+        {
+          "Texte": "Ça lague encore, ou j'étais déjà en câble",
+          "Ecarte": [
+            "wifijeu"
+          ],
+          "Preuve": "Le Wi-Fi n'y était pour rien"
+        }
+      ]
+    },
+    "q-serveur-jeu": {
+      "Type": "question",
+      "Court": "Les autres joueurs ?",
+      "Texte": "Tes amis ou d'autres joueurs ont-ils le même souci au même moment ?",
+      "Aide": "Tu peux aussi regarder sur le site downdetector.fr, avec le nom du jeu.",
+      "Reponses": [
+        {
+          "Texte": "Oui, d'autres aussi",
+          "Confirme": "serveurjeu",
+          "Preuve": "D'autres joueurs laguent au même moment"
+        },
+        {
+          "Texte": "Non, moi seulement",
+          "Ecarte": [
+            "serveurjeu"
+          ],
+          "Preuve": "Les autres joueurs n'ont pas de souci"
+        }
+      ]
+    },
+    "test-telechargements-jeu": {
+      "Type": "test",
+      "Court": "Les téléchargements",
+      "Pour": [
+        "saturation"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Mets les téléchargements en pause pendant que tu joues",
+      "Gestes": [
+        "Sur le PC : mets en pause Steam (onglet « Téléchargements ») et les autres lanceurs, et Windows Update (« Suspendre pendant 1 semaine »).",
+        "Dans la maison : mets en pause les téléchargements, les mises à jour de console et les vidéos en haute qualité.",
+        "Joue une partie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Plus de lag",
+          "Confirme": "saturation",
+          "Preuve": "Sans téléchargements à côté, plus de lag"
+        },
+        {
+          "Texte": "Ça lague encore",
+          "Ecarte": [
+            "saturation"
+          ],
+          "Preuve": "Les téléchargements n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-limite-steam": {
+      "Type": "test",
+      "Court": "La limite de vitesse",
+      "Pour": [
+        "limitesteam"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Retire la limite de vitesse",
+      "Gestes": [
+        "Steam : menu « Steam », « Paramètres », « Téléchargements ».",
+        "Décoche « Limiter la bande passante » (ou mets « Pas de limite »).",
+        "Relance le téléchargement."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est rapide",
+          "Confirme": "limitesteam",
+          "Preuve": "Sans limite, le téléchargement est rapide"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "limitesteam"
+          ],
+          "Preuve": "Il n'y avait pas de limite"
+        }
+      ]
+    },
+    "test-cache-steam": {
+      "Type": "test",
+      "Court": "Le cache",
+      "Pour": [
+        "cachesteam"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vide le cache de téléchargement",
+      "Gestes": [
+        "Steam : menu « Steam », « Paramètres », « Téléchargements ».",
+        "Clique sur « Vider le cache », confirme (Steam redémarre et te demande de te reconnecter).",
+        "Relance le téléchargement."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est rapide",
+          "Confirme": "cachesteam",
+          "Preuve": "Le cache vidé, le téléchargement est rapide"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "cachesteam"
+          ],
+          "Preuve": "Le cache n'y était pour rien"
+        }
+      ]
+    },
+    "test-region-steam": {
+      "Type": "test",
+      "Court": "La région",
+      "Pour": [
+        "regionsteam"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Change la région de téléchargement",
+      "Gestes": [
+        "Steam : menu « Steam », « Paramètres », « Téléchargements ».",
+        "Dans « Région de téléchargement », choisis une autre ville proche.",
+        "Relance le téléchargement."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est rapide",
+          "Confirme": "regionsteam",
+          "Preuve": "Avec une autre région, le téléchargement est rapide"
+        },
+        {
+          "Texte": "Toujours lent",
+          "Ecarte": [
+            "regionsteam"
+          ],
+          "Preuve": "La région n'y était pour rien"
+        }
+      ]
+    },
+    "test-alt-entree": {
+      "Type": "test",
+      "Court": "Alt + Entrée",
+      "Pour": [
+        "pleinecran"
+      ],
+      "Duree": "une minute",
+      "Texte": "Passe le jeu en fenêtre",
+      "Gestes": [
+        "Pendant l'écran noir, appuie en même temps sur Alt et Entrée.",
+        "Si l'image apparaît, va dans les options du jeu : « Fenêtré sans bordure »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image apparaît",
+          "Confirme": "pleinecran",
+          "Preuve": "En fenêtre, l'image apparaît"
+        },
+        {
+          "Texte": "Toujours noir",
+          "Ecarte": [
+            "pleinecran"
+          ],
+          "Preuve": "Passer en fenêtre n'a rien changé"
+        }
+      ]
+    },
+    "test-autre-ecran-jeu": {
+      "Type": "test",
+      "Court": "Un autre écran",
+      "Pour": [
+        "jeuautreecran"
+      ],
+      "Duree": "une minute",
+      "Texte": "Ramène le jeu sur ton écran",
+      "Gestes": [
+        "Pendant l'écran noir, appuie en même temps sur la touche Windows, Maj et la flèche gauche (puis la flèche droite si rien ne change).",
+        "Si tu as une télé ou un deuxième écran branché, allume-le ou débranche-le."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le jeu apparaît",
+          "Confirme": "jeuautreecran",
+          "Preuve": "Le jeu était sur un autre écran"
+        },
+        {
+          "Texte": "Toujours noir",
+          "Ecarte": [
+            "jeuautreecran"
+          ],
+          "Preuve": "Le jeu n'était pas sur un autre écran"
+        }
+      ]
+    },
+    "q-bouton-tour": {
+      "Type": "question",
+      "Court": "Le bouton",
+      "Texte": "Le bouton d'allumage s'enfonce-t-il mal, reste coincé, ou bouge quand on appuie ?",
+      "Aide": "Sur une tour, le bouton est relié à la carte mère par deux petits fils : un bouton usé ne fait plus contact à chaque fois.",
+      "Pour": [
+        "interrupteur"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "interrupteur",
+          "Preuve": "Le bouton d'allumage est abîmé"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "interrupteur"
+          ],
+          "Preuve": "Le bouton d'allumage s'enfonce normalement"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -6471,111 +7631,201 @@
       ]
     },
     {
-      "Id": "jeu",
+      "Id": "dll",
       "Famille": "plantages",
-      "Titre": "Ça plante seulement en jeu",
-      "Phrase": "Tout va bien, sauf quand le PC force",
+      "Titre": "Message « fichier .dll introuvable »",
+      "Phrase": "VCRUNTIME140.dll, MSVCP140.dll, d3dx9_43.dll... manque au lancement d'un programme ou d'un jeu",
       "Mots": [
-        "jouer",
-        "joue",
-        "en jeu",
-        "gaming",
-        "fps",
-        "chauffe",
-        "carte graphique",
-        "saccade",
-        "lag",
-        "steam"
+        "dll",
+        "vcruntime",
+        "vcruntime140",
+        "msvcp140",
+        "msvcp",
+        "d3dx9",
+        "xinput",
+        "introuvable",
+        "est manquant",
+        "missing dll",
+        "api-ms-win"
       ],
       "Suspects": [
-        "danger",
-        "surchauffe",
-        "alimentation",
-        "pilote",
-        "gpu",
-        "memoire"
+        "vcredist",
+        "directxruntime",
+        "leprogramme"
       ],
       "Etapes": [
         {
-          "Ref": "danger"
+          "Ref": "q-dll"
         },
+        {
+          "Ref": "test-vcredist"
+        },
+        {
+          "Ref": "test-directx"
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "piloteaffichage",
+      "Famille": "plantages",
+      "Titre": "« Le pilote d'affichage a cessé de répondre » ou écran noir quelques secondes",
+      "Phrase": "L'écran devient noir un instant puis revient, parfois avec un message",
+      "Mots": [
+        "pilote d'affichage",
+        "a cessé de répondre",
+        "a été récupéré",
+        "écran noir quelques secondes",
+        "écran noir puis revient",
+        "driver",
+        "tdr",
+        "nvlddmkm",
+        "amdkmdag"
+      ],
+      "Suspects": [
+        "pilotegraphique",
+        "surchauffe",
+        "gpu"
+      ],
+      "Etapes": [
         {
           "Ref": "type"
-        },
-        {
-          "Ref": "cepc"
-        },
-        {
-          "Ref": "auto-memtest-erreurs"
-        },
-        {
-          "Ref": "auto-memtest-ok"
-        },
-        {
-          "Id": "quoi",
-          "Type": "question",
-          "Court": "Ce qui se passe",
-          "Texte": "Quand ça plante en jeu, que se passe-t-il ?",
-          "Reponses": [
-            {
-              "Texte": "Le jeu se ferme, Windows reste là",
-              "Ecarte": [
-                "alimentation"
-              ],
-              "Preuve": "Seul le jeu se ferme : le courant n'est pas coupé"
-            },
-            {
-              "Texte": "Tout le PC s'éteint ou redémarre",
-              "Ecarte": [
-                "pilote",
-                "gpu"
-              ],
-              "Preuve": "Tout le PC s'éteint : c'est le courant qui coupe, pas l'image"
-            },
-            {
-              "Texte": "L'écran devient noir quelques secondes, puis revient",
-              "Garde": [
-                "pilote",
-                "gpu",
-                "surchauffe"
-              ],
-              "Preuve": "L'écran noir qui revient : l'affichage redémarre"
-            },
-            {
-              "Texte": "Des traits ou des couleurs bizarres apparaissent",
-              "Garde": [
-                "gpu",
-                "surchauffe"
-              ],
-              "Preuve": "Des traits ou des couleurs bizarres : la carte graphique souffre"
-            }
-          ]
-        },
-        {
-          "Id": "auto-pilote",
-          "Type": "auto",
-          "Indice": "pilotegraphique",
-          "Pour": [
-            "pilote",
-            "gpu"
-          ],
-          "SiVu": {
-            "Ecarte": [
-              "alimentation"
-            ]
-          }
         },
         {
           "Ref": "chaleur"
         },
         {
-          "Ref": "test-pilote"
+          "Ref": "test-pilote-gpu"
         },
         {
           "Ref": "test-nettoyage"
+        }
+      ]
+    },
+    {
+      "Id": "ouvrepas",
+      "Famille": "plantages",
+      "Titre": "Un programme ne s'ouvre plus (rien ne se passe)",
+      "Phrase": "Un double-clic ne fait rien, ou une fenêtre s'ouvre et se ferme",
+      "Mots": [
+        "ne s'ouvre pas",
+        "ne s'ouvre plus",
+        "rien ne se passe",
+        "double clic",
+        "se ferme tout de suite",
+        "ne démarre pas",
+        "logiciel ne se lance pas"
+      ],
+      "Suspects": [
+        "blocagefond",
+        "redemarrage",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-fin-tache"
         },
         {
-          "Ref": "test-memoire"
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il s'ouvre",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, il s'ouvre"
+            },
+            {
+              "Texte": "Toujours rien",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "microgels",
+      "Famille": "plantages",
+      "Titre": "Le PC se fige une ou deux secondes, régulièrement",
+      "Phrase": "De petits gels : la souris s'arrête un instant, puis tout repart",
+      "Mots": [
+        "fige quelques secondes",
+        "micro freeze",
+        "freeze",
+        "petits gels",
+        "lag",
+        "souris s'arrête",
+        "bloque une seconde",
+        "saccade la souris"
+      ],
+      "Suspects": [
+        "peripheriquebranche",
+        "programmegourmand",
+        "pilote",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-usb"
+        },
+        {
+          "Ref": "test-gestionnaire"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "explorateurplante",
+      "Famille": "plantages",
+      "Titre": "L'Explorateur de fichiers plante ou se ferme tout seul",
+      "Phrase": "Les dossiers se ferment, « L'Explorateur Windows ne répond pas »",
+      "Mots": [
+        "explorateur de fichiers",
+        "explorateur ne répond pas",
+        "dossier se ferme",
+        "explorer.exe",
+        "explorateur windows plante",
+        "ouvrir un dossier plante"
+      ],
+      "Suspects": [
+        "explorateur",
+        "apercu",
+        "fichierssysteme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-explorateur-redem"
+        },
+        {
+          "Ref": "test-apercu",
+          "Reponses": [
+            {
+              "Texte": "Il ne plante plus",
+              "Confirme": "apercu",
+              "Preuve": "L'aperçu fermé, l'Explorateur ne plante plus"
+            },
+            {
+              "Texte": "Il plante encore",
+              "Ecarte": [
+                "apercu"
+              ],
+              "Preuve": "L'aperçu n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-sfc"
         }
       ]
     },
@@ -7434,6 +8684,271 @@
       ]
     },
     {
+      "Id": "memoiretraining",
+      "Famille": "allumage",
+      "Titre": "Écran noir très long au premier démarrage",
+      "Phrase": "PC neuf ou nouvelle mémoire : les ventilateurs tournent, mais l'image tarde",
+      "Mots": [
+        "neuf",
+        "nouveau pc",
+        "premier démarrage",
+        "nouvelle ram",
+        "ajouté de la ram",
+        "ddr5",
+        "écran noir longtemps",
+        "met longtemps à afficher",
+        "memory training"
+      ],
+      "Suspects": [
+        "entrainementram",
+        "memoire",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-ram-neuve"
+        },
+        {
+          "Ref": "test-attendre-ram"
+        },
+        {
+          "Ref": "test-memoire-demarrage"
+        }
+      ]
+    },
+    {
+      "Id": "cpufan",
+      "Famille": "allumage",
+      "Titre": "Message « CPU Fan Error » au démarrage",
+      "Phrase": "Le PC signale un problème de ventilateur avant Windows",
+      "Mots": [
+        "cpu fan error",
+        "fan error",
+        "ventilateur",
+        "cpu fan",
+        "press f1",
+        "erreur ventilateur"
+      ],
+      "Suspects": [
+        "ventilocpu",
+        "reglageventilo"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-ventilo-cpu"
+        }
+      ]
+    },
+    {
+      "Id": "cmoserror",
+      "Famille": "allumage",
+      "Titre": "Message « CMOS » ou « Press F1 to continue » au démarrage",
+      "Phrase": "Le PC demande d'appuyer sur F1, ou parle de « CMOS checksum »",
+      "Mots": [
+        "cmos",
+        "checksum",
+        "press f1",
+        "f1 to continue",
+        "bios settings",
+        "date et heure perdues",
+        "cmos battery"
+      ],
+      "Suspects": [
+        "pilebios",
+        "modeboot"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-date-bios"
+        },
+        {
+          "Ref": "test-defauts-bios",
+          "Reponses": [
+            {
+              "Texte": "Le message ne revient plus",
+              "Confirme": "modeboot",
+              "Preuve": "Avec les réglages par défaut, le message ne revient plus"
+            },
+            {
+              "Texte": "Il revient",
+              "Ecarte": [
+                "modeboot"
+              ],
+              "Preuve": "Les réglages par défaut n'ont rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "orage",
+      "Famille": "allumage",
+      "Titre": "Plus rien après un orage ou une coupure de courant",
+      "Phrase": "Il ne s'allume plus depuis une coupure ou un orage",
+      "Mots": [
+        "orage",
+        "coupure",
+        "coupure de courant",
+        "foudre",
+        "disjoncteur",
+        "panne de courant",
+        "plus de courant",
+        "après la coupure"
+      ],
+      "Suspects": [
+        "danger",
+        "prise",
+        "residuelle",
+        "alimentation",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "danger"
+        },
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-prise-murale"
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-bist"
+        }
+      ]
+    },
+    {
+      "Id": "apresnettoyage",
+      "Famille": "allumage",
+      "Titre": "Il ne s'allume plus après avoir été nettoyé, déplacé ou ouvert",
+      "Phrase": "Il marchait, il a été bougé ou ouvert, et plus rien",
+      "Mots": [
+        "nettoyé",
+        "déplacé",
+        "déménagement",
+        "ouvert",
+        "dépoussiéré",
+        "transporté",
+        "après avoir bougé",
+        "changé une pièce"
+      ],
+      "Suspects": [
+        "cableinterne",
+        "memoire",
+        "interrupteur",
+        "materiel"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-cables-internes"
+        },
+        {
+          "Ref": "test-memoire-reinserer"
+        },
+        {
+          "Ref": "choc"
+        }
+      ]
+    },
+    {
+      "Id": "allumesecteur",
+      "Famille": "allumage",
+      "Titre": "Il s'allume dès qu'on branche la prise",
+      "Phrase": "Allumer la multiprise ou brancher le câble démarre le PC",
+      "Mots": [
+        "s'allume quand je branche",
+        "allume dès qu'on branche",
+        "multiprise",
+        "s'allume tout seul",
+        "branche la prise"
+      ],
+      "Suspects": [
+        "reglagecourant",
+        "reveilreseau"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-bios-courant"
+        },
+        {
+          "Ref": "test-reveil-reseau"
+        }
+      ]
+    },
+    {
+      "Id": "plusieursappuis",
+      "Famille": "allumage",
+      "Titre": "Il faut appuyer plusieurs fois pour qu'il s'allume",
+      "Phrase": "Le bouton ne marche qu'au deuxième, troisième essai, ou après un moment",
+      "Mots": [
+        "plusieurs fois",
+        "plusieurs essais",
+        "appuyer longtemps",
+        "bouton",
+        "s'allume mal",
+        "insister",
+        "parfois il s'allume"
+      ],
+      "Suspects": [
+        "residuelle",
+        "alimentation",
+        "interrupteur",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-bist"
+        },
+        {
+          "Ref": "q-bouton-tour"
+        }
+      ]
+    },
+    {
+      "Id": "voyantclignote",
+      "Famille": "allumage",
+      "Titre": "Le voyant clignote mais rien ne démarre (portable)",
+      "Phrase": "Une petite lumière clignote, l'écran reste noir",
+      "Mots": [
+        "voyant clignote",
+        "lumière clignote",
+        "led clignote",
+        "clignote orange",
+        "clignote blanc",
+        "code de clignotement",
+        "caps lock clignote"
+      ],
+      "Suspects": [
+        "batteriezero",
+        "residuelle",
+        "memoire",
+        "materiel"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-charger-30"
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "choc"
+        }
+      ]
+    },
+    {
       "Id": "reparationboucle",
       "Famille": "demarrage",
       "Titre": "Réparation automatique en boucle",
@@ -7597,7 +9112,13 @@
         "disque introuvable",
         "insert boot",
         "operating system not found",
-        "bootable"
+        "bootable",
+        "bootmgr",
+        "bootmgr is missing",
+        "operating system not found",
+        "no bootable device",
+        "insert boot media",
+        "boot device not found"
       ],
       "Suspects": [
         "cleusb",
@@ -8057,6 +9578,149 @@
         },
         {
           "Ref": "test-redemarrer-vraiment"
+        }
+      ]
+    },
+    {
+      "Id": "menuos",
+      "Famille": "demarrage",
+      "Titre": "Un menu « Choisir un système d'exploitation » au démarrage",
+      "Phrase": "Le PC demande quel Windows démarrer",
+      "Mots": [
+        "choisir un système",
+        "système d'exploitation",
+        "deux windows",
+        "menu au démarrage",
+        "windows 10 windows 11",
+        "volume 2",
+        "choisir un os"
+      ],
+      "Suspects": [
+        "entreeboot",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-msconfig-entree"
+        }
+      ]
+    },
+    {
+      "Id": "chkdsk",
+      "Famille": "demarrage",
+      "Titre": "Il vérifie ou répare le disque à chaque démarrage",
+      "Phrase": "« Analyse et réparation du lecteur » ou « Vérification du disque » au démarrage",
+      "Mots": [
+        "analyse et réparation",
+        "vérification du disque",
+        "chkdsk",
+        "réparation du lecteur",
+        "scanning and repairing",
+        "checking disk"
+      ],
+      "Suspects": [
+        "arretbrutal",
+        "fichierssysteme",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-laisser-verifier"
+        },
+        {
+          "Ref": "test-sfc"
+        }
+      ]
+    },
+    {
+      "Id": "profiltemp",
+      "Famille": "demarrage",
+      "Titre": "« Profil temporaire » ou Bureau vide après la connexion",
+      "Phrase": "Windows dit que tu es connecté avec un profil temporaire, tes fichiers semblent disparus",
+      "Mots": [
+        "profil temporaire",
+        "bureau vide",
+        "fichiers disparus",
+        "connecté avec un profil",
+        "service de profil",
+        "plus mes icônes",
+        "nouveau bureau"
+      ],
+      "Suspects": [
+        "redemarrage",
+        "profilabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Tout est revenu",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, le profil est revenu"
+            },
+            {
+              "Texte": "Toujours le profil vide",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, le profil est vide"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "modesansechec",
+      "Famille": "demarrage",
+      "Titre": "Windows démarre toujours en mode sans échec",
+      "Phrase": "Écrit « Mode sans échec » dans les coins, tout est en grand et en basse qualité",
+      "Mots": [
+        "mode sans échec",
+        "sans échec",
+        "safe mode",
+        "écrit mode sans échec"
+      ],
+      "Suspects": [
+        "sansechec",
+        "windowsabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-echec"
+        }
+      ]
+    },
+    {
+      "Id": "clavierconnexion",
+      "Famille": "demarrage",
+      "Titre": "Le clavier ou la souris ne marchent pas sur l'écran de connexion",
+      "Phrase": "Impossible de taper le mot de passe au démarrage",
+      "Mots": [
+        "écran de connexion",
+        "taper le mot de passe",
+        "clavier ne marche pas au démarrage",
+        "souris ne marche pas au démarrage",
+        "login"
+      ],
+      "Suspects": [
+        "portusb",
+        "demarragerapide",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-autre-port",
+          "Aide": "Pour entrer quand même : en bas à droite de l'écran de connexion, touche l'icône d'accessibilité puis « Clavier visuel », et tape le mot de passe à la souris (ou au doigt)."
+        },
+        {
+          "Ref": "test-demarrage-rapide"
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
@@ -9187,127 +10851,6 @@
         },
         {
           "Ref": "age-pc"
-        }
-      ]
-    },
-    {
-      "Id": "saccades",
-      "Famille": "lenteur",
-      "Titre": "Les jeux saccadent",
-      "Phrase": "Le jeu n'est pas fluide, l'image saute",
-      "Mots": [
-        "saccade",
-        "saccades",
-        "fps",
-        "pas fluide",
-        "lag",
-        "jeu lent",
-        "ralentit en jeu",
-        "freeze en jeu"
-      ],
-      "Suspects": [
-        "energie",
-        "pilote",
-        "surchauffe",
-        "programmegourmand",
-        "reglagesjeu",
-        "age"
-      ],
-      "Etapes": [
-        {
-          "Ref": "type"
-        },
-        {
-          "Id": "depuis",
-          "Type": "question",
-          "Court": "Depuis quand ?",
-          "Texte": "Ce jeu a-t-il toujours saccadé, ou est-ce nouveau ?",
-          "Reponses": [
-            {
-              "Texte": "Il a toujours saccadé",
-              "Garde": [
-                "energie",
-                "reglagesjeu",
-                "age",
-                "pilote"
-              ],
-              "Preuve": "Le jeu a toujours saccadé"
-            },
-            {
-              "Texte": "C'est nouveau, avant c'était fluide",
-              "Ecarte": [
-                "reglagesjeu",
-                "age"
-              ],
-              "Preuve": "Avant, le jeu était fluide"
-            }
-          ]
-        },
-        {
-          "Id": "branche",
-          "Type": "question",
-          "Court": "Branché ?",
-          "Pour": [
-            "energie"
-          ],
-          "SiNote": [
-            "portable"
-          ],
-          "Texte": "Quand tu joues, le portable est-il branché sur son chargeur ?",
-          "Reponses": [
-            {
-              "Texte": "Non, sur la batterie",
-              "Confirme": "energie",
-              "Detail": "le portable marche sur batterie",
-              "Preuve": "Le portable joue sur batterie : il se bride"
-            },
-            {
-              "Texte": "Oui, branché"
-            }
-          ]
-        },
-        {
-          "Ref": "test-energie"
-        },
-        {
-          "Ref": "chaleur"
-        },
-        {
-          "Ref": "test-gestionnaire"
-        },
-        {
-          "Ref": "test-pilote"
-        },
-        {
-          "Ref": "test-nettoyage"
-        },
-        {
-          "Id": "test-reglages",
-          "Type": "test",
-          "Court": "Les réglages du jeu",
-          "Pour": [
-            "reglagesjeu"
-          ],
-          "Duree": "cinq minutes",
-          "Texte": "Baisse les graphismes du jeu au minimum",
-          "Gestes": [
-            "Dans les options du jeu, mets la qualité graphique au plus bas (et la résolution un cran en dessous).",
-            "Rejoue quelques minutes."
-          ],
-          "Reponses": [
-            {
-              "Texte": "C'est fluide",
-              "Confirme": "reglagesjeu",
-              "Preuve": "Au minimum, le jeu est fluide"
-            },
-            {
-              "Texte": "Ça saccade encore",
-              "Ecarte": [
-                "reglagesjeu"
-              ],
-              "Preuve": "Même au minimum, ça saccade"
-            }
-          ]
         }
       ]
     },
@@ -12698,6 +14241,483 @@
         },
         {
           "Ref": "test-retelecharger"
+        }
+      ]
+    },
+    {
+      "Id": "saccades",
+      "Famille": "jeux",
+      "Titre": "Les jeux saccadent (peu d'images par seconde)",
+      "Phrase": "Le jeu n'est pas fluide, l'image saute",
+      "Mots": [
+        "saccade",
+        "saccades",
+        "fps",
+        "pas fluide",
+        "lag",
+        "jeu lent",
+        "ralentit en jeu",
+        "freeze en jeu",
+        "fps",
+        "fps bas",
+        "images par seconde",
+        "pas fluide",
+        "lag en jeu",
+        "ça rame en jeu",
+        "freeze en jeu",
+        "peu de fps",
+        "fps faibles",
+        "manque de fps"
+      ],
+      "Suspects": [
+        "ecransurcartemere",
+        "gpuintegre",
+        "energie",
+        "pilote",
+        "surchauffe",
+        "programmegourmand",
+        "reglagesjeu",
+        "age",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Id": "depuis",
+          "Type": "question",
+          "Court": "Depuis quand ?",
+          "Texte": "Ce jeu a-t-il toujours saccadé, ou est-ce nouveau ?",
+          "Reponses": [
+            {
+              "Texte": "Il a toujours saccadé",
+              "Garde": [
+                "energie",
+                "reglagesjeu",
+                "age",
+                "pilote"
+              ],
+              "Preuve": "Le jeu a toujours saccadé"
+            },
+            {
+              "Texte": "C'est nouveau, avant c'était fluide",
+              "Ecarte": [
+                "reglagesjeu",
+                "age"
+              ],
+              "Preuve": "Avant, le jeu était fluide"
+            }
+          ]
+        },
+        {
+          "Id": "branche",
+          "Type": "question",
+          "Court": "Branché ?",
+          "Pour": [
+            "energie"
+          ],
+          "SiNote": [
+            "portable"
+          ],
+          "Texte": "Quand tu joues, le portable est-il branché sur son chargeur ?",
+          "Reponses": [
+            {
+              "Texte": "Non, sur la batterie",
+              "Confirme": "energie",
+              "Detail": "le portable marche sur batterie",
+              "Preuve": "Le portable joue sur batterie : il se bride"
+            },
+            {
+              "Texte": "Oui, branché"
+            }
+          ]
+        },
+        {
+          "Ref": "test-prise-gpu"
+        },
+        {
+          "Ref": "test-gpu-jeu"
+        },
+        {
+          "Ref": "test-energie"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-gestionnaire"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Id": "test-reglages",
+          "Type": "test",
+          "Court": "Les réglages du jeu",
+          "Pour": [
+            "reglagesjeu"
+          ],
+          "Duree": "cinq minutes",
+          "Texte": "Baisse les graphismes du jeu au minimum",
+          "Gestes": [
+            "Dans les options du jeu, mets la qualité graphique au plus bas (et la résolution un cran en dessous).",
+            "Rejoue quelques minutes."
+          ],
+          "Reponses": [
+            {
+              "Texte": "C'est fluide",
+              "Confirme": "reglagesjeu",
+              "Preuve": "Au minimum, le jeu est fluide"
+            },
+            {
+              "Texte": "Ça saccade encore",
+              "Ecarte": [
+                "reglagesjeu"
+              ],
+              "Preuve": "Même au minimum, ça saccade"
+            }
+          ]
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
+      "Id": "jeu",
+      "Famille": "jeux",
+      "Titre": "Ça plante seulement en jeu",
+      "Phrase": "Tout va bien, sauf quand le PC force",
+      "Mots": [
+        "jouer",
+        "joue",
+        "en jeu",
+        "gaming",
+        "fps",
+        "chauffe",
+        "carte graphique",
+        "saccade",
+        "lag",
+        "steam"
+      ],
+      "Suspects": [
+        "danger",
+        "surchauffe",
+        "alimentation",
+        "pilote",
+        "gpu",
+        "memoire"
+      ],
+      "Etapes": [
+        {
+          "Ref": "danger"
+        },
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "cepc"
+        },
+        {
+          "Ref": "auto-memtest-erreurs"
+        },
+        {
+          "Ref": "auto-memtest-ok"
+        },
+        {
+          "Id": "quoi",
+          "Type": "question",
+          "Court": "Ce qui se passe",
+          "Texte": "Quand ça plante en jeu, que se passe-t-il ?",
+          "Reponses": [
+            {
+              "Texte": "Le jeu se ferme, Windows reste là",
+              "Ecarte": [
+                "alimentation"
+              ],
+              "Preuve": "Seul le jeu se ferme : le courant n'est pas coupé"
+            },
+            {
+              "Texte": "Tout le PC s'éteint ou redémarre",
+              "Ecarte": [
+                "pilote",
+                "gpu"
+              ],
+              "Preuve": "Tout le PC s'éteint : c'est le courant qui coupe, pas l'image"
+            },
+            {
+              "Texte": "L'écran devient noir quelques secondes, puis revient",
+              "Garde": [
+                "pilote",
+                "gpu",
+                "surchauffe"
+              ],
+              "Preuve": "L'écran noir qui revient : l'affichage redémarre"
+            },
+            {
+              "Texte": "Des traits ou des couleurs bizarres apparaissent",
+              "Garde": [
+                "gpu",
+                "surchauffe"
+              ],
+              "Preuve": "Des traits ou des couleurs bizarres : la carte graphique souffre"
+            }
+          ]
+        },
+        {
+          "Id": "auto-pilote",
+          "Type": "auto",
+          "Indice": "pilotegraphique",
+          "Pour": [
+            "pilote",
+            "gpu"
+          ],
+          "SiVu": {
+            "Ecarte": [
+              "alimentation"
+            ]
+          }
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-pilote"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-memoire"
+        }
+      ]
+    },
+    {
+      "Id": "jeunelancepas",
+      "Famille": "jeux",
+      "Titre": "Un jeu ne se lance pas",
+      "Phrase": "Rien ne se passe, il se ferme tout de suite, ou un message d'erreur",
+      "Mots": [
+        "jeu ne se lance pas",
+        "jeu ne démarre pas",
+        "ne se lance pas",
+        "se ferme au lancement",
+        "steam",
+        "epic",
+        "crash au lancement",
+        "lancer le jeu"
+      ],
+      "Suspects": [
+        "jeufichiers",
+        "vcredist",
+        "pilotegraphique",
+        "dossiersproteges",
+        "configmini"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-verifier-jeu"
+        },
+        {
+          "Ref": "test-vcredist"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        },
+        {
+          "Ref": "test-dossiers-proteges"
+        }
+      ]
+    },
+    {
+      "Id": "anticheat",
+      "Famille": "jeux",
+      "Titre": "Erreur de l'anti-triche (EasyAntiCheat, BattlEye, Vanguard)",
+      "Phrase": "Le jeu refuse de démarrer à cause de l'anti-triche",
+      "Mots": [
+        "anti-triche",
+        "anticheat",
+        "anti cheat",
+        "easyanticheat",
+        "eac",
+        "battleye",
+        "vanguard",
+        "valorant",
+        "van 9001",
+        "van 9003",
+        "tpm",
+        "secure boot",
+        "faceit"
+      ],
+      "Suspects": [
+        "tpmjeu",
+        "anticheat",
+        "jeufichiers"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-tpm"
+        },
+        {
+          "Ref": "test-reparer-anticheat"
+        },
+        {
+          "Ref": "test-verifier-jeu"
+        }
+      ]
+    },
+    {
+      "Id": "laggame",
+      "Famille": "jeux",
+      "Titre": "Ça lague en ligne (ping élevé, coupures en partie)",
+      "Phrase": "Le jeu saute, les personnages se téléportent, le ping monte",
+      "Mots": [
+        "lag",
+        "ping",
+        "ping élevé",
+        "latence",
+        "en ligne",
+        "téléporte",
+        "rubberband",
+        "déconnecté du serveur",
+        "lague en ligne",
+        "packet loss"
+      ],
+      "Suspects": [
+        "serveurjeu",
+        "saturation",
+        "wifijeu",
+        "operateur",
+        "box"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-serveur-jeu"
+        },
+        {
+          "Ref": "test-telechargements-jeu"
+        },
+        {
+          "Ref": "test-cable-jeu"
+        },
+        {
+          "Ref": "test-box"
+        }
+      ]
+    },
+    {
+      "Id": "steamlent",
+      "Famille": "jeux",
+      "Titre": "Steam (ou un autre lanceur) télécharge très lentement",
+      "Phrase": "Le téléchargement d'un jeu ou d'une mise à jour n'avance pas",
+      "Mots": [
+        "steam lent",
+        "téléchargement lent",
+        "steam télécharge lentement",
+        "mise à jour du jeu lente",
+        "epic lent",
+        "téléchargement bloqué",
+        "0 octets"
+      ],
+      "Suspects": [
+        "limitesteam",
+        "cachesteam",
+        "regionsteam",
+        "saturation",
+        "operateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-limite-steam"
+        },
+        {
+          "Ref": "test-cache-steam"
+        },
+        {
+          "Ref": "test-region-steam"
+        },
+        {
+          "Id": "telechargements",
+          "Type": "question",
+          "Court": "D'autres usages ?",
+          "Pour": [
+            "saturation"
+          ],
+          "Texte": "D'autres appareils téléchargent-ils ou regardent-ils des vidéos en même temps (consoles, mises à jour, streaming) ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Preuve": "D'autres appareils utilisent beaucoup la connexion"
+            },
+            {
+              "Texte": "Non",
+              "Ecarte": [
+                "saturation"
+              ],
+              "Preuve": "Personne d'autre n'utilise beaucoup la connexion"
+            }
+          ]
+        },
+        {
+          "Id": "test-pause",
+          "Type": "test",
+          "Court": "Tout le reste en pause",
+          "Pour": [
+            "saturation"
+          ],
+          "Duree": "cinq minutes",
+          "Texte": "Mets les autres appareils en pause, puis réessaie",
+          "Gestes": [
+            "Mets en pause les téléchargements, mises à jour et vidéos des autres appareils (ou éteins-les un moment)."
+          ],
+          "Reponses": [
+            {
+              "Texte": "C'est rapide",
+              "Confirme": "saturation",
+              "Preuve": "Seul sur la connexion, c'est rapide"
+            },
+            {
+              "Texte": "Toujours lent",
+              "Ecarte": [
+                "saturation"
+              ],
+              "Preuve": "Même seul, c'est lent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "ecrannoirjeu",
+      "Famille": "jeux",
+      "Titre": "Écran noir au lancement d'un jeu (le son marche)",
+      "Phrase": "On entend le jeu, mais l'écran reste noir",
+      "Mots": [
+        "écran noir jeu",
+        "écran noir au lancement",
+        "son mais pas d'image",
+        "jeu écran noir",
+        "black screen",
+        "plein écran"
+      ],
+      "Suspects": [
+        "pleinecran",
+        "jeuautreecran",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-alt-entree"
+        },
+        {
+          "Ref": "test-autre-ecran-jeu"
+        },
+        {
+          "Ref": "test-pilote-gpu"
         }
       ]
     }
