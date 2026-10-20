@@ -3348,11 +3348,12 @@
       ]
     },
     "cpuplace": {
-      "Titre": "Le processeur ou son support",
-      "Trouve": "Le processeur est mal en place, ou son support a des broches tordues",
-      "Pourquoi": "Le processeur est posé sur un support plein de petites broches. Mal posé, ou avec une broche tordue, il ne démarre pas (voyant CPU, parfois DRAM).",
+      "Titre": "Le processeur ou la carte mère",
+      "Trouve": "Il reste le processeur ou la carte mère : à faire vérifier",
+      "Pourquoi": "Quand ni les câbles, ni le BIOS, ni la mémoire ne sont en cause, c'est le processeur (mal posé, broches du support tordues, ou en panne) ou la carte mère.",
       "AFaire": [
-        "Ne démonte pas le processeur toi-même si tu ne l'as jamais fait : les broches se tordent très facilement."
+        "Ne démonte pas le processeur toi-même si tu ne l'as jamais fait : les broches se tordent très facilement.",
+        "Montre le rapport à un réparateur : il saura quel voyant restait allumé."
       ],
       "Pro": "Un réparateur vérifie le processeur et son support, et peut redresser une broche.",
       "Sauf": [
@@ -3478,6 +3479,18 @@
         "Garde le câble sur une prise de la box qui marche."
       ],
       "Pro": "Ton opérateur peut changer la box si plusieurs prises ne marchent plus."
+    },
+    "memoireplace": {
+      "Titre": "La mémoire mal enfoncée",
+      "Trouve": "Une barrette de mémoire était mal enfoncée",
+      "Pourquoi": "Une barrette doit être enfoncée jusqu'au clic des deux clips. Un peu sortie (transport, choc), la carte mère ne la trouve pas.",
+      "AFaire": [
+        "Rien d'autre à faire : vérifie les clips si tu déplaces la tour."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
     }
   },
   "Tests": {
@@ -11208,6 +11221,7 @@
           "Garde": [
             "profilmemoire",
             "slotsmemoire",
+            "memoireplace",
             "memoire",
             "cpuplace"
           ],
@@ -11256,6 +11270,7 @@
           "Garde": [
             "profilmemoire",
             "slotsmemoire",
+            "memoireplace",
             "memoire",
             "cpuplace"
           ],
@@ -11482,6 +11497,7 @@
           "Texte": "2,3, 2,4 ou 2,5 : la mémoire",
           "Garde": [
             "residuelle",
+            "memoireplace",
             "memoire"
           ],
           "Preuve": "Code Dell 2,3 à 2,5 : la mémoire"
@@ -11583,6 +11599,35 @@
             "portbox"
           ],
           "Preuve": "La prise de la box n'y était pour rien"
+        }
+      ]
+    },
+    "test-memoire-renfoncer": {
+      "Type": "test",
+      "Court": "Remettre la mémoire",
+      "Pour": [
+        "memoireplace"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Enlève et remets les barrettes de mémoire",
+      "Gestes": [
+        "Éteins le PC et débranche son câble électrique.",
+        "Ouvre le panneau de côté, touche une partie métallique de la tour.",
+        "Écarte les petits clips au bout de chaque barrette de mémoire, sors-la, puis remets-la bien droite jusqu'à ce que les clips se referment tout seuls (clic).",
+        "Referme, rebranche et rallume."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il démarre",
+          "Confirme": "memoireplace",
+          "Preuve": "La mémoire renfoncée, il démarre"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "memoireplace"
+          ],
+          "Preuve": "La mémoire était bien enfoncée"
         }
       ]
     }
@@ -13945,6 +13990,7 @@
       "Suspects": [
         "biosabimedell",
         "residuelle",
+        "memoireplace",
         "memoire",
         "pilebios",
         "ecranportable",
@@ -13966,8 +14012,7 @@
           "Ref": "vider"
         },
         {
-          "Ref": "test-memoire-reinserer",
-          "SiNote": null
+          "Ref": "test-memoire-renfoncer"
         },
         {
           "Ref": "test-cable-cpu"
@@ -13980,6 +14025,9 @@
         },
         {
           "Ref": "test-chargeur-hp"
+        },
+        {
+          "Ref": "test-memoire-demarrage"
         }
       ]
     },
@@ -14014,6 +14062,7 @@
         "cpuplace",
         "profilmemoire",
         "slotsmemoire",
+        "memoireplace",
         "memoire",
         "cablegpu",
         "gpuplace",
@@ -14039,8 +14088,7 @@
           "Ref": "test-slots-memoire"
         },
         {
-          "Ref": "test-memoire-reinserer",
-          "SiNote": null
+          "Ref": "test-memoire-renfoncer"
         },
         {
           "Ref": "test-memoire-demarrage"
@@ -14088,6 +14136,7 @@
         "cpuplace",
         "profilmemoire",
         "slotsmemoire",
+        "memoireplace",
         "memoire",
         "cablegpu",
         "gpuplace",
@@ -14115,8 +14164,7 @@
           "Ref": "test-slots-memoire"
         },
         {
-          "Ref": "test-memoire-reinserer",
-          "SiNote": null
+          "Ref": "test-memoire-renfoncer"
         },
         {
           "Ref": "test-memoire-demarrage"
