@@ -41,4 +41,7 @@ GGUF="$E/modeles/mindcare-0.6b-$NOM-q8_0.gguf"
 
 echo "[$(date +%H:%M)] mesure"
 python outils/ia/mesurer.py "$(w "$D/mesure.jsonl")" "$(w "$GGUF")" "$(w "$SERVEUR")" "$(w "$CAT")" "$(w "outils/ia/mesures/$NOM.md")" 2>&1 | tail -14
+echo "[$(date +%H:%M)] mesure sur les phrases écrites à la main"
+python outils/ia/phrases-a-la-main.py "$(w "$D/a-la-main.jsonl")" > /dev/null
+python outils/ia/mesurer.py "$(w "$D/a-la-main.jsonl")" "$(w "$GGUF")" "$(w "$SERVEUR")" "$(w "$CAT")" "$(w "outils/ia/mesures/$NOM-a-la-main.md")" 2>&1 | tail -9
 echo "[$(date +%H:%M)] tour $NOM fini"

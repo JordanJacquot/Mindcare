@@ -38,6 +38,10 @@ STYLES = {
         "elle décrit seulement ce qu'elle voit ou entend", "elle commence par « bonjour » ou « au secours »", "avec un détail inutile en plus",
         "avec des mots anglais du quotidien (« ça freeze », « ça lag », « le pc crash »)", "agacée, ça fait plusieurs jours que ça dure",
         "elle parle pour quelqu'un d'autre (« l'ordi de ma mère »)",
+        # (les phrases courtes, comme tapées dans une barre de recherche : le point faible du tour nuit1)
+        "très court : 2 à 5 mots, sans majuscule ni ponctuation", "deux ou trois mots-clés seulement (« pc éteint seul »)",
+        "une phrase courte et simple de moins de 8 mots", "comme tapé dans Google, en commençant par « pc » ou « ordi »",
+        "très court avec une faute de frappe", "une phrase courte qui commence par « mon pc » ou « mon ordi »",
     ],
     "mesure": [
         "un message court à un ami pour demander de l'aide", "une phrase dite au téléphone à un réparateur", "un titre de question sur un forum d'entraide",
