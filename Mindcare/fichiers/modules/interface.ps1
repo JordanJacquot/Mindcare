@@ -52,7 +52,7 @@ function Start-Capture([string]$Fichier) {
     $Window.WindowStartupLocation = 'Manual'; $Window.Left = -10000; $Window.Top = 0; $Window.ShowActivated = $false; $Window.ShowInTaskbar = $false
     $Window.Add_ContentRendered({
         $t = New-Object System.Windows.Threading.DispatcherTimer
-        $t.Interval = [TimeSpan]::FromMilliseconds(700)
+        $t.Interval = [TimeSpan]::FromMilliseconds($(if ($env:MINDCARE_CAPTURE_DELAI) { [int]$env:MINDCARE_CAPTURE_DELAI } else { 700 }))
         $t.Add_Tick({ param($s) $s.Stop(); Save-Capture $Window.Content $env:MINDCARE_CAPTURE; if (-not $env:MINDCARE_TEST_RESTER) { Exit-App } })
         $t.Start()
     })

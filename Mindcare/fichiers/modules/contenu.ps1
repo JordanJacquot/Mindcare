@@ -12,6 +12,7 @@ function Initialize-Contenu {
     try { $script:Donnees = Read-Enquetes } catch { Write-Log "Enquêtes illisibles ($EnquetesFichier) : $_" }
     Read-Historique
     Start-LectureJournaux   # (ce que Windows a noté, lu en arrière-plan pour l'enquête)
+    Start-Ia                # (l'assistant, s'il est installé : il charge son modèle en arrière-plan)
     if ($EnTest -and $env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered({ $ui.Defilement.ScrollToEnd() }) }   # (tests : capture du bas)
     if ($EnTest -and $env:MINDCARE_TEST_GALERIE) {
         $g = New-Object System.Windows.Controls.WrapPanel
@@ -22,7 +23,7 @@ function Initialize-Contenu {
     if ($EnTest -and $script:Donnees) {
         if ($env:MINDCARE_TEST_REPRENDRE -and $script:Historique.Count) { Open-Diagnostic ([string]$script:Historique[0].Id); return }
         if ($env:MINDCARE_TEST_FAMILLE) { Show-Famille $env:MINDCARE_TEST_FAMILLE; return }
-        if ($env:MINDCARE_TEST_RECHERCHE) { Show-Accueil; $ui.Recherche.Text = $env:MINDCARE_TEST_RECHERCHE; return }
+        if ($env:MINDCARE_TEST_RECHERCHE) { Show-Accueil; $ui.Recherche.Text = $env:MINDCARE_TEST_RECHERCHE; if ($env:MINDCARE_TEST_IA -or $env:MINDCARE_IA_MODELE) { Request-Ia }; return }
         # Une enquête toute faite : « redemarre » ou « redemarre:1,0,-1 » (outils\tester.ps1)
         if ($env:MINDCARE_TEST_PARCOURS) {
             $id, $suite = $env:MINDCARE_TEST_PARCOURS -split ':', 2
@@ -151,13 +152,14 @@ function Show-Accueil([string]$Famille = '') {
     $loupe.Width = 18; $loupe.Height = 18; $loupe.Margin = '0,0,10,0'; $loupe.VerticalAlignment = 'Center'
     [System.Windows.Controls.DockPanel]::SetDock($loupe, 'Left'); [void]$dp.Children.Add($loupe)
     $zone = New-Object System.Windows.Controls.Grid
-    $indice = New-Text 'Tu peux aussi écrire ton problème avec tes mots : « bip », « le son grésille », « écran bleu »...' 14 '#7E78A0'
+    $indice = New-Text $(if (Test-IaInstallee) { 'Raconte ton problème avec tes mots, puis appuie sur Entrée : « mon pc s''éteint quand je joue »...' } else { 'Tu peux aussi écrire ton problème avec tes mots : « bip », « le son grésille », « écran bleu »...' }) 14 '#7E78A0'
     $indice.IsHitTestVisible = $false; $indice.VerticalAlignment = 'Center'
     $saisie = New-Object System.Windows.Controls.TextBox
     $saisie.Background = [System.Windows.Media.Brushes]::Transparent; $saisie.BorderThickness = 0; $saisie.FontSize = 15
     $saisie.Foreground = Get-Brush '#FFFFFF'; $saisie.CaretBrush = Get-Brush '#00E5FF'; $saisie.VerticalContentAlignment = 'Center'
     $saisie.Tag = $indice
-    $saisie.Add_TextChanged({ param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Update-Accueil })
+    $saisie.Add_TextChanged({ param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Clear-ZoneIa; Update-Accueil })
+    $saisie.Add_KeyDown({ param($s, $ev) if ($ev.Key -eq 'Return') { Request-Ia } })
     [void]$zone.Children.Add($indice); [void]$zone.Children.Add($saisie)
     [void]$dp.Children.Add($zone)
     $champ.Child = $dp
@@ -181,9 +183,140 @@ function Show-Accueil([string]$Famille = '') {
         [void]$ui.Contenu.Children.Add($bandeau)
     }
 
+    # L'assistant : sa proposition (après Entrée), ou le bandeau pour l'installer
+    $ui.ZoneIa = New-Object System.Windows.Controls.StackPanel
+    [void]$ui.Contenu.Children.Add($ui.ZoneIa)
+    Update-BandeauIa
+
     $ui.ZoneAccueil = New-Object System.Windows.Controls.StackPanel
     [void]$ui.Contenu.Children.Add($ui.ZoneAccueil)
     Update-Accueil
+}
+
+# ---------------------------------------------------------------------------
+# L'assistant (ia.ps1) : le bandeau d'installation, et la carte « J'ai compris, c'est bien ça ? »
+# ---------------------------------------------------------------------------
+function New-BandeauIa {
+    $bandeau = New-Object System.Windows.Controls.Border
+    $bandeau.CornerRadius = 14; $bandeau.Padding = '16,10'; $bandeau.Margin = '0,0,0,14'
+    $bandeau.Background = Get-Brush '#14B04BFF'; $bandeau.BorderBrush = Get-Brush '#40B04BFF'; $bandeau.BorderThickness = 1
+    $bandeau
+}
+
+function Update-BandeauIa {
+    $z = $ui.ZoneIa
+    if (-not $z -or $script:IaCarte) { return }
+    $z.Children.Clear()
+    $enCours = $script:IaDl -and -not $script:IaDl.Fini
+    if ((Test-IaInstallee) -and -not $enCours) { return }
+    $bandeau = New-BandeauIa
+    $dp = New-Object System.Windows.Controls.DockPanel
+    if (-not $enCours) {
+        $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } else { 'Installer' }) 'BtnPrimary'
+        $b.Add_Click({ Start-IaInstall; Start-SuiviIa; Update-BandeauIa })
+        [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$dp.Children.Add($b)
+    }
+    $texte = if ($enCours) {
+        $pc = if ($script:IaDl.Total) { [math]::Floor(100 * $script:IaDl.Recu / $script:IaDl.Total) } else { 0 }
+        "Installation de l'assistant : $pc % ($($script:IaDl.Etape)). Tu peux continuer à te servir de Mindcare."
+    } elseif ($script:IaDl -and $script:IaDl.Erreur) {
+        "L'assistant n'a pas pu s'installer : $($script:IaDl.Erreur)."
+    } else {
+        "Mindcare peut comprendre tes phrases (« mon pc s'éteint quand je joue ») : installe son assistant, environ 700 Mo, une seule fois. Il marche ensuite sans internet."
+    }
+    $t = New-Text $texte 14 '#C9C3DD'; $t.VerticalAlignment = 'Center'; $t.Margin = '0,0,12,0'
+    [void]$dp.Children.Add($t)
+    $bandeau.Child = $dp
+    [void]$z.Children.Add($bandeau)
+}
+
+# Suit l'installation, puis lance l'assistant
+function Start-SuiviIa {
+    if ($script:IaSuivi) { return }
+    $script:IaSuivi = New-Object System.Windows.Threading.DispatcherTimer
+    $script:IaSuivi.Interval = [TimeSpan]::FromMilliseconds(500)
+    $script:IaSuivi.Add_Tick({
+        if ($script:IaDl -and $script:IaDl.Fini) {
+            $script:IaSuivi.Stop(); $script:IaSuivi = $null
+            if ($script:IaDl.Erreur) { Write-Log "Assistant non installé : $($script:IaDl.Erreur)" }
+            else { Write-Log 'Assistant installé'; Start-Ia }
+        }
+        if ($ui.ZoneIa -and $ui.ZoneIa.IsLoaded) { Update-BandeauIa }
+    })
+    $script:IaSuivi.Start()
+}
+
+function Clear-ZoneIa {
+    $script:IaCarte = $null
+    if ($script:IaAttente) { $script:IaAttente.Stop(); $script:IaAttente = $null }
+    Update-BandeauIa
+}
+
+# Entrée dans la barre : l'assistant lit la phrase (en arrière-plan), puis sa proposition s'affiche
+function Request-Ia {
+    $texte = ([string]$ui.Recherche.Text).Trim()
+    if (-not $texte -or -not $ui.ZoneIa) { return }
+    $tache = Start-IaQuestion $texte @($script:Donnees.Pannes | ForEach-Object { [string]$_.Id })
+    if (-not $tache) { return }   # (pas d'assistant : la recherche par mots reste)
+    $script:IaCarte = @{ Texte = $texte }
+    $z = $ui.ZoneIa; $z.Children.Clear()
+    $attente = New-BandeauIa
+    $attente.Child = New-Text 'Je lis ta phrase...' 14 '#C9C3DD'
+    [void]$z.Children.Add($attente)
+    $script:IaTache = $tache
+    $script:IaAttente = New-Object System.Windows.Threading.DispatcherTimer
+    $script:IaAttente.Interval = [TimeSpan]::FromMilliseconds(120)
+    $script:IaAttente.Add_Tick({
+        $r = Get-IaReponse $script:IaTache
+        if ($null -eq $r) { return }
+        $script:IaAttente.Stop(); $script:IaAttente = $null
+        if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) { Write-Log "Assistant : $($r.Erreur)"; $script:IaCarte = $null; Update-BandeauIa; return }
+        Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',')"
+        Show-CarteIa $r
+        if ($EnTest -and $env:MINDCARE_TEST_IA_CHOISIR) { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }
+    })
+    $script:IaAttente.Start()
+}
+
+# La carte « J'ai compris » : la panne de l'assistant (et ce qu'il a déjà compris), puis deux autres possibilités
+function Show-CarteIa($R) {
+    $z = $ui.ZoneIa; $z.Children.Clear()
+    $panne = Get-Panne $script:Donnees $R.Panne
+    $carte = New-Object System.Windows.Controls.Border
+    $carte.Style = $Window.FindResource('Card'); $carte.Margin = '0,0,0,16'
+    $carte.BorderBrush = Get-Brush '#B04BFF'; $carte.BorderThickness = 2
+    $sp = New-Object System.Windows.Controls.StackPanel
+    Add-Texte $sp "J'AI COMPRIS" 12 '#B04BFF' 'Bold'
+    $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,6,0,0'
+    $script:IaChoisie = @{ Panne = [string]$R.Panne; Reponses = $R.Reponses }
+    $b = New-Button "C'est ça" 'BtnPrimary'; $b.VerticalAlignment = 'Center'; $b.Margin = '14,0,0,0'
+    $b.Add_Click({ Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses })
+    [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$haut.Children.Add($b)
+    $tx = New-Object System.Windows.Controls.StackPanel
+    [void]$tx.Children.Add((New-Text ([string]$panne.Titre) 18 '#FFFFFF' 'SemiBold'))
+    $ph = New-Text ([string]$panne.Phrase) 13 '#A9A3C9'; $ph.Margin = '0,3,0,0'; [void]$tx.Children.Add($ph)
+    [void]$haut.Children.Add($tx)
+    [void]$sp.Children.Add($haut)
+    # Ce que la phrase a déjà dit (ces questions ne seront pas reposées)
+    $sus = foreach ($et in (Get-Etapes $script:Donnees $panne)) {
+        if ($R.Reponses.ContainsKey([string]$et.Id)) {
+            $n = [int]$R.Reponses[[string]$et.Id]
+            if ($n -ge 0 -and $n -lt @($et.Reponses).Count) { "$($et.Court) : $(Get-Minuscule ([string]@($et.Reponses)[$n].Texte))" }
+        }
+    }
+    if ($sus) { Add-Texte $sp "Déjà compris grâce à ta phrase : $(@($sus) -join ' ; ')." 13 '#C9C3DD' 'Normal' '0,10,0,0' }
+    # Ou peut-être : les deux premières pannes de la recherche par mots
+    $autres = @(Find-Pannes $script:Donnees $script:IaCarte.Texte | Where-Object { $_.Id -ne $R.Panne } | Select-Object -First 2)
+    if ($autres) {
+        Add-Texte $sp 'Ou peut-être :' 13 '#7E78A0' 'Normal' '0,12,0,4'
+        foreach ($a in $autres) {
+            $l = New-Text "›  $($a.Titre)" 14 '#EEEBF7'
+            $bt = Add-ChoixBouton $sp $l ([string]$a.Id) { param($s) Start-Diagnostic ([string]$s.Tag) }
+            $bt.Padding = '14,7'; $bt.Margin = '0,4,0,0'; $bt.HorizontalContentAlignment = 'Left'
+        }
+    }
+    $carte.Child = $sp
+    [void]$z.Children.Add($carte)
 }
 
 # Sous la recherche : les familles, ou les pannes trouvées par les mots tapés
@@ -267,11 +400,14 @@ function Show-Famille([string]$Id) {
 # ---------------------------------------------------------------------------
 function New-DiagId { "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$((Get-Random -Maximum 65536).ToString('x4'))" }
 
-function Start-Diagnostic([string]$Id) {
+function Start-Diagnostic([string]$Id, [hashtable]$PreRempli = $null) {
     $script:PanneEnCours = Get-Panne $script:Donnees $Id
     if (-not $script:PanneEnCours) { Show-Accueil; return }
     $script:ChoixFaits = @(); $script:DiagId = New-DiagId; $script:ReparateurOuvert = $false
-    Write-Log "Enquête : $Id"
+    $script:PreRempli = if ($PreRempli) { $PreRempli.Clone() } else { $null }   # (les réponses déjà données par la phrase, assistant)
+    if ($script:PreRempli) { $script:PreRempli.Remove('danger') }   # (la question de sécurité est toujours posée)
+    $script:IaCarte = $null
+    Write-Log "Enquête : $Id$(if ($PreRempli -and $PreRempli.Count) { " (déjà su : $(@($PreRempli.Keys) -join ', '))" })"
     Show-Etape
 }
 
@@ -294,6 +430,14 @@ function Get-EnqueteEnCours {
 
 function Show-Etape {
     $e = Get-EnqueteEnCours
+    # (une question à laquelle la phrase a déjà répondu : sa réponse est donnée toute seule, une seule fois)
+    while ($e.Etape -and $script:PreRempli -and $script:PreRempli.ContainsKey([string]$e.Etape.Id)) {
+        $n = [int]$script:PreRempli[[string]$e.Etape.Id]
+        $script:PreRempli.Remove([string]$e.Etape.Id)
+        if ($n -lt 0 -or $n -ge @($e.Etape.Reponses).Count) { break }
+        $script:ChoixFaits = @($e.Choix) + $n
+        $e = Get-EnqueteEnCours
+    }
     $script:ChoixFaits = $e.Choix
     if ($e.Etape) {
         # (une enquête déjà finie le reste dans l'historique tant qu'une nouvelle réponse ne la remplace pas)
@@ -571,4 +715,4 @@ function Add-Reparateur {
 function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Enquete $script:ResumeDe.Titre }
 
 # À la fermeture : arrêter ce qui tourne (minuteries, travaux de fond), sinon rien ne doit rester ouvert
-function Stop-Contenu { Stop-LectureJournaux; Stop-ThemeVisuels }
+function Stop-Contenu { Stop-LectureJournaux; Stop-ThemeVisuels; Stop-Ia }

@@ -7,11 +7,15 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 Mindcare s'installe avec **[Mindset](https://github.com/JordanJacquot/Mindset/releases/latest)**, le portail de la suite :
 installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et l'affiche dans sa fenêtre.
 
-## Ce qu'elle sait faire (0.8.1)
+## Ce qu'elle sait faire (0.9.0)
 
 - Un catalogue de 229 pannes rangé en 15 familles (allumage, voyants et bips, démarrage de Windows, écran, plantages, jeux vidéo, lenteur,
   bruits et chaleur, son, internet, clavier et souris, batterie, virus et arnaques, fichiers, Windows et compte), et une recherche par mots (« bip », « wifi »,
   « écran bleu »...) qui marche sans internet.
+- Un assistant qui comprend les phrases (« mon pc s'éteint quand je joue ») : une petite IA entraînée sur le catalogue
+  (Qwen3 0.6B, outils\ia), installée à la demande depuis l'accueil (environ 700 Mo, une seule fois), qui marche ensuite
+  sans internet. Elle propose la panne (« J'ai compris : ... C'est bien ça ? ») et règle d'avance les questions dont la
+  phrase donne déjà la réponse (jamais la question de sécurité). Elle ne répond qu'avec le catalogue.
 - L'accueil en questions guidées : « 1. Ça concerne quoi ? » (12 familles), puis « 2. Qu'est-ce qui se passe ? » ;
   ou on écrit son problème avec ses mots, tout en haut.
 - Une enquête par élimination : les suspects à gauche, barrés au fur et à mesure ; une question ou un test à la fois

@@ -42,7 +42,7 @@ def questions(panne):
         if e.get("Type") != "question":
             continue
         reps = e.get("Reponses") or []
-        if any(r.get("Note") == "cepc" for r in reps) or len(reps) < 2:
+        if any(r.get("Note") == "cepc" for r in reps) or len(reps) < 2 or e.get("Id") == "danger":   # (la sécurité est toujours demandée)
             continue
         q.append(e)
     return q

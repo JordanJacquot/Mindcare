@@ -230,6 +230,22 @@ Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed
 Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
 Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
 Test-Capture 'accueil' | Out-Null
+# L'assistant (ia.ps1) : sa carte « J'ai compris », puis une enquête où la phrase a déjà répondu à des questions
+$faux = '{"panne":"seteint","reponses":{"type":1,"maison":0}}'
+$s = Test-Capture 'ia-comprise' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux }
+Write-Resultat "assistant : la carte « J'ai compris » (journal)" ((Get-Journal $s) -match 'Assistant : .+ -> seteint') '(pas de proposition dans le journal)'
+$s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_CHOISIR = '1' }
+Write-Resultat "assistant : l'enquête commence après les questions déjà réglées par la phrase" ((Get-Journal $s) -match 'Enquête : seteint \(déjà su') '(pas de réponses pré-remplies dans le journal)'
+# Le vrai assistant (seulement sur le PC qui l'entraîne : le modèle et llama-server du dossier d'entraînement)
+$entr = Join-Path $env:LOCALAPPDATA 'Mindcare-entrainement'
+$vraiModele = Get-ChildItem -LiteralPath (Join-Path $entr 'modeles') -Filter 'mindcare-0.6b-*-q8_0.gguf' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
+if ($vraiModele -and (Test-Path -LiteralPath (Join-Path $entr 'llama\llama-server.exe'))) {
+    $avant = @(Get-Process llama-server -ErrorAction SilentlyContinue).Count
+    $s = Test-Capture 'ia-vraie' @{ MINDCARE_TEST_RECHERCHE = 'mon ordi s''éteint tout seul d''un coup comme une coupure de courant'; MINDCARE_IA_SERVEUR = (Join-Path $entr 'llama\llama-server.exe'); MINDCARE_IA_MODELE = $vraiModele.FullName; MINDCARE_CAPTURE_DELAI = '25000' }
+    Write-Resultat "assistant : le vrai modèle propose une panne ($($vraiModele.Name))" ((Get-Journal $s) -match 'Assistant : .+ -> \w+') "(journal : $((Get-Journal $s) -split "`n" | Select-String 'Assistant' | Select-Object -Last 2))"
+    Start-Sleep -Seconds 1
+    Write-Resultat "assistant : arrêté à la fermeture de Mindcare" (@(Get-Process llama-server -ErrorAction SilentlyContinue).Count -le $avant) '(llama-server encore lancé)'
+}
 Test-Capture 'enquete-son' @{ MINDCARE_TEST_PARCOURS = 'songresille:1' } | Out-Null
 Test-Capture 'enquete-commande' @{ MINDCARE_TEST_PARCOURS = 'wificoupe:1,1' } | Out-Null
 Test-Capture 'enquete-interrupteur' @{ MINDCARE_TEST_PARCOURS = 'rien:1,1' } | Out-Null
