@@ -54,7 +54,7 @@ try:
         r = json.loads(json.load(urllib.request.urlopen(req, timeout=120))["choices"][0]["message"]["content"])
         return r, time.time() - t0
 
-    ia_pannes = ia_reponses = mots1 = mots3 = 0
+    ia_pannes = ia_reponses = mots1 = mots3 = mixte3 = 0
     erreurs, confusions, durees = [], Counter(), []
     for k, e in enumerate(ex):
         cible = json.loads(e["messages"][2]["content"])
@@ -69,6 +69,9 @@ try:
         m = mots[k] if k < len(mots) else []
         mots1 += bool(m) and m[0] == cible["panne"]
         mots3 += cible["panne"] in m[:3]
+        # (ce que Mindcare montrerait : la panne de l'IA, puis les propositions de la recherche, 3 en tout)
+        propositions = [r.get("panne")] + [x for x in m if x and x != r.get("panne")]
+        mixte3 += cible["panne"] in propositions[:3]
         if not ok:
             erreurs.append(f"- « {e['messages'][1]['content']} » : attendu {cible['panne']}, l'IA dit {r.get('panne')}")
             confusions[(cible["panne"], r.get("panne"))] += 1
@@ -77,7 +80,7 @@ try:
     lignes = [f"# Mesure de l'IA de Mindcare ({time.strftime('%Y-%m-%d %H:%M')})", "",
               f"Modèle : `{os.path.basename(modele)}` ; {n} phrases jamais vues ({len(set(e['panne'] for e in ex))} pannes).", "",
               "| | Bonne panne en 1er | Bonne panne dans les 3 premières |", "|---|---|---|",
-              f"| L'IA | {pc(ia_pannes)} | |", f"| La recherche par mots actuelle | {pc(mots1)} | {pc(mots3)} |", "",
+              f"| L'IA | {pc(ia_pannes)} | |", f"| L'IA, puis la recherche par mots | | {pc(mixte3)} |", f"| La recherche par mots actuelle | {pc(mots1)} | {pc(mots3)} |", "",
               f"L'IA trouve aussi exactement les réponses déjà données dans {pc(ia_reponses)} des phrases.",
               f"Temps de réponse de l'IA sur le PC : {sorted(durees)[len(durees) // 2]:.2f} s (médiane).", "",
               "## Confusions les plus fréquentes", ""] + [f"- {a} ({titres.get(a, '')}) pris pour {b} ({titres.get(b, '')}) : {c} fois" for (a, b), c in confusions.most_common(15)] + \
