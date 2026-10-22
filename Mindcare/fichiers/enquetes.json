@@ -3756,6 +3756,202 @@
       "Sauf": [
         "fixe"
       ]
+    },
+    "secureboot": {
+      "Titre": "Les clés du démarrage sécurisé",
+      "Trouve": "Les clés du « Secure Boot » du BIOS ne reconnaissent plus Windows (ou une pièce)",
+      "Pourquoi": "Le démarrage sécurisé vérifie que ce qui démarre est signé. Après une mise à jour du BIOS, un changement de carte graphique ou une coupure, ses clés peuvent ne plus correspondre.",
+      "AFaire": [
+        "Dans le BIOS, « Secure Boot » : « Restore Factory Keys » (ou « Install default Secure Boot keys »), puis F10.",
+        "Si ça ne suffit pas : remets les réglages par défaut du BIOS (F9)."
+      ],
+      "Pro": "Un réparateur peut remettre le démarrage sécurisé en ordre sans toucher à tes fichiers."
+    },
+    "disqueneufvierge": {
+      "Titre": "Le disque neuf pas encore préparé",
+      "Trouve": "Le disque neuf n'avait pas été préparé (initialisé) par Windows",
+      "Pourquoi": "Un disque neuf (SSD ou disque dur) arrive vide : Windows le voit, mais il faut l'« initialiser » et y créer un volume avant qu'il apparaisse dans « Ce PC ».",
+      "AFaire": [
+        "C'est réglé : le disque apparaît avec sa lettre."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "volumeabsolu": {
+      "Titre": "Le volume du casque Bluetooth",
+      "Trouve": "Le casque Bluetooth et Windows se disputaient le volume",
+      "Pourquoi": "Avec certains casques Bluetooth, le volume du casque et celui de Windows sont liés (« volume absolu ») : ils se changent l'un l'autre, parfois tout seuls.",
+      "AFaire": [
+        "Règle le volume sur un seul des deux (le casque, ou Windows), pas les deux."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "touchevolume": {
+      "Titre": "Une touche de volume bloquée",
+      "Trouve": "Une touche de volume (clavier ou casque) restait enfoncée",
+      "Pourquoi": "Une molette ou une touche de volume coincée (sur le clavier, le casque, la télécommande du casque) change le volume en continu.",
+      "AFaire": [
+        "Débloque ou nettoie la touche ; débranche l'appareil s'il recommence."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "upnp": {
+      "Titre": "Le réglage UPnP de la box",
+      "Trouve": "La box bloquait les connexions des jeux (NAT strict)",
+      "Pourquoi": "Pour rejoindre des amis, les jeux et consoles ouvrent des « portes » dans la box (UPnP). Coupé, le NAT est « strict » : impossible de rejoindre certaines parties ou d'entendre les autres.",
+      "AFaire": [
+        "Garde l'UPnP activé dans les réglages de la box (appli ou site de la box)."
+      ],
+      "Pro": "Ton opérateur peut t'aider à trouver le réglage UPnP."
+    },
+    "parefeujeu": {
+      "Titre": "Le pare-feu de Windows",
+      "Trouve": "Le pare-feu de Windows bloquait le jeu",
+      "Pourquoi": "La première fois, Windows demande si un jeu peut utiliser le réseau. Un « Annuler » trop rapide le bloque.",
+      "AFaire": [
+        "Garde le jeu autorisé (réseaux privés et publics) dans « Autoriser une application via le pare-feu Windows »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "discordregion": {
+      "Titre": "La région du salon vocal",
+      "Trouve": "Le serveur vocal de Discord choisi répondait mal",
+      "Pourquoi": "Les salons vocaux de Discord passent par un serveur ; s'il est surchargé ou bloqué, l'appel reste sur « Connexion RTC ».",
+      "AFaire": [
+        "Dans les réglages du salon vocal : « Remplacement de région », choisis une région proche (par exemple Rotterdam)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "fenetresansbordure": {
+      "Titre": "Le mode fenêtré",
+      "Trouve": "Le jeu en mode fenêtré laissait sortir la souris",
+      "Pourquoi": "En « fenêtré » ou « fenêtré sans bordure », la souris peut sortir de la fenêtre du jeu vers l'autre écran ; en « plein écran », elle reste dedans.",
+      "AFaire": [
+        "Mets le jeu en « Plein écran », ou garde « Fenêtré sans bordure » et active « Bloquer le curseur dans la fenêtre » si le jeu le propose."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "extensionscachees": {
+      "Titre": "Les extensions cachées",
+      "Trouve": "Windows cachait la fin du nom des fichiers (.pdf, .jpg)",
+      "Pourquoi": "Par défaut, Windows cache l'« extension » des fichiers (.pdf, .jpg, .exe) : on ne sait plus de quel type est un fichier, et les virus en profitent (« facture.pdf.exe »).",
+      "AFaire": [
+        "Garde les extensions visibles."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "lectureseule": {
+      "Titre": "La case « Lecture seule »",
+      "Trouve": "Le fichier était en « lecture seule »",
+      "Pourquoi": "Un fichier marqué « Lecture seule » (souvent copié d'un CD, d'une clé ou reçu par e-mail) s'ouvre mais ne s'enregistre pas.",
+      "AFaire": [
+        "Clic droit, « Propriétés », décoche « Lecture seule »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "statutonedrive": {
+      "Titre": "Les icônes de OneDrive",
+      "Trouve": "Ce sont les icônes de OneDrive (nuage, coche verte, croix rouge)",
+      "Pourquoi": "OneDrive montre l'état de chaque fichier : nuage = seulement en ligne, coche verte = aussi sur le PC, flèches = en cours, croix rouge = problème de synchronisation.",
+      "AFaire": [
+        "Croix rouge : clique sur le nuage OneDrive près de l'heure pour voir le problème (place pleine, nom interdit, fichier ouvert).",
+        "Pour garder un dossier sur le PC : clic droit, « Toujours conserver sur cet appareil »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "compression": {
+      "Titre": "La compression ou le chiffrement",
+      "Trouve": "Les flèches bleues ou le cadenas indiquent un fichier compressé ou chiffré",
+      "Pourquoi": "Deux flèches bleues : le fichier est compressé par Windows pour gagner de la place. Un cadenas : il est chiffré (BitLocker, EFS).",
+      "AFaire": [
+        "Rien d'anormal : clic droit, « Propriétés », « Avancé » pour décocher la compression si tu le souhaites."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ancrage": {
+      "Titre": "L'ancrage des fenêtres",
+      "Trouve": "Windows aligne les fenêtres quand on les glisse vers un bord (« ancrage »)",
+      "Pourquoi": "Glisser une fenêtre en haut l'agrandit, sur un côté la met en moitié d'écran, et Windows 11 propose des dispositions : c'est l'« ancrage ».",
+      "AFaire": [
+        "Pour le couper : Paramètres, « Système », « Multitâche », « Ancrer les fenêtres » : désactivé (ou décoche seulement ce qui gêne)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appspromues": {
+      "Titre": "Les applis proposées par Windows",
+      "Trouve": "Windows installait des applis et des suggestions (publicités)",
+      "Pourquoi": "Windows ajoute des applis « proposées » (jeux, réseaux sociaux) et des suggestions dans le menu Démarrer et les notifications.",
+      "AFaire": [
+        "Désinstalle les applis qui ne servent pas (clic droit dans le menu Démarrer, « Désinstaller »).",
+        "Coupe les suggestions : Paramètres, « Personnalisation », « Démarrer » : désactive les recommandations et conseils ; « Système », « Notifications », « Paramètres supplémentaires » : décoche les suggestions."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "outilcapture": {
+      "Titre": "Le raccourci de capture",
+      "Trouve": "C'était juste à savoir : les raccourcis de capture d'écran",
+      "Pourquoi": "Windows a plusieurs façons de faire une capture : touche Windows + Maj + S (une zone), Impr écran (tout l'écran), touche Windows + Impr écran (enregistrée dans « Images », « Captures d'écran »).",
+      "AFaire": [
+        "Touche Windows + Maj + S, puis colle (Ctrl + V) où tu veux, ou clique sur la notification pour l'enregistrer.",
+        "Si Impr écran ouvre l'outil Capture sans le vouloir : Paramètres, « Accessibilité », « Clavier », « Utiliser le bouton Impr. écran pour ouvrir la capture d'écran »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "outilcapturebloque": {
+      "Titre": "L'outil Capture",
+      "Trouve": "L'outil Capture de Windows était abîmé ou désactivé",
+      "Pourquoi": "Les captures passent par l'appli « Outil Capture » : abîmée, plus rien ne marche.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "menuw11": {
+      "Titre": "Le nouveau menu de Windows 11",
+      "Trouve": "C'est le nouveau menu du clic droit de Windows 11",
+      "Pourquoi": "Windows 11 a raccourci le menu du clic droit : les anciennes options (de 7-Zip, de l'antivirus...) sont dans « Afficher d'autres options ».",
+      "AFaire": [
+        "Maj + clic droit (ou Maj + F10) ouvre directement l'ancien menu complet."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "winlock": {
+      "Titre": "Le verrou de la touche Windows",
+      "Trouve": "La touche Windows était verrouillée (mode jeu du clavier)",
+      "Pourquoi": "Les claviers de jeu ont un « mode jeu » ou un verrou (Fn + Windows, ou une touche avec un cadenas) qui coupe la touche Windows pour ne pas quitter le jeu par erreur.",
+      "AFaire": [
+        "Pour la déverrouiller : Fn + touche Windows, ou la touche « Game Mode » / « Win Lock » du clavier (ou son logiciel)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "boutonsinverses": {
+      "Titre": "Les boutons inversés",
+      "Trouve": "Les boutons de la souris étaient inversés dans Windows",
+      "Pourquoi": "Windows peut inverser le clic gauche et le clic droit (pour les gauchers).",
+      "AFaire": [
+        "Garde « Bouton principal de la souris » sur « Gauche »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "actioncapot": {
+      "Titre": "L'action du capot",
+      "Trouve": "Windows était réglé pour ne rien faire quand on ferme le capot",
+      "Pourquoi": "Ce que fait le portable quand on ferme le capot se règle : rien, veille, veille prolongée, ou arrêt.",
+      "AFaire": [
+        "Choisis l'action voulue dans « Choisir l'action qui suit la fermeture du capot »."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "partagegpu": {
+      "Titre": "La carte graphique du partage d'écran",
+      "Trouve": "L'appli de visio et le partage d'écran tournaient sur deux cartes graphiques différentes",
+      "Pourquoi": "Sur les portables à deux cartes graphiques, une appli de visio sur la puissante ne peut pas filmer un écran géré par l'autre : l'écran partagé est noir.",
+      "AFaire": [
+        "Dans « Paramètres », « Système », « Écran », « Graphiques » : mets l'appli de visio (Teams, Discord, Zoom, le navigateur) sur « Économie d'énergie »."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -12408,6 +12604,460 @@
           "Preuve": "Recalibrer n'a rien changé"
         }
       ]
+    },
+    "test-cles-secureboot": {
+      "Type": "test",
+      "Court": "Les clés Secure Boot",
+      "Pour": [
+        "secureboot"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Remets les clés d'usine du démarrage sécurisé",
+      "Gestes": [
+        "Allume le PC et appuie plusieurs fois sur Suppr (ou F2) dès qu'il démarre : le BIOS s'ouvre.",
+        "Va dans « Boot » ou « Security », puis « Secure Boot ».",
+        "Choisis « Restore Factory Keys » (ou « Install Default Secure Boot Keys »), confirme, puis F10 pour enregistrer."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "secureboot",
+          "Preuve": "Les clés remises, Windows démarre"
+        },
+        {
+          "Texte": "Toujours le message",
+          "Ecarte": [
+            "secureboot"
+          ],
+          "Preuve": "Les clés n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-initialiser": {
+      "Type": "test",
+      "Court": "Préparer le disque",
+      "Pour": [
+        "disqueneufvierge"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Prépare le disque neuf",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer, puis « Gestion des disques » (accepte l'autorisation).",
+        "Si une fenêtre propose d'« initialiser » le disque : choisis « GPT », puis OK.",
+        "Sur la zone noire « Non alloué » du nouveau disque : clic droit, « Nouveau volume simple », puis « Suivant » jusqu'au bout (c'est un disque neuf : rien n'est effacé ailleurs)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il apparaît dans « Ce PC »",
+          "Confirme": "disqueneufvierge",
+          "Preuve": "Le disque préparé apparaît"
+        },
+        {
+          "Texte": "Il n'est pas dans la liste",
+          "Ecarte": [
+            "disqueneufvierge"
+          ],
+          "Preuve": "Le disque n'est pas vu par Windows"
+        }
+      ]
+    },
+    "test-debrancher-volume": {
+      "Type": "test",
+      "Court": "Débrancher",
+      "Pour": [
+        "touchevolume"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Débranche le casque et les claviers à touches multimédia",
+      "Gestes": [
+        "Débranche le casque (et sa télécommande), le clavier à molette de volume, et les manettes.",
+        "Regarde si le volume bouge encore tout seul."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne bouge plus",
+          "Confirme": "touchevolume",
+          "Preuve": "Sans ces appareils, le volume ne bouge plus"
+        },
+        {
+          "Texte": "Il bouge encore",
+          "Ecarte": [
+            "touchevolume"
+          ],
+          "Preuve": "Ce n'est pas une touche bloquée"
+        }
+      ]
+    },
+    "q-volume-bt": {
+      "Type": "question",
+      "Court": "En Bluetooth ?",
+      "Texte": "Le son passe-t-il par un casque ou une enceinte Bluetooth ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "volumeabsolu",
+          "Preuve": "Le son passe en Bluetooth"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "volumeabsolu"
+          ],
+          "Preuve": "Pas de Bluetooth"
+        }
+      ]
+    },
+    "test-upnp": {
+      "Type": "test",
+      "Court": "L'UPnP",
+      "Pour": [
+        "upnp"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Active l'UPnP dans la box",
+      "Gestes": [
+        "Ouvre l'appli de ta box (ou son site, souvent 192.168.1.1) et connecte-toi.",
+        "Cherche « UPnP » (dans « Réseau », « NAT/PAT » ou « Avancé ») et active-le.",
+        "Redémarre la box, puis relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le NAT est ouvert ou modéré",
+          "Confirme": "upnp",
+          "Preuve": "L'UPnP activé, le NAT n'est plus strict"
+        },
+        {
+          "Texte": "Toujours strict",
+          "Ecarte": [
+            "upnp"
+          ],
+          "Preuve": "L'UPnP n'y était pour rien"
+        }
+      ]
+    },
+    "test-parefeu-jeu": {
+      "Type": "test",
+      "Court": "Le pare-feu",
+      "Pour": [
+        "parefeujeu"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Autorise le jeu dans le pare-feu de Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Autoriser une application via le pare-feu Windows » et ouvre-le.",
+        "Clique sur « Modifier les paramètres » (accepte l'autorisation), cherche le jeu et coche « Privé » et « Public ». Absent ? « Autoriser une autre application » et ajoute-le.",
+        "Relance le jeu."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça se connecte",
+          "Confirme": "parefeujeu",
+          "Preuve": "Autorisé dans le pare-feu, le jeu se connecte"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "parefeujeu"
+          ],
+          "Preuve": "Le pare-feu n'y était pour rien"
+        }
+      ]
+    },
+    "test-discord-region": {
+      "Type": "test",
+      "Court": "La région du salon",
+      "Pour": [
+        "discordregion"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Change la région du salon vocal",
+      "Gestes": [
+        "Dans Discord, roue dentée à côté du salon vocal (« Modifier le salon ») ; il faut être autorisé à le modifier.",
+        "« Remplacement de région » : choisis une région proche, enregistre et reconnecte-toi.",
+        "Sinon, demande à l'administrateur du serveur de le faire, ou essaie un autre salon."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La voix se connecte",
+          "Confirme": "discordregion",
+          "Preuve": "Avec une autre région, la voix se connecte"
+        },
+        {
+          "Texte": "Toujours « Connexion RTC »",
+          "Ecarte": [
+            "discordregion"
+          ],
+          "Preuve": "La région n'y était pour rien"
+        }
+      ]
+    },
+    "test-plein-ecran": {
+      "Type": "test",
+      "Court": "Plein écran",
+      "Pour": [
+        "fenetresansbordure"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Passe le jeu en plein écran",
+      "Gestes": [
+        "Dans les options graphiques du jeu, choisis « Plein écran » (pas « Fenêtré »), ou active « Bloquer le curseur » s'il existe.",
+        "Rejoue une partie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La souris reste dans le jeu",
+          "Confirme": "fenetresansbordure",
+          "Preuve": "En plein écran, la souris reste dans le jeu"
+        },
+        {
+          "Texte": "Elle sort encore",
+          "Ecarte": [
+            "fenetresansbordure"
+          ],
+          "Preuve": "Le mode d'affichage n'y était pour rien"
+        }
+      ]
+    },
+    "test-extensions-fichiers": {
+      "Type": "test",
+      "Court": "Afficher les extensions",
+      "Pour": [
+        "extensionscachees"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Affiche les extensions des fichiers",
+      "Gestes": [
+        "Ouvre l'Explorateur de fichiers (touche Windows + E).",
+        "En haut : « Affichage », puis « Afficher », puis coche « Extensions de noms de fichiers » (Windows 10 : onglet « Affichage », case « Extensions de noms de fichiers »)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je vois .pdf, .jpg...",
+          "Confirme": "extensionscachees",
+          "Preuve": "Les extensions sont visibles"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "extensionscachees"
+          ],
+          "Preuve": "Les extensions n'étaient pas cachées"
+        }
+      ]
+    },
+    "test-lecture-seule": {
+      "Type": "test",
+      "Court": "Lecture seule",
+      "Pour": [
+        "lectureseule"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Décoche « Lecture seule »",
+      "Gestes": [
+        "Ferme le fichier. Clic droit dessus, « Propriétés ».",
+        "En bas de l'onglet « Général », décoche « Lecture seule », puis OK.",
+        "Rouvre-le et enregistre."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'enregistre",
+          "Confirme": "lectureseule",
+          "Preuve": "Sans « Lecture seule », le fichier s'enregistre"
+        },
+        {
+          "Texte": "Toujours impossible, ou pas cochée",
+          "Ecarte": [
+            "lectureseule"
+          ],
+          "Preuve": "« Lecture seule » n'y était pour rien"
+        }
+      ]
+    },
+    "q-icones-onedrive": {
+      "Type": "question",
+      "Court": "Quelles icônes ?",
+      "Texte": "Les fichiers ont-ils des petits nuages, des coches vertes, des flèches ou des croix rouges ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "statutonedrive",
+          "Preuve": "Les icônes sont celles de OneDrive"
+        },
+        {
+          "Texte": "Non, un autre symbole (cadenas, flèches bleues)",
+          "Ecarte": [
+            "statutonedrive"
+          ],
+          "Preuve": "Ce ne sont pas les icônes de OneDrive"
+        }
+      ]
+    },
+    "test-ancrage": {
+      "Type": "test",
+      "Court": "L'ancrage",
+      "Pour": [
+        "ancrage"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Règle l'ancrage des fenêtres",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », puis « Multitâche ».",
+        "Désactive « Ancrer les fenêtres », ou ouvre-le pour décocher seulement ce qui te gêne."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "ancrage",
+          "Preuve": "L'ancrage réglé, c'est fini"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "ancrage"
+          ],
+          "Preuve": "Ce n'était pas l'ancrage"
+        }
+      ]
+    },
+    "test-suggestions": {
+      "Type": "test",
+      "Court": "Les suggestions",
+      "Pour": [
+        "appspromues"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe les suggestions de Windows",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "« Personnalisation », « Démarrer » : désactive « Afficher les recommandations de conseils, de raccourcis, de nouvelles applications ».",
+        "« Système », « Notifications », « Paramètres supplémentaires » : décoche les cases de suggestions et de conseils.",
+        "Désinstalle les applis non voulues : clic droit dans le menu Démarrer, « Désinstaller »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est plus calme",
+          "Confirme": "appspromues",
+          "Preuve": "Sans les suggestions, c'est réglé"
+        },
+        {
+          "Texte": "Il en revient",
+          "Ecarte": [
+            "appspromues"
+          ],
+          "Preuve": "Ce ne sont pas les suggestions de Windows"
+        }
+      ]
+    },
+    "test-winlock": {
+      "Type": "test",
+      "Court": "Le verrou",
+      "Pour": [
+        "winlock"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Déverrouille la touche Windows",
+      "Gestes": [
+        "Appuie sur Fn + touche Windows, ou sur une touche marquée « Win Lock », « Game Mode » ou avec une manette dessinée (souvent F12 ou Arrêt défil).",
+        "Essaie la touche Windows."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle remarche",
+          "Confirme": "winlock",
+          "Preuve": "La touche Windows était verrouillée"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "winlock"
+          ],
+          "Preuve": "La touche Windows n'était pas verrouillée"
+        }
+      ]
+    },
+    "test-boutons-souris": {
+      "Type": "test",
+      "Court": "Le bouton principal",
+      "Pour": [
+        "boutonsinverses"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets le bouton principal à gauche",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Bluetooth et appareils », puis « Souris ».",
+        "« Bouton principal de la souris » : choisis « Gauche »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est remis",
+          "Confirme": "boutonsinverses",
+          "Preuve": "Le bouton principal remis à gauche"
+        },
+        {
+          "Texte": "Toujours inversé",
+          "Ecarte": [
+            "boutonsinverses"
+          ],
+          "Preuve": "Les boutons n'étaient pas inversés dans Windows"
+        }
+      ]
+    },
+    "test-action-capot": {
+      "Type": "test",
+      "Court": "La fermeture du capot",
+      "Pour": [
+        "actioncapot"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Choisis ce que fait le capot fermé",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Modifier l'action du bouton d'alimentation » (ou Panneau de configuration, « Options d'alimentation », « Choisir l'action qui suit la fermeture du capot »).",
+        "Pour « Lorsque je ferme le capot », choisis « Mettre en veille » (sur batterie et sur secteur), puis « Enregistrer les modifications »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "actioncapot",
+          "Preuve": "L'action du capot réglée, c'est réglé"
+        },
+        {
+          "Texte": "Toujours rien quand je ferme",
+          "Ecarte": [
+            "actioncapot"
+          ],
+          "Preuve": "L'action du capot était déjà la bonne"
+        }
+      ]
+    },
+    "test-gpu-visio": {
+      "Type": "test",
+      "Court": "La carte graphique de l'appli",
+      "Pour": [
+        "partagegpu"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Mets l'appli de visio sur l'économie d'énergie",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Système », « Écran », puis « Graphiques ».",
+        "Choisis l'appli (Teams, Discord, Zoom, ou le navigateur pour Meet), « Options » : « Économie d'énergie ». Relance-la."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le partage marche",
+          "Confirme": "partagegpu",
+          "Preuve": "Sur la même carte graphique, le partage marche"
+        },
+        {
+          "Texte": "Toujours noir",
+          "Ecarte": [
+            "partagegpu"
+          ],
+          "Preuve": "La carte graphique n'y était pour rien"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -13123,7 +13773,9 @@
         "ne répond plus",
         "souris bloquée",
         "plus rien ne bouge",
-        "immobile"
+        "immobile",
+        "écran figé mais la souris bouge",
+        "la souris bouge mais rien ne répond"
       ],
       "Suspects": [
         "disque",
@@ -14454,6 +15106,35 @@
       ]
     },
     {
+      "Id": "capot",
+      "Famille": "allumage",
+      "Titre": "Rien ne se passe quand je ferme le capot",
+      "Phrase": "Le portable reste allumé capot fermé, ou s'éteint au lieu de se mettre en veille",
+      "Mots": [
+        "capot",
+        "fermer le capot",
+        "écran fermé",
+        "couvercle",
+        "rabat",
+        "reste allumé fermé"
+      ],
+      "Suspects": [
+        "actioncapot",
+        "pilote"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-action-capot"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
       "Id": "nesteintpas",
       "Famille": "allumage",
       "Titre": "Il ne s'éteint pas",
@@ -14529,7 +15210,9 @@
         "se réveille tout seul",
         "la nuit",
         "sort de veille tout seul",
-        "démarre tout seul"
+        "démarre tout seul",
+        "sort de veille tout de suite",
+        "se réveille aussitôt"
       ],
       "Suspects": [
         "reveilsouris",
@@ -15329,7 +16012,10 @@
         "operating system not found",
         "no bootable device",
         "insert boot media",
-        "boot device not found"
+        "boot device not found",
+        "reboot and select proper boot device",
+        "select proper boot device",
+        "0xc0000001"
       ],
       "Suspects": [
         "cleusb",
@@ -15453,6 +16139,47 @@
         },
         {
           "Ref": "test-defauts-bios"
+        }
+      ]
+    },
+    {
+      "Id": "secureboot",
+      "Famille": "demarrage",
+      "Titre": "« Secure Boot Violation » au démarrage",
+      "Phrase": "Un message parle de démarrage sécurisé, de signature invalide, et Windows ne démarre pas",
+      "Mots": [
+        "secure boot violation",
+        "secure boot",
+        "invalid signature",
+        "signature invalide",
+        "démarrage sécurisé",
+        "security violation"
+      ],
+      "Suspects": [
+        "secureboot",
+        "modeboot",
+        "cleusb"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cles-secureboot"
+        },
+        {
+          "Ref": "test-defauts-bios",
+          "Reponses": [
+            {
+              "Texte": "Windows démarre",
+              "Confirme": "modeboot",
+              "Preuve": "Avec les réglages par défaut, Windows démarre"
+            },
+            {
+              "Texte": "Toujours le message",
+              "Ecarte": [
+                "modeboot"
+              ],
+              "Preuve": "Les réglages par défaut n'ont rien changé"
+            }
+          ]
         }
       ]
     },
@@ -16772,7 +17499,9 @@
         "pivoté",
         "rotation",
         "de côté",
-        "vertical"
+        "vertical",
+        "l'écran tourne tout seul",
+        "rotation automatique"
       ],
       "Suspects": [
         "orientation",
@@ -17836,7 +18565,10 @@
         "update",
         "depuis la mise à jour",
         "windows update",
-        "après la mise à jour"
+        "après la mise à jour",
+        "depuis windows 11",
+        "lent depuis la mise à jour",
+        "lent depuis le passage à windows 11"
       ],
       "Suspects": [
         "majencours",
@@ -18788,6 +19520,35 @@
       ]
     },
     {
+      "Id": "volumeseul",
+      "Famille": "son",
+      "Titre": "Le volume change tout seul",
+      "Phrase": "Le volume monte ou descend sans qu'on y touche",
+      "Mots": [
+        "volume change tout seul",
+        "volume monte tout seul",
+        "volume baisse tout seul",
+        "le son baisse tout seul",
+        "volume bouge"
+      ],
+      "Suspects": [
+        "touchevolume",
+        "volumeabsolu",
+        "attenuation"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-debrancher-volume"
+        },
+        {
+          "Ref": "q-volume-bt"
+        },
+        {
+          "Ref": "test-communications"
+        }
+      ]
+    },
+    {
       "Id": "uncote",
       "Famille": "son",
       "Titre": "Le son ne sort que d'un côté",
@@ -19634,7 +20395,10 @@
         "refusé",
         "incorrect",
         "clé réseau",
-        "clé de sécurité réseau incorrecte"
+        "clé de sécurité réseau incorrecte",
+        "code pin wifi",
+        "demande un code pin",
+        "wps"
       ],
       "Suspects": [
         "mdpfaux",
@@ -19771,6 +20535,80 @@
       ]
     },
     {
+      "Id": "wifilent",
+      "Famille": "internet",
+      "Titre": "Le Wi-Fi est lent, mais avec un câble c'est rapide",
+      "Phrase": "En câble tout va bien, en Wi-Fi c'est bien plus lent",
+      "Mots": [
+        "wifi lent",
+        "wi-fi lent",
+        "lent en wifi",
+        "rapide en câble",
+        "débit wifi",
+        "wifi plus lent"
+      ],
+      "Suspects": [
+        "signal",
+        "boxbande",
+        "energiewifi",
+        "piloteres"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-pres-box"
+        },
+        {
+          "Ref": "q-tel-5ghz"
+        },
+        {
+          "Ref": "test-pilote-res",
+          "Reponses": [
+            {
+              "Texte": "C'est rapide maintenant",
+              "Confirme": "piloteres",
+              "Preuve": "Après les mises à jour, le Wi-Fi est rapide"
+            },
+            {
+              "Texte": "Toujours lent",
+              "Ecarte": [
+                "piloteres"
+              ],
+              "Preuve": "Les mises à jour n'ont rien changé"
+            }
+          ]
+        },
+        {
+          "Id": "test-energie-wifi",
+          "Type": "test",
+          "Court": "L'économie d'énergie du Wi-Fi",
+          "Pour": [
+            "energiewifi"
+          ],
+          "Duree": "cinq minutes",
+          "Texte": "Empêche Windows d'éteindre le Wi-Fi pour économiser",
+          "Gestes": [
+            "Clic droit sur le bouton Démarrer, « Gestionnaire de périphériques ».",
+            "Ouvre « Cartes réseau », double-clique sur la carte « Wi-Fi » ou « Wireless ».",
+            "Onglet « Gestion de l'alimentation » : décoche « Autoriser l'ordinateur à éteindre ce périphérique ». OK."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Ça ne coupe plus",
+              "Confirme": "energiewifi",
+              "Preuve": "Sans l'économie d'énergie du Wi-Fi, ça ne coupe plus"
+            },
+            {
+              "Texte": "Ça coupe encore",
+              "Ecarte": [
+                "energiewifi"
+              ],
+              "Preuve": "L'économie d'énergie n'y était pour rien"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "cablereseau",
       "Famille": "internet",
       "Titre": "Le câble réseau ne marche pas",
@@ -19781,7 +20619,9 @@
         "rj45",
         "filaire",
         "câble réseau",
-        "branché à la box"
+        "branché à la box",
+        "réseau non identifié",
+        "câble réseau débranché"
       ],
       "Suspects": [
         "box",
@@ -20018,6 +20858,69 @@
         },
         {
           "Ref": "test-dns"
+        }
+      ]
+    },
+    {
+      "Id": "discordrtc",
+      "Famille": "internet",
+      "Titre": "Discord reste bloqué sur « Connexion RTC » ou « Pas de route »",
+      "Phrase": "Impossible de rejoindre un salon vocal Discord, alors qu'internet marche",
+      "Mots": [
+        "discord",
+        "connexion rtc",
+        "rtc connecting",
+        "pas de route",
+        "no route",
+        "salon vocal",
+        "ice checking"
+      ],
+      "Suspects": [
+        "antivirusweb",
+        "discordregion",
+        "dns",
+        "parefeujeu"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-antivirus",
+          "Reponses": [
+            {
+              "Texte": "La voix se connecte",
+              "Confirme": "antivirusweb",
+              "Preuve": "Sans l'antivirus en plus ni le VPN, la voix se connecte"
+            },
+            {
+              "Texte": "Toujours pareil, ou je n'en ai pas",
+              "Ecarte": [
+                "antivirusweb"
+              ],
+              "Preuve": "Aucun antivirus ni VPN ne gênait"
+            }
+          ]
+        },
+        {
+          "Ref": "test-discord-region"
+        },
+        {
+          "Ref": "test-dns",
+          "Reponses": [
+            {
+              "Texte": "La voix se connecte",
+              "Confirme": "dns",
+              "Preuve": "Le carnet d'adresses vidé, la voix se connecte"
+            },
+            {
+              "Texte": "Toujours pareil",
+              "Ecarte": [
+                "dns"
+              ],
+              "Preuve": "Le carnet d'adresses n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-parefeu-jeu"
         }
       ]
     },
@@ -20362,6 +21265,36 @@
       ]
     },
     {
+      "Id": "touchewindows",
+      "Famille": "peripheriques",
+      "Titre": "La touche Windows ne marche plus",
+      "Phrase": "Elle n'ouvre plus le menu Démarrer, les raccourcis Windows + quelque chose non plus",
+      "Mots": [
+        "touche windows",
+        "touche démarrer",
+        "win lock",
+        "windows ne marche pas",
+        "raccourcis windows",
+        "mode jeu clavier"
+      ],
+      "Suspects": [
+        "winlock",
+        "explorateur",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-winlock"
+        },
+        {
+          "Ref": "test-explorateur-redem"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
       "Id": "toucherepete",
       "Famille": "peripheriques",
       "Titre": "Des lettres se répètent ou le clavier tape tout seul",
@@ -20435,7 +21368,9 @@
         "curseur",
         "flèche",
         "bouge plus",
-        "saute"
+        "saute",
+        "clic droit ne marche pas",
+        "clic gauche ne marche pas"
       ],
       "Suspects": [
         "verroupave",
@@ -20574,6 +21509,29 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "clicsinverses",
+      "Famille": "peripheriques",
+      "Titre": "Le clic gauche et le clic droit sont inversés",
+      "Phrase": "Le clic gauche ouvre le menu, le droit sélectionne",
+      "Mots": [
+        "clic inversé",
+        "clics inversés",
+        "boutons inversés",
+        "clic gauche fait clic droit",
+        "souris inversée",
+        "gaucher"
+      ],
+      "Suspects": [
+        "boutonsinverses",
+        "logicielclavier"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-boutons-souris"
         }
       ]
     },
@@ -20935,6 +21893,37 @@
       ]
     },
     {
+      "Id": "partageecran",
+      "Famille": "peripheriques",
+      "Titre": "L'écran partagé est noir (Teams, Discord, Zoom)",
+      "Phrase": "En partage d'écran, les autres voient un écran noir",
+      "Mots": [
+        "partage d'écran",
+        "écran partagé noir",
+        "partager l'écran",
+        "stream noir",
+        "discord stream noir",
+        "teams partage",
+        "obs écran noir"
+      ],
+      "Suspects": [
+        "accelmateriel",
+        "partagegpu",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-accel-nav"
+        },
+        {
+          "Ref": "test-gpu-visio"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
       "Id": "telephone",
       "Famille": "peripheriques",
       "Titre": "Le téléphone branché n'apparaît pas",
@@ -21030,7 +22019,10 @@
         "papier",
         "imprime tout seul",
         "vieux documents",
-        "file d'attente bloquée"
+        "file d'attente bloquée",
+        "pilote indisponible",
+        "imprimante hors ligne",
+        "état erreur"
       ],
       "Suspects": [
         "imprimanteconso",
@@ -22339,6 +23331,54 @@
       ]
     },
     {
+      "Id": "enregistrerimpossible",
+      "Famille": "fichiers",
+      "Titre": "« Impossible d'enregistrer » ou fichier en lecture seule",
+      "Phrase": "Le fichier s'ouvre, mais refuse d'enregistrer les changements",
+      "Mots": [
+        "impossible d'enregistrer",
+        "lecture seule",
+        "read only",
+        "enregistrer impossible",
+        "accès refusé enregistrer",
+        "ne s'enregistre pas"
+      ],
+      "Suspects": [
+        "lectureseule",
+        "motw",
+        "dossiersproteges",
+        "fichierouvert"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-lecture-seule"
+        },
+        {
+          "Ref": "test-debloquer"
+        },
+        {
+          "Ref": "test-dossiers-proteges",
+          "Reponses": [
+            {
+              "Texte": "Il s'enregistre",
+              "Confirme": "dossiersproteges",
+              "Preuve": "Autorisé, le programme enregistre"
+            },
+            {
+              "Texte": "Toujours pareil, ou c'était désactivé",
+              "Ecarte": [
+                "dossiersproteges"
+              ],
+              "Preuve": "La protection des dossiers n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-fermer-prog"
+        }
+      ]
+    },
+    {
       "Id": "disqueexterne",
       "Famille": "fichiers",
       "Titre": "Un disque externe n'est pas reconnu",
@@ -22349,7 +23389,10 @@
         "pas reconnu",
         "n'apparaît pas",
         "formater",
-        "usb"
+        "usb",
+        "raw",
+        "le disque est en raw",
+        "vous devez formater le disque"
       ],
       "Suspects": [
         "alimdisque",
@@ -22873,6 +23916,33 @@
       ]
     },
     {
+      "Id": "extensionsfichiers",
+      "Famille": "fichiers",
+      "Titre": "Je ne vois pas le type des fichiers (.pdf, .jpg)",
+      "Phrase": "Les noms n'ont pas leur fin, impossible de savoir si c'est une photo, un PDF...",
+      "Mots": [
+        "extension",
+        "extensions",
+        ".pdf",
+        ".jpg",
+        "type de fichier",
+        "fin du nom",
+        "renommer en"
+      ],
+      "Suspects": [
+        "extensionscachees",
+        "appdefaut"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-extensions-fichiers"
+        },
+        {
+          "Ref": "test-ouvrir-avec-defaut"
+        }
+      ]
+    },
+    {
       "Id": "fichierbloque",
       "Famille": "fichiers",
       "Titre": "Un fichier téléchargé est bloqué ou en « mode protégé »",
@@ -23023,6 +24093,37 @@
       ]
     },
     {
+      "Id": "disqueneuf",
+      "Famille": "fichiers",
+      "Titre": "Un disque neuf (SSD, disque dur) n'apparaît pas",
+      "Phrase": "Il vient d'être installé, mais pas de nouvelle lettre dans « Ce PC »",
+      "Mots": [
+        "disque neuf",
+        "nouveau ssd",
+        "nouveau disque",
+        "ssd n'apparaît pas",
+        "disque non initialisé",
+        "non alloué",
+        "ajouté un disque"
+      ],
+      "Suspects": [
+        "disqueneufvierge",
+        "cableinterne",
+        "disquenondetecte"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-initialiser"
+        },
+        {
+          "Ref": "test-cables-internes"
+        }
+      ]
+    },
+    {
       "Id": "onedrive",
       "Famille": "fichiers",
       "Titre": "OneDrive est plein, ou des fichiers y partent tout seuls",
@@ -23042,6 +24143,34 @@
         "sauvegardedossiers"
       ],
       "Etapes": [
+        {
+          "Ref": "q-onedrive-plein"
+        }
+      ]
+    },
+    {
+      "Id": "iconesfichiers",
+      "Famille": "fichiers",
+      "Titre": "Des nuages, des croix rouges ou des cadenas sur mes fichiers",
+      "Phrase": "De petites icônes apparaissent sur les fichiers et dossiers",
+      "Mots": [
+        "nuage",
+        "croix rouge",
+        "coche verte",
+        "icônes sur les fichiers",
+        "cadenas",
+        "flèches bleues",
+        "synchronisation onedrive"
+      ],
+      "Suspects": [
+        "statutonedrive",
+        "compression",
+        "onedriveplein"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-icones-onedrive"
+        },
         {
           "Ref": "q-onedrive-plein"
         }
@@ -23356,6 +24485,33 @@
       ]
     },
     {
+      "Id": "fenetresalignent",
+      "Famille": "windows",
+      "Titre": "Les fenêtres s'agrandissent ou se rangent toutes seules",
+      "Phrase": "En déplaçant une fenêtre, elle prend tout l'écran ou la moitié",
+      "Mots": [
+        "fenêtre s'agrandit",
+        "fenêtres se rangent",
+        "moitié d'écran",
+        "snap",
+        "ancrage",
+        "fenêtre colle au bord",
+        "disposition"
+      ],
+      "Suspects": [
+        "ancrage",
+        "explorateur"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ancrage"
+        },
+        {
+          "Ref": "test-explorateur-redem"
+        }
+      ]
+    },
+    {
       "Id": "notifications",
       "Famille": "windows",
       "Titre": "Les notifications ne s'affichent plus",
@@ -23428,6 +24584,33 @@
       "Etapes": [
         {
           "Ref": "test-apps-demarrage"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
+      "Id": "pubswindows",
+      "Famille": "windows",
+      "Titre": "Des applis ou des pubs apparaissent dans le menu Démarrer",
+      "Phrase": "Candy Crush, TikTok ou des « suggestions » s'installent ou s'affichent tout seuls",
+      "Mots": [
+        "candy crush",
+        "tiktok",
+        "applis installées toutes seules",
+        "pubs menu démarrer",
+        "suggestions",
+        "publicité windows",
+        "bloatware"
+      ],
+      "Suspects": [
+        "appspromues",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-suggestions"
         },
         {
           "Ref": "test-analyse"
@@ -23542,6 +24725,111 @@
               "Preuve": "Même après un vrai redémarrage, ça ne marche pas"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "captureecran",
+      "Famille": "windows",
+      "Titre": "Je n'arrive pas à faire une capture d'écran",
+      "Phrase": "Impr écran ne fait rien, ou je ne retrouve pas la capture",
+      "Mots": [
+        "capture d'écran",
+        "screenshot",
+        "impr écran",
+        "imprim écran",
+        "print screen",
+        "capture",
+        "copie d'écran"
+      ],
+      "Suspects": [
+        "outilcapture",
+        "onedrive",
+        "outilcapturebloque"
+      ],
+      "Etapes": [
+        {
+          "Id": "test-capture",
+          "Type": "test",
+          "Court": "Le raccourci",
+          "Pour": [
+            "outilcapture"
+          ],
+          "Duree": "une minute",
+          "Texte": "Fais une capture avec touche Windows + Maj + S",
+          "Gestes": [
+            "Appuie en même temps sur la touche Windows, Maj et S.",
+            "Sélectionne la zone à la souris.",
+            "Colle (Ctrl + V) dans un message ou un document, ou clique sur la notification pour l'enregistrer."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Ça marche",
+              "Confirme": "outilcapture",
+              "Preuve": "Le raccourci de capture marche"
+            },
+            {
+              "Texte": "Rien ne se passe",
+              "Ecarte": [
+                "outilcapture"
+              ],
+              "Preuve": "Le raccourci de capture ne marche pas"
+            }
+          ]
+        },
+        {
+          "Ref": "test-onedrive"
+        }
+      ]
+    },
+    {
+      "Id": "clicdroitw11",
+      "Famille": "windows",
+      "Titre": "Il manque des options dans le clic droit (Windows 11)",
+      "Phrase": "Les options de 7-Zip, de WinRAR ou de l'antivirus ont disparu du clic droit",
+      "Mots": [
+        "afficher d'autres options",
+        "plus d'options",
+        "clic droit windows 11",
+        "menu contextuel",
+        "option disparue clic droit",
+        "ancien menu"
+      ],
+      "Suspects": [
+        "menuw11",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Id": "test-maj-clic",
+          "Type": "test",
+          "Court": "Maj + clic droit",
+          "Pour": [
+            "menuw11"
+          ],
+          "Duree": "une minute",
+          "Texte": "Fais Maj + clic droit",
+          "Gestes": [
+            "Garde la touche Maj enfoncée et fais un clic droit sur le fichier.",
+            "(Ou clic droit, puis « Afficher d'autres options ».)"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Les options sont là",
+              "Confirme": "menuw11",
+              "Preuve": "Les options sont dans l'ancien menu"
+            },
+            {
+              "Texte": "Toujours absentes",
+              "Ecarte": [
+                "menuw11"
+              ],
+              "Preuve": "Les options ne sont pas dans l'ancien menu"
+            }
+          ]
+        },
+        {
+          "Ref": "test-reinstaller"
         }
       ]
     },
@@ -24645,6 +25933,64 @@
         },
         {
           "Ref": "place"
+        }
+      ]
+    },
+    {
+      "Id": "natstrict",
+      "Famille": "jeux",
+      "Titre": "NAT strict, impossible de rejoindre des amis en ligne",
+      "Phrase": "Le jeu dit « NAT strict » ou « type de NAT : 3 », on ne peut pas se rejoindre ou s'entendre",
+      "Mots": [
+        "nat strict",
+        "nat",
+        "type de nat",
+        "nat 3",
+        "rejoindre des amis",
+        "impossible de rejoindre",
+        "upnp",
+        "teredo"
+      ],
+      "Suspects": [
+        "parefeujeu",
+        "upnp",
+        "box"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-parefeu-jeu"
+        },
+        {
+          "Ref": "test-upnp"
+        },
+        {
+          "Ref": "test-box"
+        }
+      ]
+    },
+    {
+      "Id": "sourissortjeu",
+      "Famille": "jeux",
+      "Titre": "En jeu, la souris sort sur l'autre écran",
+      "Phrase": "Avec deux écrans, la souris quitte le jeu et clique sur l'autre écran",
+      "Mots": [
+        "souris sort",
+        "souris sort du jeu",
+        "deuxième écran jeu",
+        "curseur sort",
+        "clic sur l'autre écran",
+        "souris quitte le jeu"
+      ],
+      "Suspects": [
+        "fenetresansbordure",
+        "ordreecrans"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-plein-ecran"
+        },
+        {
+          "Ref": "test-ordre-ecrans"
         }
       ]
     }
