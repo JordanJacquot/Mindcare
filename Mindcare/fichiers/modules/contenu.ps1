@@ -134,7 +134,9 @@ function Add-Ligne($Parent, [string]$CouleurPoint, $Texte, [string]$Marge = '0,8
 function Show-Accueil([string]$Famille = '') {
     $script:FamilleChoisie = $Famille
     $script:PanneEnCours = $null; $script:ChoixFaits = @(); $script:ReparateurOuvert = $false
+    $script:FamillesAnimees = $false
     Clear-Contenu
+    Set-BulleMascotte $(if ($Famille) { 'Choisis ce qui ressemble le plus à ce qui se passe.' } else { 'Un souci avec l''ordinateur ? Dis-moi ce qui se passe.' })
     if (-not $script:Donnees) {
         $c = New-Card
         Add-Titre $c "Mindcare n'a pas pu lire ses enquêtes"
@@ -181,6 +183,7 @@ function Show-Accueil([string]$Famille = '') {
         $t.VerticalAlignment = 'Center'; [void]$bd.Children.Add($t)
         $bandeau.Child = $bd
         [void]$ui.Contenu.Children.Add($bandeau)
+        if (-not $Famille) { Set-BulleMascotte "Ton enquête « $($info.Panne.Titre) » t'attend. On la reprend ?" }
     }
 
     # L'assistant : sa proposition (après Entrée), ou le bandeau pour l'installer
@@ -253,6 +256,7 @@ function Start-SuiviIa {
 function Clear-ZoneIa {
     $script:IaCarte = $null
     if ($script:IaAttente) { $script:IaAttente.Stop(); $script:IaAttente = $null }
+    Stop-ChargementTheme
     Update-BandeauIa
 }
 
@@ -265,7 +269,14 @@ function Request-Ia {
     $script:IaCarte = @{ Texte = $texte }
     $z = $ui.ZoneIa; $z.Children.Clear()
     $attente = New-BandeauIa
-    $attente.Child = New-Text 'Je lis ta phrase...' 14 '#C9C3DD'
+    $lit = New-Text 'Je lis ta phrase...' 14 '#C9C3DD'
+    $charge = New-ChargementTheme 40
+    if ($charge) {
+        $lit.VerticalAlignment = 'Center'; $charge.Margin = '0,0,12,0'
+        $sp = New-Object System.Windows.Controls.StackPanel; $sp.Orientation = 'Horizontal'
+        [void]$sp.Children.Add($charge); [void]$sp.Children.Add($lit); $attente.Child = $sp
+    } else { $attente.Child = $lit }
+    Set-BulleMascotte 'Je regarde ce qui ressemble à ton problème...'
     [void]$z.Children.Add($attente)
     $script:IaTache = $tache
     $script:IaAttente = New-Object System.Windows.Threading.DispatcherTimer
@@ -273,7 +284,7 @@ function Request-Ia {
     $script:IaAttente.Add_Tick({
         $r = Get-IaReponse $script:IaTache
         if ($null -eq $r) { return }
-        $script:IaAttente.Stop(); $script:IaAttente = $null
+        $script:IaAttente.Stop(); $script:IaAttente = $null; Stop-ChargementTheme
         if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) { Write-Log "Assistant : $($r.Erreur)"; $script:IaCarte = $null; Update-BandeauIa; return }
         $propose = @($r.Reponses.Keys) -join ','
         $r.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $r.Panne) $r.Reponses $script:IaCarte.Texte
@@ -287,6 +298,7 @@ function Request-Ia {
 # La carte « J'ai compris » : la panne de l'assistant (et ce qu'il a déjà compris), puis deux autres possibilités
 function Show-CarteIa($R) {
     $z = $ui.ZoneIa; $z.Children.Clear()
+    Set-BulleMascotte 'J''ai une idée ! Regarde si c''est bien ça.'
     $panne = Get-Panne $script:Donnees $R.Panne
     $carte = New-Object System.Windows.Controls.Border
     $carte.Style = $Window.FindResource('Card'); $carte.Margin = '0,0,0,16'
@@ -377,6 +389,17 @@ function Update-Accueil {
         $b
     }
     Add-EnGrille $z @($tuiles) 4
+    if (-not $script:FamillesAnimees -and -not $EnTest) {
+        $script:FamillesAnimees = $true
+        $i = 0
+        foreach ($b in @($tuiles)) {
+            # (invisible jusqu'à son tour, puis fondu jusqu'à son opacité normale ; ensuite l'animation s'efface)
+            $t0 = 60 + 35 * $i++
+            $a = New-Object System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames; $a.FillBehavior = 'Stop'
+            foreach ($k in @(@(0, 0), @($t0, 0), @(($t0 + 380), $b.Opacity))) { [void]$a.KeyFrames.Add((New-Object System.Windows.Media.Animation.LinearDoubleKeyFrame ([double]$k[1]), ([System.Windows.Media.Animation.KeyTime]::FromTimeSpan([TimeSpan]::FromMilliseconds($k[0]))))) }
+            $b.BeginAnimation([System.Windows.UIElement]::OpacityProperty, $a)
+        }
+    }
     # (pas de liste des enquêtes passées : rejouer les mêmes réponses redonne la même réponse ; seule l'enquête en
     # cours se reprend, par le bandeau du haut)
 }
@@ -463,6 +486,7 @@ function Undo-Choix {
 function Add-PanneauEnquete($Parent, $E) {
     Add-Texte $Parent ([string]$script:PanneEnCours.Titre).ToUpper() 12 '#7E78A0' 'Bold' '0,0,0,12'
     Add-Texte $Parent 'Les suspects' 14 '#FFFFFF' 'SemiBold'
+    Add-AnneauSuspects $Parent $E
     foreach ($id in $script:PanneEnCours.Suspects) {
         $s = Get-Suspect $script:Donnees $id
         if ($s.Urgent) { continue }   # (le danger se vérifie, ce n'est pas un suspect à montrer)
@@ -488,6 +512,40 @@ function Add-PanneauEnquete($Parent, $E) {
             $i++
         }
     }
+}
+
+# L'anneau des suspects : combien sont déjà écartés (il se remplit à chaque réponse)
+function Add-AnneauSuspects($Parent, $E) {
+    $tous = @($script:PanneEnCours.Suspects | Where-Object { -not (Get-Suspect $script:Donnees $_).Urgent })
+    if (-not $tous.Count) { return }
+    $ecartes = @($tous | Where-Object { $E.Restants -notcontains $_ }).Count
+    $reste = $tous.Count - $ecartes
+    $g = New-Object System.Windows.Controls.Grid; $g.Margin = '0,10,0,4'
+    foreach ($w in 'Auto', '*') { $cd = New-Object System.Windows.Controls.ColumnDefinition; $cd.Width = $(if ($w -eq 'Auto') { [System.Windows.GridLength]::Auto } else { New-Object System.Windows.GridLength 1, ([System.Windows.GridUnitType]::Star) }); [void]$g.ColumnDefinitions.Add($cd) }
+    $rond = New-Object System.Windows.Controls.Grid; $rond.Width = 58; $rond.Height = 58
+    $fond = New-Object System.Windows.Shapes.Ellipse; $fond.Stroke = Get-Brush '#16FFFFFF'; $fond.StrokeThickness = 6; [void]$rond.Children.Add($fond)
+    $arc = New-Object System.Windows.Shapes.Ellipse; $arc.Stroke = Get-Brush '#00E5FF'; $arc.StrokeThickness = 6; $arc.StrokeDashCap = 'Round'
+    $arc.RenderTransformOrigin = [System.Windows.Point]::new(0.5, 0.5); $arc.RenderTransform = New-Object System.Windows.Media.RotateTransform -90
+    $L = [math]::PI * 52 / 6   # (longueur du cercle, en épaisseurs de trait)
+    $arc.StrokeDashArray = New-Object System.Windows.Media.DoubleCollection (,[double[]]@($L, $L))
+    $cible = $L * (1 - $ecartes / $tous.Count)
+    $avant = if ($script:AnneauSuspects -and $script:AnneauSuspects.Panne -eq $script:PanneEnCours.Id) { $script:AnneauSuspects.Valeur } else { $L }
+    $script:AnneauSuspects = @{ Panne = $script:PanneEnCours.Id; Valeur = $cible }
+    if ($EnTest -or $avant -eq $cible) { $arc.StrokeDashOffset = $cible }
+    else {
+        $arc.StrokeDashOffset = $avant
+        $a = New-Object System.Windows.Media.Animation.DoubleAnimation $avant, $cible, ([System.Windows.Duration]::new([TimeSpan]::FromMilliseconds(900)))
+        $a.EasingFunction = New-Object System.Windows.Media.Animation.CubicEase; $a.BeginTime = [TimeSpan]::FromMilliseconds(150)
+        $arc.BeginAnimation([System.Windows.Shapes.Shape]::StrokeDashOffsetProperty, $a)
+    }
+    [void]$rond.Children.Add($arc)
+    $n = New-Text "$ecartes/$($tous.Count)" 15 '#FFFFFF' 'Bold'; $n.HorizontalAlignment = 'Center'; $n.VerticalAlignment = 'Center'; [void]$rond.Children.Add($n)
+    [void]$g.Children.Add($rond)
+    $tx = New-Object System.Windows.Controls.StackPanel; $tx.VerticalAlignment = 'Center'; $tx.Margin = '12,0,0,0'
+    [void]$tx.Children.Add((New-Text $(if ($ecartes -eq 1) { '1 écarté' } else { "$ecartes écartés" }) 14 '#FFFFFF' 'SemiBold'))
+    [void]$tx.Children.Add((New-Text $(if ($reste -eq 1) { 'Encore 1 à vérifier' } elseif ($reste) { "Encore $reste à vérifier" } else { 'Tous vérifiés' }) 13 '#A9A3C9'))
+    [System.Windows.Controls.Grid]::SetColumn($tx, 1); [void]$g.Children.Add($tx)
+    [void]$Parent.Children.Add($g)
 }
 
 # « Étape 2 sur 5 » et sa barre (le total peut baisser : des étapes deviennent inutiles en route)
@@ -578,6 +636,7 @@ function Show-EtapeEnquete($E) {
     $droite = New-CarteDans $g 2
     $test = $et.Type -eq 'test'
     $suspects = @($E.Restants | Where-Object { -not (Get-Suspect $script:Donnees $_).Urgent }).Count
+    Set-BulleMascotte $(if ($test) { 'Prends ton temps, je t''attends ici.' } elseif ($suspects -gt 1) { "On avance ! Il reste $suspects suspects." } else { 'Presque fini ! Une dernière vérification.' })
     Add-Avancement $droite (@($E.Faits).Count + 1) (@($E.Faits).Count + 1 + [int]$E.AVenir)
     $label = if ($test) { "UNE MANIPULATION À FAIRE$(if ($et.Duree) { " ($($et.Duree))" })" } elseif ($suspects -gt 1) { "Il reste $suspects suspects" } else { 'Une dernière vérification' }
     Add-Texte $droite $label 13 $(if ($test) { '#FF2EB5' } else { '#00E5FF' }) 'Bold' '0,0,0,8'
@@ -623,6 +682,7 @@ function Show-Verdict($E) {
     $titre = Get-VerdictTitre $script:Donnees $script:PanneEnCours $v
     $suspect = Get-Suspect $script:Donnees $v.Suspect
     Write-Log "Réponse $($script:PanneEnCours.Id) : $($v.Type) $($v.Suspect) (réponses $($script:ChoixFaits -join ','))"
+    Set-BulleMascotte $(switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } })
     Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre
     $script:ResumeDe = @{ Panne = $script:PanneEnCours; Enquete = $E; Titre = $titre }
     Clear-Contenu

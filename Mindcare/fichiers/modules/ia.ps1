@@ -197,6 +197,7 @@ function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
 function Get-IaReponse($Tache) {
     if (-not $Tache) { return [pscustomobject]@{ Panne = ''; Reponses = @{}; Erreur = 'pas d''assistant' } }
     $texte = $null
+    if ($Tache.Faux -and $env:MINDCARE_TEST_IA_ATTENTE) { return $null }   # (tests : l'assistant lit encore, pour la capture de l'attente)
     if ($Tache.Faux) { $texte = $Tache.Faux }
     else {
         if (-not $Tache.Res.IsCompleted) {
