@@ -4139,6 +4139,173 @@
       "Sauf": [
         "portable"
       ]
+    },
+    "mdpwifienregistre": {
+      "Titre": "Le mot de passe gardé par le PC",
+      "Trouve": "Le PC connaît le mot de passe du Wi-Fi : il suffit de l'afficher",
+      "Pourquoi": "Un PC déjà connecté au Wi-Fi garde son mot de passe ; Windows peut l'afficher.",
+      "AFaire": [
+        "Windows 11 : Paramètres, « Réseau et Internet », « Wi-Fi », le nom du Wi-Fi, « Afficher » à côté de « Clé de sécurité Wi-Fi ».",
+        "Sinon : il est souvent écrit sous la box, ou dans l'appli de l'opérateur."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "mdpbox": {
+      "Titre": "L'étiquette de la box",
+      "Trouve": "Le mot de passe est sur la box (ou dans son appli)",
+      "Pourquoi": "Si aucun appareil ne le connaît, le mot de passe d'origine est écrit sur l'étiquette de la box (« Clé de sécurité », « Clé Wi-Fi », « WPA »).",
+      "AFaire": [
+        "Regarde sous ou derrière la box ; ou dans l'appli de l'opérateur (Orange, Free, SFR, Bouygues)."
+      ],
+      "Pro": "Ton opérateur peut t'aider."
+    },
+    "miracast": {
+      "Titre": "La diffusion sans fil (Miracast)",
+      "Trouve": "C'était à savoir : le PC peut s'afficher sans câble sur une télé compatible",
+      "Pourquoi": "Windows sait envoyer l'image sur une télé « Miracast » (beaucoup de télés récentes, ou avec un petit adaptateur) : touche Windows + K.",
+      "AFaire": [
+        "Sur la télé, choisis l'entrée « Screen mirroring » / « Miracast ». Sur le PC : touche Windows + K, puis la télé.",
+        "Les Chromecast ne marchent pas avec Windows + K : utilise « Caster » dans Chrome ou Edge."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "miracastreseau": {
+      "Titre": "Le même Wi-Fi",
+      "Trouve": "Le PC et la télé ne se voyaient pas (réseau, pilote)",
+      "Pourquoi": "Le PC et la télé doivent être proches et, souvent, sur le même Wi-Fi ; un pilote Wi-Fi trop vieux empêche la diffusion.",
+      "AFaire": [
+        "Mets le PC et la télé sur le même Wi-Fi, et fais les mises à jour de Windows."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appliwebcam": {
+      "Titre": "Une appli qui utilise la caméra",
+      "Trouve": "Une appli utilisait la caméra (ou le micro)",
+      "Pourquoi": "Le voyant s'allume dès qu'une appli utilise la caméra (visio, navigateur, appli de la marque). Windows montre lesquelles l'ont utilisée récemment.",
+      "AFaire": [
+        "Dans « Confidentialité et sécurité », « Caméra » (et « Microphone ») : coupe l'accès des applis qui n'en ont pas besoin.",
+        "Un voyant qui s'allume sans appli connue : fais une analyse avec Sécurité Windows."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "objectifsale": {
+      "Titre": "L'objectif ou la lumière",
+      "Trouve": "L'objectif était sale, ou la pièce trop sombre",
+      "Pourquoi": "Une trace de doigt sur l'objectif rend l'image floue ; une pièce sombre ou un contre-jour rendent l'image grise et granuleuse.",
+      "AFaire": [
+        "Essuie l'objectif avec un chiffon doux ; mets-toi face à une lumière (pas dos à une fenêtre)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "localiser": {
+      "Titre": "Localiser mon appareil",
+      "Trouve": "Windows peut localiser (et protéger) le portable perdu",
+      "Pourquoi": "Si « Localiser mon appareil » était activé, le compte Microsoft montre où le portable s'est connecté pour la dernière fois, et permet de le verrouiller.",
+      "AFaire": [
+        "Sur account.microsoft.com/devices (depuis un autre appareil) : « Localiser mon appareil », puis « Verrouiller » si besoin.",
+        "Change tout de suite les mots de passe de ton e-mail, de ta banque et de tes comptes enregistrés dans le navigateur.",
+        "En cas de vol : porte plainte (avec le numéro de série de la facture)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "ngc": {
+      "Titre": "Le code PIN abîmé",
+      "Trouve": "Le code PIN de Windows était abîmé : il faut en refaire un",
+      "Pourquoi": "Après une mise à jour ou un changement de carte mère, Windows peut perdre le code PIN (« Votre code PIN n'est plus disponible »). On en crée un nouveau avec le mot de passe du compte.",
+      "AFaire": [
+        "Sur l'écran de connexion : « Options de connexion », connecte-toi avec le mot de passe, puis « Configurer mon code PIN ».",
+        "Si le mot de passe est oublié : voir la panne « Mot de passe ou code PIN oublié »."
+      ],
+      "Pro": "Un réparateur peut aider si rien ne marche."
+    },
+    "cacheicones": {
+      "Titre": "Les images des icônes",
+      "Trouve": "Windows avait perdu les images de ses icônes",
+      "Pourquoi": "Windows garde les images des icônes pour aller plus vite ; abîmées, les icônes deviennent blanches ou génériques.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "repartition": {
+      "Titre": "Les dossiers sur le petit disque",
+      "Trouve": "Tout est rangé sur C:, alors que D: est vide",
+      "Pourquoi": "Windows range Documents, Téléchargements et les jeux sur C: ; avec un petit SSD C: et un grand disque D:, C: se remplit vite.",
+      "AFaire": [
+        "Déplace les dossiers : clic droit sur « Documents » (puis « Téléchargements », « Images », « Vidéos »), « Propriétés », onglet « Emplacement », choisis un dossier sur D:, « Déplacer ».",
+        "Steam : « Paramètres », « Stockage », ajoute D: et déplace les gros jeux.",
+        "Les nouveaux contenus : Paramètres, « Système », « Stockage », « Paramètres de stockage avancés », « Emplacement d'enregistrement du nouveau contenu » : D:."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "courtcircuitusb": {
+      "Titre": "Un appareil ou une prise USB en court-circuit",
+      "Trouve": "Un appareil ou une prise USB provoquait un court-circuit",
+      "Pourquoi": "Quand le PC se coupe net au branchement d'un appareil USB, l'appareil, son câble ou la prise (souvent en façade, avec un câble pincé à l'intérieur) fait un court-circuit : la carte mère coupe tout pour se protéger.",
+      "AFaire": [
+        "N'utilise plus cet appareil ou ce câble, ni cette prise.",
+        "Prise en façade : ne t'en sers plus et fais-la vérifier."
+      ],
+      "Pro": "Un réparateur peut vérifier les prises et leur câble."
+    },
+    "paume": {
+      "Titre": "La paume sur le pavé tactile",
+      "Trouve": "La paume touchait le pavé tactile en tapant",
+      "Pourquoi": "En tapant, la paume effleure le pavé tactile : le curseur saute et le texte s'écrit ailleurs.",
+      "AFaire": [
+        "Dans les réglages du pavé tactile, choisis une sensibilité plus basse (« Sensibilité faible »), ou coupe le pavé quand une souris est branchée."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "stylet": {
+      "Titre": "La pile ou l'association du stylet",
+      "Trouve": "Le stylet était déchargé ou plus associé",
+      "Pourquoi": "Un stylet actif a une pile (ou se recharge) et s'associe parfois en Bluetooth ; déchargé ou dissocié, il n'écrit plus.",
+      "AFaire": [
+        "Change la pile (souvent AAAA) ou recharge-le ; réassocie-le dans « Bluetooth et appareils »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "coexistence": {
+      "Titre": "Le Bluetooth trop chargé",
+      "Trouve": "Le Bluetooth était trop chargé (casque + souris), ou brouillé par le Wi-Fi 2,4 GHz",
+      "Pourquoi": "Un casque Bluetooth prend beaucoup de place sur la liaison ; la souris Bluetooth à côté saccade. Le Wi-Fi 2,4 GHz utilise les mêmes ondes.",
+      "AFaire": [
+        "Utilise une souris avec son propre petit récepteur USB, ou un casque avec son récepteur.",
+        "Connecte le PC au Wi-Fi 5 GHz s'il existe."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "biosmaj": {
+      "Titre": "Le BIOS après sa mise à jour",
+      "Trouve": "La mise à jour du BIOS a mal tourné ou a changé des réglages",
+      "Pourquoi": "Une mise à jour du BIOS remet souvent les réglages à zéro (mode de démarrage, XMP) ; coupée en cours, elle peut abîmer le BIOS.",
+      "AFaire": [
+        "Remets les réglages par défaut (F9), puis « Windows Boot Manager » en premier.",
+        "Si l'écran reste noir : beaucoup de cartes ont « BIOS Flashback » ou un BIOS de secours (manuel de la carte mère)."
+      ],
+      "Pro": "Un réparateur (ou le fabricant) peut réinstaller le BIOS."
+    },
+    "profilnav": {
+      "Titre": "Le compte du navigateur",
+      "Trouve": "Le navigateur n'était plus connecté au compte qui garde les favoris",
+      "Pourquoi": "Chrome et Edge gardent les favoris et mots de passe dans le compte Google ou Microsoft : déconnecté (ou sur un autre profil), ils semblent disparus.",
+      "AFaire": [
+        "Connecte-toi au navigateur avec ton compte (photo en haut à droite), et active la synchronisation."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "echelleimpression": {
+      "Titre": "La taille d'impression",
+      "Trouve": "Le format de papier ou la mise à l'échelle n'étaient pas les bons",
+      "Pourquoi": "Imprimer en « Letter » (format américain) au lieu de « A4 », ou sans « Ajuster à la page », rétrécit ou coupe la page.",
+      "AFaire": [
+        "Dans la fenêtre d'impression : format « A4 », et « Ajuster » ou « Taille réelle » selon le besoin."
+      ],
+      "Pro": "Rien à réparer."
     }
   },
   "Tests": {
@@ -13541,6 +13708,341 @@
           "Preuve": "Le logiciel n'y était pour rien"
         }
       ]
+    },
+    "test-cle-wifi": {
+      "Type": "test",
+      "Court": "Afficher la clé",
+      "Pour": [
+        "mdpwifienregistre"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Affiche le mot de passe du Wi-Fi gardé par le PC",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Réseau et Internet », « Wi-Fi », puis clique sur le nom du Wi-Fi (ou « Gérer les réseaux connus »).",
+        "À côté de « Afficher la clé de sécurité Wi-Fi », clique sur « Afficher »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Je le vois",
+          "Confirme": "mdpwifienregistre",
+          "Preuve": "Le PC connaissait le mot de passe"
+        },
+        {
+          "Texte": "Pas d'option, ou ce PC ne s'y est jamais connecté",
+          "Ecarte": [
+            "mdpwifienregistre"
+          ],
+          "Preuve": "Le PC ne connaît pas ce mot de passe"
+        }
+      ]
+    },
+    "test-miracast": {
+      "Type": "test",
+      "Court": "Windows + K",
+      "Pour": [
+        "miracast"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Affiche le PC sur la télé avec touche Windows + K",
+      "Gestes": [
+        "Sur la télé, choisis l'entrée « Screen mirroring » (ou « Miracast », « Partage d'écran »).",
+        "Sur le PC, appuie sur la touche Windows et K, puis choisis la télé dans la liste."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche",
+          "Confirme": "miracast",
+          "Preuve": "La diffusion sans fil marche"
+        },
+        {
+          "Texte": "La télé n'apparaît pas",
+          "Ecarte": [
+            "miracast"
+          ],
+          "Preuve": "La télé n'est pas trouvée"
+        }
+      ]
+    },
+    "test-webcamvoyant": {
+      "Type": "test",
+      "Court": "Qui l'utilise ?",
+      "Pour": [
+        "appliwebcam"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Regarde quelle appli a utilisé la caméra",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Confidentialité et sécurité », puis « Caméra » (puis « Microphone »).",
+        "Ouvre « Activité récente » : la liste des applis qui l'ont utilisée. Coupe l'accès de celles qui n'en ont pas besoin."
+      ],
+      "Reponses": [
+        {
+          "Texte": "J'ai trouvé l'appli",
+          "Confirme": "appliwebcam",
+          "Preuve": "Une appli utilisait la caméra"
+        },
+        {
+          "Texte": "Aucune appli connue",
+          "Ecarte": [
+            "appliwebcam"
+          ],
+          "Preuve": "Aucune appli connue n'utilise la caméra"
+        }
+      ]
+    },
+    "test-webcamfloue": {
+      "Type": "test",
+      "Court": "L'objectif et la lumière",
+      "Pour": [
+        "objectifsale"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Nettoie l'objectif et éclaire ton visage",
+      "Gestes": [
+        "Essuie l'objectif de la caméra avec un chiffon doux et sec.",
+        "Mets-toi face à une lumière (une lampe ou la fenêtre devant toi, pas derrière)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est net",
+          "Confirme": "objectifsale",
+          "Preuve": "Objectif propre et bien éclairé, c'est net"
+        },
+        {
+          "Texte": "Toujours flou ou sombre",
+          "Ecarte": [
+            "objectifsale"
+          ],
+          "Preuve": "L'objectif et la lumière n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-pinindisponible": {
+      "Type": "test",
+      "Court": "Refaire le code PIN",
+      "Pour": [
+        "ngc"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Connecte-toi avec le mot de passe, puis refais le code PIN",
+      "Gestes": [
+        "Sur l'écran de connexion, clique sur « Configurer mon code PIN » (ou « Options de connexion », la clé, pour taper le mot de passe).",
+        "Tape le mot de passe du compte (celui du compte Microsoft si une adresse e-mail est affichée).",
+        "Choisis un nouveau code PIN."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est réglé",
+          "Confirme": "ngc",
+          "Preuve": "Un nouveau code PIN est créé"
+        },
+        {
+          "Texte": "Je n'ai pas le mot de passe",
+          "Ecarte": [
+            "ngc"
+          ],
+          "Preuve": "Le mot de passe du compte manque"
+        }
+      ]
+    },
+    "test-cache-icones": {
+      "Type": "test",
+      "Court": "Les icônes",
+      "Pour": [
+        "cacheicones"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Refais les images des icônes",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal » ou « Windows PowerShell ».",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée.",
+        "Si les icônes restent blanches : redémarre le PC."
+      ],
+      "Commande": {
+        "Admin": false,
+        "Lignes": [
+          "ie4uinit.exe -show"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Les icônes sont revenues",
+          "Confirme": "cacheicones",
+          "Preuve": "Les images des icônes refaites, elles sont revenues"
+        },
+        {
+          "Texte": "Toujours blanches",
+          "Ecarte": [
+            "cacheicones"
+          ],
+          "Preuve": "Les images des icônes n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-usbcoupe": {
+      "Type": "test",
+      "Court": "Un autre appareil",
+      "Pour": [
+        "courtcircuitusb"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Essaie la même prise avec un autre appareil, et l'appareil sur une autre prise",
+      "Gestes": [
+        "Branche un autre appareil (une souris) sur la même prise : le PC s'éteint-il ?",
+        "Branche l'appareil fautif sur une autre prise, à l'arrière : le PC s'éteint-il ?"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'éteint avec cet appareil, ou avec cette prise",
+          "Confirme": "courtcircuitusb",
+          "Preuve": "Un appareil ou une prise USB fait un court-circuit"
+        },
+        {
+          "Texte": "Il ne s'éteint plus",
+          "Ecarte": [
+            "courtcircuitusb"
+          ],
+          "Preuve": "Ce n'était pas un court-circuit USB"
+        }
+      ]
+    },
+    "test-paumepave": {
+      "Type": "test",
+      "Court": "La sensibilité",
+      "Pour": [
+        "paume"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Baisse la sensibilité du pavé tactile",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Bluetooth et appareils », « Pavé tactile », puis « Appuis ».",
+        "« Sensibilité du pavé tactile » : choisis « Sensibilité faible ». Si tu utilises une souris, décoche « Laisser le pavé tactile activé quand une souris est connectée »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça n'arrive plus",
+          "Confirme": "paume",
+          "Preuve": "Avec une sensibilité plus basse, ça n'arrive plus"
+        },
+        {
+          "Texte": "Ça continue",
+          "Ecarte": [
+            "paume"
+          ],
+          "Preuve": "La sensibilité n'y était pour rien"
+        }
+      ]
+    },
+    "test-styletmarchepas": {
+      "Type": "test",
+      "Court": "Le stylet",
+      "Pour": [
+        "stylet"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Recharge ou change la pile du stylet, puis réassocie-le",
+      "Gestes": [
+        "Change la pile du stylet (souvent une AAAA, sous le capuchon) ou recharge-le.",
+        "Paramètres, « Bluetooth et appareils » : supprime le stylet s'il y est, puis « Ajouter un appareil » en gardant son bouton du haut enfoncé quelques secondes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il écrit",
+          "Confirme": "stylet",
+          "Preuve": "Rechargé et réassocié, le stylet écrit"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "stylet"
+          ],
+          "Preuve": "La pile et l'association n'y étaient pour rien"
+        }
+      ]
+    },
+    "test-btsature": {
+      "Type": "test",
+      "Court": "Sans le casque",
+      "Pour": [
+        "coexistence"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Déconnecte le casque Bluetooth un moment",
+      "Gestes": [
+        "Déconnecte le casque (ou les écouteurs) Bluetooth.",
+        "Bouge la souris quelques minutes."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La souris est fluide",
+          "Confirme": "coexistence",
+          "Preuve": "Sans le casque Bluetooth, la souris est fluide"
+        },
+        {
+          "Texte": "Elle saccade encore",
+          "Ecarte": [
+            "coexistence"
+          ],
+          "Preuve": "Le casque n'y était pour rien"
+        }
+      ]
+    },
+    "test-favoris": {
+      "Type": "test",
+      "Court": "Le compte",
+      "Pour": [
+        "profilnav"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Reconnecte le navigateur à ton compte",
+      "Gestes": [
+        "Clique sur la photo ou l'icône du profil en haut à droite du navigateur.",
+        "Regarde si tu es sur le bon profil, et connecte-toi avec ton compte Google (Chrome) ou Microsoft (Edge), puis active la synchronisation."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ils sont revenus",
+          "Confirme": "profilnav",
+          "Preuve": "Le compte reconnecté, les favoris sont revenus"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "profilnav"
+          ],
+          "Preuve": "Le compte n'y était pour rien"
+        }
+      ]
+    },
+    "test-impressioncoupee": {
+      "Type": "test",
+      "Court": "Le format et la taille",
+      "Pour": [
+        "echelleimpression"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vérifie le format A4 et la mise à l'échelle",
+      "Gestes": [
+        "Dans la fenêtre « Imprimer », ouvre « Plus de paramètres » (ou « Propriétés de l'imprimante »).",
+        "Choisis le format « A4 », et « Ajuster à la page » (ou « Taille réelle / 100 % »)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "C'est bien imprimé",
+          "Confirme": "echelleimpression",
+          "Preuve": "Avec A4 et la bonne échelle, c'est bien imprimé"
+        },
+        {
+          "Texte": "Toujours mal",
+          "Ecarte": [
+            "echelleimpression"
+          ],
+          "Preuve": "Le format n'y était pour rien"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -16043,7 +16545,10 @@
         "dépoussiéré",
         "transporté",
         "après avoir bougé",
-        "changé une pièce"
+        "changé une pièce",
+        "après avoir changé une pièce",
+        "nouvelle alimentation",
+        "installé un composant"
       ],
       "Suspects": [
         "cableinterne",
@@ -16097,6 +16602,35 @@
         },
         {
           "Ref": "test-memoire-reinserer"
+        }
+      ]
+    },
+    {
+      "Id": "usbcoupe",
+      "Famille": "allumage",
+      "Titre": "Il s'éteint dès que je branche un appareil USB",
+      "Phrase": "Brancher une clé, un câble ou une manette fait s'éteindre le PC d'un coup",
+      "Mots": [
+        "s'éteint quand je branche",
+        "branche une clé usb s'éteint",
+        "usb s'éteint",
+        "court-circuit usb",
+        "branche la manette s'éteint"
+      ],
+      "Suspects": [
+        "courtcircuitusb",
+        "alimentation",
+        "cartemere"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-usbcoupe"
+        },
+        {
+          "Ref": "test-bist"
         }
       ]
     },
@@ -16839,6 +17373,50 @@
               "Preuve": "Les réglages par défaut n'ont rien changé"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "apresbios",
+      "Famille": "demarrage",
+      "Titre": "Il ne démarre plus depuis une mise à jour du BIOS",
+      "Phrase": "Après la mise à jour du BIOS : écran noir, BIOS en boucle, ou Windows introuvable",
+      "Mots": [
+        "mise à jour du bios",
+        "flash bios",
+        "après le bios",
+        "bios update",
+        "mis à jour le bios"
+      ],
+      "Suspects": [
+        "ordredemarrage",
+        "modeboot",
+        "secureboot",
+        "biosmaj"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-ordre-boot"
+        },
+        {
+          "Ref": "test-defauts-bios",
+          "Reponses": [
+            {
+              "Texte": "Windows démarre",
+              "Confirme": "modeboot",
+              "Preuve": "Avec les réglages par défaut, Windows démarre"
+            },
+            {
+              "Texte": "Toujours pareil",
+              "Ecarte": [
+                "modeboot"
+              ],
+              "Preuve": "Les réglages par défaut n'ont rien changé"
+            }
+          ]
+        },
+        {
+          "Ref": "test-cles-secureboot"
         }
       ]
     },
@@ -17844,7 +18422,9 @@
         "flash",
         "s'éteint une seconde",
         "vacille",
-        "tremble"
+        "tremble",
+        "scintille à basse luminosité",
+        "scintillement"
       ],
       "Suspects": [
         "cable",
@@ -18471,6 +19051,33 @@
       ]
     },
     {
+      "Id": "styletmarchepas",
+      "Famille": "peripheriques",
+      "Titre": "Le stylet n'écrit plus",
+      "Phrase": "Le stylet de l'écran tactile ne fait plus rien",
+      "Mots": [
+        "stylet",
+        "stylo",
+        "pen",
+        "stylet n'écrit plus",
+        "surface pen",
+        "stylet tactile"
+      ],
+      "Suspects": [
+        "stylet",
+        "tactiledesactive",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-styletmarchepas"
+        },
+        {
+          "Ref": "test-tactile"
+        }
+      ]
+    },
+    {
       "Id": "cliquesfantomes",
       "Famille": "ecran",
       "Titre": "L'écran tactile (ou la souris) clique tout seul",
@@ -18682,6 +19289,30 @@
         },
         {
           "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
+      "Id": "miracast",
+      "Famille": "ecran",
+      "Titre": "Afficher le PC sur la télé sans câble",
+      "Phrase": "Je veux voir l'écran du PC sur la télé, sans câble HDMI",
+      "Mots": [
+        "sans fil",
+        "miracast",
+        "caster",
+        "projeter sur la télé",
+        "écran sur la télé sans câble",
+        "chromecast",
+        "windows k"
+      ],
+      "Suspects": [
+        "miracast",
+        "miracastreseau"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-miracast"
         }
       ]
     },
@@ -21210,6 +21841,31 @@
       ]
     },
     {
+      "Id": "mdpwifioublie",
+      "Famille": "internet",
+      "Titre": "J'ai oublié le mot de passe du Wi-Fi (pour connecter un autre appareil)",
+      "Phrase": "Un téléphone ou une console veut le mot de passe du Wi-Fi",
+      "Mots": [
+        "mot de passe wifi",
+        "mot de passe du wifi",
+        "code wifi oublié",
+        "retrouver le mot de passe wifi",
+        "clé wifi",
+        "afficher le mot de passe wifi",
+        "code wifi",
+        "mot de passe de la box"
+      ],
+      "Suspects": [
+        "mdpwifienregistre",
+        "mdpbox"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cle-wifi"
+        }
+      ]
+    },
+    {
       "Id": "partage",
       "Famille": "internet",
       "Titre": "Le partage de connexion du téléphone ne marche pas",
@@ -21588,6 +22244,29 @@
               "Preuve": "Même ailleurs, ça ne marche pas"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "favoris",
+      "Famille": "internet",
+      "Titre": "Mes favoris ou mes mots de passe du navigateur ont disparu",
+      "Phrase": "Le navigateur n'a plus mes favoris ou ne remplit plus mes mots de passe",
+      "Mots": [
+        "favoris",
+        "favoris disparus",
+        "mots de passe disparus",
+        "marque-pages",
+        "mots de passe enregistrés",
+        "historique disparu"
+      ],
+      "Suspects": [
+        "profilnav",
+        "reglagesnav"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-favoris"
         }
       ]
     },
@@ -22364,6 +23043,34 @@
       ]
     },
     {
+      "Id": "paumepave",
+      "Famille": "peripheriques",
+      "Titre": "Le texte s'écrit ailleurs pendant que je tape (portable)",
+      "Phrase": "En tapant, le curseur saute et le texte part au milieu d'une autre ligne",
+      "Mots": [
+        "curseur saute en tapant",
+        "texte s'écrit ailleurs",
+        "paume",
+        "pavé tactile en tapant",
+        "le curseur bouge quand j'écris"
+      ],
+      "Suspects": [
+        "paume",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-paumepave"
+        },
+        {
+          "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
       "Id": "doubleclic",
       "Famille": "peripheriques",
       "Titre": "La souris fait des doubles clics toute seule",
@@ -22480,6 +23187,35 @@
         },
         {
           "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "btsature",
+      "Famille": "peripheriques",
+      "Titre": "La souris Bluetooth saccade quand le casque Bluetooth est connecté",
+      "Phrase": "Dès que le casque (ou les écouteurs) Bluetooth est branché, la souris saute",
+      "Mots": [
+        "souris bluetooth saccade",
+        "casque bluetooth souris",
+        "bluetooth saccade",
+        "souris lag bluetooth",
+        "écouteurs bluetooth souris"
+      ],
+      "Suspects": [
+        "coexistence",
+        "piles",
+        "surfacesouris"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-btsature"
+        },
+        {
+          "Ref": "test-piles"
+        },
+        {
+          "Ref": "test-surface-souris"
         }
       ]
     },
@@ -22771,6 +23507,59 @@
       ]
     },
     {
+      "Id": "webcamvoyant",
+      "Famille": "peripheriques",
+      "Titre": "Le voyant de la webcam s'allume tout seul",
+      "Phrase": "La petite lumière de la caméra s'allume sans que j'utilise la webcam",
+      "Mots": [
+        "voyant webcam",
+        "lumière webcam",
+        "caméra s'allume toute seule",
+        "espionné",
+        "webcam allumée",
+        "micro utilisé"
+      ],
+      "Suspects": [
+        "appliwebcam",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-webcamvoyant"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
+      "Id": "webcamfloue",
+      "Famille": "peripheriques",
+      "Titre": "L'image de la webcam est floue ou sombre",
+      "Phrase": "Image floue, granuleuse, ou trop sombre en visio",
+      "Mots": [
+        "webcam floue",
+        "caméra floue",
+        "image sombre",
+        "image granuleuse",
+        "webcam sombre",
+        "qualité webcam"
+      ],
+      "Suspects": [
+        "objectifsale",
+        "pilotecamera",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-webcamfloue"
+        },
+        {
+          "Ref": "test-pilote-camera"
+        }
+      ]
+    },
+    {
       "Id": "partageecran",
       "Famille": "peripheriques",
       "Titre": "L'écran partagé est noir (Teams, Discord, Zoom)",
@@ -22900,7 +23689,9 @@
         "file d'attente bloquée",
         "pilote indisponible",
         "imprimante hors ligne",
-        "état erreur"
+        "état erreur",
+        "nouvelle box",
+        "changé de box"
       ],
       "Suspects": [
         "imprimanteconso",
@@ -23013,6 +23804,33 @@
         },
         {
           "Ref": "test-nettoyage-tetes"
+        }
+      ]
+    },
+    {
+      "Id": "impressioncoupee",
+      "Famille": "peripheriques",
+      "Titre": "Les documents s'impriment trop petits ou coupés",
+      "Phrase": "Une partie de la page manque, ou tout est minuscule",
+      "Mots": [
+        "imprimé trop petit",
+        "impression coupée",
+        "page coupée",
+        "marges",
+        "a4",
+        "letter",
+        "mise à l'échelle impression"
+      ],
+      "Suspects": [
+        "echelleimpression",
+        "piloteperiph"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-impressioncoupee"
+        },
+        {
+          "Ref": "test-pilote-periph"
         }
       ]
     },
@@ -24004,6 +24822,50 @@
         },
         {
           "Ref": "test-jeux"
+        }
+      ]
+    },
+    {
+      "Id": "cpleindvide",
+      "Famille": "fichiers",
+      "Titre": "Le disque C: est plein, mais D: est presque vide",
+      "Phrase": "Plus de place sur C:, alors que le deuxième disque n'est presque pas utilisé",
+      "Mots": [
+        "c plein",
+        "d vide",
+        "disque c plein",
+        "deuxième disque vide",
+        "déplacer sur d",
+        "c: plein",
+        "d:"
+      ],
+      "Suspects": [
+        "repartition",
+        "temporaires"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-deux-disques",
+          "Type": "question",
+          "Court": "Deux disques ?",
+          "Texte": "Dans « Ce PC », y a-t-il un disque D: (ou E:) avec beaucoup de place libre ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Confirme": "repartition",
+              "Preuve": "Le disque D: a de la place, mais tout est sur C:"
+            },
+            {
+              "Texte": "Non",
+              "Ecarte": [
+                "repartition"
+              ],
+              "Preuve": "Pas de deuxième disque avec de la place"
+            }
+          ]
+        },
+        {
+          "Ref": "test-temp"
         }
       ]
     },
@@ -25285,7 +26147,9 @@
         "verrouillé",
         "login",
         "mot de passe que je n'ai jamais mis",
-        "demande un mot de passe"
+        "demande un mot de passe",
+        "j'ai oublié mon mot de passe",
+        "oublié mon code pin"
       ],
       "Suspects": [
         "pinoublie",
@@ -25328,6 +26192,28 @@
       ]
     },
     {
+      "Id": "pinindisponible",
+      "Famille": "windows",
+      "Titre": "« Votre code PIN n'est plus disponible »",
+      "Phrase": "« Quelque chose s'est produit et votre code PIN n'est pas disponible »",
+      "Mots": [
+        "code pin n'est plus disponible",
+        "pin indisponible",
+        "quelque chose s'est produit",
+        "configurer mon code pin",
+        "pin n'est pas disponible"
+      ],
+      "Suspects": [
+        "ngc",
+        "comptemicrosoft"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-pinindisponible"
+        }
+      ]
+    },
+    {
       "Id": "hello",
       "Famille": "windows",
       "Titre": "Windows Hello (visage ou empreinte) ne marche plus",
@@ -25351,6 +26237,46 @@
         },
         {
           "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
+      "Id": "perdu",
+      "Famille": "windows",
+      "Titre": "J'ai perdu mon portable (ou on me l'a volé)",
+      "Phrase": "Je ne retrouve plus le portable, ou il a été volé",
+      "Mots": [
+        "perdu",
+        "volé",
+        "vol",
+        "localiser",
+        "retrouver mon portable",
+        "on m'a volé",
+        "oublié dans le train"
+      ],
+      "Suspects": [
+        "localiser"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-perdu",
+          "Type": "question",
+          "Court": "Le portable",
+          "Texte": "Le portable est-il perdu ou volé ?",
+          "Reponses": [
+            {
+              "Texte": "Perdu",
+              "Confirme": "localiser",
+              "Detail": "cherche-le avec « Localiser mon appareil »",
+              "Preuve": "Le portable est perdu"
+            },
+            {
+              "Texte": "Volé",
+              "Confirme": "localiser",
+              "Detail": "verrouille-le et change tes mots de passe",
+              "Preuve": "Le portable a été volé"
+            }
+          ]
         }
       ]
     },
@@ -25607,6 +26533,32 @@
         },
         {
           "Ref": "q-onedrive-bureau"
+        }
+      ]
+    },
+    {
+      "Id": "iconesblanches",
+      "Famille": "windows",
+      "Titre": "Des icônes blanches ou vides (Bureau, barre des tâches)",
+      "Phrase": "Des icônes sont devenues des pages blanches, ou n'ont plus d'image",
+      "Mots": [
+        "icônes blanches",
+        "icônes vides",
+        "icône blanche",
+        "icônes sans image",
+        "page blanche icône",
+        "icônes cassées"
+      ],
+      "Suspects": [
+        "cacheicones",
+        "leprogramme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-cache-icones"
+        },
+        {
+          "Ref": "test-reinstaller"
         }
       ]
     },
