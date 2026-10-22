@@ -74,3 +74,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - `outils\publier.ps1 -Version 0.1.0 -Notes "..."` : vérifications, construction, tests, signature, Release GitHub.
 - Copie de travail (ce dossier, avec `.git`) : lancée directement, elle n'est pas bloquée et garde ses données à part
   (`%LOCALAPPDATA%\Mindset\Mindcare (travail)`).
+
+## Licence
+
+Mindcare est sous licence MIT (voir le fichier `LICENSE`) : tu peux lire, réutiliser, modifier et redistribuer le code, en gardant la mention de licence. Les composants d'autres auteurs gardent leur propre licence : l'assistant téléchargé à part (llama.cpp et son modèle), chacun sous sa propre licence.
