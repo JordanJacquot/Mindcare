@@ -230,12 +230,32 @@ Write-Resultat "lecture des journaux de Windows ($([math]::Round($chrono.Elapsed
 Test-Capture 'famille' @{ MINDCARE_TEST_FAMILLE = 'plantages' } | Out-Null
 Test-Capture 'famille-internet' @{ MINDCARE_TEST_FAMILLE = 'internet' } | Out-Null
 Test-Capture 'accueil' | Out-Null
+# Le garde-fou de l'assistant : une réponse réglée d'avance n'est gardée que si la phrase en parle
+$DataDirSauve = $DataDir; $DataDir = $test
+. (Join-Path $AppDir 'modules\ia.ps1')
+$DataDir = $DataDirSauve
+$pSet = Get-Panne $donnees 'seteint'
+$gardes = @(foreach ($cas in @(@("mon ordi s'éteint tout seul d'un coup comme une coupure de courant", @{ clics = 1; 'maj-en-cours' = 1 }, ''),
+                              @("mon pc fixe s'éteint d'un coup quand je joue", @{ type = 1; maison = 0 }, 'type'),
+                              @("ça s'éteint et toutes les lumières de la maison aussi", @{ maison = 0 }, 'maison'),
+                              @("il est sur une multiprise et il s'éteint", @{ multiprise = 0 }, 'multiprise'))) {
+    $g = (@((Select-PreRempli $donnees $pSet $cas[1] $cas[0]).Keys) | Sort-Object) -join ','
+    if ($g -ne $cas[2]) { "« $($cas[0]) » : $g au lieu de $($cas[2])" }
+})
+Write-Resultat "assistant : réponses réglées d'avance seulement si la phrase en parle" (-not $gardes) "($($gardes -join ' ; '))"
 # L'assistant (ia.ps1) : sa carte « J'ai compris », puis une enquête où la phrase a déjà répondu à des questions
 $faux = '{"panne":"seteint","reponses":{"type":1,"maison":0}}'
 $s = Test-Capture 'ia-comprise' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux }
 Write-Resultat "assistant : la carte « J'ai compris » (journal)" ((Get-Journal $s) -match 'Assistant : .+ -> seteint') '(pas de proposition dans le journal)'
-$s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_CHOISIR = '1' }
+$s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc fixe s''éteint d''un coup, et les lumières de la maison aussi'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_CHOISIR = '1' }
 Write-Resultat "assistant : l'enquête commence après les questions déjà réglées par la phrase" ((Get-Journal $s) -match 'Enquête : seteint \(déjà su') '(pas de réponses pré-remplies dans le journal)'
+# Un ancien assistant installé (v1) : l'accueil propose de le mettre à jour, et l'ancien sert en attendant
+$ancien = Join-Path $test 'donnees-ia-maj\ia'
+Remove-Item -LiteralPath (Join-Path $test 'donnees-ia-maj') -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force -Path $ancien | Out-Null
+Set-Content -LiteralPath (Join-Path $ancien 'llama-server.exe') -Value 'faux' ; Set-Content -LiteralPath (Join-Path $ancien 'mindcare-0.6b-v1-q8_0.gguf') -Value 'faux'
+$s = Test-Capture 'ia-maj' @{} -Dossier 'ia-maj'
+Write-Resultat "assistant : mise à jour proposée quand un ancien modèle est installé" ((Get-Journal $s) -match 'nouvelle version est proposée') '(pas de mise à jour proposée, ou ancien modèle non utilisé)'
 # Le vrai assistant (seulement sur le PC qui l'entraîne : le modèle et llama-server du dossier d'entraînement)
 $entr = Join-Path $env:LOCALAPPDATA 'Mindcare-entrainement'
 $vraiModele = Get-ChildItem -LiteralPath (Join-Path $entr 'modeles') -Filter 'mindcare-0.6b-*-q8_0.gguf' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1

@@ -9,19 +9,35 @@
 
 $IaDir    = Join-Path $DataDir 'ia'
 $IaServeur = if ($EnTest -and $env:MINDCARE_IA_SERVEUR) { $env:MINDCARE_IA_SERVEUR } else { Join-Path $IaDir 'llama-server.exe' }
-$IaModele  = if ($EnTest -and $env:MINDCARE_IA_MODELE) { $env:MINDCARE_IA_MODELE } else { Join-Path $IaDir 'mindcare-0.6b-v1-q8_0.gguf' }
+$IaModele  = if ($EnTest -and $env:MINDCARE_IA_MODELE) { $env:MINDCARE_IA_MODELE } else { Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf' }
 $IaFichiers = @(
     @{ Nom = 'moteur de l''assistant'; Url = 'https://github.com/ggml-org/llama.cpp/releases/download/b11541/llama-b11541-bin-win-vulkan-x64.zip'
        Sha256 = '37BBA511D120222F13C3D520DD875F739A530CC124E78F7CBCE0026DE0173D8A'; Taille = 33464528
        Extraire = '^(llama-server\.exe|llama-server-impl\.dll|llama\.dll|llama-common\.dll|ggml[^/]*\.dll|mtmd\.dll|libomp\.dll)$'; Garder = (Join-Path $IaDir 'llama-server.exe') }
-    @{ Nom = 'cerveau de l''assistant'; Url = 'https://github.com/JordanJacquot/Mindcare/releases/download/ia-v1/mindcare-0.6b-v1-q8_0.gguf'
-       Sha256 = '18A46DEE64B196DAE981D3725934CC38B438E3626F2FE5DDA8612AFF3BBE2C49'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v1-q8_0.gguf') }
+    @{ Nom = 'cerveau de l''assistant'; Url = 'https://github.com/JordanJacquot/Mindcare/releases/download/ia-v2/mindcare-0.6b-v2-q8_0.gguf'
+       Sha256 = '13246AB9F9F7D25E22066682A81BE9744E715DDC4A1B789DF5330E4D5BE0DE5'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf') }
 )
 $IaSysteme = "Tu es Mindcare. Une personne décrit le problème de son ordinateur. Réponds seulement en JSON : la panne du catalogue qui correspond, et les réponses qu'elle donne déjà."
 $script:Ia = @{ Process = $null; Port = 0; Pret = $false }
 $script:IaDl = $null
 
-function Test-IaInstallee { (Test-Path -LiteralPath $IaServeur) -and (Test-Path -LiteralPath $IaModele) }
+# Le modèle à lancer : celui de cette version de Mindcare, sinon un plus ancien déjà installé (il sert en attendant la
+# mise à jour de l'assistant)
+function Get-IaModeleLance {
+    if (Test-Path -LiteralPath $IaModele) { return $IaModele }
+    if ($EnTest -and $env:MINDCARE_IA_MODELE) { return $null }
+    Get-ChildItem -LiteralPath $IaDir -Filter 'mindcare-*.gguf' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1 -ExpandProperty FullName
+}
+function Test-IaInstallee { (Test-Path -LiteralPath $IaServeur) -and [bool](Get-IaModeleLance) }
+function Test-IaAJour { (Test-Path -LiteralPath $IaServeur) -and (Test-Path -LiteralPath $IaModele) }
+
+# Après une mise à jour de l'assistant : les anciens modèles sont effacés (640 Mo chacun)
+function Remove-IaAnciens {
+    if (-not (Test-Path -LiteralPath $IaModele)) { return }
+    foreach ($f in Get-ChildItem -LiteralPath $IaDir -Filter 'mindcare-*.gguf' -ErrorAction SilentlyContinue) {
+        if ($f.FullName -ne $IaModele) { try { Remove-Item -LiteralPath $f.FullName -Force; Write-Log "Ancien modèle effacé : $($f.Name)" } catch { Write-Log "Ancien modèle non effacé : $_" } }
+    }
+}
 function Get-IaManquants { @($IaFichiers | Where-Object { -not (Test-Path -LiteralPath $_.Garder) }) }
 
 # ---------------------------------------------------------------------------
@@ -97,6 +113,27 @@ function Start-IaInstall {
     Write-Log "Installation de l'assistant ($([math]::Round($script:IaDl.Total / 1MB)) Mo)"
 }
 
+# Garde-fou : une réponse réglée d'avance n'est gardée que si la phrase en parle vraiment (un mot de la question ou de
+# la réponse s'y trouve). Sinon la question sera posée : mieux vaut une question de plus qu'une réponse inventée.
+function Select-PreRempli($Donnees, $Panne, [hashtable]$Reponses, [string]$Phrase) {
+    $garde = @{}
+    if (-not $Reponses -or -not $Panne) { return $garde }
+    $vides = 'avec', 'dans', 'pour', 'plus', 'tout', 'quand', 'est', 'elle', 'il', 'pas', 'une', 'des', 'les', 'que', 'qui', 'sur', 'ton', 'ses', 'son', 'mon', 'oui', 'non'
+    $mots = @((ConvertTo-Simple $Phrase) -split ' ' | Where-Object { $_.Length -ge 4 -and $vides -notcontains $_ })
+    # (les mots de la panne elle-même ne comptent pas : « s'éteint » ne dit rien de la question « la maison s'éteint aussi ? »)
+    $dePanne = @((ConvertTo-Simple "$($Panne.Titre) $($Panne.Phrase) $(@($Panne.Mots) -join ' ')") -split ' ' | Where-Object { $_.Length -ge 4 } | ForEach-Object { $_.Substring(0, [math]::Min(5, $_.Length)) })
+    foreach ($et in (Get-Etapes $Donnees $Panne)) {
+        $id = [string]$et.Id
+        if (-not $Reponses.ContainsKey($id)) { continue }
+        $n = [int]$Reponses[$id]
+        if ($n -lt 0 -or $n -ge @($et.Reponses).Count) { continue }
+        $texte = ConvertTo-Simple "$($et.Texte) $($et.Court) $([string]@($et.Reponses)[$n].Texte)"
+        $cles = @($texte -split ' ' | Where-Object { $_.Length -ge 4 -and $vides -notcontains $_ } | ForEach-Object { $_.Substring(0, [math]::Min(5, $_.Length)) } | Where-Object { $dePanne -notcontains $_ } | Select-Object -Unique)
+        if (@($mots | Where-Object { $m = $_; @($cles | Where-Object { $m.StartsWith($_) }).Count }).Count) { $garde[$id] = $n }
+    }
+    $garde
+}
+
 # ---------------------------------------------------------------------------
 # Le lancement et les questions
 # ---------------------------------------------------------------------------
@@ -112,19 +149,20 @@ function Start-Ia {
     try {
         $script:Ia.Port = Get-PortLibre
         $si = New-Object Diagnostics.ProcessStartInfo $IaServeur
-        $si.Arguments = "-m `"$IaModele`" --host 127.0.0.1 --port $($script:Ia.Port) -ngl 99 -c 2048 -np 1 --no-webui"
+        $modeleLance = Get-IaModeleLance
+        $si.Arguments = "-m `"$modeleLance`" --host 127.0.0.1 --port $($script:Ia.Port) -ngl 99 -c 2048 -np 1 --no-webui"
         $si.UseShellExecute = $false; $si.CreateNoWindow = $true
         $si.RedirectStandardOutput = $true; $si.RedirectStandardError = $true
         $si.EnvironmentVariables['LLAMA_ARG_CHAT_TEMPLATE_KWARGS'] = '{"enable_thinking":false}'
         $script:Ia.Process = [Diagnostics.Process]::Start($si)
         $script:Ia.Process.BeginOutputReadLine(); $script:Ia.Process.BeginErrorReadLine()   # (sinon ses messages bloquent)
         $script:Ia.Pret = $false
-        Write-Log "Assistant lancé (port $($script:Ia.Port))"
+        Write-Log "Assistant lancé (port $($script:Ia.Port), $([IO.Path]::GetFileName($modeleLance)))"
     } catch { Write-Log "Assistant : lancement impossible ($_)"; $script:Ia.Process = $null }
 }
 
 function Stop-Ia {
-    try { if ($script:Ia.Process -and -not $script:Ia.Process.HasExited) { $script:Ia.Process.Kill() } } catch {}
+    try { if ($script:Ia.Process -and -not $script:Ia.Process.HasExited) { $script:Ia.Process.Kill(); [void]$script:Ia.Process.WaitForExit(3000) } } catch {}
     try { if ($script:IaDl -and $script:IaDl.PS) { $script:IaDl.PS.Stop() } } catch {}
 }
 

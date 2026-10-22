@@ -208,11 +208,13 @@ function Update-BandeauIa {
     if (-not $z -or $script:IaCarte) { return }
     $z.Children.Clear()
     $enCours = $script:IaDl -and -not $script:IaDl.Fini
-    if ((Test-IaInstallee) -and -not $enCours) { return }
+    if ((Test-IaAJour) -and -not $enCours) { return }
+    $maj = Test-IaInstallee   # (un ancien assistant marche : il s'agit de le mettre à jour)
+    if ($maj -and -not $script:IaMajNotee) { $script:IaMajNotee = $true; Write-Log 'Assistant : une nouvelle version est proposée' }
     $bandeau = New-BandeauIa
     $dp = New-Object System.Windows.Controls.DockPanel
     if (-not $enCours) {
-        $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } else { 'Installer' }) 'BtnPrimary'
+        $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } elseif ($maj) { 'Mettre à jour' } else { 'Installer' }) 'BtnPrimary'
         $b.Add_Click({ Start-IaInstall; Start-SuiviIa; Update-BandeauIa })
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$dp.Children.Add($b)
     }
@@ -221,6 +223,8 @@ function Update-BandeauIa {
         "Installation de l'assistant : $pc % ($($script:IaDl.Etape)). Tu peux continuer à te servir de Mindcare."
     } elseif ($script:IaDl -and $script:IaDl.Erreur) {
         "L'assistant n'a pas pu s'installer : $($script:IaDl.Erreur)."
+    } elseif ($maj) {
+        "Une nouvelle version de l'assistant comprend mieux tes phrases : mets-la à jour (environ 640 Mo, une seule fois). L'assistant actuel marche en attendant."
     } else {
         "Mindcare peut comprendre tes phrases (« mon pc s'éteint quand je joue ») : installe son assistant, environ 700 Mo, une seule fois. Il marche ensuite sans internet."
     }
@@ -239,7 +243,7 @@ function Start-SuiviIa {
         if ($script:IaDl -and $script:IaDl.Fini) {
             $script:IaSuivi.Stop(); $script:IaSuivi = $null
             if ($script:IaDl.Erreur) { Write-Log "Assistant non installé : $($script:IaDl.Erreur)" }
-            else { Write-Log 'Assistant installé'; Start-Ia }
+            else { Write-Log 'Assistant installé'; Stop-Ia; Remove-IaAnciens; Start-Ia }
         }
         if ($ui.ZoneIa -and $ui.ZoneIa.IsLoaded) { Update-BandeauIa }
     })
@@ -271,7 +275,9 @@ function Request-Ia {
         if ($null -eq $r) { return }
         $script:IaAttente.Stop(); $script:IaAttente = $null
         if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) { Write-Log "Assistant : $($r.Erreur)"; $script:IaCarte = $null; Update-BandeauIa; return }
-        Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',')"
+        $propose = @($r.Reponses.Keys) -join ','
+        $r.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $r.Panne) $r.Reponses $script:IaCarte.Texte
+        Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',') (proposé : $propose)"
         Show-CarteIa $r
         if ($EnTest -and $env:MINDCARE_TEST_IA_CHOISIR) { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }
     })

@@ -7,7 +7,7 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 Mindcare s'installe avec **[Mindset](https://github.com/JordanJacquot/Mindset/releases/latest)**, le portail de la suite :
 installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et l'affiche dans sa fenêtre.
 
-## Ce qu'elle sait faire (0.9.0)
+## Ce qu'elle sait faire (0.9.1)
 
 - Un catalogue de 229 pannes rangé en 15 familles (allumage, voyants et bips, démarrage de Windows, écran, plantages, jeux vidéo, lenteur,
   bruits et chaleur, son, internet, clavier et souris, batterie, virus et arnaques, fichiers, Windows et compte), et une recherche par mots (« bip », « wifi »,
