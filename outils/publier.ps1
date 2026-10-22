@@ -3,7 +3,7 @@
 #
 #   .\outils\publier.ps1 -Version 0.1.0 -Notes "Ce qui change, en mots simples"
 #
-# Avant de publier : syntaxe de tous les fichiers, fenêtre (interface.xaml), tirets cadratins, clé publique (la même que
+# Avant de publier : syntaxe de tous les fichiers, fenêtre (interface.xaml), tirets cadratins, clés publiques (les mêmes que
 # Mindset), construction, puis le test automatique (outils\tester.ps1). -SansTest le saute (urgence seulement).
 # Le zip est signé avec la clé de la suite (Mindset\outils\signer.ps1) : sans signature, rien n'est publié.
 # Les notes de version ne citent jamais un thème perso (Mario, Pokémon, Dofus...).
@@ -45,10 +45,13 @@ try { [void][xml][IO.File]::ReadAllText((Join-Path $app 'fichiers\modules\interf
 Get-ChildItem -LiteralPath $racine -Recurse -File -Include '*.ps1', '*.cs', '*.xaml', '*.txt', '*.md', '*.json' |
     Where-Object { $_.FullName -notmatch '\\(\.git|_test|release)\\' } | Select-String -Pattern '[\u2013\u2014]' |
     ForEach-Object { $problemes += "Tiret cadratin : $($_.Path) ligne $($_.LineNumber)" }
-$cle = Join-Path $app 'fichiers\cle-publique.xml'
-$cleMindset = Join-Path $mindset 'Mindset\fichiers\cle-publique.xml'
-if (-not (Test-Path -LiteralPath $cle) -or -not (Test-Path -LiteralPath $cleMindset) -or (Get-FileHash -LiteralPath $cle).Hash -ne (Get-FileHash -LiteralPath $cleMindset).Hash) {
-    $problemes += "Clé publique : Mindcare\fichiers\cle-publique.xml absente ou différente de celle de Mindset ($cleMindset)"
+# Clés publiques : exactement la liste de Mindset (mêmes fichiers, même contenu)
+$cles = Join-Path $app 'fichiers\cles-publiques'
+$clesMindset = Join-Path $mindset 'Mindset\fichiers\cles-publiques'
+function Get-EmpreinteCles([string]$Dossier) { @(Get-ChildItem -LiteralPath $Dossier -File -Force -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { "$($_.Name)=$((Get-FileHash -LiteralPath $_.FullName).Hash)" }) -join ';' }
+$empreinte = Get-EmpreinteCles $cles
+if (-not $empreinte -or $empreinte -ne (Get-EmpreinteCles $clesMindset)) {
+    $problemes += "Clés publiques : Mindcare\fichiers\cles-publiques absentes ou différentes de celles de Mindset ($clesMindset)"
 }
 if ($problemes) { $problemes | ForEach-Object { Write-Host $_ -ForegroundColor Red }; throw 'Publication annulée : corrige les points ci-dessus.' }
 

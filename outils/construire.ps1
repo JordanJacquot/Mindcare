@@ -5,7 +5,7 @@
 #     Mindcare.exe                    <- le programme (icône de Mindcare)
 #     LISEZMOI.txt
 #     fichiers\Mindcare.ps1, Mindcare.ico
-#     fichiers\cle-publique.xml        <- la clé publique de la suite (la même que Mindset)
+#     fichiers\cles-publiques\*.xml    <- les clés publiques de la suite (les mêmes que Mindset)
 #     fichiers\modules\                <- le code découpé par partie
 
 $ErrorActionPreference = 'Stop'
