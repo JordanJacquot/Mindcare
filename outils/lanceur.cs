@@ -13,8 +13,8 @@ using System.Windows.Forms;
 [assembly: AssemblyTitle("Mindcare")]
 [assembly: AssemblyProduct("Mindcare")]
 [assembly: AssemblyDescription("Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.")]
-[assembly: AssemblyVersion("0.9.1.0")]
-[assembly: AssemblyFileVersion("0.9.1.0")]
+[assembly: AssemblyVersion("0.10.0.0")]
+[assembly: AssemblyFileVersion("0.10.0.0")]
 
 static class Lanceur
 {
