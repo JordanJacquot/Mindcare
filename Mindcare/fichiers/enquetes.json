@@ -3368,10 +3368,7 @@
         "Après le démarrage, si tu veux réactiver XMP / EXPO dans le BIOS, essaie le profil le plus bas.",
         "Mets le BIOS à jour : la gestion de la mémoire s'améliore souvent."
       ],
-      "Pro": "Rien à réparer.",
-      "Sauf": [
-        "portable"
-      ]
+      "Pro": "Rien à réparer."
     },
     "slotsmemoire": {
       "Titre": "Les emplacements de la mémoire",
@@ -3952,6 +3949,196 @@
         "Dans « Paramètres », « Système », « Écran », « Graphiques » : mets l'appli de visio (Teams, Discord, Zoom, le navigateur) sur « Économie d'énergie »."
       ],
       "Pro": "Rien à réparer."
+    },
+    "bipnormal": {
+      "Titre": "Un bip normal",
+      "Trouve": "Un seul bip court au démarrage : c'est normal",
+      "Pourquoi": "Beaucoup de PC font un bip court au démarrage pour dire que les tests sont bons. Ce n'est pas une panne.",
+      "AFaire": [
+        "Rien à faire. Seuls plusieurs bips, ou des bips longs, signalent un problème."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "peripheriquelogo": {
+      "Titre": "Un appareil branché",
+      "Trouve": "Un appareil branché bloquait le démarrage sur le logo",
+      "Pourquoi": "Le PC teste les appareils branchés avant Windows ; une clé, un disque, un hub ou une manette défaillants peuvent le bloquer sur le logo.",
+      "AFaire": [
+        "Branche ces appareils une fois Windows démarré."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "verrmaj": {
+      "Titre": "Les majuscules (Verr. Maj)",
+      "Trouve": "Les majuscules étaient verrouillées (Verr. Maj)",
+      "Pourquoi": "Les mots de passe font attention aux majuscules : avec Verr. Maj allumé, le bon mot de passe est refusé.",
+      "AFaire": [
+        "Regarde le petit voyant Verr. Maj ; l'écran de connexion prévient aussi souvent « Verr. Maj est activé »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "clavierconnexionlangue": {
+      "Titre": "La langue du clavier à la connexion",
+      "Trouve": "Le clavier était en anglais (QWERTY) sur l'écran de connexion",
+      "Pourquoi": "Si l'écran de connexion utilise un clavier anglais, A et Q, Z et W, et les chiffres changent de place : le mot de passe tapé n'est pas le bon.",
+      "AFaire": [
+        "En bas à droite de l'écran de connexion, clique sur « FRA » / « ENG » et choisis « Français (AZERTY) »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "liquideurgent": {
+      "Titre": "Le liquide renversé",
+      "Trouve": "Un liquide dans le PC : ne surtout pas le rallumer",
+      "Pourquoi": "Un liquide (même de l'eau) crée des courts-circuits quand le PC est allumé, et le sucre ou le café rongent la carte mère en quelques jours.",
+      "AFaire": [
+        "Éteins tout de suite (appui long sur le bouton) et débranche le chargeur.",
+        "Retourne le portable, ouvert en V à l'envers, pour que le liquide s'écoule. Essuie sans frotter.",
+        "Ne le rallume PAS pour voir, pas de sèche-cheveux ni de riz.",
+        "Apporte-le vite à un réparateur : nettoyé tôt, il est souvent sauvé."
+      ],
+      "Pro": "Un réparateur doit le nettoyer à l'intérieur le plus vite possible (surtout pour le café, le soda, le sucré).",
+      "Urgent": true
+    },
+    "chuteecran": {
+      "Titre": "L'écran après la chute",
+      "Trouve": "L'écran a souffert de la chute",
+      "Pourquoi": "Une chute fissure souvent l'écran, ou abîme sa nappe : taches, lignes, écran noir.",
+      "AFaire": [
+        "Sauvegarde tes fichiers en branchant un écran externe si besoin."
+      ],
+      "Pro": "Un réparateur change l'écran ou sa nappe."
+    },
+    "chutedisque": {
+      "Titre": "Le disque après la chute",
+      "Trouve": "Le disque a souffert de la chute",
+      "Pourquoi": "Un disque dur à plateaux (pas un SSD) supporte mal les chocs pendant qu'il tourne : clics, lenteur, fichiers abîmés.",
+      "AFaire": [
+        "Sauvegarde tes fichiers tout de suite, avant qu'il ne lâche."
+      ],
+      "Pro": "Un réparateur peut remplacer le disque par un SSD et récupérer les fichiers."
+    },
+    "toucheclip": {
+      "Titre": "Le petit clip de la touche",
+      "Trouve": "La touche est sortie de son clip",
+      "Pourquoi": "Chaque touche de portable tient sur un petit clip en plastique (en forme de X ou de papillon). Souvent, il suffit de la reclipser.",
+      "AFaire": [
+        "Pose la touche bien droite au-dessus de son emplacement et appuie au centre jusqu'au double clic.",
+        "Si le petit clip blanc est cassé ou perdu : on trouve des touches de remplacement pour le modèle exact du portable."
+      ],
+      "Pro": "Un réparateur peut remettre ou changer la touche."
+    },
+    "analysedefender": {
+      "Titre": "L'analyse de Sécurité Windows",
+      "Trouve": "C'est Sécurité Windows qui analysait le PC (c'est normal)",
+      "Pourquoi": "« Antimalware Service Executable », c'est l'antivirus de Windows. Il fait des analyses régulières, surtout après une mise à jour ou quand le PC ne travaille pas : il peut prendre beaucoup de processeur un moment.",
+      "AFaire": [
+        "Laisse-le finir (souvent moins d'une heure) ; ne le désactive pas.",
+        "Si c'est tout le temps, fais les mises à jour de Windows et redémarre."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "fauxpositif": {
+      "Titre": "Une fausse alerte de l'antivirus",
+      "Trouve": "L'antivirus s'est trompé sur un programme sûr (faux positif)",
+      "Pourquoi": "Un antivirus bloque parfois un programme sûr (jeux modifiés, petits outils, programmes peu connus). Mais un programme piraté ou « crack » est souvent vraiment dangereux.",
+      "AFaire": [
+        "Ne débloque QUE si le programme vient de son site officiel : Sécurité Windows, « Historique de protection », l'élément, « Actions », « Autoriser » ou « Restaurer ».",
+        "Un programme piraté ou un « crack » : ne le débloque pas."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reinit": {
+      "Titre": "Remettre Windows à zéro",
+      "Trouve": "Réinitialiser Windows peut régler les problèmes que rien d'autre ne règle",
+      "Pourquoi": "« Réinitialiser ce PC » réinstalle Windows. Avec « Conserver mes fichiers », les documents restent, mais tous les programmes sont à réinstaller.",
+      "AFaire": [
+        "AVANT : sauvegarde tes fichiers importants sur une clé ou un disque, et note les programmes à réinstaller.",
+        "Paramètres, « Système », « Récupération », « Réinitialiser ce PC », « Conserver mes fichiers », « Téléchargement à partir du cloud ».",
+        "Ne choisis « Supprimer tout » que pour donner ou vendre le PC."
+      ],
+      "Pro": "Un réparateur peut le faire en sauvegardant tout avant."
+    },
+    "memoiremoitie": {
+      "Titre": "Une barrette non reconnue",
+      "Trouve": "Une barrette de mémoire n'est pas reconnue",
+      "Pourquoi": "Windows n'affiche que la moitié de la mémoire : une barrette est mal enfoncée, dans un mauvais emplacement, abîmée, ou d'un modèle qui ne va pas avec l'autre.",
+      "AFaire": [
+        "PC éteint et débranché : renfonce les barrettes jusqu'au clic, dans les emplacements A2 et B2.",
+        "Si ça ne change rien, essaie chaque barrette seule : celle qui n'est pas vue est abîmée ou incompatible."
+      ],
+      "Pro": "Un réparateur peut tester les barrettes."
+    },
+    "memoirereservee": {
+      "Titre": "La mémoire réservée",
+      "Trouve": "Il manque juste un peu de mémoire : c'est normal",
+      "Pourquoi": "Une partie de la mémoire est réservée par le matériel (souvent pour la puce graphique) : 15,8 Go sur 16, c'est normal.",
+      "AFaire": [
+        "Rien à faire."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "processeurbloque": {
+      "Titre": "Le processeur bridé",
+      "Trouve": "Le processeur restait bridé à basse vitesse",
+      "Pourquoi": "Le processeur ralentit pour se protéger quand il chauffe trop, ou quand le chargeur d'un portable est trop faible ou non reconnu (vitesse bloquée vers 0,4 à 0,8 GHz).",
+      "AFaire": [
+        "Utilise le chargeur d'origine, nettoie les grilles, et mets le mode d'alimentation sur « Performances optimales »."
+      ],
+      "Pro": "Si la vitesse reste bloquée malgré tout, un réparateur peut vérifier le chargeur et la carte mère."
+    },
+    "jackbloque": {
+      "Titre": "La prise casque qui se croit occupée",
+      "Trouve": "La prise casque croyait un casque branché",
+      "Pourquoi": "Quand Windows croit qu'un casque est branché (prise abîmée ou poussière dans la prise), il coupe les haut-parleurs du portable.",
+      "AFaire": [
+        "Souffle dans la prise casque, branche et débranche un casque plusieurs fois.",
+        "Choisis les haut-parleurs comme sortie du son."
+      ],
+      "Pro": "Si ça continue, un réparateur peut changer la prise casque.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "clecontrefaite": {
+      "Titre": "Une clé contrefaite",
+      "Trouve": "La clé (ou la carte) est une contrefaçon : sa vraie taille est bien plus petite",
+      "Pourquoi": "Les clés « 1 To » ou « 2 To » à 10 euros annoncent une fausse taille : au-delà de leur vraie capacité (souvent 8 à 32 Go), les fichiers copiés sont perdus.",
+      "AFaire": [
+        "Ne t'en sers pas pour des fichiers importants.",
+        "Le logiciel gratuit H2testw (ou ValiDrive) vérifie la vraie taille d'une clé.",
+        "Achète les clés chez un vendeur sérieux, de marque connue."
+      ],
+      "Pro": "Rien à réparer : la clé est à jeter ou à rendre."
+    },
+    "erp": {
+      "Titre": "Le courant USB à l'arrêt",
+      "Trouve": "La carte mère continue d'alimenter les prises USB quand le PC est éteint (c'est un réglage)",
+      "Pourquoi": "Beaucoup de cartes mères laissent du courant sur les prises USB après l'arrêt (pour recharger un téléphone) : le clavier et la souris restent allumés.",
+      "AFaire": [
+        "Pour les éteindre : dans le BIOS, active « ErP » (ou « EuP », « Deep Sleep »), ou désactive « USB Power in S5 », puis F10."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "rgblogiciel": {
+      "Titre": "Le logiciel de l'éclairage",
+      "Trouve": "Le logiciel de l'éclairage (RGB) manquait ou était bloqué",
+      "Pourquoi": "Les lumières des ventilateurs, de la mémoire et du clavier sont gérées par le logiciel de la marque (Armoury Crate, MSI Center, Gigabyte Control Center, iCUE, SignalRGB...) ; plusieurs logiciels à la fois se disputent l'éclairage.",
+      "AFaire": [
+        "Garde un seul logiciel d'éclairage, à jour."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "rgbcable": {
+      "Titre": "Le câble de l'éclairage",
+      "Trouve": "Le câble de l'éclairage était débranché ou sur la mauvaise prise",
+      "Pourquoi": "Les ventilateurs lumineux ont un petit câble à part (3 broches « ARGB 5V » ou 4 broches « RGB 12V ») : sur la mauvaise prise, ils ne s'allument pas (et un ARGB sur une prise 12V peut griller).",
+      "AFaire": [
+        "Vérifie, PC débranché, que chaque câble d'éclairage va sur la prise du même type (ARGB 5V à 3 broches, RGB 12V à 4 broches)."
+      ],
+      "Pro": "Un réparateur peut vérifier le câblage.",
+      "Sauf": [
+        "portable"
+      ]
     }
   },
   "Tests": {
@@ -13058,6 +13245,302 @@
           "Preuve": "La carte graphique n'y était pour rien"
         }
       ]
+    },
+    "q-bip-unique": {
+      "Type": "question",
+      "Court": "Un seul bip ?",
+      "Texte": "Le PC fait-il un seul bip court, puis démarre normalement ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, un bip et tout va bien",
+          "Confirme": "bipnormal",
+          "Preuve": "Un seul bip court, et le PC démarre"
+        },
+        {
+          "Texte": "Non, plusieurs bips, ou il ne démarre pas",
+          "Ecarte": [
+            "bipnormal"
+          ],
+          "Preuve": "Plusieurs bips, ou le PC ne démarre pas"
+        }
+      ]
+    },
+    "test-verrmaj": {
+      "Type": "test",
+      "Court": "Verr. Maj",
+      "Pour": [
+        "verrmaj"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Vérifie Verr. Maj et retape",
+      "Gestes": [
+        "Regarde le voyant Verr. Maj (ou la flèche vers le haut) : s'il est allumé, appuie une fois dessus.",
+        "Clique sur l'œil à droite du champ pour voir ce que tu tapes, et retape le mot de passe."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça passe",
+          "Confirme": "verrmaj",
+          "Preuve": "Avec Verr. Maj éteint, le mot de passe passe"
+        },
+        {
+          "Texte": "Toujours refusé",
+          "Ecarte": [
+            "verrmaj"
+          ],
+          "Preuve": "Verr. Maj n'y était pour rien"
+        }
+      ]
+    },
+    "test-langue-connexion": {
+      "Type": "test",
+      "Court": "La langue du clavier",
+      "Pour": [
+        "clavierconnexionlangue"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Remets le clavier en français sur l'écran de connexion",
+      "Gestes": [
+        "En bas à droite de l'écran de connexion, clique sur « ENG » (ou l'icône du clavier).",
+        "Choisis « Français » / « FRA », puis retape le mot de passe (l'œil à droite du champ montre ce que tu tapes)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça passe",
+          "Confirme": "clavierconnexionlangue",
+          "Preuve": "Le clavier en français, le mot de passe passe"
+        },
+        {
+          "Texte": "Toujours refusé",
+          "Ecarte": [
+            "clavierconnexionlangue"
+          ],
+          "Preuve": "La langue du clavier n'y était pour rien"
+        }
+      ]
+    },
+    "q-chute": {
+      "Type": "question",
+      "Court": "Après la chute",
+      "Texte": "Qu'est-ce qui ne va plus depuis la chute ?",
+      "Reponses": [
+        {
+          "Texte": "L'écran (fissure, taches, lignes, noir)",
+          "Confirme": "chuteecran",
+          "Preuve": "L'écran a souffert de la chute"
+        },
+        {
+          "Texte": "Il fait des clics, ou il est devenu très lent",
+          "Confirme": "chutedisque",
+          "Preuve": "Le disque a souffert de la chute"
+        },
+        {
+          "Texte": "Il ne s'allume plus",
+          "Garde": [
+            "materiel"
+          ],
+          "Preuve": "Il ne s'allume plus depuis la chute"
+        },
+        {
+          "Texte": "Rien de visible",
+          "Garde": [
+            "materiel"
+          ],
+          "SansPreuve": true
+        }
+      ]
+    },
+    "q-antimalware": {
+      "Type": "question",
+      "Court": "Combien de temps ?",
+      "Texte": "Ça dure moins d'une heure, puis ça se calme ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, puis ça se calme",
+          "Confirme": "analysedefender",
+          "Preuve": "L'analyse de Sécurité Windows finit par se calmer"
+        },
+        {
+          "Texte": "Non, c'est tout le temps",
+          "Ecarte": [
+            "analysedefender"
+          ],
+          "Preuve": "Le processeur est occupé tout le temps"
+        }
+      ]
+    },
+    "q-source-programme": {
+      "Type": "question",
+      "Court": "D'où vient le programme ?",
+      "Texte": "Le programme bloqué vient-il de son site officiel (ou de Steam, du Store) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, du site officiel",
+          "Confirme": "fauxpositif",
+          "Preuve": "Le programme vient d'un site officiel"
+        },
+        {
+          "Texte": "Non (copie, crack, site inconnu)",
+          "Ecarte": [
+            "fauxpositif"
+          ],
+          "Preuve": "Le programme ne vient pas d'un site officiel"
+        },
+        {
+          "Texte": "Je ne sais pas",
+          "Ecarte": [
+            "fauxpositif"
+          ],
+          "SansPreuve": true
+        }
+      ]
+    },
+    "q-memoire-moitie": {
+      "Type": "question",
+      "Court": "La mémoire",
+      "Texte": "Dans le Gestionnaire des tâches (Ctrl + Maj + Échap), onglet « Performances », « Mémoire » : la mémoire affichée fait-elle à peu près la moitié de ce qui est installé ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, la moitié (ou il manque une barrette)",
+          "Garde": [
+            "memoireplace",
+            "slotsmemoire",
+            "memoiremoitie"
+          ],
+          "Preuve": "Windows ne voit qu'une partie de la mémoire"
+        },
+        {
+          "Texte": "Non, presque tout (un peu moins, c'est normal)",
+          "Confirme": "memoirereservee",
+          "Preuve": "Windows voit presque toute la mémoire"
+        }
+      ]
+    },
+    "q-vitesse-cpu": {
+      "Type": "question",
+      "Court": "La vitesse",
+      "Texte": "Dans le Gestionnaire des tâches, onglet « Performances », « Processeur » : la « Vitesse » reste-t-elle sous 1 GHz même quand ça rame ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, sous 1 GHz",
+          "Garde": [
+            "chargeurfaible",
+            "surchauffe",
+            "energie",
+            "processeurbloque"
+          ],
+          "Preuve": "Le processeur reste sous 1 GHz"
+        },
+        {
+          "Texte": "Non, elle monte",
+          "Ecarte": [
+            "processeurbloque"
+          ],
+          "Preuve": "Le processeur monte en vitesse"
+        }
+      ]
+    },
+    "test-jack-vide": {
+      "Type": "test",
+      "Court": "La prise casque",
+      "Pour": [
+        "jackbloque"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Débloque la prise casque",
+      "Gestes": [
+        "Branche puis débranche un casque 3 ou 4 fois dans la prise casque du portable.",
+        "Souffle doucement dans la prise pour enlever la poussière.",
+        "Clique sur le haut-parleur en bas à droite, choisis « Haut-parleurs » comme sortie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les haut-parleurs remarchent",
+          "Confirme": "jackbloque",
+          "Preuve": "La prise débloquée, les haut-parleurs remarchent"
+        },
+        {
+          "Texte": "Toujours muets",
+          "Ecarte": [
+            "jackbloque"
+          ],
+          "Preuve": "La prise casque n'y était pour rien"
+        }
+      ]
+    },
+    "q-cle-prix": {
+      "Type": "question",
+      "Court": "La clé",
+      "Texte": "La clé (ou la carte) annonce une très grande taille pour un petit prix (par exemple « 1 To » ou plus pour moins de 30 euros) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "clecontrefaite",
+          "Preuve": "La clé annonce une taille trop belle pour son prix"
+        },
+        {
+          "Texte": "Non, une clé de marque à un prix normal",
+          "Ecarte": [
+            "clecontrefaite"
+          ],
+          "Preuve": "La clé est de marque, à un prix normal"
+        }
+      ]
+    },
+    "test-erp": {
+      "Type": "test",
+      "Court": "Le réglage ErP",
+      "Pour": [
+        "erp"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Coupe le courant USB à l'arrêt",
+      "Gestes": [
+        "Allume le PC et appuie plusieurs fois sur Suppr (ou F2) : le BIOS s'ouvre.",
+        "Cherche « ErP Ready » (ou « EuP », « Deep Sleep », « Power Loading ») et active-le ; ou désactive « USB Power in S4/S5 ».",
+        "F10 pour enregistrer, puis éteins le PC."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Tout s'éteint maintenant",
+          "Confirme": "erp",
+          "Preuve": "Avec ErP, les lumières s'éteignent à l'arrêt"
+        },
+        {
+          "Texte": "Elles restent allumées",
+          "Ecarte": [
+            "erp"
+          ],
+          "Preuve": "Ce réglage n'y était pour rien"
+        }
+      ]
+    },
+    "test-rgb-logiciel": {
+      "Type": "test",
+      "Court": "Le logiciel",
+      "Pour": [
+        "rgblogiciel"
+      ],
+      "Duree": "un quart d'heure",
+      "Texte": "Règle l'éclairage dans un seul logiciel",
+      "Gestes": [
+        "Installe (ou mets à jour) le logiciel de la marque de ta carte mère ou de tes ventilateurs.",
+        "Désinstalle les autres logiciels d'éclairage, puis redémarre et règle l'éclairage dans celui qui reste."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les lumières marchent",
+          "Confirme": "rgblogiciel",
+          "Preuve": "Avec un seul logiciel, l'éclairage marche"
+        },
+        {
+          "Texte": "Toujours éteintes",
+          "Ecarte": [
+            "rgblogiciel"
+          ],
+          "Preuve": "Le logiciel n'y était pour rien"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -14352,6 +14835,76 @@
       ]
     },
     {
+      "Id": "memoiremoitie",
+      "Famille": "lenteur",
+      "Titre": "Windows ne voit qu'une partie de la mémoire (RAM)",
+      "Phrase": "Le PC a 16 Go, Windows en affiche 8 (ou « utilisable » bien moins)",
+      "Mots": [
+        "mémoire utilisable",
+        "moitié de la ram",
+        "8 go au lieu de 16",
+        "ram pas reconnue",
+        "barrette pas reconnue",
+        "ram manquante",
+        "mémoire installée"
+      ],
+      "Suspects": [
+        "memoirereservee",
+        "memoireplace",
+        "slotsmemoire",
+        "memoiremoitie"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-memoire-moitie"
+        },
+        {
+          "Ref": "test-memoire-renfoncer"
+        },
+        {
+          "Ref": "test-slots-memoire"
+        }
+      ]
+    },
+    {
+      "Id": "processeurbride",
+      "Famille": "lenteur",
+      "Titre": "Le processeur reste bloqué à basse vitesse",
+      "Phrase": "Le PC est très lent, et la vitesse du processeur ne monte jamais",
+      "Mots": [
+        "processeur bridé",
+        "bloqué à 0,8 ghz",
+        "ghz",
+        "vitesse du processeur",
+        "throttling",
+        "processeur lent",
+        "fréquence bloquée"
+      ],
+      "Suspects": [
+        "chargeurfaible",
+        "surchauffe",
+        "energie",
+        "processeurbloque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-vitesse-cpu"
+        },
+        {
+          "Ref": "q-chargeur-origine"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-energie"
+        }
+      ]
+    },
+    {
       "Id": "rien",
       "Famille": "allumage",
       "Titre": "Rien ne s'allume",
@@ -14879,11 +15432,16 @@
         "sonne"
       ],
       "Suspects": [
+        "bipnormal",
         "residuelle",
+        "memoireplace",
         "memoire",
         "cartemere"
       ],
       "Etapes": [
+        {
+          "Ref": "q-bip-unique"
+        },
         {
           "Ref": "type"
         },
@@ -14895,7 +15453,7 @@
           "Type": "test",
           "Court": "Remettre la mémoire",
           "Pour": [
-            "memoire"
+            "memoireplace"
           ],
           "SaufNote": [
             "portable"
@@ -14910,14 +15468,16 @@
           ],
           "Reponses": [
             {
-              "Texte": "Plus de bips, il démarre",
-              "Confirme": "memoire",
-              "Detail": "une barrette mal enfoncée",
-              "Preuve": "Barrettes remises en place : il démarre"
+              "Texte": "Il démarre sans bip",
+              "Confirme": "memoireplace",
+              "Preuve": "La mémoire renfoncée, il démarre"
             },
             {
-              "Texte": "Les bips continuent",
-              "Preuve": "Les bips continuent après avoir remis la mémoire"
+              "Texte": "Toujours les bips",
+              "Ecarte": [
+                "memoireplace"
+              ],
+              "Preuve": "La mémoire était bien enfoncée"
             }
           ]
         },
@@ -15116,7 +15676,9 @@
         "écran fermé",
         "couvercle",
         "rabat",
-        "reste allumé fermé"
+        "reste allumé fermé",
+        "s'éteint quand je ferme le capot",
+        "écran externe capot fermé"
       ],
       "Suspects": [
         "actioncapot",
@@ -15163,6 +15725,32 @@
         },
         {
           "Ref": "test-alim-defaut"
+        }
+      ]
+    },
+    {
+      "Id": "lumieresarret",
+      "Famille": "allumage",
+      "Titre": "Le clavier ou la souris restent allumés quand le PC est éteint",
+      "Phrase": "Les lumières du clavier, de la souris ou des ventilateurs restent allumées après l'arrêt",
+      "Mots": [
+        "reste allumé éteint",
+        "lumière clavier éteint",
+        "souris allumée pc éteint",
+        "led reste allumée",
+        "rgb reste allumé",
+        "usb alimenté éteint"
+      ],
+      "Suspects": [
+        "erp",
+        "demarragerapide"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-erp"
+        },
+        {
+          "Ref": "test-demarrage-rapide"
         }
       ]
     },
@@ -15368,6 +15956,77 @@
         },
         {
           "Ref": "test-bist"
+        }
+      ]
+    },
+    {
+      "Id": "liquide",
+      "Famille": "allumage",
+      "Titre": "Un liquide a coulé sur l'ordinateur",
+      "Phrase": "De l'eau, du café ou du soda renversé sur le portable ou dans la tour",
+      "Mots": [
+        "liquide",
+        "eau",
+        "café",
+        "renversé",
+        "pris l'eau",
+        "soda",
+        "mouillé",
+        "verre d'eau"
+      ],
+      "Suspects": [
+        "liquideurgent"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-liquide-quand",
+          "Type": "question",
+          "Court": "Le PC",
+          "Texte": "Le PC est-il éteint et débranché ?",
+          "Aide": "Si non : éteins-le tout de suite (appui long sur le bouton) et débranche le chargeur, avant tout le reste.",
+          "Reponses": [
+            {
+              "Texte": "Oui, c'est fait",
+              "Garde": [
+                "liquideurgent"
+              ],
+              "Preuve": "Un liquide a coulé sur le PC"
+            },
+            {
+              "Texte": "Je l'éteins maintenant",
+              "Garde": [
+                "liquideurgent"
+              ],
+              "Preuve": "Un liquide a coulé sur le PC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": "chute",
+      "Famille": "allumage",
+      "Titre": "L'ordinateur est tombé",
+      "Phrase": "Une chute, et depuis quelque chose ne va plus",
+      "Mots": [
+        "tombé",
+        "chute",
+        "fait tomber",
+        "choc",
+        "par terre",
+        "est tombé",
+        "mon portable est tombé",
+        "mon pc est tombé",
+        "il est tombé par terre"
+      ],
+      "Suspects": [
+        "chuteecran",
+        "chutedisque",
+        "materiel"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-chute"
         }
       ]
     },
@@ -16254,6 +16913,71 @@
       ]
     },
     {
+      "Id": "logobloque",
+      "Famille": "demarrage",
+      "Titre": "Il reste bloqué sur le logo du fabricant",
+      "Phrase": "Le logo (ASUS, HP, Dell, MSI...) s'affiche, puis plus rien ne bouge",
+      "Mots": [
+        "bloqué sur le logo",
+        "reste sur le logo",
+        "logo asus",
+        "logo hp",
+        "logo dell",
+        "logo msi",
+        "logo lenovo",
+        "figé sur le logo",
+        "écran de démarrage"
+      ],
+      "Suspects": [
+        "peripheriquelogo",
+        "residuelle",
+        "profilmemoire",
+        "disque"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-debrancher-tout",
+          "Pour": [
+            "peripheriquelogo"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il démarre",
+              "Confirme": "peripheriquelogo",
+              "Preuve": "Sans les appareils USB, il démarre"
+            },
+            {
+              "Texte": "Toujours bloqué",
+              "Ecarte": [
+                "peripheriquelogo"
+              ],
+              "Preuve": "Les appareils USB n'y étaient pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "vider"
+        },
+        {
+          "Ref": "test-clear-cmos",
+          "Reponses": [
+            {
+              "Texte": "Il démarre",
+              "Confirme": "profilmemoire",
+              "Preuve": "Le BIOS remis à zéro, il démarre"
+            },
+            {
+              "Texte": "Toujours bloqué",
+              "Ecarte": [
+                "profilmemoire"
+              ],
+              "Preuve": "Remettre le BIOS à zéro n'a rien changé"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "ecrannoircurseur",
       "Famille": "demarrage",
       "Titre": "Écran noir avec la souris après la connexion",
@@ -16930,7 +17654,9 @@
         "le voyant de l'écran est orange",
         "voyant de l'écran orange",
         "écran voyant orange",
-        "l'écran clignote orange"
+        "l'écran clignote orange",
+        "nouvelle carte graphique",
+        "changé de carte graphique"
       ],
       "Suspects": [
         "cable",
@@ -18339,6 +19065,37 @@
       ]
     },
     {
+      "Id": "antimalware",
+      "Famille": "lenteur",
+      "Titre": "« Antimalware Service Executable » prend tout le processeur",
+      "Phrase": "Ce programme est en haut du Gestionnaire des tâches et le PC rame",
+      "Mots": [
+        "antimalware service executable",
+        "msmpeng",
+        "antimalware",
+        "defender processeur",
+        "sécurité windows ralentit",
+        "service host",
+        "compatibility telemetry"
+      ],
+      "Suspects": [
+        "analysedefender",
+        "majencours",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-antimalware"
+        },
+        {
+          "Ref": "maj-en-cours"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
       "Id": "arretlong",
       "Famille": "lenteur",
       "Titre": "Il met très longtemps à s'éteindre",
@@ -19232,6 +19989,39 @@
       ]
     },
     {
+      "Id": "hautparleursportable",
+      "Famille": "son",
+      "Titre": "Les haut-parleurs du portable ne marchent plus (le casque oui)",
+      "Phrase": "Le son passe au casque, mais plus par les haut-parleurs",
+      "Mots": [
+        "haut-parleurs du portable",
+        "haut parleurs internes",
+        "que dans le casque",
+        "casque oui haut-parleurs non",
+        "haut-parleurs muets"
+      ],
+      "Suspects": [
+        "sortie",
+        "jackbloque",
+        "pilotesson",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-sortie"
+        },
+        {
+          "Ref": "test-jack-vide"
+        },
+        {
+          "Ref": "test-depanneur-son"
+        }
+      ]
+    },
+    {
       "Id": "songresille",
       "Famille": "son",
       "Titre": "Le son grésille ou coupe",
@@ -19459,7 +20249,9 @@
         "jeu sans son",
         "son dans mon jeu",
         "dans mon jeu",
-        "dans le jeu"
+        "dans le jeu",
+        "pas de son dans le navigateur",
+        "vidéo sans son"
       ],
       "Suspects": [
         "volumeappli",
@@ -20979,7 +21771,9 @@
         "err_cert_date_invalid",
         "votre horloge",
         "avertissement de sécurité",
-        "site non sécurisé"
+        "site non sécurisé",
+        "wifi d'hôtel",
+        "accepter les conditions"
       ],
       "Suspects": [
         "synchro",
@@ -21239,6 +22033,54 @@
       ]
     },
     {
+      "Id": "touchearrachee",
+      "Famille": "peripheriques",
+      "Titre": "Une touche du clavier s'est détachée",
+      "Phrase": "Une touche est tombée ou ne tient plus",
+      "Mots": [
+        "touche tombée",
+        "touche arrachée",
+        "touche détachée",
+        "remettre une touche",
+        "touche cassée",
+        "clip"
+      ],
+      "Suspects": [
+        "toucheclip",
+        "peripheriquehs"
+      ],
+      "Etapes": [
+        {
+          "Id": "test-reclipser",
+          "Type": "test",
+          "Court": "Reclipser",
+          "Pour": [
+            "toucheclip"
+          ],
+          "Duree": "deux minutes",
+          "Texte": "Remets la touche en place",
+          "Gestes": [
+            "Regarde l'emplacement : le petit clip blanc ou transparent est-il encore là et entier ?",
+            "Pose la touche bien droite au-dessus, puis appuie fermement au centre jusqu'au clic (parfois deux clics)."
+          ],
+          "Reponses": [
+            {
+              "Texte": "Elle tient et marche",
+              "Confirme": "toucheclip",
+              "Preuve": "La touche reclipsée tient"
+            },
+            {
+              "Texte": "Le clip est cassé, ou elle ne tient pas",
+              "Ecarte": [
+                "toucheclip"
+              ],
+              "Preuve": "Le clip de la touche est abîmé"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "touchesf",
       "Famille": "peripheriques",
       "Titre": "Les touches F1 à F12 font autre chose (volume, luminosité...)",
@@ -21353,6 +22195,42 @@
         },
         {
           "Ref": "test-eclairage-dyn"
+        }
+      ]
+    },
+    {
+      "Id": "rgb",
+      "Famille": "peripheriques",
+      "Titre": "Les lumières (RGB) du PC ne s'allument plus ou restent fixes",
+      "Phrase": "Les ventilateurs, la mémoire ou le clavier lumineux ne changent plus de couleur",
+      "Mots": [
+        "rgb",
+        "argb",
+        "éclairage",
+        "lumières du pc",
+        "led ventilateurs",
+        "couleurs ne changent pas",
+        "armoury crate",
+        "icue",
+        "le rgb marche plus",
+        "rgb marche plus",
+        "rgb ne marche plus",
+        "rgb s'allume plus"
+      ],
+      "Suspects": [
+        "eclairagedyn",
+        "rgblogiciel",
+        "rgbcable"
+      ],
+      "Etapes": [
+        {
+          "Ref": "type"
+        },
+        {
+          "Ref": "test-eclairage-dyn"
+        },
+        {
+          "Ref": "test-rgb-logiciel"
         }
       ]
     },
@@ -22985,6 +23863,38 @@
       ]
     },
     {
+      "Id": "antivirusbloque",
+      "Famille": "virus",
+      "Titre": "L'antivirus supprime ou bloque un programme (ou un téléchargement)",
+      "Phrase": "« Menace trouvée », « Virus détecté », le programme a disparu ou ne se télécharge pas",
+      "Mots": [
+        "menace trouvée",
+        "virus détecté",
+        "téléchargement bloqué",
+        "antivirus supprime",
+        "faux positif",
+        "defender bloque",
+        "quarantaine",
+        "trojan"
+      ],
+      "Suspects": [
+        "fauxpositif",
+        "quarantaine",
+        "indesirables"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-source-programme"
+        },
+        {
+          "Ref": "test-historique-protection"
+        },
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
       "Id": "gestionnairebloque",
       "Famille": "virus",
       "Titre": "« Le Gestionnaire des tâches a été désactivé par votre administrateur »",
@@ -23500,6 +24410,35 @@
       "Etapes": [
         {
           "Ref": "test-elements-masques"
+        },
+        {
+          "Ref": "test-autre-pc"
+        }
+      ]
+    },
+    {
+      "Id": "clefausse",
+      "Famille": "fichiers",
+      "Titre": "Les fichiers copiés sur la clé sont illisibles ou ont disparu",
+      "Phrase": "La copie semble réussir, mais les fichiers sont vides ou abîmés ensuite",
+      "Mots": [
+        "fichiers illisibles",
+        "clé fausse",
+        "clé contrefaite",
+        "fichiers corrompus sur la clé",
+        "1 to",
+        "2 to",
+        "clé chinoise",
+        "fichiers vides"
+      ],
+      "Suspects": [
+        "clecontrefaite",
+        "peripheriquehs",
+        "portusb"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-cle-prix"
         },
         {
           "Ref": "test-autre-pc"
@@ -24363,6 +25302,32 @@
       ]
     },
     {
+      "Id": "mdpincorrect",
+      "Famille": "windows",
+      "Titre": "« Mot de passe incorrect » alors que je tape le bon",
+      "Phrase": "Windows refuse un mot de passe ou un code PIN que je connais",
+      "Mots": [
+        "mot de passe incorrect",
+        "nom d'utilisateur ou le mot de passe est incorrect",
+        "mot de passe refusé",
+        "code pin incorrect",
+        "il refuse mon mot de passe"
+      ],
+      "Suspects": [
+        "verrmaj",
+        "clavierconnexionlangue",
+        "comptemicrosoft"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-verrmaj"
+        },
+        {
+          "Ref": "test-langue-connexion"
+        }
+      ]
+    },
+    {
       "Id": "hello",
       "Famille": "windows",
       "Titre": "Windows Hello (visage ou empreinte) ne marche plus",
@@ -24469,7 +25434,8 @@
         "barre en haut",
         "icônes centrées",
         "barre cachée",
-        "taskbar"
+        "taskbar",
+        "barre de recherche disparue"
       ],
       "Suspects": [
         "barremasquee",
@@ -24968,6 +25934,47 @@
       "Etapes": [
         {
           "Ref": "q-raison-w11"
+        }
+      ]
+    },
+    {
+      "Id": "reinitialiser",
+      "Famille": "windows",
+      "Titre": "Je veux remettre Windows à zéro (réinitialiser le PC)",
+      "Phrase": "Tout va mal, ou le PC va être donné ou vendu",
+      "Mots": [
+        "réinitialiser",
+        "remettre à zéro",
+        "réinstaller windows",
+        "formater",
+        "remise à zéro",
+        "repartir de zéro",
+        "vendre mon pc",
+        "donner mon pc"
+      ],
+      "Suspects": [
+        "reinit"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-reinit-pourquoi",
+          "Type": "question",
+          "Court": "Pourquoi ?",
+          "Texte": "Tu veux remettre Windows à zéro pour :",
+          "Reponses": [
+            {
+              "Texte": "Régler un problème",
+              "Confirme": "reinit",
+              "Detail": "choisis « Conserver mes fichiers »",
+              "Preuve": "Pour régler un problème, en gardant les fichiers"
+            },
+            {
+              "Texte": "Donner ou vendre le PC",
+              "Confirme": "reinit",
+              "Detail": "choisis « Supprimer tout » (et « Nettoyer le lecteur »)",
+              "Preuve": "Pour donner ou vendre le PC, en effaçant tout"
+            }
+          ]
         }
       ]
     },
