@@ -3491,6 +3491,271 @@
       "Sauf": [
         "portable"
       ]
+    },
+    "narrateur": {
+      "Titre": "Le Narrateur",
+      "Trouve": "Le Narrateur de Windows s'était allumé",
+      "Pourquoi": "Le Narrateur lit à voix haute tout ce qui est à l'écran, pour les personnes qui voient mal. Un raccourci (touche Windows + Ctrl + Entrée) l'allume sans le vouloir.",
+      "AFaire": [
+        "Pour l'éteindre : touche Windows + Ctrl + Entrée.",
+        "Pour que le raccourci ne l'allume plus : Paramètres, « Accessibilité », « Narrateur », décoche « Raccourci clavier pour le Narrateur »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "touchesremanentes": {
+      "Titre": "Le raccourci des touches rémanentes",
+      "Trouve": "Le raccourci des « touches rémanentes » s'activait en appuyant 5 fois sur Maj",
+      "Pourquoi": "Appuyer 5 fois de suite sur Maj (souvent en jeu) propose d'activer les « touches rémanentes », avec un bip : c'est un raccourci d'accessibilité.",
+      "AFaire": [
+        "Coupe le raccourci : Paramètres, « Accessibilité », « Clavier », « Touches rémanentes », décoche « Raccourci clavier pour les touches rémanentes ».",
+        "Pareil pour « Touches filtres » (Maj droite enfoncée 8 secondes)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "modeS": {
+      "Titre": "Le mode S de Windows",
+      "Trouve": "Windows est en « mode S » : seules les applis du Store sont permises",
+      "Pourquoi": "Certains PC sont vendus en « Windows mode S », qui n'accepte que les applis du Microsoft Store. On peut le quitter gratuitement, une fois pour toutes (on ne peut pas y revenir).",
+      "AFaire": [
+        "Pour le quitter : Paramètres, « Système », « Activation », « Passer de Windows S », puis « Obtenir » dans le Store (gratuit). Ce n'est pas réversible."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "stratgestionnaire": {
+      "Titre": "Une règle de sécurité (ou un virus)",
+      "Trouve": "Une règle bloque le Gestionnaire des tâches (souvent laissée par un virus)",
+      "Pourquoi": "Le message « Le Gestionnaire des tâches a été désactivé par votre administrateur », sur un PC personnel, vient souvent d'un programme malveillant qui veut éviter d'être arrêté.",
+      "AFaire": [
+        "Fais une analyse hors ligne avec Sécurité Windows (« Options d'analyse », « Analyse Microsoft Defender hors ligne »).",
+        "Puis montre le PC à un réparateur pour retirer la règle."
+      ],
+      "Pro": "Un réparateur peut retirer la règle et vérifier le PC."
+    },
+    "redemarrageauto": {
+      "Titre": "Le redémarrage après une erreur",
+      "Trouve": "Windows redémarre au lieu de s'éteindre à cause d'une erreur à l'arrêt",
+      "Pourquoi": "Si une erreur arrive pendant l'arrêt, Windows peut redémarrer tout seul (« Redémarrer automatiquement »).",
+      "AFaire": [
+        "Garde le réglage : touche Windows, « Afficher les paramètres système avancés », « Démarrage et récupération », « Paramètres » : décoche « Redémarrer automatiquement »."
+      ],
+      "Pro": "Si ça continue, un réparateur peut lire l'erreur dans les journaux."
+    },
+    "horslimites": {
+      "Titre": "Une résolution que l'écran n'accepte pas",
+      "Trouve": "Le PC envoyait une résolution ou une fréquence que l'écran n'accepte pas",
+      "Pourquoi": "Chaque écran a ses limites : une résolution ou une fréquence trop haute (souvent choisie dans un jeu) donne « Hors limites », « Input not supported » ou « Out of range ».",
+      "AFaire": [
+        "Garde la résolution « (recommandé) » de Windows, et la fréquence proposée pour cet écran."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "antivirusnav": {
+      "Titre": "L'antivirus en plus",
+      "Trouve": "Un antivirus en plus se mettait en travers du navigateur",
+      "Pourquoi": "Les antivirus en plus de celui de Windows injectent leurs modules dans le navigateur : ça peut le faire planter.",
+      "AFaire": [
+        "Un seul antivirus suffit : celui de Windows protège déjà bien."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "appabimee": {
+      "Titre": "L'appli de Windows",
+      "Trouve": "Cette appli de Windows était déréglée",
+      "Pourquoi": "Les applis de Windows (Photos, Calculatrice, Courrier, Xbox...) peuvent se dérégler ; Windows sait les réparer ou les remettre à zéro.",
+      "AFaire": [
+        "C'est réglé."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "vsync": {
+      "Titre": "La synchronisation verticale",
+      "Trouve": "La synchronisation verticale (V-Sync) ajoutait du retard",
+      "Pourquoi": "La V-Sync attend l'écran avant d'afficher chaque image : ça évite les déchirures, mais ajoute un petit retard aux gestes, surtout si les images par seconde baissent.",
+      "AFaire": [
+        "Coupe la V-Sync dans le jeu (ou active G-Sync / FreeSync si ton écran le permet), et mets une limite d'images un peu sous la fréquence de l'écran."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pollingsouris": {
+      "Titre": "La souris sans fil ou en Bluetooth",
+      "Trouve": "La liaison de la souris ajoutait du retard",
+      "Pourquoi": "Une souris en Bluetooth (ou avec des piles faibles) envoie ses mouvements moins souvent : en jeu, on sent un retard.",
+      "AFaire": [
+        "Pour jouer, préfère une souris filaire ou avec son petit récepteur USB (2,4 GHz), pas le Bluetooth."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "shaders": {
+      "Titre": "La préparation des graphismes",
+      "Trouve": "Le jeu préparait ses graphismes (c'est normal au début)",
+      "Pourquoi": "Après une installation ou une mise à jour du pilote graphique, beaucoup de jeux préparent leurs « shaders » : saccades ou chargement long les premières minutes, puis tout va bien.",
+      "AFaire": [
+        "Laisse le jeu finir sa préparation (souvent un écran « Compilation des shaders ») avant de jouer.",
+        "Si ça recommence à chaque lancement, vérifie qu'il reste de la place sur le disque."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "servicesjeux": {
+      "Titre": "Les services de jeu de Windows",
+      "Trouve": "Les « services de jeu » de Windows étaient abîmés",
+      "Pourquoi": "L'appli Xbox et le Game Pass s'appuient sur les « Gaming Services » de Windows. Abîmés, les jeux ne s'installent ou ne se lancent plus.",
+      "AFaire": [
+        "C'est réglé : les services de jeu ont été réinstallés."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "antiviruslourd": {
+      "Titre": "Un antivirus en plus",
+      "Trouve": "Un antivirus en plus ralentissait le PC",
+      "Pourquoi": "Un deuxième antivirus (souvent installé avec le PC ou un autre programme) analyse tout en double : le PC devient lent, surtout au démarrage.",
+      "AFaire": [
+        "Garde un seul antivirus : celui de Windows suffit. Désinstalle l'autre (et ses « optimiseurs »)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "veillesac": {
+      "Titre": "La veille dans le sac",
+      "Trouve": "Le portable restait allumé (en veille) dans le sac",
+      "Pourquoi": "Fermer le capot met le portable en veille, pas à l'arrêt. Certains se réveillent dans le sac (mise à jour, souris Bluetooth) et chauffent sans air.",
+      "AFaire": [
+        "Fais « Arrêter » (ou « Mettre en veille prolongée ») avant de ranger le portable dans un sac."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "fixe"
+      ]
+    },
+    "vibrationdisque": {
+      "Titre": "Un disque dur qui vibre",
+      "Trouve": "Un disque dur (ou ventilateur) faisait vibrer le boîtier",
+      "Pourquoi": "Un disque dur à plateaux, ou un ventilateur, transmet ses vibrations au boîtier : bourdonnement grave, surtout posé sur un meuble creux.",
+      "AFaire": [
+        "Vérifie que le disque est bien vissé (4 vis), et pose la tour sur un sol stable ou un tapis.",
+        "Un SSD ne vibre pas du tout : c'est un bon remplacement."
+      ],
+      "Pro": "Rien à réparer.",
+      "Sauf": [
+        "portable"
+      ]
+    },
+    "bouclemasse": {
+      "Titre": "Un parasite électrique",
+      "Trouve": "Un parasite électrique passait dans le câble du son",
+      "Pourquoi": "Le câble du son (jack) capte les parasites de l'ordinateur : bourdonnement, grésillement qui change quand la souris bouge ou que le PC travaille. Souvent sur les prises de façade, ou avec l'ordinateur et les enceintes sur deux prises différentes.",
+      "AFaire": [
+        "Branche le jack à l'arrière de la tour (pas en façade).",
+        "Branche le PC et les enceintes sur la même multiprise.",
+        "Si ça continue : une petite carte son USB (ou un casque USB) supprime le problème."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "reseaupublic": {
+      "Titre": "Le profil du réseau",
+      "Trouve": "Le Wi-Fi de la maison était réglé en « réseau public »",
+      "Pourquoi": "En « réseau public », Windows cache le PC et ne cherche pas les autres appareils (partage, imprimantes, autres PC) : c'est voulu pour les cafés, pas pour la maison.",
+      "AFaire": [
+        "À la maison, garde le profil « Réseau privé »."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "identifiantscourrier": {
+      "Titre": "Le mot de passe enregistré",
+      "Trouve": "Le mot de passe enregistré pour la messagerie n'était plus le bon",
+      "Pourquoi": "Outlook et Courrier gardent le mot de passe du compte. Changé ailleurs (ou trop vieux), ils le redemandent sans arrêt.",
+      "AFaire": [
+        "Supprime le compte dans la messagerie puis ajoute-le de nouveau, avec le bon mot de passe.",
+        "Pour Gmail et d'autres, le mieux est de se connecter avec le bouton « Google » (pas un mot de passe tapé)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "politiquenav": {
+      "Titre": "Une règle installée dans le navigateur",
+      "Trouve": "Une règle « gérée par votre organisation » a été installée dans le navigateur (souvent par un programme indésirable)",
+      "Pourquoi": "Sur un PC personnel, « Géré par votre organisation » veut souvent dire qu'un programme indésirable a imposé sa page d'accueil, son moteur de recherche ou une extension.",
+      "AFaire": [
+        "Fais une analyse avec Sécurité Windows, puis réinitialise le navigateur.",
+        "Si le message reste, un réparateur peut retirer la règle."
+      ],
+      "Pro": "Un réparateur peut retirer la règle."
+    },
+    "disquesain": {
+      "Titre": "Le disque lui-même est sain",
+      "Trouve": "Tes fichiers sont sans doute intacts sur le disque",
+      "Pourquoi": "Quand un PC ne démarre plus, le disque et les fichiers vont souvent bien : c'est Windows ou une autre pièce qui bloque.",
+      "AFaire": [
+        "La façon la plus simple : un réparateur sort le disque et copie tes fichiers.",
+        "Si tu es à l'aise : un boîtier ou adaptateur USB pour disque (SATA ou M.2, 15 à 25 euros) branche le disque sur un autre PC comme une clé USB.",
+        "Si Windows propose « Choisir une option » : « Dépannage », « Options avancées », « Invite de commandes » permet aussi de copier sur une clé (demande de l'aide)."
+      ],
+      "Pro": "Un réparateur récupère les fichiers d'un disque sain en quelques minutes."
+    },
+    "disqueabime": {
+      "Titre": "Le disque est abîmé",
+      "Trouve": "Le disque lui-même est abîmé : la récupération demande un spécialiste",
+      "Pourquoi": "Un disque qui fait des clics, qui n'est plus vu par le BIOS ou qui est tombé peut garder les fichiers, mais chaque essai peut l'abîmer davantage.",
+      "AFaire": [
+        "N'insiste pas : éteins le PC.",
+        "Confie le disque à un spécialiste de la récupération de données (le prix dépend des dégâts)."
+      ],
+      "Pro": "Un spécialiste de la récupération de données."
+    },
+    "cheminlong": {
+      "Titre": "Un chemin trop long",
+      "Trouve": "Le chemin du fichier (dossiers + nom) était trop long",
+      "Pourquoi": "Windows limite la longueur du chemin complet (environ 260 caractères) : des dossiers très imbriqués avec de longs noms bloquent la copie ou la suppression.",
+      "AFaire": [
+        "Raccourcis le nom des dossiers, ou déplace le dossier plus haut (par exemple directement dans C:\\ ou D:\\)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "lecteurpdf": {
+      "Titre": "Le lecteur de PDF",
+      "Trouve": "Il manquait un bon lecteur de PDF (ou le mauvais était choisi)",
+      "Pourquoi": "Les PDF s'ouvrent avec le navigateur ou un lecteur. Certains PDF (formulaires, signés) ne s'affichent bien qu'avec Adobe Acrobat Reader (gratuit).",
+      "AFaire": [
+        "Installe Adobe Acrobat Reader (gratuit, adobe.com) et choisis-le pour les PDF (clic droit, « Ouvrir avec », « Toujours »)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "pasdoffice": {
+      "Titre": "Pas de Word sur ce PC",
+      "Trouve": "Il n'y a pas de traitement de texte installé",
+      "Pourquoi": "Word et Excel sont payants et pas toujours installés. Il existe des solutions gratuites qui ouvrent et enregistrent ces fichiers.",
+      "AFaire": [
+        "Gratuit en ligne : office.com (Word, Excel en ligne avec un compte Microsoft) : envoie le fichier sur OneDrive et ouvre-le.",
+        "Gratuit sur le PC : LibreOffice (libreoffice.org) ouvre et enregistre les .docx et .xlsx."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "disquesale": {
+      "Titre": "Le disque (CD, DVD) lui-même",
+      "Trouve": "Le CD ou DVD était sale ou rayé",
+      "Pourquoi": "Les traces de doigts, la poussière ou les rayures empêchent le lecteur de lire le disque.",
+      "AFaire": [
+        "Nettoie le disque avec un chiffon doux, du centre vers le bord (jamais en rond)."
+      ],
+      "Pro": "Rien à réparer."
+    },
+    "lecteurdvd": {
+      "Titre": "Le lecteur de CD/DVD",
+      "Trouve": "Le lecteur de CD/DVD est fatigué ou mal reconnu",
+      "Pourquoi": "Les lecteurs s'usent (lentille encrassée) ou perdent leur pilote après une mise à jour.",
+      "AFaire": [
+        "Un lecteur DVD externe USB coûte une vingtaine d'euros."
+      ],
+      "Pro": "Un réparateur peut changer le lecteur d'une tour."
+    },
+    "jaugebatterie": {
+      "Titre": "La jauge de la batterie",
+      "Trouve": "La jauge de la batterie était mal réglée",
+      "Pourquoi": "La batterie mesure sa charge avec une jauge qui se décale avec le temps : le pourcentage saute, reste bloqué, ou tombe d'un coup.",
+      "AFaire": [
+        "Une fois par mois : charge à 100 %, laisse se vider jusqu'à l'arrêt, puis recharge à 100 % sans débrancher."
+      ],
+      "Pro": "Si ça continue, la batterie est sans doute usée : elle se change.",
+      "Sauf": [
+        "fixe"
+      ]
     }
   },
   "Tests": {
@@ -11630,6 +11895,519 @@
           "Preuve": "La mémoire était bien enfoncée"
         }
       ]
+    },
+    "test-narrateur": {
+      "Type": "test",
+      "Court": "Éteindre le Narrateur",
+      "Pour": [
+        "narrateur"
+      ],
+      "Duree": "une minute",
+      "Texte": "Éteins le Narrateur",
+      "Gestes": [
+        "Appuie en même temps sur la touche Windows, Ctrl et Entrée.",
+        "(Ou touche Windows + I, « Accessibilité », « Narrateur » : désactivé.)"
+      ],
+      "Reponses": [
+        {
+          "Texte": "La voix s'est arrêtée",
+          "Confirme": "narrateur",
+          "Preuve": "Le Narrateur était allumé"
+        },
+        {
+          "Texte": "Elle parle encore",
+          "Ecarte": [
+            "narrateur"
+          ],
+          "Preuve": "Ce n'était pas le Narrateur"
+        }
+      ]
+    },
+    "test-raccourci-remanentes": {
+      "Type": "test",
+      "Court": "Le raccourci",
+      "Pour": [
+        "touchesremanentes"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe le raccourci des touches rémanentes",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Accessibilité », puis « Clavier ».",
+        "Ouvre « Touches rémanentes » : désactive-les et décoche « Raccourci clavier pour les touches rémanentes ». Fais pareil dans « Touches filtres »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le message ne revient plus",
+          "Confirme": "touchesremanentes",
+          "Preuve": "Sans le raccourci, le message ne revient plus"
+        },
+        {
+          "Texte": "Il revient",
+          "Ecarte": [
+            "touchesremanentes"
+          ],
+          "Preuve": "Ce n'était pas ce raccourci"
+        }
+      ]
+    },
+    "q-mode-s": {
+      "Type": "question",
+      "Court": "Le message",
+      "Texte": "Un message dit-il que « pour votre sécurité, Windows n'autorise que les applications du Microsoft Store » (ou parle du « mode S ») ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "modeS",
+          "Preuve": "Windows est en mode S"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "modeS"
+          ],
+          "Preuve": "Windows n'est pas en mode S"
+        }
+      ]
+    },
+    "test-redemarrage-auto": {
+      "Type": "test",
+      "Court": "Le redémarrage automatique",
+      "Pour": [
+        "redemarrageauto"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Empêche Windows de redémarrer après une erreur",
+      "Gestes": [
+        "Appuie sur la touche Windows, tape « Afficher les paramètres système avancés » et ouvre-le.",
+        "Dans « Démarrage et récupération », clique sur « Paramètres ».",
+        "Décoche « Redémarrer automatiquement ». OK, puis essaie « Arrêter »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'éteint maintenant",
+          "Confirme": "redemarrageauto",
+          "Preuve": "Sans le redémarrage automatique, il s'éteint"
+        },
+        {
+          "Texte": "Il redémarre encore (ou un écran bleu apparaît)",
+          "Ecarte": [
+            "redemarrageauto"
+          ],
+          "Preuve": "Le redémarrage automatique n'y était pour rien"
+        }
+      ]
+    },
+    "test-mode-basse-resolution": {
+      "Type": "test",
+      "Court": "Basse résolution",
+      "Pour": [
+        "horslimites"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Démarre en basse résolution et remets la bonne",
+      "Gestes": [
+        "Si le message apparaît dans un jeu : appuie sur Alt + Entrée, ou attends 15 secondes (Windows revient seul à l'ancien réglage).",
+        "Sinon : redémarre en maintenant Maj sur « Redémarrer », puis « Dépannage », « Options avancées », « Paramètres », « Redémarrer », touche 3 « Activer la vidéo basse résolution ».",
+        "Dans Windows, clic droit sur le Bureau, « Paramètres d'affichage » : choisis la résolution « (recommandé) » et une fréquence proposée."
+      ],
+      "Reponses": [
+        {
+          "Texte": "L'image est revenue",
+          "Confirme": "horslimites",
+          "Preuve": "Avec une résolution acceptée, l'image est revenue"
+        },
+        {
+          "Texte": "Toujours le message",
+          "Ecarte": [
+            "horslimites"
+          ],
+          "Preuve": "La résolution n'y était pour rien"
+        }
+      ]
+    },
+    "test-reparer-appli": {
+      "Type": "test",
+      "Court": "Réparer l'appli",
+      "Pour": [
+        "appabimee"
+      ],
+      "Duree": "cinq minutes",
+      "Texte": "Répare (ou remets à zéro) l'appli",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Applications », puis « Applications installées », et cherche l'appli.",
+        "Les trois points à droite (ou son nom), « Options avancées » : clique sur « Réparer » ; si ça ne suffit pas, sur « Réinitialiser »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Elle s'ouvre",
+          "Confirme": "appabimee",
+          "Preuve": "Réparée, l'appli s'ouvre"
+        },
+        {
+          "Texte": "Toujours pas",
+          "Ecarte": [
+            "appabimee"
+          ],
+          "Preuve": "Réparer l'appli n'a rien changé"
+        }
+      ]
+    },
+    "test-vsync": {
+      "Type": "test",
+      "Court": "La V-Sync",
+      "Pour": [
+        "vsync"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Coupe la synchronisation verticale",
+      "Gestes": [
+        "Dans les options graphiques du jeu, désactive « V-Sync » (ou « Synchronisation verticale »).",
+        "Si tu as une carte NVIDIA, tu peux aussi activer « NVIDIA Reflex » s'il est proposé.",
+        "Rejoue une partie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "La souris répond tout de suite",
+          "Confirme": "vsync",
+          "Preuve": "Sans V-Sync, plus de retard"
+        },
+        {
+          "Texte": "Toujours du retard",
+          "Ecarte": [
+            "vsync"
+          ],
+          "Preuve": "La V-Sync n'y était pour rien"
+        }
+      ]
+    },
+    "q-souris-bt": {
+      "Type": "question",
+      "Court": "La souris",
+      "Texte": "Ta souris est-elle en Bluetooth (sans récepteur USB) ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, en Bluetooth",
+          "Confirme": "pollingsouris",
+          "Preuve": "La souris est en Bluetooth"
+        },
+        {
+          "Texte": "Non, filaire ou avec un récepteur USB",
+          "Ecarte": [
+            "pollingsouris"
+          ],
+          "Preuve": "La souris est filaire ou en 2,4 GHz"
+        }
+      ]
+    },
+    "q-shaders": {
+      "Type": "question",
+      "Court": "Au début seulement ?",
+      "Texte": "Les saccades arrivent-elles surtout les premières minutes (ou à chaque nouveau lieu), puis ça va mieux ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, surtout au début, ou après une mise à jour",
+          "Confirme": "shaders",
+          "Preuve": "Les saccades sont surtout au début"
+        },
+        {
+          "Texte": "Non, tout le temps",
+          "Ecarte": [
+            "shaders"
+          ],
+          "Preuve": "Les saccades durent toute la partie"
+        }
+      ]
+    },
+    "test-gaming-services": {
+      "Type": "test",
+      "Court": "Les services de jeu",
+      "Pour": [
+        "servicesjeux"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Réinstalle les services de jeu de Windows",
+      "Gestes": [
+        "Clic droit sur le bouton Démarrer (le logo Windows en bas), puis « Terminal (administrateur) » ou « Windows PowerShell (administrateur) ». Windows demande une autorisation : accepte.",
+        "Clique sur « Copier » à côté de la commande ci-dessous, puis dans la fenêtre noire : clic droit (ça colle), et touche Entrée.",
+        "Ouvre ensuite le Microsoft Store, cherche « Gaming Services » et installe-le (ou relance l'appli Xbox : elle le propose). Redémarre."
+      ],
+      "Commande": {
+        "Admin": true,
+        "Lignes": [
+          "Get-AppxPackage *gamingservices* -AllUsers | Remove-AppxPackage -AllUsers"
+        ]
+      },
+      "Reponses": [
+        {
+          "Texte": "Les jeux s'installent et se lancent",
+          "Confirme": "servicesjeux",
+          "Preuve": "Les services de jeu réinstallés, ça marche"
+        },
+        {
+          "Texte": "Toujours pareil",
+          "Ecarte": [
+            "servicesjeux"
+          ],
+          "Preuve": "Les services de jeu n'y étaient pour rien"
+        }
+      ]
+    },
+    "q-sac": {
+      "Type": "question",
+      "Court": "Rangé comment ?",
+      "Texte": "Juste avant, le portable était rangé dans un sac, capot simplement fermé ?",
+      "Reponses": [
+        {
+          "Texte": "Oui, capot fermé dans le sac",
+          "Confirme": "veillesac",
+          "Preuve": "Le portable était en veille dans un sac"
+        },
+        {
+          "Texte": "Non",
+          "Ecarte": [
+            "veillesac"
+          ],
+          "Preuve": "Le portable n'était pas rangé en veille"
+        }
+      ]
+    },
+    "test-vibration": {
+      "Type": "test",
+      "Court": "Le bourdonnement",
+      "Pour": [
+        "vibrationdisque"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Pose la main sur le boîtier",
+      "Gestes": [
+        "PC allumé, pose la main à plat sur différentes parties du boîtier (et sur le meuble).",
+        "Si le bourdonnement s'arrête quand tu appuies, c'est une vibration : resserre les vis du disque dur et des panneaux, ou change la tour de place."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le bruit change quand j'appuie",
+          "Confirme": "vibrationdisque",
+          "Preuve": "C'est une vibration du boîtier"
+        },
+        {
+          "Texte": "Rien ne change",
+          "Ecarte": [
+            "vibrationdisque"
+          ],
+          "Preuve": "Ce n'est pas une vibration du boîtier"
+        }
+      ]
+    },
+    "test-prise-arriere-son": {
+      "Type": "test",
+      "Court": "La prise arrière",
+      "Pour": [
+        "bouclemasse"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Branche le son à l'arrière, et tout sur la même multiprise",
+      "Gestes": [
+        "Branche le casque ou les enceintes sur la prise jack verte à l'arrière de la tour (pas en façade).",
+        "Branche le PC et les enceintes (ou leur bloc) sur la même multiprise.",
+        "Écoute."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le bourdonnement a disparu",
+          "Confirme": "bouclemasse",
+          "Preuve": "À l'arrière et sur la même prise, le bourdonnement disparaît"
+        },
+        {
+          "Texte": "Toujours là",
+          "Ecarte": [
+            "bouclemasse"
+          ],
+          "Preuve": "Le branchement n'y était pour rien"
+        }
+      ]
+    },
+    "test-reseau-prive": {
+      "Type": "test",
+      "Court": "Réseau privé",
+      "Pour": [
+        "reseaupublic"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Passe le Wi-Fi de la maison en réseau privé",
+      "Gestes": [
+        "Appuie sur la touche Windows du clavier et I en même temps : les Paramètres s'ouvrent.",
+        "Va dans « Réseau et Internet », clique sur ta connexion (Wi-Fi ou Ethernet), puis sur ses propriétés.",
+        "Dans « Type de profil réseau », choisis « Réseau privé ». (Seulement chez toi, jamais dans un lieu public.)"
+      ],
+      "Reponses": [
+        {
+          "Texte": "Les appareils apparaissent",
+          "Confirme": "reseaupublic",
+          "Preuve": "En réseau privé, les autres appareils apparaissent"
+        },
+        {
+          "Texte": "Toujours rien",
+          "Ecarte": [
+            "reseaupublic"
+          ],
+          "Preuve": "Le profil du réseau n'y était pour rien"
+        }
+      ]
+    },
+    "test-compte-messagerie": {
+      "Type": "test",
+      "Court": "Rajouter le compte",
+      "Pour": [
+        "identifiantscourrier"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Supprime puis rajoute le compte dans la messagerie",
+      "Gestes": [
+        "Outlook : « Fichier » (ou la roue dentée), « Paramètres du compte », choisis le compte, « Supprimer ».",
+        "Puis « Ajouter un compte » et connecte-toi avec le bon mot de passe (ou le bouton Google, Microsoft...)."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il ne redemande plus",
+          "Confirme": "identifiantscourrier",
+          "Preuve": "Le compte rajouté, il ne redemande plus le mot de passe"
+        },
+        {
+          "Texte": "Il redemande encore",
+          "Ecarte": [
+            "identifiantscourrier"
+          ],
+          "Preuve": "Rajouter le compte n'a rien changé"
+        }
+      ]
+    },
+    "q-disque-sain": {
+      "Type": "question",
+      "Court": "Le disque",
+      "Texte": "Le disque fait-il des clics ou des grattements, ou le PC (ou le BIOS) ne le voit-il plus du tout ?",
+      "Reponses": [
+        {
+          "Texte": "Oui",
+          "Confirme": "disqueabime",
+          "Preuve": "Le disque fait des bruits ou n'est plus vu"
+        },
+        {
+          "Texte": "Non, ou je ne sais pas",
+          "Confirme": "disquesain",
+          "Preuve": "Le disque ne montre pas de signe de panne"
+        }
+      ]
+    },
+    "test-chemin-court": {
+      "Type": "test",
+      "Court": "Raccourcir",
+      "Pour": [
+        "cheminlong"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Raccourcis le chemin",
+      "Gestes": [
+        "Renomme les dossiers qui contiennent le fichier avec des noms plus courts (ou déplace le dossier principal directement à la racine du disque, comme C:\\Archives).",
+        "Réessaie."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Ça marche",
+          "Confirme": "cheminlong",
+          "Preuve": "Le chemin raccourci, ça marche"
+        },
+        {
+          "Texte": "Toujours bloqué",
+          "Ecarte": [
+            "cheminlong"
+          ],
+          "Preuve": "La longueur du chemin n'y était pour rien"
+        }
+      ]
+    },
+    "test-acrobat": {
+      "Type": "test",
+      "Court": "Acrobat Reader",
+      "Pour": [
+        "lecteurpdf"
+      ],
+      "Duree": "dix minutes",
+      "Texte": "Ouvre le PDF avec Adobe Acrobat Reader",
+      "Gestes": [
+        "Installe Adobe Acrobat Reader depuis adobe.com (gratuit ; décoche les offres en plus).",
+        "Clic droit sur le PDF, « Ouvrir avec », « Adobe Acrobat »."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il s'ouvre bien",
+          "Confirme": "lecteurpdf",
+          "Preuve": "Avec Acrobat Reader, le PDF s'ouvre bien"
+        },
+        {
+          "Texte": "Toujours vide ou erreur",
+          "Ecarte": [
+            "lecteurpdf"
+          ],
+          "Preuve": "Le lecteur n'y était pour rien"
+        }
+      ]
+    },
+    "test-nettoyer-dvd": {
+      "Type": "test",
+      "Court": "Nettoyer le disque",
+      "Pour": [
+        "disquesale"
+      ],
+      "Duree": "deux minutes",
+      "Texte": "Nettoie le disque et essaie-en un autre",
+      "Gestes": [
+        "Nettoie le CD ou DVD avec un chiffon doux, du centre vers le bord.",
+        "Essaie aussi un autre disque qui marchait avant."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il est lu",
+          "Confirme": "disquesale",
+          "Preuve": "Le disque nettoyé est lu"
+        },
+        {
+          "Texte": "Aucun disque n'est lu",
+          "Ecarte": [
+            "disquesale"
+          ],
+          "Preuve": "Même un autre disque n'est pas lu"
+        }
+      ]
+    },
+    "test-recalibrer": {
+      "Type": "test",
+      "Court": "Recalibrer",
+      "Pour": [
+        "jaugebatterie"
+      ],
+      "Duree": "une journée",
+      "Texte": "Recalibre la batterie",
+      "Gestes": [
+        "Charge le portable jusqu'à 100 %, puis laisse-le branché encore une heure.",
+        "Débranche et sers-t'en normalement jusqu'à ce qu'il s'éteigne tout seul.",
+        "Laisse-le éteint 2 heures, puis recharge-le jusqu'à 100 % sans le débrancher."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Le pourcentage est cohérent",
+          "Confirme": "jaugebatterie",
+          "Preuve": "Recalibrée, la jauge est juste"
+        },
+        {
+          "Texte": "Toujours faux",
+          "Ecarte": [
+            "jaugebatterie"
+          ],
+          "Preuve": "Recalibrer n'a rien changé"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -11982,7 +12760,15 @@
         "0xef",
         "0x7a",
         "0x50",
-        "0x3b"
+        "0x3b",
+        "dpc_watchdog_violation",
+        "whea_uncorrectable_error",
+        "critical_process_died",
+        "irql_not_less_or_equal",
+        "kernel_security_check_failure",
+        "system_service_exception",
+        "page_fault_in_nonpaged_area",
+        "video_tdr_failure"
       ],
       "Suspects": [
         "windowsabime",
@@ -12486,6 +13272,64 @@
       ]
     },
     {
+      "Id": "navplante",
+      "Famille": "plantages",
+      "Titre": "Le navigateur plante ou affiche « Oh non ! »",
+      "Phrase": "Chrome, Edge ou Firefox se ferme, ou affiche « Oh non ! » / « Aw, Snap » / « Ce site est inaccessible »",
+      "Mots": [
+        "oh non",
+        "aw snap",
+        "navigateur plante",
+        "chrome plante",
+        "edge plante",
+        "firefox plante",
+        "onglet plante",
+        "status_access_violation",
+        "erreur de page"
+      ],
+      "Suspects": [
+        "extension",
+        "accelmateriel",
+        "memoirepeu",
+        "antivirusnav",
+        "reglagesnav"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-extensions"
+        },
+        {
+          "Ref": "test-accel-nav"
+        },
+        {
+          "Ref": "test-memoire-pleine"
+        },
+        {
+          "Ref": "test-sans-antivirus",
+          "Pour": [
+            "antivirusnav"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il ne plante plus",
+              "Confirme": "antivirusnav",
+              "Preuve": "Sans l'antivirus en plus, le navigateur ne plante plus"
+            },
+            {
+              "Texte": "Il plante encore, ou je n'en ai pas",
+              "Ecarte": [
+                "antivirusnav"
+              ],
+              "Preuve": "Aucun antivirus en plus ne gênait"
+            }
+          ]
+        },
+        {
+          "Ref": "test-reset-nav"
+        }
+      ]
+    },
+    {
       "Id": "dll",
       "Famille": "plantages",
       "Titre": "Message « fichier .dll introuvable »",
@@ -12662,6 +13506,55 @@
         },
         {
           "Ref": "test-reinstaller"
+        }
+      ]
+    },
+    {
+      "Id": "appliwindows",
+      "Famille": "plantages",
+      "Titre": "Une appli de Windows ne s'ouvre plus (Photos, Calculatrice...)",
+      "Phrase": "Elle s'ouvre et se ferme aussitôt, ou rien ne se passe",
+      "Mots": [
+        "photos ne s'ouvre pas",
+        "calculatrice",
+        "appli photos",
+        "application windows",
+        "courrier",
+        "outlook nouveau",
+        "se ferme aussitôt",
+        "appli du store"
+      ],
+      "Suspects": [
+        "appabimee",
+        "redemarrage",
+        "fichierssysteme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-reparer-appli"
+        },
+        {
+          "Ref": "test-redemarrer-vraiment",
+          "Pour": [
+            "redemarrage"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Elle s'ouvre",
+              "Confirme": "redemarrage",
+              "Preuve": "Après un vrai redémarrage, l'appli s'ouvre"
+            },
+            {
+              "Texte": "Toujours pas",
+              "Ecarte": [
+                "redemarrage"
+              ],
+              "Preuve": "Même après un vrai redémarrage, rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-sfc"
         }
       ]
     },
@@ -13593,6 +14486,39 @@
       ]
     },
     {
+      "Id": "arretredemarre",
+      "Famille": "allumage",
+      "Titre": "Quand je fais « Arrêter », il redémarre",
+      "Phrase": "Il s'éteint, puis se rallume tout seul aussitôt",
+      "Mots": [
+        "arrêter redémarre",
+        "s'éteint puis se rallume",
+        "redémarre au lieu de s'éteindre",
+        "impossible de l'éteindre",
+        "se rallume tout seul"
+      ],
+      "Suspects": [
+        "demarragerapide",
+        "redemarrageauto",
+        "reveilreseau",
+        "pilote"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-demarrage-rapide"
+        },
+        {
+          "Ref": "test-redemarrage-auto"
+        },
+        {
+          "Ref": "test-reveil-reseau"
+        },
+        {
+          "Ref": "test-pilote"
+        }
+      ]
+    },
+    {
       "Id": "allumeseul",
       "Famille": "allumage",
       "Titre": "Il s'allume tout seul",
@@ -13943,7 +14869,10 @@
         "hp écran noir",
         "code hp",
         "touche majuscule clignote",
-        "clignote rouge blanc"
+        "clignote rouge blanc",
+        "hp pc fixe clignote",
+        "bouton d'alimentation clignote",
+        "voyant hp"
       ],
       "Suspects": [
         "biosabimehp",
@@ -15407,6 +16336,50 @@
       ]
     },
     {
+      "Id": "horslimites",
+      "Famille": "ecran",
+      "Titre": "« Hors limites », « Input not supported » ou « Out of range » sur l'écran",
+      "Phrase": "L'écran affiche ce message au lieu de l'image",
+      "Mots": [
+        "hors limites",
+        "input not supported",
+        "out of range",
+        "entrée non prise en charge",
+        "mode non pris en charge",
+        "signal hors limite"
+      ],
+      "Suspects": [
+        "horslimites",
+        "cable",
+        "pilotegraphique"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-mode-basse-resolution"
+        },
+        {
+          "Ref": "test-cable-couleur",
+          "Reponses": [
+            {
+              "Texte": "L'image est revenue",
+              "Confirme": "cable",
+              "Preuve": "Câble rebranché, l'image est revenue"
+            },
+            {
+              "Texte": "Toujours le message",
+              "Ecarte": [
+                "cable"
+              ],
+              "Preuve": "Le câble n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        }
+      ]
+    },
+    {
       "Id": "clignote",
       "Famille": "ecran",
       "Titre": "L'écran clignote",
@@ -16187,7 +17160,11 @@
         "projecteur",
         "détecté",
         "dupliquer",
-        "étendre"
+        "étendre",
+        "télé",
+        "tv",
+        "pc sur la télé",
+        "brancher la télé"
       ],
       "Suspects": [
         "cable",
@@ -16945,6 +17922,103 @@
       ]
     },
     {
+      "Id": "videosaccade",
+      "Famille": "lenteur",
+      "Titre": "Les vidéos saccadent (YouTube, Netflix...)",
+      "Phrase": "L'image des vidéos saute ou se fige, alors que le reste va bien",
+      "Mots": [
+        "vidéo saccade",
+        "youtube saccade",
+        "netflix saccade",
+        "vidéo lag",
+        "vidéo qui saute",
+        "vidéo se fige",
+        "streaming saccade"
+      ],
+      "Suspects": [
+        "saturation",
+        "accelmateriel",
+        "pilotegraphique",
+        "energie"
+      ],
+      "Etapes": [
+        {
+          "Id": "telechargements",
+          "Type": "question",
+          "Court": "D'autres usages ?",
+          "Pour": [
+            "saturation"
+          ],
+          "Texte": "D'autres appareils téléchargent-ils ou regardent-ils des vidéos en même temps (consoles, mises à jour, streaming) ?",
+          "Reponses": [
+            {
+              "Texte": "Oui",
+              "Preuve": "D'autres appareils utilisent beaucoup la connexion"
+            },
+            {
+              "Texte": "Non",
+              "Ecarte": [
+                "saturation"
+              ],
+              "Preuve": "Personne d'autre n'utilise beaucoup la connexion"
+            }
+          ]
+        },
+        {
+          "Ref": "test-accel-nav"
+        },
+        {
+          "Ref": "test-pilote-gpu"
+        },
+        {
+          "Ref": "test-energie"
+        }
+      ]
+    },
+    {
+      "Id": "lentantivirus",
+      "Famille": "lenteur",
+      "Titre": "Il est lent depuis l'installation d'un antivirus",
+      "Phrase": "Depuis Avast, Norton, McAfee ou un autre, tout rame",
+      "Mots": [
+        "lent depuis l'antivirus",
+        "avast",
+        "norton",
+        "mcafee",
+        "antivirus ralentit",
+        "antivirus lent"
+      ],
+      "Suspects": [
+        "antiviruslourd",
+        "programmegourmand"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-sans-antivirus",
+          "Pour": [
+            "antiviruslourd"
+          ],
+          "Reponses": [
+            {
+              "Texte": "C'est redevenu rapide",
+              "Confirme": "antiviruslourd",
+              "Preuve": "Sans l'antivirus en plus, c'est rapide"
+            },
+            {
+              "Texte": "Toujours lent, ou je n'en ai pas",
+              "Ecarte": [
+                "antiviruslourd"
+              ],
+              "Preuve": "Aucun antivirus en plus ne ralentissait"
+            }
+          ]
+        },
+        {
+          "Ref": "test-gestionnaire"
+        }
+      ]
+    },
+    {
       "Id": "ventilobruyant",
       "Famille": "bruits",
       "Titre": "Un ventilateur très bruyant",
@@ -16957,7 +18031,10 @@
         "souffle",
         "grince",
         "claque",
-        "vrombit"
+        "vrombit",
+        "frotte",
+        "gratte",
+        "bruit de frottement"
       ],
       "Suspects": [
         "programmegourmand",
@@ -17199,6 +18276,78 @@
       ]
     },
     {
+      "Id": "brulantsac",
+      "Famille": "bruits",
+      "Titre": "Le portable est brûlant en le sortant du sac",
+      "Phrase": "Capot fermé, rangé dans un sac, il en ressort très chaud et vidé",
+      "Mots": [
+        "brûlant dans le sac",
+        "chaud dans le sac",
+        "sac",
+        "sorti du sac chaud",
+        "chauffe fermé",
+        "capot fermé chaud"
+      ],
+      "Suspects": [
+        "veillesac",
+        "minuteurs",
+        "reveilsouris"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-sac"
+        },
+        {
+          "Ref": "test-minuteurs"
+        },
+        {
+          "Ref": "test-reveil-souris"
+        }
+      ]
+    },
+    {
+      "Id": "vibration",
+      "Famille": "bruits",
+      "Titre": "Le PC vibre ou bourdonne",
+      "Phrase": "Un bourdonnement grave, le meuble vibre",
+      "Mots": [
+        "vibre",
+        "vibration",
+        "bourdonne",
+        "bourdonnement",
+        "ronronne",
+        "meuble vibre",
+        "bruit sourd"
+      ],
+      "Suspects": [
+        "vibrationdisque",
+        "ventilateur",
+        "coilwhine"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-vibration"
+        },
+        {
+          "Ref": "test-ventilo-doigt",
+          "Reponses": [
+            {
+              "Texte": "Il accroche, ou tourne mal",
+              "Confirme": "ventilateur",
+              "Preuve": "Le ventilateur accroche : il est fatigué"
+            },
+            {
+              "Texte": "Il tourne librement",
+              "Ecarte": [
+                "ventilateur"
+              ],
+              "Preuve": "Le ventilateur tourne librement"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "odeurbrule",
       "Famille": "bruits",
       "Titre": "Une odeur de brûlé ou de la fumée",
@@ -17317,7 +18466,9 @@
         "haut-parleur",
         "volume",
         "aucun son",
-        "plus aucun son"
+        "plus aucun son",
+        "plus de son depuis la mise à jour",
+        "son disparu"
       ],
       "Suspects": [
         "soncoupe",
@@ -17442,6 +18593,37 @@
         },
         {
           "Ref": "test-prise-jack"
+        },
+        {
+          "Ref": "test-ailleurs"
+        }
+      ]
+    },
+    {
+      "Id": "bourdonnementson",
+      "Famille": "son",
+      "Titre": "Un bourdonnement dans les haut-parleurs ou le casque",
+      "Phrase": "Un « bzzz » qui change quand la souris bouge ou que le PC travaille",
+      "Mots": [
+        "bzzz",
+        "bourdonnement",
+        "parasite",
+        "bruit quand la souris bouge",
+        "grésille quand je bouge la souris",
+        "ronflement",
+        "bruit de fond"
+      ],
+      "Suspects": [
+        "bouclemasse",
+        "ameliorations",
+        "hautparleurs"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-prise-arriere-son"
+        },
+        {
+          "Ref": "test-ameliorations"
         },
         {
           "Ref": "test-ailleurs"
@@ -18778,6 +19960,33 @@
       ]
     },
     {
+      "Id": "appareilsreseau",
+      "Famille": "internet",
+      "Titre": "Le PC ne voit pas les autres appareils de la maison",
+      "Phrase": "Imprimante en Wi-Fi, autre PC, télé ou disque réseau introuvables",
+      "Mots": [
+        "autres appareils",
+        "réseau local",
+        "partage",
+        "voir les autres pc",
+        "imprimante wifi introuvable",
+        "nas",
+        "dossier partagé"
+      ],
+      "Suspects": [
+        "reseaupublic",
+        "box"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-reseau-prive"
+        },
+        {
+          "Ref": "test-box"
+        }
+      ]
+    },
+    {
       "Id": "proxy",
       "Famille": "internet",
       "Titre": "Le navigateur dit « pas de connexion », mais d'autres applis marchent",
@@ -18809,6 +20018,48 @@
         },
         {
           "Ref": "test-dns"
+        }
+      ]
+    },
+    {
+      "Id": "outlookmdp",
+      "Famille": "internet",
+      "Titre": "Outlook (ou Courrier) redemande sans arrêt le mot de passe",
+      "Phrase": "Une fenêtre de mot de passe revient sans cesse, les mails n'arrivent plus",
+      "Mots": [
+        "outlook",
+        "mot de passe outlook",
+        "redemande le mot de passe",
+        "courrier",
+        "mails n'arrivent plus",
+        "messagerie",
+        "thunderbird"
+      ],
+      "Suspects": [
+        "identifiantscourrier",
+        "synchro",
+        "motdepassevole"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-compte-messagerie"
+        },
+        {
+          "Ref": "test-synchro",
+          "Reponses": [
+            {
+              "Texte": "L'heure était fausse : maintenant ça marche",
+              "Confirme": "synchro",
+              "Preuve": "L'heure remise à jour, la messagerie marche"
+            },
+            {
+              "Texte": "L'heure était juste, ou toujours pareil",
+              "Ecarte": [
+                "synchro"
+              ],
+              "Preuve": "L'heure du PC n'y était pour rien"
+            }
+          ]
         }
       ]
     },
@@ -19923,6 +21174,34 @@
       ]
     },
     {
+      "Id": "dvd",
+      "Famille": "peripheriques",
+      "Titre": "Le lecteur de CD ou DVD ne lit pas (ou n'apparaît pas)",
+      "Phrase": "Le disque tourne sans être lu, ou le lecteur a disparu de « Ce PC »",
+      "Mots": [
+        "dvd",
+        "cd",
+        "lecteur dvd",
+        "lecteur cd",
+        "disque ne se lit pas",
+        "graveur",
+        "blu-ray"
+      ],
+      "Suspects": [
+        "disquesale",
+        "piloteperiph",
+        "lecteurdvd"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-nettoyer-dvd"
+        },
+        {
+          "Ref": "test-pilote-periph"
+        }
+      ]
+    },
+    {
       "Id": "necharge",
       "Famille": "batterie",
       "Titre": "Il ne charge plus",
@@ -20110,6 +21389,34 @@
               "Preuve": "Réduire la consommation ne change rien"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "pourcentagefaux",
+      "Famille": "batterie",
+      "Titre": "Le pourcentage de la batterie est faux (il saute ou reste bloqué)",
+      "Phrase": "Il passe de 40 % à 10 % d'un coup, ou reste bloqué sur un chiffre",
+      "Mots": [
+        "pourcentage",
+        "pourcentage faux",
+        "saute",
+        "bloqué à 100",
+        "tombe d'un coup",
+        "jauge",
+        "batterie saute"
+      ],
+      "Suspects": [
+        "pilotebatterie",
+        "jaugebatterie",
+        "batterieusee"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-pilote-batterie"
+        },
+        {
+          "Ref": "test-recalibrer"
         }
       ]
     },
@@ -20399,6 +21706,32 @@
       ]
     },
     {
+      "Id": "organisation",
+      "Famille": "virus",
+      "Titre": "Le navigateur dit « Géré par votre organisation »",
+      "Phrase": "Sans être au travail, le navigateur dit être géré, et impose une page ou une extension",
+      "Mots": [
+        "géré par votre organisation",
+        "managed by your organization",
+        "organisation",
+        "géré par",
+        "extension impossible à supprimer"
+      ],
+      "Suspects": [
+        "indesirables",
+        "reglagesnav",
+        "politiquenav"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-analyse"
+        },
+        {
+          "Ref": "test-reset-nav"
+        }
+      ]
+    },
+    {
       "Id": "programmesinconnus",
       "Famille": "virus",
       "Titre": "Des programmes inconnus",
@@ -20660,6 +21993,28 @@
       ]
     },
     {
+      "Id": "gestionnairebloque",
+      "Famille": "virus",
+      "Titre": "« Le Gestionnaire des tâches a été désactivé par votre administrateur »",
+      "Phrase": "Ctrl + Maj + Échap ne marche plus, ou les réglages sont bloqués",
+      "Mots": [
+        "gestionnaire des tâches désactivé",
+        "désactivé par votre administrateur",
+        "gestionnaire bloqué",
+        "regedit désactivé",
+        "administrateur a désactivé"
+      ],
+      "Suspects": [
+        "indesirables",
+        "stratgestionnaire"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-analyse"
+        }
+      ]
+    },
+    {
       "Id": "fauxnettoyage",
       "Famille": "virus",
       "Titre": "Un programme dit que le PC est infecté et demande de payer",
@@ -20826,6 +22181,29 @@
       ]
     },
     {
+      "Id": "recupfichiers",
+      "Famille": "fichiers",
+      "Titre": "Récupérer mes fichiers d'un PC qui ne démarre plus",
+      "Phrase": "Le PC ne démarre plus, et mes photos ou documents sont dedans",
+      "Mots": [
+        "récupérer mes fichiers",
+        "récupérer les photos",
+        "sauver mes fichiers",
+        "pc ne démarre plus fichiers",
+        "récupération de données",
+        "mes documents sont dedans"
+      ],
+      "Suspects": [
+        "disquesain",
+        "disqueabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-disque-sain"
+        }
+      ]
+    },
+    {
       "Id": "fichierintrouvable",
       "Famille": "fichiers",
       "Titre": "Je ne retrouve plus un fichier enregistré",
@@ -20932,6 +22310,31 @@
               "Preuve": "Même après un vrai redémarrage, c'est refusé"
             }
           ]
+        }
+      ]
+    },
+    {
+      "Id": "nomtroplong",
+      "Famille": "fichiers",
+      "Titre": "« Le nom du fichier est trop long » (copie ou suppression impossible)",
+      "Phrase": "Copier, déplacer ou supprimer s'arrête sur un nom trop long",
+      "Mots": [
+        "nom trop long",
+        "chemin trop long",
+        "nom de fichier trop long",
+        "trop long pour le dossier de destination",
+        "path too long"
+      ],
+      "Suspects": [
+        "cheminlong",
+        "fichierouvert"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-chemin-court"
+        },
+        {
+          "Ref": "test-fermer-prog"
         }
       ]
     },
@@ -21292,6 +22695,46 @@
       ]
     },
     {
+      "Id": "pasdeword",
+      "Famille": "fichiers",
+      "Titre": "Je n'ai pas Word (ou Excel) pour ouvrir un document",
+      "Phrase": "Un .docx ou .xlsx reçu ne s'ouvre avec rien, ou Windows demande quel programme utiliser",
+      "Mots": [
+        "pas de word",
+        "pas d'excel",
+        "docx",
+        "xlsx",
+        "ouvrir un document word",
+        "libreoffice",
+        "word gratuit",
+        "comment ouvrir"
+      ],
+      "Suspects": [
+        "pasdoffice",
+        "officefin"
+      ],
+      "Etapes": [
+        {
+          "Id": "q-word-installe",
+          "Type": "question",
+          "Court": "Word installé ?",
+          "Texte": "Word (ou Excel) est-il installé, mais affiche « produit sans licence » ou « fonctions réduites » ?",
+          "Reponses": [
+            {
+              "Texte": "Oui, il est là mais bloqué",
+              "Confirme": "officefin",
+              "Preuve": "Word est installé mais sans licence"
+            },
+            {
+              "Texte": "Non, il n'y a pas Word",
+              "Confirme": "pasdoffice",
+              "Preuve": "Word n'est pas installé"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "wordperdu",
       "Famille": "fichiers",
       "Titre": "J'ai fermé Word (ou Excel) sans enregistrer",
@@ -21371,6 +22814,34 @@
       "Etapes": [
         {
           "Ref": "test-7zip"
+        }
+      ]
+    },
+    {
+      "Id": "pdf",
+      "Famille": "fichiers",
+      "Titre": "Un PDF ne s'ouvre pas, ou s'affiche vide",
+      "Phrase": "Page blanche, « impossible d'afficher », ou un formulaire qu'on ne peut pas remplir",
+      "Mots": [
+        "pdf",
+        "pdf vide",
+        "pdf ne s'ouvre pas",
+        "formulaire pdf",
+        "acrobat",
+        "page blanche pdf",
+        "impossible d'ouvrir le pdf"
+      ],
+      "Suspects": [
+        "motw",
+        "lecteurpdf",
+        "fichierabime"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-debloquer"
+        },
+        {
+          "Ref": "test-acrobat"
         }
       ]
     },
@@ -21633,6 +23104,58 @@
       ]
     },
     {
+      "Id": "narrateur",
+      "Famille": "windows",
+      "Titre": "Une voix lit tout ce qui est à l'écran",
+      "Phrase": "Un cadre bleu autour de ce qu'on touche, et une voix qui lit tout",
+      "Mots": [
+        "voix",
+        "narrateur",
+        "lit tout",
+        "parle tout seul",
+        "voix qui lit",
+        "cadre bleu",
+        "lit à voix haute",
+        "il parle"
+      ],
+      "Suspects": [
+        "narrateur",
+        "programme"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-narrateur"
+        }
+      ]
+    },
+    {
+      "Id": "touchesremanentes",
+      "Famille": "windows",
+      "Titre": "Un bip et un message « touches rémanentes » quand j'appuie sur Maj",
+      "Phrase": "Appuyer plusieurs fois sur Maj (en jeu) fait biper et ouvre une fenêtre",
+      "Mots": [
+        "touches rémanentes",
+        "maj 5 fois",
+        "bip maj",
+        "touches filtres",
+        "sticky keys",
+        "fenêtre quand j'appuie sur maj",
+        "shift"
+      ],
+      "Suspects": [
+        "touchesremanentes",
+        "reglagesclavier"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-raccourci-remanentes"
+        },
+        {
+          "Ref": "test-reglages-clavier"
+        }
+      ]
+    },
+    {
       "Id": "claviertactile",
       "Famille": "windows",
       "Titre": "Le clavier à l'écran apparaît tout le temps",
@@ -21692,7 +23215,9 @@
         "connexion",
         "identifiant",
         "verrouillé",
-        "login"
+        "login",
+        "mot de passe que je n'ai jamais mis",
+        "demande un mot de passe"
       ],
       "Suspects": [
         "pinoublie",
@@ -22142,7 +23667,10 @@
         "fin de support",
         "windows 10",
         "mise à niveau",
-        "pc health check"
+        "pc health check",
+        "fin du support",
+        "plus de mises à jour windows 10",
+        "windows 10 n'est plus pris en charge"
       ],
       "Suspects": [
         "tpmoff",
@@ -22342,10 +23870,17 @@
         "installe",
         "programme",
         "logiciel",
-        "erreur installation"
+        "erreur installation",
+        "mode s",
+        "seulement les applications du store",
+        "applications du microsoft store",
+        "windows n'autorise que les applications du store",
+        "n'autorise que les applications",
+        "windows n'autorise que"
       ],
       "Suspects": [
         "disqueplein",
+        "modeS",
         "smartscreen",
         "installeurabime",
         "versionwindows"
@@ -22353,6 +23888,9 @@
       "Etapes": [
         {
           "Ref": "place"
+        },
+        {
+          "Ref": "q-mode-s"
         },
         {
           "Ref": "q-smartscreen"
@@ -22990,6 +24528,123 @@
         },
         {
           "Ref": "test-verifier-jeu"
+        }
+      ]
+    },
+    {
+      "Id": "inputlag",
+      "Famille": "jeux",
+      "Titre": "La souris ou la manette réagit en retard dans les jeux",
+      "Phrase": "Un petit retard entre le geste et l'image, la visée paraît molle",
+      "Mots": [
+        "retard souris",
+        "input lag",
+        "latence souris",
+        "visée molle",
+        "délai",
+        "retard en jeu",
+        "souris en retard"
+      ],
+      "Suspects": [
+        "vsync",
+        "pollingsouris",
+        "energie",
+        "surchauffe"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-vsync"
+        },
+        {
+          "Ref": "q-souris-bt"
+        },
+        {
+          "Ref": "test-energie"
+        },
+        {
+          "Ref": "chaleur"
+        },
+        {
+          "Ref": "test-nettoyage"
+        }
+      ]
+    },
+    {
+      "Id": "saccadesdebut",
+      "Famille": "jeux",
+      "Titre": "Le jeu saccade au début, puis ça va mieux",
+      "Phrase": "Gros ralentissements les premières minutes, ou à chaque nouvel endroit",
+      "Mots": [
+        "saccade au début",
+        "stutter",
+        "shader",
+        "compilation des shaders",
+        "freeze au début",
+        "lag au début de la partie"
+      ],
+      "Suspects": [
+        "shaders",
+        "disqueplein",
+        "memoirepeu"
+      ],
+      "Etapes": [
+        {
+          "Ref": "q-shaders"
+        },
+        {
+          "Ref": "place"
+        },
+        {
+          "Ref": "test-memoire-pleine"
+        }
+      ]
+    },
+    {
+      "Id": "gamepass",
+      "Famille": "jeux",
+      "Titre": "Un jeu Game Pass (appli Xbox) ne s'installe pas ou ne se lance pas",
+      "Phrase": "L'appli Xbox bloque l'installation, ou affiche une erreur (0x80...)",
+      "Mots": [
+        "game pass",
+        "appli xbox",
+        "xbox app",
+        "gaming services",
+        "0x80",
+        "microsoft store jeu",
+        "pc game pass"
+      ],
+      "Suspects": [
+        "synchro",
+        "servicesjeux",
+        "cachestore",
+        "disqueplein"
+      ],
+      "Etapes": [
+        {
+          "Ref": "test-synchro",
+          "Reponses": [
+            {
+              "Texte": "L'heure était fausse : maintenant ça marche",
+              "Confirme": "synchro",
+              "Preuve": "L'heure remise à jour, l'appli Xbox marche"
+            },
+            {
+              "Texte": "L'heure était juste, ou toujours pareil",
+              "Ecarte": [
+                "synchro"
+              ],
+              "Preuve": "L'heure du PC n'y était pour rien"
+            }
+          ]
+        },
+        {
+          "Ref": "test-gaming-services"
+        },
+        {
+          "Ref": "test-wsreset"
+        },
+        {
+          "Ref": "place"
         }
       ]
     }
