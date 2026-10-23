@@ -5,6 +5,9 @@
 #   3. l'entraînement du Qwen3 0.6B (entrainer.py), puis la conversion en GGUF (pour llama.cpp, PC et téléphone)
 #   4. la mesure (mesurer.py) : l'IA comparée à la recherche par mots actuelle ; le rapport va dans outils/ia/mesures/
 # Usage (Git Bash) : bash outils/ia/nuit.sh <nom du tour> [situations par panne] [époques]
+# Catalogue agrandi : ANCIEN=<commit du catalogue de la nuit précédente> ANCIENS=<tour précédent> bash outils/ia/nuit.sh ...
+#   les phrases neuves seulement pour les pannes nouvelles ou modifiées (changees.py), les phrases encore justes du tour
+#   précédent gardées pour les autres (garder.py) ; la mesure porte toujours sur tout le catalogue.
 set -u
 cd "$(dirname "$0")/../.."
 NOM="$1"; PAR="${2:-60}"; EPOQUES="${3:-3}"
@@ -21,18 +24,29 @@ CAT="Mindcare/fichiers/enquetes.json"
 w() { cygpath -w "$1"; }
 echo "[$(date +%H:%M)] tour $NOM : $PAR situations par panne, $EPOQUES époques"
 
-[ -s "$D/taches.jsonl" ] || python outils/ia/taches.py "$CAT" "$(w "$D/taches.jsonl")" "$PAR" 1
+SEULES=""
+if [ -n "${ANCIEN:-}" ]; then
+    git show "$ANCIEN:$CAT" > "$D/ancien-catalogue.json"
+    python outils/ia/changees.py "$(w "$D/ancien-catalogue.json")" "$CAT" "$(w "$D/changees.txt")"
+    SEULES="$(w "$D/changees.txt")"
+fi
+[ -s "$D/taches.jsonl" ] || python outils/ia/taches.py "$CAT" "$(w "$D/taches.jsonl")" "$PAR" 1 $SEULES
 [ -s "$D/taches-mesure.jsonl" ] || python outils/ia/taches.py "$CAT" "$(w "$D/taches-mesure.jsonl")" 4 99
 
 echo "[$(date +%H:%M)] phrases d'entraînement"
 [ -s "$D/exemples.jsonl" ] || python outils/ia/phrases.py "$(w "$D/taches.jsonl")" "$(w "$D/exemples.jsonl")" "$(w "$SERVEUR")" "$(w "$QWEN4B")" 4 8 1000 entrainement 2>&1 | grep -E "000/|Fini|rreur" | tail -40
 [ -s "$D/exemples.jsonl" ] || { echo "aucune phrase écrite"; exit 1; }
+if [ -n "${ANCIENS:-}" ] && [ ! -s "$D/exemples-tout.jsonl" ]; then
+    python outils/ia/garder.py "$(w "$E/donnees/$ANCIENS/exemples.jsonl")" "$CAT" "$(w "$D/changees.txt")" "$(w "$D/gardees.jsonl")"
+    cat "$D/gardees.jsonl" "$D/exemples.jsonl" > "$D/exemples-tout.jsonl"
+fi
+EX="$D/exemples.jsonl"; [ -s "$D/exemples-tout.jsonl" ] && EX="$D/exemples-tout.jsonl"
 echo "[$(date +%H:%M)] phrases de mesure"
 [ -s "$D/mesure.jsonl" ] || python outils/ia/phrases.py "$(w "$D/taches-mesure.jsonl")" "$(w "$D/mesure.jsonl")" "$(w "$SERVEUR")" "$(w "$QWEN4B")" 3 8 50000 mesure 2>&1 | grep -E "Fini|rreur" | tail -5
 
 echo "[$(date +%H:%M)] entraînement"
 if [ ! -f "$E/modeles/mindcare-0.6b-$NOM/config.json" ]; then
-    "$PY" outils/ia/entrainer.py "$(w "$D/exemples.jsonl")" "$(w "$BASE")" "$(w "$E/modeles/mindcare-0.6b-$NOM")" "$EPOQUES" 64 2>&1 \
+    "$PY" outils/ia/entrainer.py "$(w "$EX")" "$(w "$BASE")" "$(w "$E/modeles/mindcare-0.6b-$NOM")" "$EPOQUES" 64 2>&1 \
         | grep -vE "it/s\]|Warning|warn|use_cache" | grep -E "exemples|pas [0-9]+0{3}/|validation|Validation|Enregistré|rror" | tail -30
 fi
 GGUF="$E/modeles/mindcare-0.6b-$NOM-q8_0.gguf"
@@ -44,4 +58,7 @@ python outils/ia/mesurer.py "$(w "$D/mesure.jsonl")" "$(w "$GGUF")" "$(w "$SERVE
 echo "[$(date +%H:%M)] mesure sur les phrases écrites à la main"
 python outils/ia/phrases-a-la-main.py "$(w "$D/a-la-main.jsonl")" > /dev/null
 python outils/ia/mesurer.py "$(w "$D/a-la-main.jsonl")" "$(w "$GGUF")" "$(w "$SERVEUR")" "$(w "$CAT")" "$(w "outils/ia/mesures/$NOM-a-la-main.md")" 2>&1 | tail -9
+echo "[$(date +%H:%M)] mesure sur les phrases écrites à la main, pannes ajoutées le 22 octobre seulement"
+python outils/ia/phrases-a-la-main.py "$(w "$D/a-la-main-nouvelles.jsonl")" nouvelles > /dev/null
+python outils/ia/mesurer.py "$(w "$D/a-la-main-nouvelles.jsonl")" "$(w "$GGUF")" "$(w "$SERVEUR")" "$(w "$CAT")" "$(w "outils/ia/mesures/$NOM-a-la-main-nouvelles.md")" 2>&1 | tail -9
 echo "[$(date +%H:%M)] tour $NOM fini"

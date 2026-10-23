@@ -6,7 +6,8 @@
 # Ce que l'IA doit répondre (la « cible ») : {"panne": "<id>", "reponses": {"<id de l'étape>": <numéro de la réponse>}}.
 # Elle ne choisit que dans le catalogue : elle n'invente jamais une panne ni une manipulation.
 #
-# Usage : python outils/ia/taches.py <enquetes.json> <sortie.jsonl> [situations par panne] [graine]
+# Usage : python outils/ia/taches.py <enquetes.json> <sortie.jsonl> [situations par panne] [graine] [pannes.txt]
+# (pannes.txt : seulement ces pannes, une par ligne, par exemple les nouvelles et les modifiées de changees.py)
 import json
 import random
 import sys
@@ -14,6 +15,7 @@ import sys
 catalogue_f, sortie = sys.argv[1], sys.argv[2]
 par_panne = int(sys.argv[3]) if len(sys.argv) > 3 else 30
 graine = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+seulement = set(open(sys.argv[5], encoding="utf-8").read().split()) if len(sys.argv) > 5 else None
 
 SYSTEME = ("Tu es Mindcare. Une personne décrit le problème de son ordinateur. Réponds seulement en JSON : "
            "la panne du catalogue qui correspond, et les réponses qu'elle donne déjà.")
@@ -52,6 +54,8 @@ hasard = random.Random(graine)
 n = 0
 with open(sortie, "w", encoding="utf-8", newline="\n") as f:
     for p in d["Pannes"]:
+        if seulement is not None and p["Id"] not in seulement:
+            continue
         qs = questions(p)
         for k in range(par_panne):
             m = hasard.choices([0, 1, 2], weights=[4, 4, 2])[0] if qs else 0

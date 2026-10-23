@@ -126,6 +126,54 @@ PHRASES = [
     ("le pc a pris l'orage", "orage"),
     ("depuis que j'ai nettoyé la tour elle démarre plus", "apresnettoyage"),
 ]
+# Les pannes ajoutées au catalogue le 22 octobre 2026 (229 à 300 pannes) : « nouvelles » en 2e argument ne sort qu'elles
+NOUVELLES = [
+    ("chrome me met oh non ! tout le temps", "navplante"),
+    ("la calculatrice de windows s'ouvre plus", "appliwindows"),
+    ("j'ai 16go de ram mais windows en voit que 8", "memoiremoitie"),
+    ("mon processeur reste bloqué a 0,8 ghz", "processeurbride"),
+    ("j'ai renversé mon café sur le clavier du portable", "liquide"),
+    ("mon portable est tombé par terre et depuis il marche mal", "chute"),
+    ("des que je branche ma manette en usb le pc s'eteint", "usbcoupe"),
+    ("secure boot violation au démarrage", "secureboot"),
+    ("j'ai mis a jour le bios et maintenant plus rien", "apresbios"),
+    ("ça reste bloqué sur le logo asus", "logobloque"),
+    ("l'écran dit input not supported", "horslimites"),
+    ("je voudrais mettre mon pc sur la tv sans fil hdmi", "miracast"),
+    ("antimalware service executable me bouffe tout le cpu", "antimalware"),
+    ("youtube saccade alors que la connexion est bonne", "videosaccade"),
+    ("depuis que j'ai mis avast le pc rame", "lentantivirus"),
+    ("le son du portable marche plus mais avec le casque oui", "hautparleursportable"),
+    ("ça grésille et bourdonne dans le casque", "bourdonnementson"),
+    ("le son baisse tout seul", "volumeseul"),
+    ("je connais plus le code du wifi pour brancher la switch", "mdpwifioublie"),
+    ("le wifi rame mais en cable c'est nickel", "wifilent"),
+    ("discord reste sur connexion rtc", "discordrtc"),
+    ("outlook me redemande mon mot de passe en boucle", "outlookmdp"),
+    ("une touche du clavier est partie", "touchearrachee"),
+    ("la touche windows fait plus rien", "touchewindows"),
+    ("quand je tape le texte part n'importe ou sur mon portable", "paumepave"),
+    ("ma souris bluetooth lag quand j'ai mes écouteurs", "btsature"),
+    ("la lumiere de la webcam s'allume toute seule", "webcamvoyant"),
+    ("quand je partage mon écran sur discord ils voient du noir", "partageecran"),
+    ("la batterie passe de 40 a 5 % d'un coup", "pourcentagefaux"),
+    ("chrome dit géré par votre organisation", "organisation"),
+    ("le c est plein mais j'ai un disque d vide", "cpleindvide"),
+    ("mon pc démarre plus je veux récupérer mes photos", "recupfichiers"),
+    ("j'ai pas word pour ouvrir le document", "pasdeword"),
+    ("j'ai acheté un ssd et il apparait pas", "disqueneuf"),
+    ("y a une voix qui lit tout ce que je fais", "narrateur"),
+    ("windows dit que mon mot de passe est faux alors que c'est le bon", "mdpincorrect"),
+    ("on m'a volé mon pc portable", "perdu"),
+    ("je veux remettre mon pc a zero", "reinitialiser"),
+    ("le jeu saccade les premieres minutes puis ca va", "saccadesdebut"),
+    ("nat strict sur warzone", "natstrict"),
+    ("en jeu ma souris part sur l'autre écran", "sourissortjeu"),
+]
+if len(sys.argv) > 2 and sys.argv[2] == "nouvelles":
+    PHRASES = NOUVELLES
+else:
+    PHRASES = PHRASES + NOUVELLES
 
 with open(sys.argv[1], "w", encoding="utf-8", newline="\n") as f:
     for ph, panne in PHRASES:
