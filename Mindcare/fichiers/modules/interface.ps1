@@ -20,9 +20,21 @@ foreach ($m in [regex]::Matches($xamlTexte, 'x:Name="([A-Za-z0-9_]+)"')) {
     if ($o) { $ui[$n] = $o }
 }
 
-# Barre de titre sombre (de la couleur du fond sur Windows 11) et icône de l'appli
+# Commande qui relance Mindcare (épingle de la barre des tâches) : Mindset.exe de son dossier (ou le relais Mindcare.exe),
+# ou PowerShell s'il manque (copie de travail)
+function Get-LaunchCommand {
+    if (Test-Path -LiteralPath $AppExe) { "`"$AppExe`"" }
+    else { "`"$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$MainScript`"" }
+}
+
+# Barre de titre sombre (de la couleur du fond sur Windows 11) et icône de l'appli. Dans la barre des tâches : l'identité
+# de Mindcare (le nom « Mindcare » du bouton vient du raccourci du menu Démarrer de même identité, écrit par Mindset),
+# et épinglée, elle se relance par son programme avec le nom « Mindcare » et son icône
 $Window.Add_SourceInitialized({
-    try { [MindcareNatif]::SetDarkTitleBar((New-Object System.Windows.Interop.WindowInteropHelper $Window).Handle, 0x200C0C) } catch {}
+    $h = (New-Object System.Windows.Interop.WindowInteropHelper $Window).Handle
+    try { [MindcareNatif]::SetDarkTitleBar($h, 0x200C0C) } catch {}
+    try { [MindcareNatif]::SetWindowIdentity($h, "JordanJacquot.$AppNom", (Get-LaunchCommand), "$ico,0", $AppNom) }
+    catch { Write-Log "Identité de la fenêtre : $($_.Exception.Message)" }
 })
 $ico = Join-Path $AppDir 'Mindcare.ico'
 if (Test-Path -LiteralPath $ico) { try { $Window.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create((New-Object Uri $ico)) } catch {} }

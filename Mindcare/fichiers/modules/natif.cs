@@ -26,6 +26,53 @@ public static class MindcareNatif
     // Identité propre dans la barre des tâches (son icône, pas celle de PowerShell)
     public static void SetAppId(string appId) { SetCurrentProcessExplicitAppUserModelID(appId); }
 
+    // Identité de la fenêtre dans la barre des tâches, et ce que Windows relance quand on l'épingle : Mindset.exe de son
+    // dossier (son hôte), avec le nom « Mindcare » et son icône, pas PowerShell ni « Mindset » (le nom de l'hôte).
+    // (Le nom du bouton lui-même vient du raccourci du menu Démarrer de même identité, écrit par Mindset.)
+    // Même principe que Mindset, Nevermind et Evermind.
+    [StructLayout(LayoutKind.Sequential, Pack = 4)] struct PROPERTYKEY { public Guid fmtid; public uint pid; }
+    [StructLayout(LayoutKind.Explicit)] struct PROPVARIANT
+    {
+        [FieldOffset(0)] public ushort vt;
+        [FieldOffset(8)] public IntPtr p;
+        [FieldOffset(8)] public long pad1;
+        [FieldOffset(16)] public long pad2;
+    }
+    [ComImport, Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IPropertyStore
+    {
+        void GetCount(out uint count);
+        void GetAt(uint index, out PROPERTYKEY key);
+        void GetValue(ref PROPERTYKEY key, out PROPVARIANT value);
+        void SetValue(ref PROPERTYKEY key, ref PROPVARIANT value);
+        void Commit();
+    }
+    [DllImport("shell32.dll", PreserveSig = false)] static extern void SHGetPropertyStoreForWindow(IntPtr hwnd, ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out IPropertyStore store);
+
+    static void SetString(IPropertyStore store, uint pid, string value)
+    {
+        PROPERTYKEY key = new PROPERTYKEY { fmtid = new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), pid = pid };
+        PROPVARIANT v = new PROPVARIANT { vt = 31, p = Marshal.StringToCoTaskMemUni(value) };   // 31 = VT_LPWSTR
+        try { store.SetValue(ref key, ref v); }
+        finally { Marshal.FreeCoTaskMem(v.p); }
+    }
+
+    public static void SetWindowIdentity(IntPtr hwnd, string appId, string relaunchCommand, string iconPath, string name)
+    {
+        Guid iid = typeof(IPropertyStore).GUID;
+        IPropertyStore store;
+        SHGetPropertyStoreForWindow(hwnd, ref iid, out store);
+        try
+        {
+            SetString(store, 2, relaunchCommand);   // System.AppUserModel.RelaunchCommand
+            SetString(store, 3, iconPath);          // System.AppUserModel.RelaunchIconResource
+            SetString(store, 4, name);              // System.AppUserModel.RelaunchDisplayNameResource
+            SetString(store, 5, appId);             // System.AppUserModel.ID, en dernier
+            store.Commit();
+        }
+        finally { Marshal.ReleaseComObject(store); }
+    }
+
     // Accrochée dans Mindset : style WS_CHILD, ou un parent
     public static bool EstEnfant(IntPtr hwnd)
     {

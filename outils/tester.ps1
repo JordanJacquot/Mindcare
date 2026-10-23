@@ -340,6 +340,69 @@ foreach ($f in Get-ChildItem -LiteralPath $AppDir -Recurse -File | Where-Object 
     }
 }
 Write-Resultat 'aucun envoi automatique sur Internet (adresses connues, assistant sur un clic)' (-not $reseau) "($($reseau -join ' ; '))"
+# Le nom dans la barre des tâches : la fenêtre porte l'identité de Mindcare (le raccourci du menu Démarrer de même
+# identité, écrit par Mindset, donne le nom « Mindcare » au bouton ; sans lui, Windows afficherait « Mindset », le nom de
+# son hôte), et l'épingle relance son programme avec le nom « Mindcare » et son icône. Le vrai code d'interface.ps1
+# (Get-LaunchCommand et l'ouverture de la fenêtre) sur une fenêtre de test hors de l'écran, jamais montrée ; ses
+# propriétés sont relues avec SHGetPropertyStoreForWindow.
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class MCTestFenetre
+{
+    [StructLayout(LayoutKind.Sequential, Pack = 4)] struct PK { public Guid f; public uint p; }
+    [StructLayout(LayoutKind.Explicit)] struct PV { [FieldOffset(0)] public ushort vt; [FieldOffset(8)] public IntPtr p; [FieldOffset(16)] public long x; }
+    [ComImport, Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IPropertyStore { void GetCount(out uint c); void GetAt(uint i, out PK k); void GetValue(ref PK k, out PV v); }
+    [DllImport("ole32.dll")] static extern int PropVariantClear(ref PV v);
+    [DllImport("shell32.dll", PreserveSig = false)] static extern void SHGetPropertyStoreForWindow(IntPtr h, ref Guid iid, [MarshalAs(UnmanagedType.Interface)] out IPropertyStore s);
+    // { identité, commande de relance, icône de relance, nom de relance }
+    public static string[] Lire(IntPtr h)
+    {
+        Guid iid = typeof(IPropertyStore).GUID; IPropertyStore s;
+        SHGetPropertyStoreForWindow(h, ref iid, out s);
+        try
+        {
+            string[] r = new string[4]; uint[] pids = { 5, 2, 3, 4 };
+            for (int i = 0; i < 4; i++)
+            {
+                PK k = new PK { f = new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), p = pids[i] };
+                PV v; s.GetValue(ref k, out v);
+                try { r[i] = v.vt == 31 && v.p != IntPtr.Zero ? Marshal.PtrToStringUni(v.p) : ""; } finally { PropVariantClear(ref v); }
+            }
+            return r;
+        }
+        finally { Marshal.ReleaseComObject(s); }
+    }
+}
+'@
+$tok = $null; $errI = $null
+$astI = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $AppDir 'modules\interface.ps1'), [ref]$tok, [ref]$errI)
+Invoke-Expression ($astI.Find({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq 'Get-LaunchCommand' }, $true).Extent.Text)
+$ouverture = $astI.Find({ param($n) $n -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $n.Member.Value -eq 'Add_SourceInitialized' }, $true).Arguments[0].ScriptBlock.GetScriptBlock()
+$AppNomSauve = $AppNom; $AppExeSauve = $AppExe; $MainScriptSauve = $MainScript; $icoSauve = $ico; $WindowSauve = $Window
+$AppNom = [regex]::Match([IO.File]::ReadAllText($main, [Text.Encoding]::UTF8), "(?m)^\`$AppNom\s*=\s*'([^']+)'").Groups[1].Value
+$ico = Join-Path $AppDir 'Mindcare.ico'
+$MainScript = $main
+$fenetreEssais = @()
+foreach ($avecProgramme in $true, $false) {
+    $AppExe = Join-Path $test $(if ($avecProgramme) { 'fenetre\Mindset.exe' } else { 'fenetre\absent.exe' })
+    if ($avecProgramme) { New-Item -ItemType Directory -Force -Path (Split-Path $AppExe) | Out-Null; [IO.File]::WriteAllText($AppExe, 'programme') }
+    $Window = New-Object System.Windows.Window
+    $Window.WindowStartupLocation = 'Manual'; $Window.Left = -10000; $Window.Top = 0; $Window.Width = 200; $Window.Height = 100
+    $Window.ShowActivated = $false; $Window.ShowInTaskbar = $false
+    $h = (New-Object System.Windows.Interop.WindowInteropHelper $Window).EnsureHandle()
+    & $ouverture
+    $pf = [MCTestFenetre]::Lire($h)
+    $Window.Close()
+    $relance = if ($avecProgramme) { "`"$AppExe`"" } else { "`"$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$main`"" }
+    if ($pf[0] -cne 'JordanJacquot.Mindcare') { $fenetreEssais += "identité « $($pf[0]) »" }
+    if ($pf[1] -ne $relance) { $fenetreEssais += "relance « $($pf[1]) » au lieu de « $relance »" }
+    if ($pf[3] -cne 'Mindcare' -or $pf[2] -ne "$ico,0") { $fenetreEssais += "nom « $($pf[3]) », icône « $($pf[2]) »" }
+}
+Remove-Item -LiteralPath (Join-Path $test 'fenetre') -Recurse -Force -ErrorAction SilentlyContinue
+$AppNom = $AppNomSauve; $AppExe = $AppExeSauve; $MainScript = $MainScriptSauve; $ico = $icoSauve; $Window = $WindowSauve
+Write-Resultat 'barre des tâches : identité JordanJacquot.Mindcare, épingle vers Mindset.exe (PowerShell sans lui), nom « Mindcare » et son icône' (-not $errI -and -not $fenetreEssais) "($($fenetreEssais -join ' ; '))"
 if (-not $SansFenetre) {
     # L'assistant (ia.ps1) : sa carte « J'ai compris », puis une enquête où la phrase a déjà répondu à des questions
     $faux = '{"panne":"seteint","reponses":{"type":1,"maison":0}}'
