@@ -22,7 +22,7 @@ New-Item -ItemType Directory -Force -Path $DataDir | Out-Null
 $LogFile      = Join-Path $DataDir 'journal.txt'
 $SettingsFile = Join-Path $DataDir 'reglages.json'
 $Utf8NoBom    = New-Object Text.UTF8Encoding($false)
-$env:MINDCARE_JOURNAL = $LogFile   # Mindcare.exe (outils\lanceur.cs) y écrit les erreurs qu'il voit passer
+$env:MINDCARE_JOURNAL = $LogFile   # Mindset.exe (outils\lanceur.cs) y écrit les erreurs qu'il voit passer
 
 # Journal : une ligne datée par événement. Gardé petit : au-delà de 1 Mo, seulement les 3000 dernières lignes.
 # Il sert à aider à distance : chaque échec utile pour comprendre un problème y est noté.

@@ -3,7 +3,7 @@
 # pas celle de Mindset s'arrête tout de suite (Test-BlocageMindset), sans rien démarrer.
 #
 # %LOCALAPPDATA%\Mindset\suite.json, écrit par Mindset :
-#   { "theme": "neon" | "pack:<id>", "applis": { "mindcare": "<dossier de Mindcare.exe>", ... }, "micro": "...", "casque": "..." }
+#   { "theme": "neon" | "pack:<id>", "applis": { "mindcare": "<dossier de Mindcare>", ... }, "micro": "...", "casque": "..." }
 # Mindcare est « gérée par Mindset » si applis.mindcare est le dossier de cette copie.
 # Sécurité : n'importe quel programme de l'utilisateur peut modifier ce fichier. On n'y accepte qu'un nom de thème connu,
 # et le dossier ne sert qu'à comparer avec le nôtre : rien n'y est jamais lancé ni ouvert.
@@ -33,7 +33,7 @@ function Read-Suite {
     $s
 }
 
-$AppRacine = Get-CheminNormal (Split-Path $AppDir -Parent)   # le dossier de cette copie (celui de Mindcare.exe)
+$AppRacine = Get-CheminNormal (Split-Path $AppDir -Parent)   # le dossier de cette copie (celui de Mindset.exe et Mindcare.exe)
 $script:Suite = Read-Suite
 $GereParMindset = [bool]($AppRacine -and $script:Suite.Dossier -and $script:Suite.Dossier -ieq $AppRacine)
 

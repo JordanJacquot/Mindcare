@@ -12,7 +12,8 @@ param([int]$Delai = 60, [switch]$SansFenetre)
 $ErrorActionPreference = 'Stop'
 $racine = Split-Path $PSScriptRoot -Parent
 $main   = Join-Path $racine 'Mindcare\fichiers\Mindcare.ps1'
-$exe    = Join-Path $racine 'Mindcare\Mindcare.exe'
+$exe    = Join-Path $racine 'Mindcare\Mindset.exe'    # le programme (même nom pour toute la suite : une ligne « Mindset »)
+$relais = Join-Path $racine 'Mindcare\Mindcare.exe'   # le relais vers Mindset.exe (ce que les anciennes versions de Mindset lancent)
 $test   = Join-Path $racine '_test'
 New-Item -ItemType Directory -Force -Path $test | Out-Null
 $script:Ok = $true
@@ -21,9 +22,9 @@ function Write-Resultat([string]$Nom, [bool]$Bon, [string]$Detail = '') {
     if ($Bon) { Write-Host "OK     $Nom" -ForegroundColor Green } else { Write-Host "ÉCHEC  $Nom $Detail" -ForegroundColor Red; $script:Ok = $false }
 }
 
-# Lance l'appli (le script, ou le programme avec -Programme ; pas « -Exe » : il cacherait $exe) dans une situation donnée et renvoie le processus, ses données et sa capture
+# Lance l'appli (le script, le programme avec -Programme, ou son relais avec -ViaRelais ; pas « -Exe » ni « -Relais » : ils cacheraient $exe et $relais) dans une situation donnée et renvoie le processus, ses données et sa capture
 # (-Dossier : les données d'un autre scénario, gardées telles quelles, pour enchaîner plusieurs lancements)
-function Start-Scenario([string]$Nom, [hashtable]$Env = @{}, [switch]$Programme, [string]$Dossier) {
+function Start-Scenario([string]$Nom, [hashtable]$Env = @{}, [switch]$Programme, [switch]$ViaRelais, [string]$Dossier) {
     $donnees = Join-Path $test "donnees-$(if ($Dossier) { $Dossier } else { $Nom })"
     if (-not $Dossier -and (Test-Path -LiteralPath $donnees)) { Remove-Item -LiteralPath $donnees -Recurse -Force }
     New-Item -ItemType Directory -Force -Path $donnees | Out-Null
@@ -33,7 +34,7 @@ function Start-Scenario([string]$Nom, [hashtable]$Env = @{}, [switch]$Programme,
     $env:MINDCARE_TEST = '1'; $env:MINDCARE_DONNEES = $donnees
     foreach ($k in $Env.Keys) { Set-Item "env:$k" $Env[$k] }
     $err = Join-Path $test "erreurs-$Nom.txt"
-    $p = if ($Programme) { Start-Process $exe -ArgumentList '-Demarrage' -PassThru }
+    $p = if ($Programme -or $ViaRelais) { Start-Process $(if ($ViaRelais) { $relais } else { $exe }) -ArgumentList '-Demarrage' -PassThru }
          else { Start-Process powershell.exe -ArgumentList '-NoProfile', '-STA', '-ExecutionPolicy', 'Bypass', '-File', "`"$main`"" -PassThru -WindowStyle Hidden -RedirectStandardError $err }
     Get-ChildItem env: | Where-Object { $_.Name -like 'MINDCARE_*' } | ForEach-Object { Remove-Item "env:$($_.Name)" }
     @{ P = $p; Donnees = $donnees; Capture = $capture; Erreurs = $err }
@@ -274,6 +275,54 @@ Start-Sleep -Seconds 2
 $apres = $idAssistant -and [bool](Get-Process -Id $idAssistant -ErrorAction SilentlyContinue)
 if ($apres) { Stop-Process -Id $idAssistant -Force -ErrorAction SilentlyContinue }
 Write-Resultat 'assistant : arrêté avec Mindcare, même fermée de force' ($avant -and -not $apres -and $lu -match ' True$') "(relié : $lu ; encore lancé après : $apres)"
+# L'assistant tourne sous le nom Mindset.exe (une seule ligne « Mindset » dans le Gestionnaire des tâches) : une copie de
+# llama-server.exe dans son dossier, refaite quand llama-server.exe change, et llama-server.exe si la copie est
+# impossible. Essai avec un faux llama-server (un petit programme qui attend, compilé ici : rien n'est téléchargé), lancé
+# et arrêté par Start-Ia et Stop-Ia comme dans Mindcare.
+$iaCopie = Join-Path $test 'ia-copie'
+Remove-Item -LiteralPath $iaCopie -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force -Path $iaCopie | Out-Null
+$csc = Join-Path $env:windir 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+function New-FauxServeur([int]$Attente) {
+    $src = Join-Path $iaCopie 'faux-serveur.cs'
+    [IO.File]::WriteAllText($src, "static class F { static void Main() { System.Threading.Thread.Sleep($Attente); } }")
+    $null = & $csc /nologo /target:winexe "/out:$(Join-Path $iaCopie 'llama-server.exe')" $src
+}
+function Get-InfosProcessus([int]$Id) { Get-CimInstance Win32_Process -Filter "ProcessId = $Id" -ErrorAction SilentlyContinue }
+if (-not (Get-Command Write-Log -ErrorAction SilentlyContinue)) { function Write-Log([string]$Texte) { $script:JournalIa += @($Texte) } }
+$script:JournalIa = @()
+Add-Type -TypeDefinition ([IO.File]::ReadAllText((Join-Path $AppDir 'modules\natif.cs'), [Text.Encoding]::UTF8))
+$IaServeurSauve = $IaServeur; $IaModeleSauve = $IaModele
+$IaServeur = Join-Path $iaCopie 'llama-server.exe'; $IaModele = Join-Path $iaCopie 'mindcare-test.gguf'
+Set-Content -LiteralPath $IaModele -Value 'faux'
+$copie = Join-Path $iaCopie 'Mindset.exe'
+$essais = @()
+# 1. Une installation sans copie (comme toutes celles d'avant) : la copie est faite, l'assistant tourne sous Mindset.exe
+New-FauxServeur 60000
+Start-Ia
+$pr = if ($script:Ia.Process) { Get-InfosProcessus $script:Ia.Process.Id }
+$essais += [pscustomobject]@{ Nom = 'copie faite'; Bon = ($pr -and $pr.Name -eq 'Mindset.exe' -and $pr.ExecutablePath -ieq $copie -and (Get-FileHash $copie).Hash -eq (Get-FileHash $IaServeur).Hash); Vu = "$($pr.Name) $($pr.ExecutablePath)" }
+$idIa = if ($script:Ia.Process) { $script:Ia.Process.Id } else { 0 }
+Stop-Ia
+$essais += [pscustomobject]@{ Nom = 'arrêté par Stop-Ia'; Bon = ($idIa -and -not (Get-Process -Id $idIa -ErrorAction SilentlyContinue)); Vu = "processus $idIa" }
+# 2. llama-server.exe mis à jour : la copie est refaite
+New-FauxServeur 60001
+Start-Ia
+$pr = if ($script:Ia.Process) { Get-InfosProcessus $script:Ia.Process.Id }
+$essais += [pscustomobject]@{ Nom = 'copie refaite'; Bon = ($pr -and $pr.ExecutablePath -ieq $copie -and (Get-FileHash $copie).Hash -eq (Get-FileHash $IaServeur).Hash); Vu = "$($pr.Name) $($pr.ExecutablePath)" }
+Stop-Ia
+# 3. Copie impossible (fichier verrouillé) : llama-server.exe, comme avant
+New-FauxServeur 60002
+$verrou = [IO.File]::Open($copie, 'Open', 'Read', 'None')
+try {
+    Start-Ia
+    $pr = if ($script:Ia.Process) { Get-InfosProcessus $script:Ia.Process.Id }
+    $essais += [pscustomobject]@{ Nom = 'secours llama-server.exe'; Bon = ($pr -and $pr.Name -eq 'llama-server.exe' -and ($script:JournalIa -join ' ') -match 'copie Mindset\.exe impossible'); Vu = "$($pr.Name)" }
+    Stop-Ia
+} finally { $verrou.Dispose() }
+$IaServeur = $IaServeurSauve; $IaModele = $IaModeleSauve
+$rates = @($essais | Where-Object { -not $_.Bon } | ForEach-Object { "$($_.Nom) : $($_.Vu)" })
+Write-Resultat "assistant : lancé sous le nom Mindset.exe (copie de llama-server.exe), sinon llama-server.exe" (-not $rates -and $essais.Count -eq 4) "($($rates -join ' ; '))"
 # Aucun envoi automatique sur Internet (CODE_SIGNING.md, confidentialité) : seulement les adresses connues, et le
 # téléchargement de l'assistant ne part que d'un clic. Un nouvel envoi doit être ajouté ici ET dans CODE_SIGNING.md.
 $connues = 'https://github.com/ggml-org/llama.cpp/releases/download/', 'https://github.com/JordanJacquot/Mindcare/releases/download/', 'https://github.com/JordanJacquot/Mindset/releases/latest', 'http://127.0.0.1:'
@@ -309,11 +358,19 @@ if (-not $SansFenetre) {
     $entr = Join-Path $env:LOCALAPPDATA 'Mindcare-entrainement'
     $vraiModele = Get-ChildItem -LiteralPath (Join-Path $entr 'modeles') -Filter 'mindcare-0.6b-*-q8_0.gguf' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
     if ($vraiModele -and (Test-Path -LiteralPath (Join-Path $entr 'llama\llama-server.exe'))) {
-        $avant = @(Get-Process llama-server -ErrorAction SilentlyContinue).Count
-        $s = Test-Capture 'ia-vraie' @{ MINDCARE_TEST_RECHERCHE = 'mon ordi s''éteint tout seul d''un coup comme une coupure de courant'; MINDCARE_IA_SERVEUR = (Join-Path $entr 'llama\llama-server.exe'); MINDCARE_IA_MODELE = $vraiModele.FullName; MINDCARE_CAPTURE_DELAI = '25000' }
+        # (llama.cpp recopié dans _test : Mindcare y fait sa copie Mindset.exe, rien n'est écrit dans le dossier d'entraînement)
+        $moteur = Join-Path $test 'ia-vraie-moteur'
+        Remove-Item -LiteralPath $moteur -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path $moteur | Out-Null
+        Get-ChildItem -LiteralPath (Join-Path $entr 'llama') -File | Where-Object { $_.Extension -in '.exe', '.dll' -and $_.Name -ne 'Mindset.exe' } | Copy-Item -Destination $moteur
+        $deMoteur = { @(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -and $_.ExecutablePath.StartsWith("$moteur\", [StringComparison]::OrdinalIgnoreCase) }) }
+        $s = Test-Capture 'ia-vraie' @{ MINDCARE_TEST_RECHERCHE = 'mon ordi s''éteint tout seul d''un coup comme une coupure de courant'; MINDCARE_IA_SERVEUR = (Join-Path $moteur 'llama-server.exe'); MINDCARE_IA_MODELE = $vraiModele.FullName; MINDCARE_CAPTURE_DELAI = '25000' }
         Write-Resultat "assistant : le vrai modèle propose une panne ($($vraiModele.Name))" ((Get-Journal $s) -match 'Assistant : .+ -> \w+') "(journal : $((Get-Journal $s) -split "`n" | Select-String 'Assistant' | Select-Object -Last 2))"
+        Write-Resultat "assistant : le vrai lancé sous le nom Mindset.exe" ((Get-Journal $s) -match 'Assistant lancé \(.+, Mindset\.exe\)') "(journal : $((Get-Journal $s) -split "`n" | Select-String 'Assistant lancé' | Select-Object -Last 1))"
         Start-Sleep -Seconds 1
-        Write-Resultat "assistant : arrêté à la fermeture de Mindcare" (@(Get-Process llama-server -ErrorAction SilentlyContinue).Count -le $avant) '(llama-server encore lancé)'
+        $restants = & $deMoteur
+        Write-Resultat "assistant : arrêté à la fermeture de Mindcare" (-not $restants) "(encore lancé : $($restants.Name -join ', '))"
+        if ($restants) { $restants | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue } }
     }
     Test-Capture 'enquete-son' @{ MINDCARE_TEST_PARCOURS = 'songresille:1' } | Out-Null
     Test-Capture 'enquete-commande' @{ MINDCARE_TEST_PARCOURS = 'wificoupe:1,1' } | Out-Null
@@ -360,19 +417,39 @@ if (-not $SansFenetre) {
     Write-Resultat 'reprise de l''enquête pas finie' ((Get-Journal $s) -match "Reprise de l'enquête .* \(seteint\)" -and $g[0].Panne -eq 'seteint' -and $g.Count -eq 10) '(pas de reprise dans le journal)'
 
     # 7. Lancée cachée par Mindset, puis « Tout quitter » : elle doit quitter d'elle-même, vite
-    function Test-Quitter([string]$Nom, [switch]$Programme) {
-        $s = Start-Scenario $Nom @{ MINDCARE_TEST_DEMARRAGE = '1' } -Programme:$Programme
+    function Test-Quitter([string]$Nom, [switch]$Programme, [switch]$ViaRelais) {
+        $s = Start-Scenario $Nom @{ MINDCARE_TEST_DEMARRAGE = '1' } -Programme:$Programme -ViaRelais:$ViaRelais
+        $p = $s.P
+        if ($ViaRelais) {
+            # Le relais Mindcare.exe lance Mindset.exe de son dossier puis se ferme aussitôt ; c'est Mindset.exe qui tourne
+            $relaisParti = $p.WaitForExit(10000)
+            $enfant = @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $($p.Id)" -ErrorAction SilentlyContinue | Where-Object { $_.ExecutablePath -ieq $exe })
+            Write-Resultat "$Nom : le relais se ferme et lance Mindset.exe" ($relaisParti -and $enfant.Count -eq 1) "(relais fermé : $relaisParti ; lancés : $($enfant.Count))"
+            if (-not $relaisParti) { $p.Kill() }
+            if ($enfant.Count -ne 1) { return }
+            $p = Get-Process -Id $enfant[0].ProcessId -ErrorAction SilentlyContinue
+            if (-not $p) { Write-Resultat $Nom $false '(Mindset.exe déjà fermé)'; return }
+        }
+        if ($Programme -or $ViaRelais) {
+            # Le nom que voit le Gestionnaire des tâches : Mindset.exe, du dossier de Mindcare
+            $info = Get-CimInstance Win32_Process -Filter "ProcessId = $($p.Id)" -ErrorAction SilentlyContinue
+            Write-Resultat "$Nom : le processus s'appelle Mindset.exe" ($info -and $info.Name -eq 'Mindset.exe' -and $info.ExecutablePath -ieq $exe) "($($info.Name) $($info.ExecutablePath))"
+        }
         $fin = (Get-Date).AddSeconds($Delai)
         while ((Get-Date) -lt $fin -and (Get-Journal $s) -notmatch 'Démarrage ') { Start-Sleep -Milliseconds 300 }
         Start-Sleep -Seconds 2
         [IO.File]::WriteAllText((Join-Path $s.Donnees 'quitter.demande'), 'test')
-        $parti = $s.P.WaitForExit(8000)
-        if (-not $parti) { $s.P.Kill() }
+        $parti = $p.WaitForExit(8000)
+        if (-not $parti) { $p.Kill() }
         Write-Resultat $Nom ($parti -and (Get-Journal $s) -match 'Fermeture demandée par Mindset') $(if (-not $parti) { '(encore ouverte 8 s après la demande : Mindset la fermerait de force)' } else { '(pas de trace dans le journal)' })
     }
     Test-Quitter 'quitter (script)'
-    # 8. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir)
-    if (Test-Path -LiteralPath $exe) { Test-Quitter 'quitter (programme)' -Programme } else { Write-Host "(pas de $exe : lance construire.ps1 pour tester le programme)" -ForegroundColor Yellow }
+    # 8. Le vrai programme : son processus doit disparaître (sinon Mindset ne pourrait plus la rouvrir), lancé
+    # directement (nouvelles versions de Mindset) ou par le relais Mindcare.exe (anciennes versions, raccourcis)
+    if ((Test-Path -LiteralPath $exe) -and (Test-Path -LiteralPath $relais)) {
+        Test-Quitter 'quitter (programme)' -Programme
+        Test-Quitter 'quitter (relais)' -ViaRelais
+    } else { Write-Host "(pas de $exe ou de $relais : lance construire.ps1 pour tester le programme)" -ForegroundColor Yellow }
 }
 
 if ($script:Ok) { Write-Host "`nTout est bon. Captures : $test" -ForegroundColor Green; exit 0 }

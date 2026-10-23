@@ -143,13 +143,32 @@ function Get-PortLibre {
     $l.Start(); $p = $l.LocalEndpoint.Port; $l.Stop(); $p
 }
 
+# Le programme à lancer. Le Gestionnaire des tâches range sur une seule ligne « Mindset » les programmes qui ont le même
+# nom : l'assistant est donc lancé depuis une copie de llama-server.exe nommée Mindset.exe, dans le même dossier (il y
+# trouve ses .dll). L'empreinte du téléchargement a été vérifiée avant l'extraction ; la copie est refaite dès qu'elle
+# n'est plus identique à llama-server.exe (assistant mis à jour, copie abîmée). Si la copie est impossible :
+# llama-server.exe, comme avant. Rien ne cherche ce processus par son nom : Mindcare le garde par son numéro (Stop-Ia, job).
+function Get-IaServeurLance {
+    $copie = Join-Path (Split-Path $IaServeur -Parent) 'Mindset.exe'
+    try {
+        $empreinte = (Get-FileHash -LiteralPath $IaServeur -Algorithm SHA256 -ErrorAction Stop).Hash
+        $c = Get-Item -LiteralPath $copie -ErrorAction SilentlyContinue
+        if (-not $c -or $c.Length -ne (Get-Item -LiteralPath $IaServeur).Length -or (Get-FileHash -LiteralPath $copie -Algorithm SHA256 -ErrorAction Stop).Hash -ne $empreinte) {
+            Copy-Item -LiteralPath $IaServeur -Destination $copie -Force -ErrorAction Stop
+            if ((Get-FileHash -LiteralPath $copie -Algorithm SHA256 -ErrorAction Stop).Hash -ne $empreinte) { throw 'copie différente de llama-server.exe' }
+        }
+        $copie
+    } catch { Write-Log "Assistant : copie Mindset.exe impossible, llama-server.exe lancé ($($_.Exception.Message))"; $IaServeur }
+}
+
 # Lance llama-server caché (si l'assistant est installé et pas déjà lancé) ; il est prêt quelques secondes après
 function Start-Ia {
     if ($script:Ia.Process -and -not $script:Ia.Process.HasExited) { return }
     if (-not (Test-IaInstallee)) { return }
     try {
         $script:Ia.Port = Get-PortLibre
-        $si = New-Object Diagnostics.ProcessStartInfo $IaServeur
+        $programme = Get-IaServeurLance
+        $si = New-Object Diagnostics.ProcessStartInfo $programme
         $modeleLance = Get-IaModeleLance
         $si.Arguments = "-m `"$modeleLance`" --host 127.0.0.1 --port $($script:Ia.Port) -ngl 99 -c 2048 -np 1 --no-webui"
         $si.UseShellExecute = $false; $si.CreateNoWindow = $true
@@ -160,7 +179,7 @@ function Start-Ia {
         try { if (-not [MindcareNatif]::ArreterAvecMindcare($script:Ia.Process.Handle)) { Write-Log 'Assistant : pas relié à Mindcare' } } catch { Write-Log "Assistant : pas relié à Mindcare ($_)" }
         $script:Ia.Process.BeginOutputReadLine(); $script:Ia.Process.BeginErrorReadLine()   # (sinon ses messages bloquent)
         $script:Ia.Pret = $false
-        Write-Log "Assistant lancé (port $($script:Ia.Port), $([IO.Path]::GetFileName($modeleLance)))"
+        Write-Log "Assistant lancé (port $($script:Ia.Port), $([IO.Path]::GetFileName($modeleLance)), $([IO.Path]::GetFileName($programme)))"
     } catch { Write-Log "Assistant : lancement impossible ($_)"; $script:Ia.Process = $null }
 }
 

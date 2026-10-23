@@ -60,10 +60,11 @@ $c = [IO.File]::ReadAllText($ps1, [Text.Encoding]::UTF8)
 $c = [regex]::Replace($c, "(?m)^\`$AppVersion = '[^']*'", "`$AppVersion = '$Version'")
 $c = [regex]::Replace($c, '(?m)^(    Mindcare) [\d\.]+(\r?)$', "`$1 $Version`$2")
 [IO.File]::WriteAllText($ps1, $c, $utf8)
-$cs = Join-Path $PSScriptRoot 'lanceur.cs'
-$l = [IO.File]::ReadAllText($cs, [Text.Encoding]::UTF8)
-$l = [regex]::Replace($l, 'Assembly(File)?Version\("[\d\.]+"\)', { param($m) "Assembly$($m.Groups[1].Value)Version(`"$Version.0`")" })
-[IO.File]::WriteAllText($cs, $l, $utf8)
+foreach ($cs in (Join-Path $PSScriptRoot 'lanceur.cs'), (Join-Path $PSScriptRoot 'relais.cs')) {   # (Mindset.exe et le relais Mindcare.exe)
+    $l = [IO.File]::ReadAllText($cs, [Text.Encoding]::UTF8)
+    $l = [regex]::Replace($l, 'Assembly(File)?Version\("[\d\.]+"\)', { param($m) "Assembly$($m.Groups[1].Value)Version(`"$Version.0`")" })
+    [IO.File]::WriteAllText($cs, $l, $utf8)
+}
 
 # 2. Construction, test automatique (avec le vrai programme), puis signature
 & (Join-Path $PSScriptRoot 'construire.ps1')

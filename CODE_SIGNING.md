@@ -10,7 +10,7 @@ Free code signing provided by [SignPath.io](https://about.signpath.io), certific
 
 ## What is signed
 
-- `Mindcare.exe` and the PowerShell scripts (`.ps1`) of Mindcare (`fichiers\Mindcare.ps1` and `fichiers\modules\*.ps1`),
+- `Mindset.exe` (the Mindcare program, named like every program of the suite), `Mindcare.exe` (a small relay that starts it) and the PowerShell scripts (`.ps1`) of Mindcare (`fichiers\Mindcare.ps1` and `fichiers\modules\*.ps1`),
   all built from this repository.
 - The other files of the app are data, not programs, and are not signed: the catalogue of breakdowns
   (`enquetes.json`), the drawings (`.svg`), the window layout (`.xaml`), the public keys of the suite (`.xml`) and a
@@ -28,7 +28,7 @@ Free code signing provided by [SignPath.io](https://about.signpath.io), certific
 ## How a release is built and signed
 
 1. The version is tagged in this repository (`v<version>`).
-2. The [Release workflow](.github/workflows/release.yml) builds `Mindcare.exe` and `catalogue.zip` on a GitHub hosted
+2. The [Release workflow](.github/workflows/release.yml) builds `Mindset.exe`, `Mindcare.exe` and `catalogue.zip` on a GitHub hosted
    runner (`outils\construire.ps1`), from the tagged source only, and uploads the `Mindcare` folder as a workflow
    artifact (`catalogue.zip` is uploaded as a separate artifact and is not sent for signing).
 3. The workflow sends a signing request to SignPath. SignPath checks that the artifact comes from this workflow and
@@ -104,7 +104,7 @@ Signature gratuite du code fournie par [SignPath.io](https://about.signpath.io),
 
 ## Ce qui est signé
 
-- `Mindcare.exe` et les scripts PowerShell (`.ps1`) de Mindcare (`fichiers\Mindcare.ps1` et `fichiers\modules\*.ps1`),
+- `Mindset.exe` (le programme de Mindcare, au même nom que chaque programme de la suite), `Mindcare.exe` (un petit relais qui le lance) et les scripts PowerShell (`.ps1`) de Mindcare (`fichiers\Mindcare.ps1` et `fichiers\modules\*.ps1`),
   tous construits depuis ce dépôt.
 - Les autres fichiers de l'appli sont des données, pas des programmes, et ne sont pas signés : le catalogue des pannes
   (`enquetes.json`), les dessins (`.svg`), la mise en page de la fenêtre (`.xaml`), les clés publiques de la suite
@@ -123,7 +123,7 @@ Signature gratuite du code fournie par [SignPath.io](https://about.signpath.io),
 ## Comment une version est construite et signée
 
 1. La version reçoit son étiquette dans ce dépôt (`v<version>`).
-2. Le [workflow Release](.github/workflows/release.yml) construit `Mindcare.exe` et `catalogue.zip` sur une machine de
+2. Le [workflow Release](.github/workflows/release.yml) construit `Mindset.exe`, `Mindcare.exe` et `catalogue.zip` sur une machine de
    GitHub (`outils\construire.ps1`), seulement depuis le code de cette étiquette, et dépose le dossier `Mindcare` comme
    artefact (`catalogue.zip` est déposé à part, et n'est pas envoyé à la signature).
 3. Le workflow envoie une demande de signature à SignPath, qui vérifie que l'artefact vient bien de ce workflow et de

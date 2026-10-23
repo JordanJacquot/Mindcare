@@ -72,7 +72,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 - `outils\tester.ps1` : les tests automatiques (hors de l'écran, données à part) ; `-SansFenetre` : seulement ceux qui
   n'ouvrent aucune fenêtre (GitHub les lance à chaque envoi, `.github\workflows\tests.yml`).
 - `outils\verifier.ps1` : syntaxe, encodage, fenêtre, tirets longs, licence (lancé par `publier.ps1` et par GitHub).
-- `outils\construire.ps1` : `Mindcare.exe`, `release\Mindcare.zip` et `release\catalogue.zip` (pour Mindcare Mobile) ;
+- `outils\construire.ps1` : `Mindset.exe` (le programme), `Mindcare.exe` (son relais), `release\Mindcare.zip` et `release\catalogue.zip` (pour Mindcare Mobile) ;
   GitHub construit aussi chaque version depuis son étiquette (`.github\workflows\release.yml`).
 - `outils\publier.ps1 -Version 0.1.0 -Notes "..."` : vérifications, construction, tests, signature, Release GitHub.
 - Copie de travail (ce dossier, avec `.git`) : lancée directement, elle n'est pas bloquée et garde ses données à part
@@ -80,7 +80,7 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
 
 ## Code signing policy
 
-Mindcare.exe et les scripts de Mindcare seront signés gratuitement par SignPath.io, avec un certificat de la SignPath
+Mindset.exe, Mindcare.exe et les scripts de Mindcare seront signés gratuitement par SignPath.io, avec un certificat de la SignPath
 Foundation (demande en cours). Rôles et confidentialité : [Code signing policy](CODE_SIGNING.md).
 
 Mindcare ne va jamais sur Internet d'elle-même : seulement quand tu installes ou mets à jour son assistant (un bouton

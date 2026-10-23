@@ -2,8 +2,8 @@
 # Authenticode gratuite par SignPath Foundation (même modèle que Mindset et Nevermind, issue #4 de Mindset).
 #
 # Déroulé :
-#   1. « construire » : compile Mindcare.exe et construit catalogue.zip (outils\construire.ps1), dépose le dossier
-#      Mindcare comme artefact à signer, et catalogue.zip (données pour Mindcare Mobile, jamais signées) à part.
+#   1. « construire » : compile Mindset.exe (le programme) et Mindcare.exe (son relais), construit catalogue.zip
+#      (outils\construire.ps1), dépose le dossier Mindcare comme artefact à signer, et catalogue.zip (données pour Mindcare Mobile, jamais signées) à part.
 #   2. « signer » : seulement quand la variable SIGNPATH_ACTIVE vaut true (Settings > Secrets and variables >
 #      Actions > Variables). Envoie l'artefact à SignPath, attend l'approbation manuelle de Jordan dans SignPath,
 #      vérifie les signatures, puis dépose Mindcare.zip (signé) comme artefact.
@@ -55,27 +55,33 @@ jobs:
           [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "version4=$v4`n")
           Write-Host "Version $v ($v4)"
 
-      # Mindcare.exe n'est jamais pris dans le dépôt (il est dans .gitignore) : il est compilé ici depuis outils\lanceur.cs
+      # Mindset.exe et Mindcare.exe ne sont jamais pris dans le dépôt (.gitignore) : compilés ici depuis outils\lanceur.cs
+      # (Mindset.exe, le programme : même nom pour toute la suite, une seule ligne « Mindset » dans le Gestionnaire des
+      # tâches) et outils\relais.cs (Mindcare.exe, qui lance Mindset.exe : pour ce qui appelle encore Mindcare.exe)
       - name: "Construire (outils\\construire.ps1)"
         run: |
           $ErrorActionPreference = 'Stop'
-          if (Test-Path -LiteralPath 'Mindcare\Mindcare.exe') { throw 'Mindcare.exe ne doit pas venir du dépôt.' }
+          foreach ($e in 'Mindset.exe', 'Mindcare.exe') { if (Test-Path -LiteralPath "Mindcare\$e") { throw "$e ne doit pas venir du dépôt." } }
           .\outils\construire.ps1
 
-      - name: "Vérifier Mindcare.exe"
+      - name: "Vérifier Mindset.exe et Mindcare.exe"
         run: |
           $ErrorActionPreference = 'Stop'
           # (Where-Object et pas -Include : avec -LiteralPath, PowerShell 5.1 ignore -Include et rend tous les fichiers)
           $exes = @(Get-ChildItem -LiteralPath 'Mindcare' -Recurse -File | Where-Object { $_.Extension -in '.exe', '.dll' })
-          if ($exes.Count -ne 1 -or $exes[0].Name -ne 'Mindcare.exe') { throw "Seul Mindcare.exe est attendu dans le dossier, trouvés : $($exes.Name -join ', ')" }
-          $i = $exes[0].VersionInfo
-          Write-Host "Produit : $($i.ProductName), version du produit : $($i.ProductVersion), version du fichier : $($i.FileVersion)"
-          if ($i.ProductName -ne 'Mindcare') { throw "Nom de produit inattendu : $($i.ProductName)" }
-          if ($i.ProductVersion -ne '${{ steps.version.outputs.version4 }}') {
-            Write-Host "::warning::La version de Mindcare.exe ($($i.ProductVersion)) n'est pas ${{ steps.version.outputs.version4 }} : lanceur.cs n'a pas été mis à jour par publier.ps1."
+          $noms = @($exes | ForEach-Object { $_.FullName.Substring((Resolve-Path 'Mindcare').Path.Length + 1) } | Sort-Object)
+          if (($noms -join ',') -ne 'Mindcare.exe,Mindset.exe') { throw "Seuls Mindset.exe et Mindcare.exe sont attendus à la racine du dossier, trouvés : $($noms -join ', ')" }
+          foreach ($x in $exes) {
+            $i = $x.VersionInfo
+            Write-Host "$($x.Name) : produit $($i.ProductName), description $($i.FileDescription), version du produit $($i.ProductVersion), version du fichier $($i.FileVersion)"
+            if ($i.ProductName -ne 'Mindcare') { throw "Nom de produit inattendu pour $($x.Name) : $($i.ProductName)" }
+            if ($x.Name -eq 'Mindset.exe' -and $i.FileDescription -ne 'Mindset') { throw "Description inattendue pour Mindset.exe : $($i.FileDescription) (le nom de la ligne commune de la suite dans le Gestionnaire des tâches)" }
+            if ($i.ProductVersion -ne '${{ steps.version.outputs.version4 }}') {
+              Write-Host "::warning::La version de $($x.Name) ($($i.ProductVersion)) n'est pas ${{ steps.version.outputs.version4 }} : lanceur.cs ou relais.cs n'a pas été mis à jour par publier.ps1."
+            }
+            $h = (Get-FileHash -LiteralPath $x.FullName -Algorithm SHA256).Hash
+            [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "$($x.Name) (non signé) : SHA-256 ``$h``" + "`n")
           }
-          $h = (Get-FileHash -LiteralPath $exes[0].FullName -Algorithm SHA256).Hash
-          [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Mindcare.exe (non signé) : SHA-256 ``$h``" + "`n")
           $c = (Get-FileHash -LiteralPath 'release\catalogue.zip' -Algorithm SHA256).Hash.ToLowerInvariant()
           [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "catalogue.zip (données, jamais signé) : SHA-256 ``$c``" + "`n")
 
@@ -87,7 +93,7 @@ jobs:
           Copy-Item -LiteralPath 'Mindcare' -Destination $dest -Recurse
           Get-ChildItem -LiteralPath $dest -Recurse -File | Measure-Object | ForEach-Object { Write-Host "$($_.Count) fichiers" }
 
-      # L'artefact contient un seul dossier « Mindcare » (Mindcare.exe, LISEZMOI.txt, fichiers\...).
+      # L'artefact contient un seul dossier « Mindcare » (Mindset.exe, Mindcare.exe, LISEZMOI.txt, fichiers\...).
       # SignPath vérifie qu'il vient bien de ce workflow (origin verification).
       - name: "Déposer l'artefact non signé"
         id: depot
@@ -146,16 +152,16 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $racine = '_ci\signe\Mindcare'
-          if (-not (Test-Path -LiteralPath "$racine\Mindcare.exe")) { throw "Dossier signé inattendu : $racine\Mindcare.exe absent" }
+          foreach ($e in 'Mindset.exe', 'Mindcare.exe') { if (-not (Test-Path -LiteralPath "$racine\$e")) { throw "Dossier signé inattendu : $racine\$e absent" } }
           $problemes = @()
           # (Where-Object et pas -Include : avec -LiteralPath, PowerShell 5.1 ignore -Include et rend tous les fichiers)
-          $nos = @(Get-Item -LiteralPath "$racine\Mindcare.exe") + @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.ps1', '.psm1', '.psd1' })
+          $nos = @(Get-Item -LiteralPath "$racine\Mindset.exe", "$racine\Mindcare.exe") + @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.ps1', '.psm1', '.psd1' })
           foreach ($f in $nos) {
             $s = Get-AuthenticodeSignature -LiteralPath $f.FullName
             if ($s.Status -ne 'Valid' -or $s.SignerCertificate.Subject -notmatch 'SignPath Foundation') { $problemes += "$($f.FullName) : $($s.Status) $($s.SignerCertificate.Subject)" }
           }
           # Aucun autre programme dans le dossier (l'assistant n'y est jamais : il est téléchargé à part, sur demande)
-          $autres = @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.exe', '.dll' -and $_.Name -ne 'Mindcare.exe' })
+          $autres = @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.exe', '.dll' -and $_.FullName -notin $nos.FullName })
           foreach ($f in $autres) { $problemes += "Programme inattendu : $($f.FullName)" }
           if ($problemes) { $problemes | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
           Write-Host "$($nos.Count) fichiers signés par SignPath Foundation."

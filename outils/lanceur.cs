@@ -1,6 +1,9 @@
-﻿// Mindcare.exe : le programme Mindcare. Il exécute lui-même le code de l'appli (fichiers\Mindcare.ps1) au lieu de le
-// confier à powershell.exe : pour Windows, c'est une vraie application, avec son nom et son icône.
-// Compilé par construire.ps1. « Mindcare.exe -Demarrage » : lancée cachée (par Mindset, ou avec Windows).
+﻿// Mindset.exe (dans le dossier de Mindcare) : le programme Mindcare. Il exécute lui-même le code de l'appli
+// (fichiers\Mindcare.ps1) au lieu de le confier à powershell.exe : pour Windows, c'est une vraie application, avec son
+// icône. Il s'appelle Mindset.exe comme le programme de chaque appli de la suite : le Gestionnaire des tâches range sur
+// une seule ligne « Mindset » les programmes qui ont le même nom. Mindcare.exe (outils\relais.cs) n'est qu'un relais
+// vers lui, pour ce qui l'appelle encore. Rien ne doit donc chercher ce programme par son nom : par son chemin.
+// Compilé par construire.ps1. « Mindset.exe -Demarrage » : lancée cachée (par Mindset, ou avec Windows).
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -10,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-[assembly: AssemblyTitle("Mindcare")]
+[assembly: AssemblyTitle("Mindset")]   // (le nom de la ligne commune dans le Gestionnaire des tâches)
 [assembly: AssemblyProduct("Mindcare")]
 [assembly: AssemblyDescription("Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.")]
 [assembly: AssemblyVersion("0.10.2.0")]

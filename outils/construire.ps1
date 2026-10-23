@@ -3,7 +3,9 @@
 # (Mindcare doit être fermée : son .exe est remplacé.)
 #
 #   Mindcare\
-#     Mindcare.exe                    <- le programme (icône de Mindcare)
+#     Mindset.exe                     <- le programme (icône de Mindcare ; même nom pour toute la suite : une seule
+#                                        ligne « Mindset » dans le Gestionnaire des tâches)
+#     Mindcare.exe                    <- le relais vers Mindset.exe, pour ce qui appelle encore Mindcare.exe
 #     LISEZMOI.txt
 #     fichiers\Mindcare.ps1, Mindcare.ico
 #     fichiers\cles-publiques\*.xml    <- les clés publiques de la suite (les mêmes que Mindset)
@@ -19,10 +21,13 @@ $csc    = Join-Path $env:windir 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 & (Join-Path $PSScriptRoot 'icone.ps1') -OutDir $icones | Out-Null
 Copy-Item (Join-Path $icones 'Mindcare.ico') (Join-Path $fich 'Mindcare.ico') -Force
 
-$exe = Join-Path $app 'Mindcare.exe'
+$exe = Join-Path $app 'Mindset.exe'
 $sma = [psobject].Assembly.Location   # le moteur PowerShell de Windows, que l'exe fait tourner
 & $csc /nologo /target:winexe /optimize+ /platform:anycpu "/win32icon:$(Join-Path $icones 'Mindcare.ico')" "/win32manifest:$(Join-Path $PSScriptRoot 'lanceur.manifest')" /reference:System.Windows.Forms.dll "/reference:$sma" "/out:$exe" (Join-Path $PSScriptRoot 'lanceur.cs')
 if ($LASTEXITCODE) { throw "Échec de compilation de $exe" }
+$relais = Join-Path $app 'Mindcare.exe'
+& $csc /nologo /target:winexe /optimize+ /platform:anycpu "/win32icon:$(Join-Path $icones 'Mindcare.ico')" "/win32manifest:$(Join-Path $PSScriptRoot 'lanceur.manifest')" /reference:System.Windows.Forms.dll "/out:$relais" (Join-Path $PSScriptRoot 'relais.cs')
+if ($LASTEXITCODE) { throw "Échec de compilation de $relais" }
 
 # Le zip (release\ n'est pas suivi par git : publier.ps1 le signe et le joint à la Release GitHub, où Mindset le prend)
 $release = Join-Path $racine 'release'

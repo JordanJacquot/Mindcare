@@ -19,7 +19,8 @@ Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples
 $MainScript = $PSCommandPath
 $AppDir     = $PSScriptRoot
 $ModulesDir = Join-Path $AppDir 'modules'
-$AppExe     = Join-Path (Split-Path $AppDir -Parent) 'Mindcare.exe'   # le programme qui exécute ce script
+$AppExe     = Join-Path (Split-Path $AppDir -Parent) 'Mindset.exe'    # le programme qui exécute ce script (Mindcare.exe n'est qu'un relais vers lui)
+if (-not (Test-Path -LiteralPath $AppExe)) { $AppExe = Join-Path (Split-Path $AppDir -Parent) 'Mindcare.exe' }
 $EnTest     = [bool]$env:MINDCARE_TEST      # test automatique (outils\tester.ps1) : rien n'est modifié sur le PC
 if ($EnTest -and $env:MINDCARE_TEST_DEMARRAGE) { $Demarrage = $true }
 
@@ -87,4 +88,4 @@ if ($script:Relancer -and -not $EnTest) {
     if (Test-Path -LiteralPath $AppExe) { if ($opt) { Start-Process -FilePath $AppExe -ArgumentList $opt } else { Start-Process -FilePath $AppExe } }
     else { Start-Process -FilePath "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList (@('-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', "`"$MainScript`"") + $opt) }
 }
-# (le lanceur Mindcare.exe termine ensuite le processus : aucun fil de fond ne le garde ouvert sans fenêtre)
+# (le programme Mindset.exe termine ensuite le processus : aucun fil de fond ne le garde ouvert sans fenêtre)
