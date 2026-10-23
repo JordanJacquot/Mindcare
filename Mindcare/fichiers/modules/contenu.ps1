@@ -13,7 +13,11 @@ function Initialize-Contenu {
     Read-Historique
     Start-LectureJournaux   # (ce que Windows a noté, lu en arrière-plan pour l'enquête)
     Start-Ia                # (l'assistant, s'il est installé : il charge son modèle en arrière-plan)
-    if ($EnTest -and $env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered({ $ui.Defilement.ScrollToEnd() }) }   # (tests : capture du bas)
+    if ($EnTest -and $env:MINDCARE_TEST_ERREUR) {   # (tests : une minuterie qui se trompe à chaque tour, pour le filet)
+        $t = New-Object System.Windows.Threading.DispatcherTimer; $t.Interval = [TimeSpan]::FromMilliseconds(50)
+        $t.Add_Tick((Protect-Action { $script:MinuterieAbsente.Stop() })); $t.Start()
+    }
+    if ($EnTest -and $env:MINDCARE_TEST_BAS) { $Window.Add_ContentRendered((Protect-Action { $ui.Defilement.ScrollToEnd() })) }   # (tests : capture du bas)
     if ($EnTest -and $env:MINDCARE_TEST_GALERIE) {
         $g = New-Object System.Windows.Controls.WrapPanel
         foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') { $v = ConvertFrom-Svg $f.BaseName; $v.Width = 150; $v.Height = 100; $v.Margin = '0,0,12,12'; [void]$g.Children.Add($v) }
@@ -23,7 +27,7 @@ function Initialize-Contenu {
     if ($EnTest -and $script:Donnees) {
         if ($env:MINDCARE_TEST_REPRENDRE -and $script:Historique.Count) { Open-Diagnostic ([string]$script:Historique[0].Id); return }
         if ($env:MINDCARE_TEST_FAMILLE) { Show-Famille $env:MINDCARE_TEST_FAMILLE; return }
-        if ($env:MINDCARE_TEST_RECHERCHE) { Show-Accueil; $ui.Recherche.Text = $env:MINDCARE_TEST_RECHERCHE; if ($env:MINDCARE_TEST_IA -or $env:MINDCARE_IA_MODELE) { Request-Ia }; return }
+        if ($env:MINDCARE_TEST_RECHERCHE) { Show-Accueil; $ui.Recherche.Text = $env:MINDCARE_TEST_RECHERCHE; if ($env:MINDCARE_TEST_IA -or $env:MINDCARE_IA_MODELE) { Request-Ia; if ($env:MINDCARE_TEST_IA_DOUBLE) { Request-Ia } }; return }   # (DOUBLE : Entrée appuyée deux fois)
         # Une enquête toute faite : « redemarre » ou « redemarre:1,0,-1 » (outils\tester.ps1)
         if ($env:MINDCARE_TEST_PARCOURS) {
             $id, $suite = $env:MINDCARE_TEST_PARCOURS -split ':', 2
@@ -59,11 +63,11 @@ function Add-Titre($Parent, [string]$Texte, [string]$Style = 'H1', [string]$Marg
 # Une rangée de boutons, et un bouton dedans
 function New-Rangee($Parent) { $r = New-Object System.Windows.Controls.WrapPanel; $r.Margin = '0,18,0,0'; [void]$Parent.Children.Add($r); $r }
 function Add-Bouton($Rangee, [string]$Texte, [scriptblock]$Clic, [string]$Style = 'BtnSecondary') {
-    $b = New-Button $Texte $Style; $b.Margin = '0,0,10,8'; $b.Add_Click($Clic); [void]$Rangee.Children.Add($b)
+    $b = New-Button $Texte $Style; $b.Margin = '0,0,10,8'; $b.Add_Click((Protect-Action $Clic)); [void]$Rangee.Children.Add($b)
 }
 # Un grand bouton à choisir (une réponse, une panne, une famille), le contenu à gauche ; Tag dit lequel
 function Add-ChoixBouton($Parent, $Contenu, $Tag, [scriptblock]$Clic) {
-    $b = New-Button '' 'BtnChoix'; $b.Content = $Contenu; $b.Tag = $Tag; $b.Add_Click($Clic)
+    $b = New-Button '' 'BtnChoix'; $b.Content = $Contenu; $b.Tag = $Tag; $b.Add_Click((Protect-Action $Clic))
     [void]$Parent.Children.Add($b)
     $b
 }
@@ -160,8 +164,8 @@ function Show-Accueil([string]$Famille = '') {
     $saisie.Background = [System.Windows.Media.Brushes]::Transparent; $saisie.BorderThickness = 0; $saisie.FontSize = 15
     $saisie.Foreground = Get-Brush '#FFFFFF'; $saisie.CaretBrush = Get-Brush '#00E5FF'; $saisie.VerticalContentAlignment = 'Center'
     $saisie.Tag = $indice
-    $saisie.Add_TextChanged({ param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Clear-ZoneIa; Update-Accueil })
-    $saisie.Add_KeyDown({ param($s, $ev) if ($ev.Key -eq 'Return') { Request-Ia } })
+    $saisie.Add_TextChanged((Protect-Action { param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Clear-ZoneIa; Update-Accueil }))
+    $saisie.Add_KeyDown((Protect-Action { param($s, $ev) if ($ev.Key -eq 'Return') { Request-Ia } }))
     [void]$zone.Children.Add($indice); [void]$zone.Children.Add($saisie)
     [void]$dp.Children.Add($zone)
     $champ.Child = $dp
@@ -177,7 +181,7 @@ function Show-Accueil([string]$Famille = '') {
         $bandeau.Background = Get-Brush '#1400E5FF'; $bandeau.BorderBrush = Get-Brush '#4000E5FF'; $bandeau.BorderThickness = 1
         $bd = New-Object System.Windows.Controls.DockPanel
         $script:AReprendre = [string]$dernier.Id
-        $b = New-Button 'La reprendre' 'BtnPrimary'; $b.Add_Click({ Open-Diagnostic $script:AReprendre })
+        $b = New-Button 'La reprendre' 'BtnPrimary'; $b.Add_Click((Protect-Action { Open-Diagnostic $script:AReprendre }))
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$bd.Children.Add($b)
         $t = New-Text "Ton enquête « $($info.Panne.Titre) » n'est pas finie (commencée le $(Format-Date ([string]$dernier.Debut)))." 14 '#C9C3DD'
         $t.VerticalAlignment = 'Center'; [void]$bd.Children.Add($t)
@@ -218,7 +222,7 @@ function Update-BandeauIa {
     $dp = New-Object System.Windows.Controls.DockPanel
     if (-not $enCours) {
         $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } elseif ($maj) { 'Mettre à jour' } else { 'Installer' }) 'BtnPrimary'
-        $b.Add_Click({ Start-IaInstall; Start-SuiviIa; Update-BandeauIa })
+        $b.Add_Click((Protect-Action { Start-IaInstall; Start-SuiviIa; Update-BandeauIa }))
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$dp.Children.Add($b)
     }
     $texte = if ($enCours) {
@@ -242,14 +246,15 @@ function Start-SuiviIa {
     if ($script:IaSuivi) { return }
     $script:IaSuivi = New-Object System.Windows.Threading.DispatcherTimer
     $script:IaSuivi.Interval = [TimeSpan]::FromMilliseconds(500)
-    $script:IaSuivi.Add_Tick({
+    $script:IaSuivi.Add_Tick((Protect-Action {
+        param($s)
         if ($script:IaDl -and $script:IaDl.Fini) {
-            $script:IaSuivi.Stop(); $script:IaSuivi = $null
+            $s.Stop(); $script:IaSuivi = $null
             if ($script:IaDl.Erreur) { Write-Log "Assistant non installé : $($script:IaDl.Erreur)" }
             else { Write-Log 'Assistant installé'; Stop-Ia; Remove-IaAnciens; Start-Ia }
         }
         if ($ui.ZoneIa -and $ui.ZoneIa.IsLoaded) { Update-BandeauIa }
-    })
+    }))
     $script:IaSuivi.Start()
 }
 
@@ -262,6 +267,7 @@ function Clear-ZoneIa {
 
 # Entrée dans la barre : l'assistant lit la phrase (en arrière-plan), puis sa proposition s'affiche
 function Request-Ia {
+    if ($script:IaAttente) { return }   # (l'assistant lit déjà une phrase : Entrée appuyée une deuxième fois, ignorée)
     $texte = ([string]$ui.Recherche.Text).Trim()
     if (-not $texte -or -not $ui.ZoneIa) { return }
     $tache = Start-IaQuestion $texte @($script:Donnees.Pannes | ForEach-Object { [string]$_.Id })
@@ -281,17 +287,18 @@ function Request-Ia {
     $script:IaTache = $tache
     $script:IaAttente = New-Object System.Windows.Threading.DispatcherTimer
     $script:IaAttente.Interval = [TimeSpan]::FromMilliseconds(120)
-    $script:IaAttente.Add_Tick({
+    $script:IaAttente.Add_Tick((Protect-Action {
+        param($s)
         $r = Get-IaReponse $script:IaTache
         if ($null -eq $r) { return }
-        $script:IaAttente.Stop(); $script:IaAttente = $null; Stop-ChargementTheme
+        $s.Stop(); if ($script:IaAttente -eq $s) { $script:IaAttente = $null }; Stop-ChargementTheme
         if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) { Write-Log "Assistant : $($r.Erreur)"; $script:IaCarte = $null; Update-BandeauIa; return }
         $propose = @($r.Reponses.Keys) -join ','
         $r.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $r.Panne) $r.Reponses $script:IaCarte.Texte
         Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',') (proposé : $propose)"
         Show-CarteIa $r
         if ($EnTest -and $env:MINDCARE_TEST_IA_CHOISIR) { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }
-    })
+    }))
     $script:IaAttente.Start()
 }
 
@@ -308,7 +315,7 @@ function Show-CarteIa($R) {
     $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,6,0,0'
     $script:IaChoisie = @{ Panne = [string]$R.Panne; Reponses = $R.Reponses }
     $b = New-Button "C'est ça" 'BtnPrimary'; $b.VerticalAlignment = 'Center'; $b.Margin = '14,0,0,0'
-    $b.Add_Click({ Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses })
+    $b.Add_Click((Protect-Action { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }))
     [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$haut.Children.Add($b)
     $tx = New-Object System.Windows.Controls.StackPanel
     [void]$tx.Children.Add((New-Text ([string]$panne.Titre) 18 '#FFFFFF' 'SemiBold'))
@@ -358,7 +365,7 @@ function Update-Accueil {
     if ($fc) {
         $choisi = New-Object System.Windows.Controls.DockPanel; $choisi.Margin = '0,0,0,16'
         $b = New-Button 'Changer' 'BtnSecondary'; $b.VerticalAlignment = 'Center'
-        $b.Add_Click({ $script:FamilleChoisie = ''; Update-Accueil; $ui.Defilement.ScrollToTop() })
+        $b.Add_Click((Protect-Action { $script:FamilleChoisie = ''; Update-Accueil; $ui.Defilement.ScrollToTop() }))
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$choisi.Children.Add($b)
         $ic = ConvertFrom-Svg ([string]$fc.Icone)
         if ($ic) { $ic.Width = 26; $ic.Height = 26; $ic.Margin = '0,0,10,0'; [System.Windows.Controls.DockPanel]::SetDock($ic, 'Left'); [void]$choisi.Children.Add($ic) }
@@ -385,7 +392,7 @@ function Update-Accueil {
         [void]$sp.Children.Add($ph)
         $b = New-Button '' 'BtnChoix'; $b.Content = $sp; $b.Tag = [string]$f.Id; $b.Padding = '16,14'
         $b.HorizontalContentAlignment = 'Left'; $b.VerticalContentAlignment = 'Top'
-        if ($n) { $b.Add_Click({ param($s) Show-Famille ([string]$s.Tag) }) } else { $b.IsEnabled = $false; $b.Opacity = 0.45 }
+        if ($n) { $b.Add_Click((Protect-Action { param($s) Show-Famille ([string]$s.Tag) })) } else { $b.IsEnabled = $false; $b.Opacity = 0.45 }
         $b
     }
     Add-EnGrille $z @($tuiles) 4
@@ -412,7 +419,7 @@ function New-PanneBouton($Panne, [bool]$AvecFamille = $false) {
     $ph = New-Text ([string]$Panne.Phrase) 13 '#A9A3C9'; $ph.Margin = '0,3,0,0'
     [void]$sp.Children.Add($ph)
     $b = New-Button '' 'BtnChoix'; $b.Content = $sp; $b.Tag = [string]$Panne.Id; $b.Margin = '0'
-    $b.Add_Click({ param($s) Start-Diagnostic ([string]$s.Tag) })
+    $b.Add_Click((Protect-Action { param($s) Start-Diagnostic ([string]$s.Tag) }))
     $b
 }
 
@@ -507,7 +514,7 @@ function Add-PanneauEnquete($Parent, $E) {
             [void]$d.Children.Add((New-Text $f.Court 12 '#A9A3C9'))
             $r = New-Text $f.Reponse 13 '#EEEBF7'; $r.MaxHeight = 36; $r.TextTrimming = 'CharacterEllipsis'; [void]$d.Children.Add($r)
             $d.Cursor = 'Hand'; $d.Tag = $i; $d.ToolTip = 'Changer cette réponse'
-            $d.Add_MouseLeftButtonUp({ param($s) $script:ChoixFaits = @($script:ChoixFaits | Select-Object -First ([int]$s.Tag)); Show-Etape })
+            $d.Add_MouseLeftButtonUp((Protect-Action { param($s) $script:ChoixFaits = @($script:ChoixFaits | Select-Object -First ([int]$s.Tag)); Show-Etape }))
             [void]$Parent.Children.Add($d)
             $i++
         }
@@ -580,13 +587,13 @@ function Add-Gestes($Parent, $Gestes, $Commande = $null) {
         [System.Windows.Controls.DockPanel]::SetDock($case, 'Left'); [void]$d.Children.Add($case)
         $t = New-Text "$n. $l" 14 '#C9C3DD'; [void]$d.Children.Add($t)
         $d.Tag = @{ Case = $case; Coche = $coche; Texte = $t; Fait = $false }
-        $d.Add_MouseLeftButtonUp({
+        $d.Add_MouseLeftButtonUp((Protect-Action {
             param($s)
             $g = $s.Tag; $g.Fait = -not $g.Fait
             $g.Case.Background = if ($g.Fait) { Get-Brush '#00E5FF' } else { [System.Windows.Media.Brushes]::Transparent }
             $g.Coche.Visibility = if ($g.Fait) { 'Visible' } else { 'Hidden' }
             $g.Texte.Foreground = Get-Brush $(if ($g.Fait) { '#6E6890' } else { '#C9C3DD' })
-        })
+        }))
         [void]$Parent.Children.Add($d)
         # (la commande juste sous le geste qui dit de la copier)
         if ($Commande -and -not $posee -and [string]$l -match 'Copier') { Add-Commandes $Parent $Commande; $posee = $true }
@@ -605,10 +612,10 @@ function Add-Commandes($Parent, $Commande) {
     foreach ($l in @($Commande.Lignes)) {
         $d = New-Object System.Windows.Controls.DockPanel; $d.Margin = '0,6,0,0'
         $b = New-Button 'Copier' 'BtnSecondary'; $b.Tag = [string]$l; $b.Margin = '12,0,0,0'
-        $b.Add_Click({
+        $b.Add_Click((Protect-Action {
             param($s)
             try { [System.Windows.Clipboard]::SetText([string]$s.Tag); $s.Content = 'Copiée' } catch { Write-Log "Commande non copiée : $_"; $s.Content = 'Copie impossible' }
-        })
+        }))
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$d.Children.Add($b)
         $t = New-Object System.Windows.Controls.TextBox
         $t.Text = [string]$l; $t.IsReadOnly = $true; $t.BorderThickness = 0; $t.Background = [System.Windows.Media.Brushes]::Transparent

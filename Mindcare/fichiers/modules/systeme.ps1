@@ -106,7 +106,7 @@ function Start-Surveillances {
     $script:Tours = 0
     $script:Surveillance = New-Object System.Windows.Threading.DispatcherTimer
     $script:Surveillance.Interval = [TimeSpan]::FromMilliseconds(500)
-    $script:Surveillance.Add_Tick({
+    $script:Surveillance.Add_Tick((Protect-Action {
         $script:Tours++
         try { Update-DansMindset } catch { Write-Log "Affichage dans Mindset : $_" }
         if ($script:ShowSignal -and $script:ShowSignal.WaitOne(0)) { Show-MainWindow }
@@ -118,10 +118,10 @@ function Start-Surveillances {
         }
         if ($script:Tours % 5 -eq 1) { try { Update-SuiteSurveillance } catch { Write-Log "Suite Mindset : $_" } }
         if ($script:Tours % 120 -eq 0) { Write-EtatMindset }   # toutes les minutes (et dès le démarrage, plus bas)
-    })
+    }))
     $script:Surveillance.Start()
     Write-EtatMindset
-    $Window.Add_SizeChanged({ if ($script:DansMindset) { Update-EchelleMindset } })
+    $Window.Add_SizeChanged((Protect-Action { if ($script:DansMindset) { Update-EchelleMindset } }))
 }
 
 # ---------------------------------------------------------------------------

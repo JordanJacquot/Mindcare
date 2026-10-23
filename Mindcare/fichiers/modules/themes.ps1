@@ -220,7 +220,7 @@ function Start-Defilement($Img, $Frames, [int]$Delay) {
     $t = New-Object System.Windows.Threading.DispatcherTimer
     $t.Interval = [TimeSpan]::FromMilliseconds($Delay)
     $t.Tag = @{ Img = $Img; Frames = $Frames; Frame = 0 }
-    $t.Add_Tick({ param($s) if (-not $Window.IsVisible -or $Window.WindowState -eq 'Minimized') { return }; $x = $s.Tag; $x.Frame = ($x.Frame + 1) % $x.Frames.Count; $x.Img.Source = $x.Frames[$x.Frame] })
+    $t.Add_Tick((Protect-Action { param($s) if (-not $Window.IsVisible -or $Window.WindowState -eq 'Minimized') { return }; $x = $s.Tag; $x.Frame = ($x.Frame + 1) % $x.Frames.Count; $x.Img.Source = $x.Frames[$x.Frame] }))
     if ($Frames.Count -gt 1) { $t.Start() }
     $script:ThemeMinuteries += $t
 }
@@ -321,10 +321,10 @@ function Initialize-ThemeVisuels {
         # Police pixel partout : les textes créés par le code aussi
         if ($PackFont -and $ThemePack.FontScope -eq 'tout' -and $ThemePack.FontPixel) {
             $script:PixelAFaire = $true
-            $Window.Add_LayoutUpdated({ $script:PixelAFaire = $true })
+            $Window.Add_LayoutUpdated((Protect-Action { $script:PixelAFaire = $true }))
             $t = New-Object System.Windows.Threading.DispatcherTimer
             $t.Interval = [TimeSpan]::FromMilliseconds(350)
-            $t.Add_Tick({ if ($script:PixelAFaire -and $Window.IsVisible) { $script:PixelAFaire = $false; Update-TaillesPixel $Window } })
+            $t.Add_Tick((Protect-Action { if ($script:PixelAFaire -and $Window.IsVisible) { $script:PixelAFaire = $false; Update-TaillesPixel $Window } }))
             $t.Start(); $script:ThemeMinuteries += $t
         }
         Write-Log "Thème perso : $($ThemePack.Id) ($($ThemePack.Dir))"
@@ -359,7 +359,7 @@ function New-ChargementTheme([double]$Taille = 40) {
     $t = New-Object System.Windows.Threading.DispatcherTimer
     $t.Interval = [TimeSpan]::FromMilliseconds($ThemePack.Loader.Delay)
     $t.Tag = @{ Img = $img; Frame = 0 }
-    $t.Add_Tick({ param($s) if (-not $Window.IsVisible) { return }; $x = $s.Tag; $x.Frame = ($x.Frame + 1) % $script:ChargementImages.Count; $x.Img.Source = $script:ChargementImages[$x.Frame] })
+    $t.Add_Tick((Protect-Action { param($s) if (-not $Window.IsVisible) { return }; $x = $s.Tag; $x.Frame = ($x.Frame + 1) % $script:ChargementImages.Count; $x.Img.Source = $script:ChargementImages[$x.Frame] }))
     $t.Start(); $script:ChargementTimer = $t
     $img
 }

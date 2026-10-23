@@ -16,7 +16,7 @@ $IaFichiers = @(
        Sha256 = '37BBA511D120222F13C3D520DD875F739A530CC124E78F7CBCE0026DE0173D8A'; Taille = 33464528
        Extraire = '^(llama-server\.exe|llama-server-impl\.dll|llama\.dll|llama-common\.dll|ggml[^/]*\.dll|mtmd\.dll|libomp\.dll)$'; Garder = (Join-Path $IaDir 'llama-server.exe') }
     @{ Nom = 'cerveau de l''assistant'; Url = 'https://github.com/JordanJacquot/Mindcare/releases/download/ia-v2/mindcare-0.6b-v2-q8_0.gguf'
-       Sha256 = '13246AB9F9F7D25E22066682A81BE9744E715DDC4A1B789DF5330E4D5BE0DE5'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf') }
+       Sha256 = '13246AB9F9F7D25E22066682A81BE9744E715DDC4A1B789DF5330E4D5BE0DE5C'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf') }
 )
 $IaSysteme = "Tu es Mindcare. Une personne décrit le problème de son ordinateur. Réponds seulement en JSON : la panne du catalogue qui correspond, et les réponses qu'elle donne déjà."
 $script:Ia = @{ Process = $null; Port = 0; Pret = $false }

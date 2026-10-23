@@ -250,6 +250,10 @@ $gardes = @(foreach ($cas in @(@("mon ordi s'éteint tout seul d'un coup comme u
     if ($g -ne $cas[2]) { "« $($cas[0]) » : $g au lieu de $($cas[2])" }
 })
 Write-Resultat "assistant : réponses réglées d'avance seulement si la phrase en parle" (-not $gardes) "($($gardes -join ' ; '))"
+# Les empreintes des fichiers de l'assistant : exactement 64 chiffres hexadécimaux (une empreinte coupée d'un caractère
+# faisait échouer chaque installation : 640 Mo téléchargés deux fois, puis « arrivé abîmé »)
+$empreintesFausses = @($IaFichiers | Where-Object { [string]$_.Sha256 -notmatch '^[0-9A-Fa-f]{64}$' } | ForEach-Object { "$($_.Nom) : « $($_.Sha256) » ($(([string]$_.Sha256).Length) caractères)" })
+Write-Resultat "assistant : empreintes SHA-256 complètes (64 caractères hexadécimaux)" ($IaFichiers.Count -ge 2 -and -not $empreintesFausses) "($($empreintesFausses -join ' ; '))"
 # L'assistant s'arrête avec Mindcare, même quand Mindset l'arrête de force (mise à jour, désinstallation) : un faux
 # assistant (une pause de PowerShell) lancé par un faux Mindcare qui le relie comme Start-Ia, puis arrêté de force
 $relie = Join-Path $test 'assistant-relie.txt'
@@ -340,6 +344,61 @@ foreach ($f in Get-ChildItem -LiteralPath $AppDir -Recurse -File | Where-Object 
     }
 }
 Write-Resultat 'aucun envoi automatique sur Internet (adresses connues, assistant sur un clic)' (-not $reseau) "($($reseau -join ' ; '))"
+# Le filet contre les plantages (donnees.ps1), avec son vrai code, dans des boucles de messages WPF de test
+# (DispatcherFrame : le Dispatcher de ce script reste utilisable ensuite). Dans chaque boucle, une minuterie d'essai
+# (toutes les 15 ms) et une minuterie de fin (8 tours de 40 ms) ; une minuterie en C# arrête tout après 5 secondes au
+# plus, pour qu'un test raté ne bloque jamais.
+$astF = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $AppDir 'modules\donnees.ps1'), [ref]$null, [ref]$null)
+foreach ($nom in 'Get-TexteErreur', 'Write-ErreurImprevue', 'Protect-Action', 'Register-FiletErreurs') { Invoke-Expression ($astF.Find({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq $nom }, $true).Extent.Text) }
+function Show-ProblemeImprevu { $script:FiletMontre++ }
+Add-Type -ReferencedAssemblies WindowsBase -TypeDefinition @'
+using System;
+using System.Windows.Threading;
+public static class MCTestFilet
+{
+    // Une erreur de WPF lui-même (pas d'un code PowerShell)
+    public static void ErreurWpf(Dispatcher d) { d.BeginInvoke(new Action(() => { throw new InvalidOperationException("erreur de WPF (essai)"); })); }
+    public static void Limite(DispatcherFrame f, int ms)
+    {
+        DispatcherTimer t = new DispatcherTimer(); t.Interval = TimeSpan.FromMilliseconds(ms);
+        t.Tick += (s, e) => { t.Stop(); f.Continue = false; }; t.Start();
+    }
+}
+'@
+function Start-BoucleTest([scriptblock]$Essai, [switch]$SansProtection, [switch]$ErreurWpf) {
+    $script:FiletTours = 0; $script:FiletEssais = 0; $script:FiletEssai = $Essai
+    $cadre = New-Object System.Windows.Threading.DispatcherFrame
+    [MCTestFilet]::Limite($cadre, 5000)
+    $fin = New-Object System.Windows.Threading.DispatcherTimer; $fin.Interval = [TimeSpan]::FromMilliseconds(40)
+    $fin.Add_Tick({ param($s) $script:FiletTours++; if ($script:FiletTours -ge 8) { $s.Stop(); $cadre.Continue = $false } })
+    $m = New-Object System.Windows.Threading.DispatcherTimer; $m.Interval = [TimeSpan]::FromMilliseconds(15)
+    $corps = { $script:FiletEssais++; & $script:FiletEssai }
+    if ($SansProtection) { $m.Add_Tick($corps) } else { $m.Add_Tick((Protect-Action $corps)) }
+    $fin.Start(); $m.Start()
+    if ($ErreurWpf) { [MCTestFilet]::ErreurWpf([System.Windows.Threading.Dispatcher]::CurrentDispatcher) }
+    $sortie = ''
+    try { [System.Windows.Threading.Dispatcher]::PushFrame($cadre) } catch { $sortie = "$($_.Exception.Message)" }
+    $fin.Stop(); $m.Stop()
+    $sortie
+}
+$script:Filet = @{ Vues = @{}; Montre = $false; Fatale = '' }; $script:FiletMontre = 0; $script:JournalIa = @()
+Register-FiletErreurs
+# 1. Une minuterie protégée qui se trompe à chaque tour (l'erreur du double Entrée) : elle continue de tourner, l'appli
+#    aussi ; l'erreur est notée 3 fois avec son script et sa ligne ; un seul message
+$sortie = Start-BoucleTest { $script:MinuterieAbsente.Stop() }
+$notees = @($script:JournalIa | Where-Object { $_ -like 'Erreur imprévue*' })
+Write-Resultat "filet contre les plantages : une minuterie qui se trompe à chaque tour continue, notée avec sa ligne, un seul message" (-not $sortie -and $script:FiletTours -ge 8 -and $script:FiletEssais -ge 8 -and $notees.Count -eq 3 -and $notees[0] -match 'tester\.ps1 ligne \d+' -and $notees[0] -match 'MinuterieAbsente' -and $script:FiletMontre -eq 1) "(sortie : $sortie ; tours : $script:FiletTours ; essais : $script:FiletEssais ; notées : $($notees.Count) ; messages : $script:FiletMontre ; $($notees | Select-Object -First 1))"
+# 2. Une erreur de WPF lui-même : notée, l'appli continue
+$script:JournalIa = @()
+$sortie = Start-BoucleTest {} -ErreurWpf
+$wpf = @($script:JournalIa | Where-Object { $_ -like 'Erreur imprévue*erreur de WPF (essai)*' })
+Write-Resultat "filet contre les plantages : une erreur de WPF est notée et l'appli continue" (-not $sortie -and $script:FiletTours -ge 8 -and $wpf.Count -eq 1 -and -not $script:Filet.Fatale) "(sortie : $sortie ; tours : $script:FiletTours ; notées : $($wpf.Count))"
+# 3. Une erreur qui sort d'un code non protégé : notée, l'appli continue (seule cette minuterie-là s'arrête : WPF ne la
+#    relance pas, d'où Protect-Action partout dans l'appli)
+$script:JournalIa = @()
+$sortie = Start-BoucleTest { throw 'erreur de PowerShell (essai)' } -SansProtection
+$ps = @($script:JournalIa | Where-Object { $_ -like 'Erreur imprévue*erreur de PowerShell (essai)*' })
+Write-Resultat "filet contre les plantages : une erreur sortie d'un code non protégé est notée et l'appli continue" (-not $sortie -and $script:FiletTours -ge 8 -and $ps.Count -eq 1 -and -not $script:Filet.Fatale) "(sortie : $sortie ; tours : $script:FiletTours ; essais : $script:FiletEssais ; notées : $($ps.Count))"
 # Le nom dans la barre des tâches : la fenêtre porte l'identité de Mindcare (le raccourci du menu Démarrer de même
 # identité, écrit par Mindset, donne le nom « Mindcare » au bouton ; sans lui, Windows afficherait « Mindset », le nom de
 # son hôte), et l'épingle relance son programme avec le nom « Mindcare » et son icône. Le vrai code d'interface.ps1
@@ -379,7 +438,7 @@ public static class MCTestFenetre
 $tok = $null; $errI = $null
 $astI = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $AppDir 'modules\interface.ps1'), [ref]$tok, [ref]$errI)
 Invoke-Expression ($astI.Find({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -eq 'Get-LaunchCommand' }, $true).Extent.Text)
-$ouverture = $astI.Find({ param($n) $n -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $n.Member.Value -eq 'Add_SourceInitialized' }, $true).Arguments[0].ScriptBlock.GetScriptBlock()
+$ouverture = $astI.Find({ param($n) $n -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $n.Member.Value -eq 'Add_SourceInitialized' }, $true).Find({ param($n) $n -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $true).ScriptBlock.GetScriptBlock()
 $AppNomSauve = $AppNom; $AppExeSauve = $AppExe; $MainScriptSauve = $MainScript; $icoSauve = $ico; $WindowSauve = $Window
 $AppNom = [regex]::Match([IO.File]::ReadAllText($main, [Text.Encoding]::UTF8), "(?m)^\`$AppNom\s*=\s*'([^']+)'").Groups[1].Value
 $ico = Join-Path $AppDir 'Mindcare.ico'
@@ -410,6 +469,35 @@ if (-not $SansFenetre) {
     Write-Resultat "assistant : la carte « J'ai compris » (journal)" ((Get-Journal $s) -match 'Assistant : .+ -> seteint') '(pas de proposition dans le journal)'
     $s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc fixe s''éteint d''un coup, et les lumières de la maison aussi'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_CHOISIR = '1' }
     Write-Resultat "assistant : l'enquête commence après les questions déjà réglées par la phrase" ((Get-Journal $s) -match 'Enquête : seteint \(déjà su') '(pas de réponses pré-remplies dans le journal)'
+    # Entrée appuyée deux fois pendant que l'assistant lit : la deuxième est ignorée, Mindcare reste ouverte (avant, la
+    # première minuterie arrêtait une minuterie déjà effacée et l'appli se fermait sans un mot)
+    $s = Test-Capture 'ia-double-entree' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_DOUBLE = '1' }
+    $propositions = @([regex]::Matches((Get-Journal $s), 'Assistant : .+ -> seteint')).Count
+    Write-Resultat "assistant : Entrée appuyée deux fois, une seule proposition et l'appli reste ouverte" ((Test-Path -LiteralPath $s.Capture) -and -not (Get-Erreurs $s) -and $propositions -eq 1 -and (Get-Journal $s) -notmatch 'Erreur imprévue') "($propositions proposition(s))"
+    # Le filet dans la vraie appli : une minuterie qui se trompe à chaque tour (toutes les 50 ms) ; Mindcare continue
+    # jusqu'à sa capture, l'erreur est notée 3 fois avec son script et sa ligne, et signalée une seule fois
+    $s = Start-Scenario 'filet' @{ MINDCARE_CAPTURE = (Join-Path $test 'capture-filet.png'); MINDCARE_TEST_ERREUR = '1' }
+    if (-not $s.P.WaitForExit($Delai * 1000)) { $s.P.Kill() }
+    $notees = @((Get-Journal $s) -split "`r?`n" | Where-Object { $_ -match 'Erreur imprévue' })
+    $signalees = @([regex]::Matches((Get-Erreurs $s), 'Erreur impr.{1,2}vue')).Count   # (la console écrit les accents dans sa propre page de codes)
+    Write-Resultat "filet contre les plantages : dans Mindcare, une minuterie qui se trompe n'arrête rien" ((Test-Path -LiteralPath $s.Capture) -and $notees.Count -eq 3 -and $notees[0] -match 'contenu\.ps1 ligne \d+' -and $signalees -eq 1) "(capture : $(Test-Path -LiteralPath $s.Capture) ; notées : $($notees.Count) ; signalées : $signalees)"
+    # Les empreintes comparées à celles que GitHub publie pour chaque fichier (lecture des informations de la publication
+    # seulement, rien n'est téléchargé ; sans Internet, le test le dit sans échouer)
+    $verifs = @(); $horsLigne = ''
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        foreach ($f in $IaFichiers) {
+            if ($f.Url -notmatch '^https://github\.com/([^/]+/[^/]+)/releases/download/([^/]+)/([^/]+)$') { $verifs += "$($f.Nom) : adresse inattendue"; continue }
+            $pub = Invoke-RestMethod "https://api.github.com/repos/$($Matches[1])/releases/tags/$($Matches[2])" -TimeoutSec 15 -Headers @{ 'User-Agent' = 'Mindcare-tests' }
+            $nomFichier = $Matches[3]
+            $asset = @($pub.assets | Where-Object { $_.name -eq $nomFichier })[0]
+            if (-not $asset) { $verifs += "$($f.Nom) : $nomFichier absent de la publication"; continue }
+            if ("$($asset.digest)" -ne "sha256:$(([string]$f.Sha256).ToLower())") { $verifs += "$($f.Nom) : empreinte $($f.Sha256), GitHub $($asset.digest)" }
+            if ([long]$asset.size -ne [long]$f.Taille) { $verifs += "$($f.Nom) : taille $($f.Taille), GitHub $($asset.size)" }
+        }
+    } catch { $horsLigne = "$($_.Exception.Message)" }
+    if ($horsLigne) { Write-Host "(empreintes non comparées à GitHub : injoignable ($horsLigne))" -ForegroundColor Yellow }
+    else { Write-Resultat "assistant : empreintes et tailles identiques à celles publiées sur GitHub" (-not $verifs) "($($verifs -join ' ; '))" }
     # Un ancien assistant installé (v1) : l'accueil propose de le mettre à jour, et l'ancien sert en attendant
     $ancien = Join-Path $test 'donnees-ia-maj\ia'
     Remove-Item -LiteralPath (Join-Path $test 'donnees-ia-maj') -Recurse -Force -ErrorAction SilentlyContinue

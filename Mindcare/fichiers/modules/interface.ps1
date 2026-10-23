@@ -30,12 +30,12 @@ function Get-LaunchCommand {
 # Barre de titre sombre (de la couleur du fond sur Windows 11) et icône de l'appli. Dans la barre des tâches : l'identité
 # de Mindcare (le nom « Mindcare » du bouton vient du raccourci du menu Démarrer de même identité, écrit par Mindset),
 # et épinglée, elle se relance par son programme avec le nom « Mindcare » et son icône
-$Window.Add_SourceInitialized({
+$Window.Add_SourceInitialized((Protect-Action {
     $h = (New-Object System.Windows.Interop.WindowInteropHelper $Window).Handle
     try { [MindcareNatif]::SetDarkTitleBar($h, 0x200C0C) } catch {}
     try { [MindcareNatif]::SetWindowIdentity($h, "JordanJacquot.$AppNom", (Get-LaunchCommand), "$ico,0", $AppNom) }
     catch { Write-Log "Identité de la fenêtre : $($_.Exception.Message)" }
-})
+}))
 $ico = Join-Path $AppDir 'Mindcare.ico'
 if (Test-Path -LiteralPath $ico) { try { $Window.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create((New-Object Uri $ico)) } catch {} }
 
@@ -62,10 +62,10 @@ function New-Card {
 # Capture d'écran (tests automatiques) : la fenêtre est dessinée hors de l'écran, enregistrée en image, puis l'appli quitte
 function Start-Capture([string]$Fichier) {
     $Window.WindowStartupLocation = 'Manual'; $Window.Left = -10000; $Window.Top = 0; $Window.ShowActivated = $false; $Window.ShowInTaskbar = $false
-    $Window.Add_ContentRendered({
+    $Window.Add_ContentRendered((Protect-Action {
         $t = New-Object System.Windows.Threading.DispatcherTimer
         $t.Interval = [TimeSpan]::FromMilliseconds($(if ($env:MINDCARE_CAPTURE_DELAI) { [int]$env:MINDCARE_CAPTURE_DELAI } else { 700 }))
-        $t.Add_Tick({ param($s) $s.Stop(); Save-Capture $Window.Content $env:MINDCARE_CAPTURE; if (-not $env:MINDCARE_TEST_RESTER) { Exit-App } })
+        $t.Add_Tick((Protect-Action { param($s) $s.Stop(); Save-Capture $Window.Content $env:MINDCARE_CAPTURE; if (-not $env:MINDCARE_TEST_RESTER) { Exit-App } }))
         $t.Start()
-    })
+    }))
 }

@@ -80,6 +80,13 @@ if ($Demarrage) {
 $script:Debut = Get-Date
 [System.Windows.Threading.Dispatcher]::Run()
 
+# Une erreur imprévue a dû fermer Mindcare (modules\donnees.ps1, Register-FiletErreurs) : elle est au journal, et la
+# personne le sait au lieu de voir l'appli disparaître
+if ($script:Filet.Fatale -and -not $script:Quitting) {
+    try { Stop-Contenu } catch {}
+    if (-not $EnTest) { [System.Windows.MessageBox]::Show("$AppNom a dû se fermer à cause d'un problème imprévu.`n`nRelance-la. Si ça se répète, utilise « Signaler un problème ».", $AppNom, 'OK', 'Warning') | Out-Null }
+}
+
 # Relance demandée (nouveau thème de la suite) : la place est libérée, puis une nouvelle copie démarre
 if ($script:Relancer -and -not $EnTest) {
     try { $script:InstanceMutex.ReleaseMutex(); $script:InstanceMutex.Dispose() } catch {}
