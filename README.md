@@ -69,12 +69,23 @@ Validé avec Jordan le 2026-10-18 (fiche : [CADRAGE.md](CADRAGE.md)).
   - `images.ps1` : les dessins de `fichiers\images\` (SVG simples, le même format servira au téléphone), dans le thème ;
   - `mindset.ps1`, `donnees.ps1`, `themes.ps1`, `interface.ps1`, `systeme.ps1`, `evenements.ps1` : la vie dans la suite
     (Mindset, données, thème, fenêtre, fermeture, carte vivante), déjà prêts.
-- `outils\tester.ps1` : les tests automatiques (hors de l'écran, données à part).
-- `outils\construire.ps1` : `Mindcare.exe` et `release\Mindcare.zip`.
+- `outils\tester.ps1` : les tests automatiques (hors de l'écran, données à part) ; `-SansFenetre` : seulement ceux qui
+  n'ouvrent aucune fenêtre (GitHub les lance à chaque envoi, `.github\workflows\tests.yml`).
+- `outils\verifier.ps1` : syntaxe, encodage, fenêtre, tirets longs, licence (lancé par `publier.ps1` et par GitHub).
+- `outils\construire.ps1` : `Mindcare.exe`, `release\Mindcare.zip` et `release\catalogue.zip` (pour Mindcare Mobile) ;
+  GitHub construit aussi chaque version depuis son étiquette (`.github\workflows\release.yml`).
 - `outils\publier.ps1 -Version 0.1.0 -Notes "..."` : vérifications, construction, tests, signature, Release GitHub.
 - Copie de travail (ce dossier, avec `.git`) : lancée directement, elle n'est pas bloquée et garde ses données à part
   (`%LOCALAPPDATA%\Mindset\Mindcare (travail)`).
 
+## Code signing policy
+
+Mindcare.exe et les scripts de Mindcare seront signés gratuitement par SignPath.io, avec un certificat de la SignPath
+Foundation (demande en cours). Rôles et confidentialité : [Code signing policy](CODE_SIGNING.md).
+
+Mindcare ne va jamais sur Internet d'elle-même : seulement quand tu installes ou mets à jour son assistant (un bouton
+de l'accueil, téléchargement depuis GitHub). La liste complète : [Code signing policy](CODE_SIGNING.md#privacy-policy).
+
 ## Licence
 
-Mindcare est sous licence MIT (voir le fichier `LICENSE`) : tu peux lire, réutiliser, modifier et redistribuer le code, en gardant la mention de licence. Les composants d'autres auteurs gardent leur propre licence : l'assistant téléchargé à part (llama.cpp et son modèle), chacun sous sa propre licence.
+Mindcare est sous licence MIT (voir le fichier `LICENSE`) : tu peux lire, réutiliser, modifier et redistribuer le code, en gardant la mention de licence. Les composants d'autres auteurs gardent leur propre licence : l'assistant téléchargé à part, llama.cpp (ggml-org, MIT) et son modèle (entraîné à partir de Qwen3 0.6B, Apache 2.0).

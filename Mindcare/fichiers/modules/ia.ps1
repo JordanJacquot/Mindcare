@@ -4,7 +4,8 @@
 #
 # Installé à la demande (bandeau de l'accueil, environ 700 Mo, une seule fois) dans le dossier de données de Mindcare :
 # llama.cpp (version Vulkan : carte graphique NVIDIA, AMD ou Intel, sinon le processeur) et le modèle.
-# Lancé en arrière-plan à l'ouverture de Mindcare s'il est installé, arrêté à la fermeture (Stop-Ia).
+# Lancé en arrière-plan à l'ouverture de Mindcare s'il est installé, arrêté à la fermeture (Stop-Ia), et aussi quand
+# Mindcare est arrêtée de force (natif.cs, ArreterAvecMindcare). Il n'écoute que ce PC (127.0.0.1) et ne va pas sur Internet.
 # Chargé par Mindcare.ps1 avant contenu.ps1.
 
 $IaDir    = Join-Path $DataDir 'ia'
@@ -155,6 +156,8 @@ function Start-Ia {
         $si.RedirectStandardOutput = $true; $si.RedirectStandardError = $true
         $si.EnvironmentVariables['LLAMA_ARG_CHAT_TEMPLATE_KWARGS'] = '{"enable_thinking":false}'
         $script:Ia.Process = [Diagnostics.Process]::Start($si)
+        # (arrêté avec Mindcare, même si elle est fermée de force : sinon il resterait lancé, sans fenêtre, jusqu'au redémarrage)
+        try { if (-not [MindcareNatif]::ArreterAvecMindcare($script:Ia.Process.Handle)) { Write-Log 'Assistant : pas relié à Mindcare' } } catch { Write-Log "Assistant : pas relié à Mindcare ($_)" }
         $script:Ia.Process.BeginOutputReadLine(); $script:Ia.Process.BeginErrorReadLine()   # (sinon ses messages bloquent)
         $script:Ia.Pret = $false
         Write-Log "Assistant lancé (port $($script:Ia.Port), $([IO.Path]::GetFileName($modeleLance)))"

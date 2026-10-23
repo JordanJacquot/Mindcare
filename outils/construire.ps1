@@ -1,4 +1,5 @@
-﻿# Construit le dossier de Mindcare prêt à installer, puis release\Mindcare.zip (signé ensuite par publier.ps1).
+﻿# Construit le dossier de Mindcare prêt à installer, puis release\Mindcare.zip (signé ensuite par publier.ps1) et
+# release\catalogue.zip (pour Mindcare Mobile). Lancé aussi par la CI de GitHub (.github\workflows\release.yml).
 # (Mindcare doit être fermée : son .exe est remplacé.)
 #
 #   Mindcare\
@@ -29,3 +30,17 @@ New-Item -ItemType Directory -Force -Path $release | Out-Null
 $zip = Join-Path $release 'Mindcare.zip'
 Compress-Archive -Path $app -DestinationPath $zip -Force
 "OK : $zip"
+
+# Le catalogue pour Mindcare Mobile (joint à la Release par publier.ps1 ; le téléphone le télécharge) : enquetes.json et
+# images\*.svg seulement. Mindcare sur PC ne s'en sert pas : elle a déjà ces fichiers dans son dossier.
+$catalogue = Join-Path $release 'catalogue.zip'
+Remove-Item -LiteralPath $catalogue -ErrorAction SilentlyContinue
+Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+$archive = [IO.Compression.ZipFile]::Open($catalogue, 'Create')
+try {
+    [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, (Join-Path $fich 'enquetes.json'), 'enquetes.json')
+    foreach ($img in Get-ChildItem -LiteralPath (Join-Path $fich 'images') -Filter '*.svg') {
+        [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $img.FullName, "images/$($img.Name)")   # (des « / » : Android les attend)
+    }
+} finally { $archive.Dispose() }
+"OK : $catalogue"

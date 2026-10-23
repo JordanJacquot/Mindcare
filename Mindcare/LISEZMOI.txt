@@ -8,4 +8,6 @@ https://github.com/JordanJacquot/Mindset/releases/latest
 2. Dans Mindset, clique sur « Installer » sur la carte de Mindcare.
 3. Ouvre-la depuis son onglet dans Mindset.
 
-Ses réglages et ses données restent sur ton PC.
+Ses réglages et ses données restent sur ton PC. Elle ne va sur Internet que si tu installes son assistant
+(un bouton de l'accueil). Tout est expliqué ici (Code signing policy) :
+https://github.com/JordanJacquot/Mindcare/blob/main/CODE_SIGNING.md

@@ -4,6 +4,7 @@
     "couleur":  "#FF8A00",
     "description":  "Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.",
     "depot":  "JordanJacquot/Mindcare",
+    "confidentialite":  "https://github.com/JordanJacquot/Mindcare/blob/main/CODE_SIGNING.md",
     "zip":  "Mindcare.zip",
     "dossier_zip":  "Mindcare",
     "exe":  "Mindcare.exe",

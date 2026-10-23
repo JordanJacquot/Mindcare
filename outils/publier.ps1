@@ -34,17 +34,9 @@ if ($tagExiste -or $releaseExiste) { throw "La version $Version existe déjà. C
 
 # Vérifications
 $problemes = @()
-foreach ($f in Get-ChildItem -LiteralPath $racine -Recurse -Filter '*.ps1' | Where-Object { $_.FullName -notmatch '\\(\.git|_test|release)\\' }) {
-    $err = $null
-    [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$err)
-    foreach ($e in $err) { $problemes += "Syntaxe : $($f.Name) ligne $($e.Extent.StartLineNumber) : $($e.Message)" }
-    $o = [IO.File]::ReadAllBytes($f.FullName)
-    if ($o.Length -lt 3 -or $o[0] -ne 0xEF -or $o[1] -ne 0xBB -or $o[2] -ne 0xBF) { $problemes += "Encodage : $($f.Name) doit être en UTF-8 avec BOM (sinon les accents cassent)" }
-}
-try { [void][xml][IO.File]::ReadAllText((Join-Path $app 'fichiers\modules\interface.xaml'), [Text.Encoding]::UTF8) } catch { $problemes += "interface.xaml : $($_.Exception.Message)" }
-Get-ChildItem -LiteralPath $racine -Recurse -File -Include '*.ps1', '*.cs', '*.xaml', '*.txt', '*.md', '*.json' |
-    Where-Object { $_.FullName -notmatch '\\(\.git|_test|release)\\' } | Select-String -Pattern '[\u2013\u2014]' |
-    ForEach-Object { $problemes += "Tiret cadratin : $($_.Path) ligne $($_.LineNumber)" }
+# Syntaxe, encodage, fenêtre, tirets longs, licence : outils\verifier.ps1 (le même que la CI de GitHub)
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'verifier.ps1')
+if ($LASTEXITCODE) { $problemes += 'Vérifications : voir les problèmes listés par outils\verifier.ps1 ci-dessus' }
 # Clés publiques : exactement la liste de Mindset (mêmes fichiers, même contenu)
 $cles = Join-Path $app 'fichiers\cles-publiques'
 $clesMindset = Join-Path $mindset 'Mindset\fichiers\cles-publiques'
@@ -83,19 +75,10 @@ Remove-Item -LiteralPath "$zip.sig" -ErrorAction SilentlyContinue   # jamais l'a
 & (Join-Path $mindset 'outils\signer.ps1') -Fichier $zip
 if (-not (Test-Path -LiteralPath "$zip.sig")) { throw 'Publication annulée : le zip n''a pas pu être signé.' }
 
-# 2 bis. Le catalogue pour Mindcare Mobile (le téléphone le télécharge tout seul) : enquetes.json et images\*.svg,
-# avec son empreinte dans les notes (« SHA-256 du catalogue : ... », lue par l'appli Android, maj/MajCatalogue.kt)
+# 2 bis. Le catalogue pour Mindcare Mobile (le téléphone le télécharge tout seul), construit par construire.ps1, avec
+# son empreinte dans les notes (« SHA-256 du catalogue : ... », lue par l'appli Android, maj/MajCatalogue.kt)
 $catalogue = Join-Path $racine 'release\catalogue.zip'
-Remove-Item -LiteralPath $catalogue -ErrorAction SilentlyContinue
-Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
-$fichiers = Join-Path $racine 'Mindcare\fichiers'
-$archive = [IO.Compression.ZipFile]::Open($catalogue, 'Create')
-try {
-    [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, (Join-Path $fichiers 'enquetes.json'), 'enquetes.json')
-    foreach ($img in Get-ChildItem -LiteralPath (Join-Path $fichiers 'images') -Filter '*.svg') {
-        [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $img.FullName, "images/$($img.Name)")   # (des « / » : Android les attend)
-    }
-} finally { $archive.Dispose() }
+if (-not (Test-Path -LiteralPath $catalogue)) { throw 'Publication annulée : release\catalogue.zip n''a pas été construit.' }
 $shaCatalogue = (Get-FileHash -LiteralPath $catalogue -Algorithm SHA256).Hash.ToLowerInvariant()
 
 # 3. Commit, tag, Release (le zip et sa signature sont seulement joints à la Release : release\ n'est pas suivi par git)
