@@ -46,3 +46,13 @@ jobs:
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File outils\tester.ps1 -SansFenetre
           exit $LASTEXITCODE
+
+      - name: "Tests du diagnostic (journaux de Windows lus sans figer la fenêtre, textes, carte de Mindset, journal et rapport)"
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File outils\tester-diagnostic.ps1
+          exit $LASTEXITCODE
+
+      - name: "Tests de l'assistant (lancé seulement quand on s'en sert, échecs montrés, disque plein ou fichier bloqué, installation coupée)"
+        run: |
+          powershell -NoProfile -STA -ExecutionPolicy Bypass -File outils\tester-assistant.ps1
+          exit $LASTEXITCODE

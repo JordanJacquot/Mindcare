@@ -1,6 +1,7 @@
-﻿# Mindcare : ce que Windows a noté sur ce PC (son journal « Système », ces 30 derniers jours), pour départager les
-# pistes quand Mindcare est ouvert sur le PC en panne (réponse « cepc »). Tout se lit sans droits administrateur et
-# sans rien modifier. La lecture se fait en arrière-plan dès le démarrage (une à deux secondes).
+﻿# Mindcare : ce que Windows a noté sur ce PC (son journal « Système », ces 30 derniers jours, et quelques mesures :
+# place libre, batterie, dernier redémarrage), pour départager les pistes quand Mindcare est ouvert sur le PC en panne
+# (réponse « cepc »). Tout se lit sans droits administrateur et sans rien modifier. La lecture se fait en arrière-plan
+# dès le démarrage (quelques secondes, plus sur un PC lent) : l'enquête l'attend sans figer la fenêtre (contenu.ps1).
 # Chargé par Mindcare.ps1 avant historique.ps1 ; outils\tester.ps1 s'en sert aussi.
 #
 #   Un indice : { Vu, Texte (ce qui a été vu), TexteOk (rien de vu : la bonne nouvelle, ou vide), Affiche }
@@ -28,6 +29,23 @@ $JournauxCode = {
         try { @(Get-WinEvent -FilterHashtable ($Filtre + @{ LogName = 'System' }) -MaxEvents $Max -ErrorAction Stop) } catch { @() }
     }
     function Get-Quantite([int]$N, [string]$Un, [string]$Plusieurs) { if ($N -le 1) { "$N $Un" } else { "$N $Plusieurs" } }
+
+    # Les erreurs de disque qui concernent les disques du PC lui-même : une clé USB ou un disque externe qui signale
+    # des erreurs ne dit rien du disque du PC. Internes : les numéros des disques du PC ; Lettres : leurs lecteurs (C, D...).
+    # Inconnus ($null), ou une erreur qui ne dit pas son disque : elle compte.
+    function Select-ErreursDisque($Evenements, $Internes, $Lettres) {
+        @(foreach ($e in $Evenements) {
+            $t = "$(@($e.Properties | ForEach-Object { $_.Value }) -join ' ') $($e.Message)"
+            if ($e.ProviderName -eq 'Ntfs') {
+                $m = [regex]::Match($t, '\b([A-Za-z]):')
+                if ($m.Success -and $null -ne $Lettres -and @($Lettres) -notcontains $m.Groups[1].Value.ToUpperInvariant()) { continue }
+            } else {
+                $m = [regex]::Match($t, '(?i)Harddisk(\d+)\\|\b(?:disk|disque)\s+(\d+)\b')
+                if ($m.Success -and $null -ne $Internes -and @($Internes) -notcontains [int]"$($m.Groups[1].Value)$($m.Groups[2].Value)") { continue }
+            }
+            $e
+        })
+    }
 
     function Get-IndicesWindows([int]$Jours = 30) {
         $fr = [Globalization.CultureInfo]::GetCultureInfo('fr-FR')
@@ -65,10 +83,15 @@ $JournauxCode = {
         & $ajoute 'testmemoire-erreurs' $erreurs $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) a trouvé des erreurs" }) ''
         & $ajoute 'testmemoire-ok' ($ev.Count -and -not $erreurs) $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) n'a trouvé aucune erreur" }) ''
 
-        # Le disque : ses erreurs, et ce que Windows dit de sa santé
-        $ev = @(Get-EvenementsSysteme @{ ProviderName = 'disk'; Id = 7, 51, 153; StartTime = $depuis }) + @(Get-EvenementsSysteme @{ ProviderName = 'Ntfs'; Id = 55; StartTime = $depuis })
-        $malades = @(try { Get-PhysicalDisk -ErrorAction Stop | Where-Object { $_.HealthStatus -and "$($_.HealthStatus)" -ne 'Healthy' } } catch { })
-        $texte = if ($malades) { "Windows dit qu'un disque n'est pas en bonne santé ($($malades[0].FriendlyName))" } else { "Le disque a signalé $(Get-Quantite $ev.Count 'erreur' 'erreurs') ces $Jours jours" }
+        # Le disque du PC : ses erreurs, et ce que Windows dit de sa santé (les clés USB et disques externes ne comptent pas)
+        $internes = $null; $lettres = $null
+        try {
+            $internes = @(Get-Disk -ErrorAction Stop | Where-Object { "$($_.BusType)" -ne 'USB' } | ForEach-Object { [int]$_.Number })
+            $lettres = @(Get-Partition -ErrorAction Stop | Where-Object { $internes -contains [int]$_.DiskNumber -and "$($_.DriveLetter)" -match '^[A-Za-z]$' } | ForEach-Object { "$($_.DriveLetter)".ToUpperInvariant() })
+        } catch { }
+        $ev = @(Select-ErreursDisque (@(Get-EvenementsSysteme @{ ProviderName = 'disk'; Id = 7, 51, 153; StartTime = $depuis }) + @(Get-EvenementsSysteme @{ ProviderName = 'Ntfs'; Id = 55; StartTime = $depuis })) $internes $lettres)
+        $malades = @(try { Get-PhysicalDisk -ErrorAction Stop | Where-Object { "$($_.BusType)" -ne 'USB' -and $_.HealthStatus -and "$($_.HealthStatus)" -ne 'Healthy' } } catch { })
+        $texte = if ($malades) { "Windows dit qu'un disque du PC n'est pas en bonne santé ($($malades[0].FriendlyName))" } else { "Le disque du PC a signalé $(Get-Quantite $ev.Count 'erreur' 'erreurs') ces $Jours jours" }
         & $ajoute 'disque' ($malades.Count -or $ev.Count) $texte 'Disques en bonne santé'
 
         # Le pilote de la carte graphique qui plante (puis repart)
@@ -79,9 +102,10 @@ $JournauxCode = {
         $ev = @(Get-EvenementsSysteme @{ ProviderName = 'User32'; Id = 1074; StartTime = $depuis } | Where-Object { "$($_.Properties[0].Value)" -match 'TrustedInstaller|MoUsoCoreWorker|UsoClient|wuauclt|musnotification' })
         & $ajoute 'majredemarrage' $ev.Count "$(Get-Quantite $ev.Count 'redémarrage' 'redémarrages') pour les mises à jour de Windows$(if ($ev.Count) { & $dernier $ev })" "Aucun redémarrage pour les mises à jour ces $Jours jours"
 
-        # Le processeur freiné (le plus souvent par la chaleur)
+        # Le processeur ralenti par la carte mère (événement 37 : « vitesse limitée par le microprogramme » ; sur un
+        # portable, c'est souvent la gestion de l'énergie, sinon la chaleur)
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-Kernel-Processor-Power'; Id = 37; StartTime = $depuis }
-        & $ajoute 'freinage' $ev.Count "Le processeur a été freiné $(Get-Quantite $ev.Count 'fois' 'fois') ces $Jours jours (souvent la chaleur)" "Processeur jamais freiné ces $Jours jours"
+        & $ajoute 'freinage' $ev.Count "Le processeur a été ralenti $(Get-Quantite $ev.Count 'fois' 'fois') ces $Jours jours (souvent pour économiser l'énergie, parfois à cause de la chaleur)" "Processeur jamais ralenti ces $Jours jours"
 
         # La place libre sur le disque de Windows
         try {
@@ -119,19 +143,38 @@ $JournauxCode = {
 # ---------------------------------------------------------------------------
 $script:Journaux = [hashtable]::Synchronized(@{})
 
-function Start-LectureJournaux {
-    if ($EnTest) { return }   # (les tests ne lisent jamais les journaux du vrai PC : voir Get-Indices)
+# Lecture : la commande lancée en arrière-plan (les tests en donnent une fausse ; sans elle, en test, rien n'est lu)
+function Start-LectureJournaux([string]$Lecture = 'Get-IndicesWindows') {
+    if ($EnTest -and $Lecture -eq 'Get-IndicesWindows') { return }   # (les tests ne lisent jamais les journaux du vrai PC : voir Get-Indices)
     try {
         $ps = [powershell]::Create()
-        [void]$ps.AddScript($JournauxCode.ToString() + "`n" + '$e = $args[0]; try { $e.Indices = Get-IndicesWindows } catch { $e.Erreur = "$_" }')
+        [void]$ps.AddScript($JournauxCode.ToString() + "`n" + '$e = $args[0]; try { $e.Indices = & { ' + $Lecture + ' } } catch { $e.Erreur = "$_" }')
         [void]$ps.AddArgument($script:Journaux)
         $script:JournauxTache = @{ PS = $ps; Res = $ps.BeginInvoke() }
-    } catch { Write-Log "Journaux de Windows : lecture impossible ($_)" }
+    } catch { Write-Log "Journaux de Windows : lecture impossible ($_)"; $script:Journaux.Erreur = "lecture impossible ($_)" }
 }
 
-# Les indices (attend la fin de la lecture, quelques secondes au plus). Tests : ceux de MINDCARE_TEST_JOURNAUX.
+# La lecture est-elle finie (ou abandonnée) ? Jamais d'attente ici : la fenêtre ne doit pas se figer.
+# Tests sans fausse lecture : MINDCARE_TEST_JOURNAUX_DELAI (en millisecondes) fait attendre l'enquête comme sur un PC lent.
+function Test-JournauxLus {
+    if ($script:JournauxAbandon -or $script:Journaux.Indices -or $script:Journaux.Erreur) { return $true }
+    if ($script:JournauxTache) { return $script:JournauxTache.Res.IsCompleted }
+    if ($EnTest -and $env:MINDCARE_TEST_JOURNAUX_DELAI) {
+        if (-not $script:JournauxDebutTest) { $script:JournauxDebutTest = Get-Date }
+        return ((Get-Date) - $script:JournauxDebutTest).TotalMilliseconds -ge [int]$env:MINDCARE_TEST_JOURNAUX_DELAI
+    }
+    $true
+}
+
+# La lecture prend trop de temps : l'enquête continue sans elle, et ne s'en servira plus ensuite (sinon les suspects
+# changeraient en cours de route quand elle finirait)
+function Stop-AttenteJournaux { if (-not (Test-JournauxLus)) { $script:JournauxAbandon = $true } }
+
+# Les indices, si la lecture est finie (sinon aucun : contenu.ps1 attend avant de s'en servir). Tests : ceux de
+# MINDCARE_TEST_JOURNAUX, ou ceux de la fausse lecture donnée à Start-LectureJournaux.
 function Get-Indices {
-    if ($EnTest) {
+    if (-not (Test-JournauxLus)) { return @{} }
+    if ($EnTest -and -not $script:JournauxTache) {
         $h = @{}
         if ($env:MINDCARE_TEST_JOURNAUX) {
             try { foreach ($pr in ($env:MINDCARE_TEST_JOURNAUX | ConvertFrom-Json).PSObject.Properties) { $h[$pr.Name] = [pscustomobject]@{ Vu = [bool]$pr.Value.Vu; Texte = [string]$pr.Value.Texte; TexteOk = [string]$pr.Value.TexteOk; Affiche = ($pr.Value.Affiche -ne $false) } } }
@@ -139,8 +182,14 @@ function Get-Indices {
         }
         return $h
     }
-    if (-not $script:Journaux.Indices -and $script:JournauxTache) { [void]$script:JournauxTache.Res.AsyncWaitHandle.WaitOne(8000) }
-    if (-not $script:Journaux.Indices) { Write-Log "Journaux de Windows non lus : $($script:Journaux.Erreur)"; return @{} }
+    if ($script:JournauxAbandon -or -not $script:Journaux.Indices) {
+        if (-not $script:JournauxNonLus) {
+            $script:JournauxNonLus = $true
+            $cause = if ($script:JournauxAbandon) { 'trop longs à lire, enquête continuée sans eux' } elseif ($script:Journaux.Erreur) { $script:Journaux.Erreur } elseif (-not $script:JournauxTache) { 'lecture pas lancée' } else { 'lecture finie sans résultat' }
+            Write-Log "Journaux de Windows non lus : $cause"
+        }
+        return @{}
+    }
     if (-not $script:JournauxNotes) {
         $script:JournauxNotes = $true
         Write-Log "Journaux de Windows : $(@($script:Journaux.Indices.GetEnumerator() | Where-Object { $_.Value.Vu } | ForEach-Object { $_.Key }) -join ', ')"

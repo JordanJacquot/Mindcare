@@ -82,7 +82,7 @@ function Get-ResumeTexte($Panne, $Enquete, [string]$Titre) {
     if ($ecartes) { $l.Add(''); $l.Add('Écartés :'); foreach ($e in $ecartes) { $l.Add("- $e") } }
     if ($Enquete.Verdict.Type -eq 'reparateur') { $l.Add(''); $l.Add("Il reste : $(@($Enquete.Verdict.Restants | ForEach-Object { (Get-Suspect $script:Donnees $_).Titre }) -join ', ')") }
     if ($Enquete.Auto) {
-        $l.Add(''); $l.Add('Ce que Windows a noté sur ce PC (30 derniers jours) :')
+        $l.Add(''); $l.Add('Ce que Mindcare a vérifié sur ce PC (ce que Windows a noté, la place libre, la batterie...) :')
         foreach ($a in $Enquete.Auto) { $l.Add("- $($a.Texte)") }
     }
     $l.Add(''); $l.Add('Les réponses :')
@@ -94,7 +94,9 @@ function Get-ResumeTexte($Panne, $Enquete, [string]$Titre) {
 # Enregistre le rapport sur le Bureau (dans le dossier de données pendant les tests) et l'ouvre ; renvoie son chemin
 function Save-Resume([string]$Texte) {
     $dossier = if ($EnTest) { $DataDir } else { [Environment]::GetFolderPath('Desktop') }
-    $f = Join-Path $dossier "Mindcare, diagnostic du $((Get-Date).ToString('d-MM-yyyy HH''h''mm')).txt"
+    $nom = "Mindcare, diagnostic du $((Get-Date).ToString('d-MM-yyyy HH''h''mm'))"
+    $f = Join-Path $dossier "$nom.txt"
+    for ($n = 2; [IO.File]::Exists($f); $n++) { $f = Join-Path $dossier "$nom ($n).txt" }   # (deux rapports dans la même minute : le premier est gardé)
     [IO.File]::WriteAllText($f, $Texte, (New-Object Text.UTF8Encoding($true)))   # (avec BOM : le Bloc-notes lit bien les accents)
     Write-Log "Rapport enregistré : $f"
     if (-not $EnTest) { try { Start-Process -FilePath $f } catch { Write-Log "Rapport non ouvert : $_" } }
@@ -104,7 +106,23 @@ function Save-Resume([string]$Texte) {
 # ---------------------------------------------------------------------------
 # La carte vivante dans l'accueil de Mindset (voir systeme.ps1, Write-EtatMindset) : la dernière enquête
 # ---------------------------------------------------------------------------
-function Get-Court([string]$Texte, [int]$Max = 80) { if ($Texte.Length -le $Max) { $Texte } else { $Texte.Substring(0, $Max - 3).TrimEnd() + '...' } }
+# Mindset coupe chaque ligne de sa carte à 80 caractères : chaque ligne tient dans 80, coupée au dernier mot entier
+function Get-Court([string]$Texte, [int]$Max = 80) {
+    if ($Texte.Length -le $Max) { return $Texte }
+    $t = $Texte.Substring(0, $Max - 3)
+    $i = $t.LastIndexOf(' ')
+    if ($i -gt $Max / 2) { $t = $t.Substring(0, $i) }
+    $t.TrimEnd(' ', ',', ':', ';', '(') + '...'
+}
+
+# La réponse d'une enquête finie, sur une ligne de la carte : la consigne utile ne doit jamais être coupée
+function Get-PhraseCarte($Info) {
+    $p = [string]$Info.Phrase
+    if (-not $Info.Suspect -and $p -eq (Get-VerdictTitre $null $null ([pscustomobject]@{ Type = 'rien' }))) { return 'Aucune piste trouvée : montre le rapport à un réparateur' }
+    if ($p.Length -le 80) { return $p }
+    if (-not $Info.Suspect) { return 'Plusieurs pistes : un réparateur départagera' }
+    Get-Court ($p -split ' : ', 2)[0]   # (« ce qui a été trouvé : le détail » : ce qui a été trouvé)
+}
 
 function Get-EtatCarte {
     $carte = @{ Titre = 'Dernier diagnostic'; Scores = @(); Lignes = @(@{ Texte = "Aucun diagnostic pour l'instant."; Etat = 'info' }) }
@@ -113,10 +131,13 @@ function Get-EtatCarte {
     $i = Get-DiagnosticInfo $d
     if (-not $i.Panne) { return $carte }
     $quand = Format-Date ([string]$d.Debut)
+    # (la panne, puis la réponse sur sa propre ligne : une seule phrase « panne : réponse » coupait la réponse)
     $carte.Lignes = if (-not $d.Fini) {
-        @(@{ Texte = Get-Court "$($i.Panne.Titre) : enquête pas finie"; Etat = 'info' }, @{ Texte = "Commencée le $quand, à reprendre dans Mindcare."; Etat = 'info' })
+        @(@{ Texte = Get-Court ([string]$i.Panne.Titre); Etat = 'info' }, @{ Texte = Get-Court "Pas finie (commencée le $quand), à reprendre dans Mindcare."; Etat = 'info' })
     } else {
-        @(@{ Texte = Get-Court "$($i.Panne.Titre) : $($i.Phrase)"; Etat = $(if ($i.Suspect -and $i.Suspect.Urgent) { 'urgent' } else { 'attention' }) }, @{ Texte = "Le $quand"; Etat = 'info' })
+        @(@{ Texte = Get-Court ([string]$i.Panne.Titre); Etat = 'info' }
+          @{ Texte = Get-PhraseCarte $i; Etat = $(if ($i.Suspect -and $i.Suspect.Urgent) { 'urgent' } else { 'attention' }) }
+          @{ Texte = "Le $quand"; Etat = 'info' })
     }
     $carte
 }

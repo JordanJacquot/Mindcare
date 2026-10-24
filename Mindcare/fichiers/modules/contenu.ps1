@@ -12,7 +12,7 @@ function Initialize-Contenu {
     try { $script:Donnees = Read-Enquetes } catch { Write-Log "Enquêtes illisibles ($EnquetesFichier) : $_" }
     Read-Historique
     Start-LectureJournaux   # (ce que Windows a noté, lu en arrière-plan pour l'enquête)
-    Start-Ia                # (l'assistant, s'il est installé : il charge son modèle en arrière-plan)
+    # (l'assistant n'est pas lancé ici, il prendrait la carte graphique pour rien : seulement quand on écrit dans la recherche)
     if ($EnTest -and $env:MINDCARE_TEST_ERREUR) {   # (tests : une minuterie qui se trompe à chaque tour, pour le filet)
         $t = New-Object System.Windows.Threading.DispatcherTimer; $t.Interval = [TimeSpan]::FromMilliseconds(50)
         $t.Add_Tick((Protect-Action { $script:MinuterieAbsente.Stop() })); $t.Start()
@@ -164,7 +164,7 @@ function Show-Accueil([string]$Famille = '') {
     $saisie.Background = [System.Windows.Media.Brushes]::Transparent; $saisie.BorderThickness = 0; $saisie.FontSize = 15
     $saisie.Foreground = Get-Brush '#FFFFFF'; $saisie.CaretBrush = Get-Brush '#00E5FF'; $saisie.VerticalContentAlignment = 'Center'
     $saisie.Tag = $indice
-    $saisie.Add_TextChanged((Protect-Action { param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); Clear-ZoneIa; Update-Accueil }))
+    $saisie.Add_TextChanged((Protect-Action { param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); if ($s.Text) { Start-Ia }; Clear-ZoneIa; Update-Accueil }))   # (l'assistant se prépare dès qu'on écrit)
     $saisie.Add_KeyDown((Protect-Action { param($s, $ev) if ($ev.Key -eq 'Return') { Request-Ia } }))
     [void]$zone.Children.Add($indice); [void]$zone.Children.Add($saisie)
     [void]$dp.Children.Add($zone)
@@ -221,7 +221,7 @@ function Update-BandeauIa {
     $bandeau = New-BandeauIa
     $dp = New-Object System.Windows.Controls.DockPanel
     if (-not $enCours) {
-        $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } elseif ($maj) { 'Mettre à jour' } else { 'Installer' }) 'BtnPrimary'
+        $b = New-Button $(if ($script:IaDl -and $script:IaDl.Erreur) { 'Réessayer' } elseif ($maj) { 'Mettre à jour' } elseif (Test-IaIncomplete) { 'Réparer' } else { 'Installer' }) 'BtnPrimary'
         $b.Add_Click((Protect-Action { Start-IaInstall; Start-SuiviIa; Update-BandeauIa }))
         [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$dp.Children.Add($b)
     }
@@ -230,6 +230,8 @@ function Update-BandeauIa {
         "Installation de l'assistant : $pc % ($($script:IaDl.Etape)). Tu peux continuer à te servir de Mindcare."
     } elseif ($script:IaDl -and $script:IaDl.Erreur) {
         "L'assistant n'a pas pu s'installer : $($script:IaDl.Erreur)."
+    } elseif (Test-IaIncomplete) {
+        "L'installation de l'assistant n'est pas allée jusqu'au bout (Mindcare a peut-être été fermée pendant) : répare-la, environ $([math]::Ceiling(((Get-IaManquants | ForEach-Object { $_.Taille }) | Measure-Object -Sum).Sum / 1MB)) Mo, une seule fois."
     } elseif ($maj) {
         "Une nouvelle version de l'assistant comprend mieux tes phrases : mets-la à jour (environ 640 Mo, une seule fois). L'assistant actuel marche en attendant."
     } else {
@@ -251,11 +253,22 @@ function Start-SuiviIa {
         if ($script:IaDl -and $script:IaDl.Fini) {
             $s.Stop(); $script:IaSuivi = $null
             if ($script:IaDl.Erreur) { Write-Log "Assistant non installé : $($script:IaDl.Erreur)" }
-            else { Write-Log 'Assistant installé'; Stop-Ia; Remove-IaAnciens; Start-Ia }
+            else { Write-Log 'Assistant installé'; Stop-IaServeur; Remove-IaAnciens }   # (lancé à la prochaine question)
         }
         if ($ui.ZoneIa -and $ui.ZoneIa.IsLoaded) { Update-BandeauIa }
     }))
     $script:IaSuivi.Start()
+}
+
+# L'assistant n'a pas pu lire la phrase (trop long, arrêté, réponse illisible) : on le dit, au lieu d'effacer l'attente
+# sans un mot (la vraie cause est dans le journal). La recherche par mots, juste en dessous, marche toujours.
+function Show-EchecIa {
+    if (-not $ui.ZoneIa) { return }
+    $b = New-BandeauIa
+    $t = New-Text "L'assistant n'a pas réussi à lire ta phrase cette fois. Regarde les pannes ci-dessous, ou appuie encore sur Entrée pour réessayer." 14 '#C9C3DD'
+    $t.TextWrapping = 'Wrap'; $b.Child = $t
+    $ui.ZoneIa.Children.Insert(0, $b)
+    Set-BulleMascotte 'Je n''ai pas compris cette fois. Regarde les pannes en dessous.'
 }
 
 function Clear-ZoneIa {
@@ -271,7 +284,10 @@ function Request-Ia {
     $texte = ([string]$ui.Recherche.Text).Trim()
     if (-not $texte -or -not $ui.ZoneIa) { return }
     $tache = Start-IaQuestion $texte @($script:Donnees.Pannes | ForEach-Object { [string]$_.Id })
-    if (-not $tache) { return }   # (pas d'assistant : la recherche par mots reste)
+    if (-not $tache) {   # (pas d'assistant : la recherche par mots reste ; installé mais il ne démarre pas : on le dit)
+        if (Test-IaInstallee) { Write-Log 'Assistant : pas de réponse : il ne démarre pas'; Show-EchecIa }
+        return
+    }
     $script:IaCarte = @{ Texte = $texte }
     $z = $ui.ZoneIa; $z.Children.Clear()
     $attente = New-BandeauIa
@@ -292,7 +308,10 @@ function Request-Ia {
         $r = Get-IaReponse $script:IaTache
         if ($null -eq $r) { return }
         $s.Stop(); if ($script:IaAttente -eq $s) { $script:IaAttente = $null }; Stop-ChargementTheme
-        if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) { Write-Log "Assistant : $($r.Erreur)"; $script:IaCarte = $null; Update-BandeauIa; return }
+        if ($r.Erreur -or -not (Get-Panne $script:Donnees $r.Panne)) {
+            Write-Log "Assistant : $(if ($r.Erreur) { $r.Erreur } else { "panne inconnue ($($r.Panne))" })"
+            $script:IaCarte = $null; Update-BandeauIa; Show-EchecIa; return
+        }
         $propose = @($r.Reponses.Keys) -join ','
         $r.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $r.Panne) $r.Reponses $script:IaCarte.Texte
         Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',') (proposé : $propose)"
@@ -464,8 +483,41 @@ function Get-EnqueteEnCours {
     $e
 }
 
+# Sur le PC en panne, l'enquête attend ce que Windows a noté (lu en arrière-plan, journaux.ps1) avant d'avancer : la
+# fenêtre ne se fige pas, et les suspects ne changent pas en cours de route quand la lecture finit. Vrai si elle attend :
+# un écran « Mindcare regarde... », puis Show-Etape de nouveau une fois la lecture finie (ou abandonnée au bout de
+# $AttenteJournauxMax secondes). Si la personne est partie ailleurs entre-temps, rien n'est réaffiché.
+$AttenteJournauxMax = 30
+function Wait-Journaux($E) {
+    if ($E.Notes -notcontains 'cepc' -or (Test-JournauxLus)) { return $false }
+    Clear-Contenu
+    $carte = New-Card
+    Add-Titre $carte 'Mindcare regarde ce que Windows a noté...' 'H1'
+    Add-Texte $carte 'Quelques secondes : ce que Windows a noté sur ce PC permet d''écarter des pistes sans rien te demander.' 14 '#A9A3C9' 'Normal' '0,8,0,0'
+    $rg = New-Rangee $carte
+    Add-Bouton $rg 'Étape précédente' { Undo-Choix }
+    Add-Bouton $rg 'Accueil' { Show-Accueil }
+    Set-BulleMascotte 'Je regarde ce que Windows a noté, ça ne prend qu''un instant.'
+    if ($script:AttenteJournaux) { $script:AttenteJournaux.Ecran = $carte; return $true }
+    $t = New-Object System.Windows.Threading.DispatcherTimer; $t.Interval = [TimeSpan]::FromMilliseconds(200)
+    $script:AttenteJournaux = @{ Ecran = $carte; Debut = Get-Date }
+    $t.Add_Tick((Protect-Action {
+        param($s)
+        $a = $script:AttenteJournaux
+        if (-not (Test-JournauxLus) -and ((Get-Date) - $a.Debut).TotalSeconds -lt $AttenteJournauxMax) { return }
+        $s.Stop(); $script:AttenteJournaux = $null
+        if (-not (Test-JournauxLus)) { Stop-AttenteJournaux }
+        Write-Log "Journaux de Windows : attendus $([math]::Round(((Get-Date) - $a.Debut).TotalSeconds, 1)) s"
+        # (toujours sur l'écran d'attente : l'enquête reprend)
+        if ($a.Ecran.Parent -and $ui.Contenu.Children.Contains($a.Ecran.Parent)) { Show-Etape }
+    }))
+    $t.Start()
+    $true
+}
+
 function Show-Etape {
     $e = Get-EnqueteEnCours
+    if (Wait-Journaux $e) { return }
     # (une question à laquelle la phrase a déjà répondu : sa réponse est donnée toute seule, une seule fois)
     while ($e.Etape -and $script:PreRempli -and $script:PreRempli.ContainsKey([string]$e.Etape.Id)) {
         $n = [int]$script:PreRempli[[string]$e.Etape.Id]
@@ -473,6 +525,7 @@ function Show-Etape {
         if ($n -lt 0 -or $n -ge @($e.Etape.Reponses).Count) { break }
         $script:ChoixFaits = @($e.Choix) + $n
         $e = Get-EnqueteEnCours
+        if (Wait-Journaux $e) { return }
     }
     $script:ChoixFaits = $e.Choix
     if ($e.Etape) {
@@ -684,17 +737,18 @@ function Show-EtapeEnquete($E) {
 # ---------------------------------------------------------------------------
 # 4. La réponse : trouvée (ou tout le reste écarté), ou ce qui reste pour le réparateur
 # ---------------------------------------------------------------------------
-function Show-Verdict($E) {
+# (Reaffiche : la même réponse, montrée de nouveau avec ou sans « Pour le réparateur » : rien n'est noté ni enregistré)
+function Show-Verdict($E, [switch]$Reaffiche) {
     $v = $E.Verdict
     $titre = Get-VerdictTitre $script:Donnees $script:PanneEnCours $v
     $suspect = Get-Suspect $script:Donnees $v.Suspect
-    Write-Log "Réponse $($script:PanneEnCours.Id) : $($v.Type) $($v.Suspect) (réponses $($script:ChoixFaits -join ','))"
+    if (-not $Reaffiche) { Write-Log "Réponse $($script:PanneEnCours.Id) : $($v.Type)$(if ($v.Suspect) { " $($v.Suspect)" }) (réponses $($script:ChoixFaits -join ','))" }
     # Une pièce seulement restée par élimination n'a pas été testée : jamais présentée comme sûre (on ne fait pas acheter sur une supposition)
     $piece = $suspect -and $suspect.Piece
     $supposee = $piece -and $v.Type -eq 'elimination'
     if ($supposee) { $titre = "À vérifier : $(Get-Minuscule ([string]$suspect.Titre))" }
     Set-BulleMascotte $(if ($supposee) { 'Tout le reste est écarté, mais cette pièce n''a pas été testée : fais-la vérifier avant d''acheter.' } else { switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } } })
-    Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre
+    if (-not $Reaffiche) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre }
     $script:ResumeDe = @{ Panne = $script:PanneEnCours; Enquete = $E; Titre = $titre }
     Clear-Contenu
 
@@ -702,7 +756,7 @@ function Show-Verdict($E) {
     $boutons = New-Object System.Windows.Controls.StackPanel; $boutons.Orientation = 'Horizontal'; $boutons.VerticalAlignment = 'Center'
     [System.Windows.Controls.DockPanel]::SetDock($boutons, 'Right'); [void]$haut.Children.Add($boutons)
     Add-Bouton $boutons 'Changer ma dernière réponse' { Undo-Choix }
-    Add-Bouton $boutons 'Pour le réparateur' { $script:ReparateurOuvert = -not $script:ReparateurOuvert; Show-Verdict (Get-EnqueteEnCours) }
+    Add-Bouton $boutons 'Pour le réparateur' { $script:ReparateurOuvert = -not $script:ReparateurOuvert; Show-Verdict (Get-EnqueteEnCours) -Reaffiche }
     Add-Bouton $boutons 'Retour à l''accueil' { Show-Accueil } 'BtnPrimary'
     $pn = New-Text ([string]$script:PanneEnCours.Titre) 14 '#A9A3C9'; $pn.VerticalAlignment = 'Center'
     [void]$haut.Children.Add($pn)
@@ -740,7 +794,7 @@ function Show-Verdict($E) {
                          else { 'Si le PC a moins de 2 ans, il est encore sous garantie : contacte d''abord le magasin ou le fabricant, la réparation peut être gratuite. Dans le doute, un réparateur peut confirmer avant que tu achètes.' }) 14 '#C9C3DD' 'Normal' '0,6,0,0'
         $av.Child = $avs
         [void]$ui.Contenu.Children.Add($av)
-        Write-Log "Avant d'acheter : pièce $(if ($supposee) { 'supposée (pas testée)' } else { 'confirmée' })"
+        if (-not $Reaffiche) { Write-Log "Avant d'acheter : pièce $(if ($supposee) { 'supposée (pas testée)' } else { 'confirmée' })" }
     }
 
     if ($script:ReparateurOuvert) { Add-Reparateur }

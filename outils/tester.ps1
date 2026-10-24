@@ -299,6 +299,7 @@ Add-Type -TypeDefinition ([IO.File]::ReadAllText((Join-Path $AppDir 'modules\nat
 $IaServeurSauve = $IaServeur; $IaModeleSauve = $IaModele
 $IaServeur = Join-Path $iaCopie 'llama-server.exe'; $IaModele = Join-Path $iaCopie 'mindcare-test.gguf'
 Set-Content -LiteralPath $IaModele -Value 'faux'
+foreach ($d in $IaMoteurDll) { Set-Content -LiteralPath (Join-Path $iaCopie $d) -Value 'faux' }   # (sans elles, l'installation compte comme pas finie)
 $copie = Join-Path $iaCopie 'Mindset.exe'
 $essais = @()
 # 1. Une installation sans copie (comme toutes celles d'avant) : la copie est faite, l'assistant tourne sous Mindset.exe
@@ -503,6 +504,7 @@ if (-not $SansFenetre) {
     Remove-Item -LiteralPath (Join-Path $test 'donnees-ia-maj') -Recurse -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $ancien | Out-Null
     Set-Content -LiteralPath (Join-Path $ancien 'llama-server.exe') -Value 'faux' ; Set-Content -LiteralPath (Join-Path $ancien 'mindcare-0.6b-v1-q8_0.gguf') -Value 'faux'
+    foreach ($x in $IaMoteurDll) { Set-Content -LiteralPath (Join-Path $ancien $x) -Value 'faux' }
     $s = Test-Capture 'ia-maj' @{} -Dossier 'ia-maj'
     Write-Resultat "assistant : mise à jour proposée quand un ancien modèle est installé" ((Get-Journal $s) -match 'nouvelle version est proposée') '(pas de mise à jour proposée, ou ancien modèle non utilisé)'
     # Le vrai assistant (seulement sur le PC qui l'entraîne : le modèle et llama-server du dossier d'entraînement)
@@ -559,14 +561,14 @@ if (-not $SansFenetre) {
     $s = Test-Capture 'historique-reponse' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,1,1,1,0'; MINDCARE_TEST_RESUME = '1' } -Dossier 'historique'
     $g = Read-Gardes; $et = Read-Etat
     Write-Resultat 'enquête finie gardée (la plus récente en tête, 10 au plus)' ($g.Count -eq 10 -and $g[0].Panne -eq 'redemarre' -and $g[0].Fini -and $g[0].Suspect -eq 'memoire' -and $g[1].Id -eq 'vieux-1') "($($g.Count) gardées, en tête : $($g[0].Panne))"
-    Write-Resultat 'carte de Mindset : la dernière réponse' ($et -and @($et.Lignes)[0].Texte -eq 'Il redémarre tout seul : Une barrette de mémoire (RAM) est abîmée' -and @($et.Lignes)[0].Etat -eq 'attention' -and @($et.Lignes | Where-Object { $_.Texte.Length -gt 80 }).Count -eq 0) "($(@($et.Lignes)[0].Texte))"
+    Write-Resultat 'carte de Mindset : la dernière réponse' ($et -and @($et.Lignes)[0].Texte -eq 'Il redémarre tout seul' -and @($et.Lignes)[1].Texte -eq 'Une barrette de mémoire (RAM) est abîmée' -and @($et.Lignes)[1].Etat -eq 'attention' -and @($et.Lignes | Where-Object { $_.Texte.Length -gt 80 }).Count -eq 0) "($(@($et.Lignes | ForEach-Object { $_.Texte }) -join ' / '))"
     $resume = @(Get-ChildItem -LiteralPath $hist -Filter 'Mindcare, diagnostic du *.txt')
     $rt = if ($resume) { [IO.File]::ReadAllText($resume[0].FullName, [Text.Encoding]::UTF8) } else { '' }
     Write-Resultat 'rapport pour le réparateur' ($rt -match 'Réponse : Une barrette de mémoire' -and $rt -match 'Comment on le sait :' -and $rt -match 'Le test de mémoire de Windows a trouvé des erreurs' -and $rt -match 'Écartés :' -and $rt -match 'Les réponses :' -and $rt.IndexOfAny([char[]](0x2013, 0x2014)) -lt 0) "($($resume.Count) fichier)"
     Test-Capture 'historique-pas-finie' @{ MINDCARE_TEST_PARCOURS = 'seteint:1,1' } -Dossier 'historique' | Out-Null
     $g = Read-Gardes; $et = Read-Etat
     Write-Resultat 'enquête pas finie gardée' ($g.Count -eq 10 -and $g[0].Panne -eq 'seteint' -and -not $g[0].Fini -and (@($g[0].Choix) -join ',') -eq '1,1' -and $g[1].Panne -eq 'redemarre') "(en tête : $($g[0].Panne), $(@($g[0].Choix) -join ','))"
-    Write-Resultat 'carte de Mindset : pas finie' ($et -and @($et.Lignes)[0].Texte -eq "Il s'éteint d'un coup : enquête pas finie") "($(@($et.Lignes)[0].Texte))"
+    Write-Resultat 'carte de Mindset : pas finie' ($et -and @($et.Lignes)[0].Texte -eq "Il s'éteint d'un coup" -and @($et.Lignes)[1].Texte -match '^Pas finie') "($(@($et.Lignes | ForEach-Object { $_.Texte }) -join ' / '))"
     Test-Capture 'historique-accueil' @{} -Dossier 'historique' | Out-Null
     $s = Test-Capture 'historique-reprise' @{ MINDCARE_TEST_REPRENDRE = '1' } -Dossier 'historique'
     $g = Read-Gardes
