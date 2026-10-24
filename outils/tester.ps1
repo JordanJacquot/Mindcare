@@ -534,7 +534,12 @@ if (-not $SansFenetre) {
     Test-Capture 'enquete-image' @{ MINDCARE_TEST_PARCOURS = 'seteint:1,0,1' } | Out-Null
     $s = Test-Capture 'verdict-trouve' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,1,1,1,0' }
     Write-Resultat 'réponse trouvée (journal)' ((Get-Journal $s) -match 'Réponse redemarre : trouve memoire') '(pas de « trouve memoire » dans le journal)'
-    Test-Capture 'verdict-elimination' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,1,1,1,1' } | Out-Null
+    Write-Resultat 'pièce confirmée : rappel de la garantie avant d''acheter' ((Get-Journal $s) -match "Avant d'acheter : pièce confirmée") '(pas d''avertissement dans le journal)'
+    # Une pièce restée seulement par élimination (tout « non ») : jamais présentée comme sûre
+    $s = Test-Capture 'verdict-elimination' @{ MINDCARE_TEST_PARCOURS = 'redemarre:1,1,1,1,1,1,1' }
+    Write-Resultat 'pièce supposée : « fais-la vérifier avant d''acheter »' ((Get-Journal $s) -match 'Réponse redemarre : elimination alimentation' -and (Get-Journal $s) -match "Avant d'acheter : pièce supposée") '(pas d''avertissement dans le journal)'
+    $s = Test-Capture 'verdict-sans-piece' @{ MINDCARE_TEST_PARCOURS = 'mdpwifioublie:0' }
+    Write-Resultat 'pas d''avertissement quand ce n''est pas une pièce' ((Get-Journal $s) -match 'Réponse mdpwifioublie : trouve mdpwifienregistre' -and (Get-Journal $s) -notmatch "Avant d'acheter") '(pas de réponse, ou avertissement affiché à tort)'
     Test-Capture 'verdict-urgent' @{ MINDCARE_TEST_PARCOURS = 'redemarre:0' } | Out-Null
     Test-Capture 'verdict-reparateur' @{ MINDCARE_TEST_PARCOURS = 'ecranbleu:1,1,3,1,1,1' } | Out-Null
     $jx = '{"testmemoire-erreurs":{"Vu":true,"Texte":"Le test de mémoire du 18 octobre a trouvé des erreurs"},"testmemoire-ok":{"Vu":false},"majredemarrage":{"Vu":false,"TexteOk":"Aucun redémarrage pour les mises à jour ces 30 jours"}}'

@@ -689,7 +689,11 @@ function Show-Verdict($E) {
     $titre = Get-VerdictTitre $script:Donnees $script:PanneEnCours $v
     $suspect = Get-Suspect $script:Donnees $v.Suspect
     Write-Log "Réponse $($script:PanneEnCours.Id) : $($v.Type) $($v.Suspect) (réponses $($script:ChoixFaits -join ','))"
-    Set-BulleMascotte $(switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } })
+    # Une pièce seulement restée par élimination n'a pas été testée : jamais présentée comme sûre (on ne fait pas acheter sur une supposition)
+    $piece = $suspect -and $suspect.Piece
+    $supposee = $piece -and $v.Type -eq 'elimination'
+    if ($supposee) { $titre = "À vérifier : $(Get-Minuscule ([string]$suspect.Titre))" }
+    Set-BulleMascotte $(if ($supposee) { 'Tout le reste est écarté, mais cette pièce n''a pas été testée : fais-la vérifier avant d''acheter.' } else { switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } } })
     Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre
     $script:ResumeDe = @{ Panne = $script:PanneEnCours; Enquete = $E; Titre = $titre }
     Clear-Contenu
@@ -708,7 +712,7 @@ function Show-Verdict($E) {
     $urgent = $suspect -and $suspect.Urgent
     $couleur, $signe, $label = switch ($v.Type) {
         'trouve'      { if ($urgent) { '#FF5A6E', '!', 'URGENT' } else { '#3DDC97', ([string][char]0x2713), 'TROUVÉ' } }
-        'elimination' { '#3DDC97', ([string][char]0x2713), 'TOUT LE RESTE EST ÉCARTÉ' }
+        'elimination' { if ($supposee) { '#FFB547', '?', 'LA PISTE LA PLUS PROBABLE' } else { '#3DDC97', ([string][char]0x2713), 'TOUT LE RESTE EST ÉCARTÉ' } }
         'reparateur'  { '#FFB547', '?', 'À FAIRE VÉRIFIER PAR UN RÉPARATEUR' }
         default       { '#FFB547', '?', 'AUCUNE PISTE NE CORRESPOND' }
     }
@@ -726,6 +730,18 @@ function Show-Verdict($E) {
     [void]$cd.Children.Add($tx)
     $carte.Child = $cd
     [void]$ui.Contenu.Children.Add($carte)
+
+    if ($piece) {
+        $av = New-Object System.Windows.Controls.Border
+        $av.Style = $Window.FindResource('Card'); $av.Margin = '0,14,0,16'; $av.BorderBrush = Get-Brush '#FFB547'; $av.BorderThickness = 2
+        $avs = New-Object System.Windows.Controls.StackPanel
+        Add-Texte $avs 'AVANT D''ACHETER UNE PIÈCE' 13 '#FFB547' 'Bold'
+        Add-Texte $avs $(if ($supposee) { 'Mindcare n''a pas pu tester cette pièce : elle reste parce que tout le reste est écarté. Avant d''en acheter une neuve, fais-la vérifier par un réparateur, ou essaie avec celle d''un proche.' }
+                         else { 'Si le PC a moins de 2 ans, il est encore sous garantie : contacte d''abord le magasin ou le fabricant, la réparation peut être gratuite. Dans le doute, un réparateur peut confirmer avant que tu achètes.' }) 14 '#C9C3DD' 'Normal' '0,6,0,0'
+        $av.Child = $avs
+        [void]$ui.Contenu.Children.Add($av)
+        Write-Log "Avant d'acheter : pièce $(if ($supposee) { 'supposée (pas testée)' } else { 'confirmée' })"
+    }
 
     if ($script:ReparateurOuvert) { Add-Reparateur }
 

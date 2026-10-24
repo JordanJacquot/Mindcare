@@ -119,7 +119,8 @@
         "En attendant, le PC marche avec les barrettes qui vont bien, juste avec moins de mémoire.",
         "Remplace la barrette abîmée par la même (Mindcare a noté sa référence dans le rapport)."
       ],
-      "Pro": "Un réparateur peut changer la barrette : c'est une réparation simple et peu chère. Sur un portable, laisse-le faire."
+      "Pro": "Un réparateur peut changer la barrette : c'est une réparation simple et peu chère. Sur un portable, laisse-le faire.",
+      "Piece": true
     },
     "alimentation": {
       "Titre": "Le bloc d'alimentation",
@@ -132,7 +133,8 @@
         "Vérifie que le câble électrique est bien enfoncé à l'arrière de la tour.",
         "N'ouvre jamais le bloc d'alimentation : même débranché, il garde de l'électricité dangereuse."
       ],
-      "Pro": "Un réparateur le teste en quelques minutes et le change : c'est une réparation courante, tes fichiers ne sont pas touchés."
+      "Pro": "Un réparateur le teste en quelques minutes et le change : c'est une réparation courante, tes fichiers ne sont pas touchés.",
+      "Piece": true
     },
     "surchauffe": {
       "Titre": "La chaleur",
@@ -185,7 +187,8 @@
         "En attendant, garde le portable branché sur son chargeur d'origine.",
         "Si la batterie a gonflé (le portable ne tient plus à plat), arrête de t'en servir : c'est dangereux."
       ],
-      "Pro": "Une batterie usée se change : sur beaucoup de portables, c'est un réparateur qui le fait."
+      "Pro": "Une batterie usée se change : sur beaucoup de portables, c'est un réparateur qui le fait.",
+      "Piece": true
     },
     "materiel": {
       "Titre": "Une pièce abîmée",
@@ -195,7 +198,8 @@
         "Après un liquide renversé : ne rallume pas le PC. Retourne un portable ouvert, clavier vers le bas.",
         "Si le PC a été ouvert, la personne qui l'a ouvert peut vérifier que tout est bien rebranché."
       ],
-      "Pro": "C'est le travail d'un réparateur : dis-lui ce qui s'est passé. Tes fichiers sont souvent récupérables."
+      "Pro": "C'est le travail d'un réparateur : dis-lui ce qui s'est passé. Tes fichiers sont souvent récupérables.",
+      "Piece": true
     },
     "appareil": {
       "Titre": "Un appareil branché",
@@ -234,7 +238,8 @@
       "AFaire": [
         "Sauvegarde tout de suite tes fichiers importants (photos, documents) sur une clé USB ou un disque externe."
       ],
-      "Pro": "Un réparateur peut changer le disque et recopier tes fichiers sur le nouveau si c'est encore possible : n'attends pas."
+      "Pro": "Un réparateur peut changer le disque et recopier tes fichiers sur le nouveau si c'est encore possible : n'attends pas.",
+      "Piece": true
     },
     "windowsabime": {
       "Titre": "Windows lui-même",
@@ -256,7 +261,8 @@
       "AFaire": [
         "Vérifie que ses câbles d'alimentation (dans la tour) sont bien enfoncés, PC éteint et débranché."
       ],
-      "Pro": "Un réparateur peut tester la carte graphique et la changer."
+      "Pro": "Un réparateur peut tester la carte graphique et la changer.",
+      "Piece": true
     },
     "courant": {
       "Titre": "Le courant (prise, multiprise, câble)",
@@ -278,7 +284,8 @@
       "AFaire": [
         "Laisse l'interrupteur sur « I »."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "chargeur": {
       "Titre": "Le chargeur",
@@ -291,7 +298,8 @@
         "Ne te sers plus de ce chargeur.",
         "Prends un chargeur identique (même marque, même puissance, même embout) : sur le chargeur, regarde les chiffres en « W » et en « V »."
       ],
-      "Pro": "Un réparateur ou le fabricant du portable peut fournir le bon chargeur."
+      "Pro": "Un réparateur ou le fabricant du portable peut fournir le bon chargeur.",
+      "Piece": true
     },
     "residuelle": {
       "Titre": "Un blocage électrique",
@@ -309,7 +317,8 @@
       "AFaire": [
         "N'insiste pas : rallumer sans cesse n'arrange rien."
       ],
-      "Pro": "C'est le travail d'un réparateur : il teste la carte mère et dit si la réparation vaut le coup. Tes fichiers sont presque toujours récupérables, le disque n'est pas touché."
+      "Pro": "C'est le travail d'un réparateur : il teste la carte mère et dit si la réparation vaut le coup. Tes fichiers sont presque toujours récupérables, le disque n'est pas touché.",
+      "Piece": true
     },
     "bips": {
       "Titre": "Une pièce mal en place (des bips)",
@@ -345,7 +354,8 @@
         "Garde le câble bien enfoncé des deux côtés.",
         "Si l'écran a plusieurs entrées, laisse-le sur la bonne (bouton « Input » ou « Source »)."
       ],
-      "Pro": "Si l'écran ne marche avec aucun câble, un réparateur peut le vérifier."
+      "Pro": "Si l'écran ne marche avec aucun câble, un réparateur peut le vérifier.",
+      "Piece": true
     },
     "cablecarte": {
       "Titre": "La prise de l'écran",
@@ -400,7 +410,8 @@
       "AFaire": [
         "En attendant, branche le portable sur une télé ou un écran (prise HDMI)."
       ],
-      "Pro": "Un réparateur peut changer l'écran ou son câble. Tes fichiers sont intacts."
+      "Pro": "Un réparateur peut changer l'écran ou son câble. Tes fichiers sont intacts.",
+      "Piece": true
     },
     "cleusb": {
       "Titre": "Une clé USB ou un disque branché",
@@ -436,7 +447,8 @@
       "AFaire": [
         "Sauvegarde tes fichiers importants sur une clé USB ou un disque externe."
       ],
-      "Pro": "Remplacer un vieux disque dur par un SSD est souvent ce qui accélère le plus un vieux PC : un réparateur le fait en gardant Windows et tes fichiers."
+      "Pro": "Remplacer un vieux disque dur par un SSD est souvent ce qui accélère le plus un vieux PC : un réparateur le fait en gardant Windows et tes fichiers.",
+      "Piece": true
     },
     "redemarrage": {
       "Titre": "Pas de vrai redémarrage",
@@ -485,7 +497,8 @@
       "AFaire": [
         "Essaie un autre écran ou une télé pour en être sûr."
       ],
-      "Pro": "Un écran se répare rarement : un réparateur peut dire si ça vaut le coup."
+      "Pro": "Un écran se répare rarement : un réparateur peut dire si ça vaut le coup.",
+      "Piece": true
     },
     "resolution": {
       "Titre": "La résolution",
@@ -506,7 +519,8 @@
       "AFaire": [
         "En attendant, branche le portable sur une télé ou un écran."
       ],
-      "Pro": "Un réparateur peut changer ce câble : c'est moins cher que l'écran."
+      "Pro": "Un réparateur peut changer ce câble : c'est moins cher que l'écran.",
+      "Piece": true
     },
     "projection": {
       "Titre": "Le mode d'affichage",
@@ -545,7 +559,8 @@
       "AFaire": [
         "Garde peu de choses ouvertes à la fois."
       ],
-      "Pro": "Un réparateur peut dire si un disque SSD ou plus de mémoire suffirait, ou s'il vaut mieux changer de PC."
+      "Pro": "Un réparateur peut dire si un disque SSD ou plus de mémoire suffirait, ou s'il vaut mieux changer de PC.",
+      "Piece": true
     },
     "programmegourmand": {
       "Titre": "Un programme qui tourne à fond",
@@ -593,7 +608,8 @@
       "AFaire": [
         "PC éteint et débranché : souffle la poussière, et vérifie qu'aucun câble ne touche un ventilateur."
       ],
-      "Pro": "Un ventilateur se change facilement : un réparateur le fait vite et pour pas cher."
+      "Pro": "Un ventilateur se change facilement : un réparateur le fait vite et pour pas cher.",
+      "Piece": true
     },
     "coilwhine": {
       "Titre": "Un sifflement électrique",
@@ -633,7 +649,8 @@
       "AFaire": [
         "S'il chauffe très fort, sent le brûlé ou grésille fort : débranche-le et ne t'en sers plus."
       ],
-      "Pro": "Prends un chargeur identique (même marque, même puissance, même embout)."
+      "Pro": "Prends un chargeur identique (même marque, même puissance, même embout).",
+      "Piece": true
     },
     "soncoupe": {
       "Titre": "Le son coupé",
@@ -669,7 +686,8 @@
       "AFaire": [
         "Enfonce la prise à fond, dans la bonne prise (souvent verte ou avec un petit casque dessiné)."
       ],
-      "Pro": "Si le câble est abîmé, il faut le changer."
+      "Pro": "Si le câble est abîmé, il faut le changer.",
+      "Piece": true
     },
     "hautparleurs": {
       "Titre": "Le casque ou les enceintes",
@@ -678,7 +696,8 @@
       "AFaire": [
         "Essaie un autre casque ou d'autres enceintes en attendant."
       ],
-      "Pro": "Un casque ou des enceintes se changent ; la garantie marche souvent les deux premières années."
+      "Pro": "Un casque ou des enceintes se changent ; la garantie marche souvent les deux premières années.",
+      "Piece": true
     },
     "micropermission": {
       "Titre": "L'accès au micro",
@@ -742,7 +761,8 @@
       "AFaire": [
         "Fais les mises à jour : touche Windows, « Windows Update », y compris les facultatives."
       ],
-      "Pro": "Si le Wi-Fi n'apparaît plus du tout, un réparateur peut changer la carte Wi-Fi (ou une clé Wi-Fi USB peut dépanner)."
+      "Pro": "Si le Wi-Fi n'apparaît plus du tout, un réparateur peut changer la carte Wi-Fi (ou une clé Wi-Fi USB peut dépanner).",
+      "Piece": true
     },
     "reseauwindows": {
       "Titre": "Les réglages réseau de Windows",
@@ -770,7 +790,8 @@
       "AFaire": [
         "Garde le câble qui marche, et une autre prise de la box si besoin."
       ],
-      "Pro": "Rien à réparer, sinon change le câble."
+      "Pro": "Rien à réparer, sinon change le câble.",
+      "Piece": true
     },
     "site": {
       "Titre": "Le site lui-même",
@@ -824,7 +845,8 @@
       "AFaire": [
         "Branche le récepteur sur une prise USB proche (à l'avant de la tour, ou avec une rallonge)."
       ],
-      "Pro": "Si rien n'y fait, l'appareil peut être en panne."
+      "Pro": "Si rien n'y fait, l'appareil peut être en panne.",
+      "Piece": true
     },
     "portusb": {
       "Titre": "La prise USB",
@@ -833,7 +855,8 @@
       "AFaire": [
         "Utilise une autre prise USB, directement sur le PC (pas sur un hub)."
       ],
-      "Pro": "Si plusieurs prises USB ne marchent plus, un réparateur peut vérifier la carte mère."
+      "Pro": "Si plusieurs prises USB ne marchent plus, un réparateur peut vérifier la carte mère.",
+      "Piece": true
     },
     "peripheriquehs": {
       "Titre": "L'appareil lui-même",
@@ -842,7 +865,8 @@
       "AFaire": [
         "Essaie un autre appareil en attendant."
       ],
-      "Pro": "Un clavier, une souris ou une clé se change ; regarde la garantie (souvent 2 ans)."
+      "Pro": "Un clavier, une souris ou une clé se change ; regarde la garantie (souvent 2 ans).",
+      "Piece": true
     },
     "verrou": {
       "Titre": "Une touche de verrouillage",
@@ -950,7 +974,8 @@
         "Garde le portable branché quand tu peux.",
         "Baisse la luminosité, ferme ce qui ne sert pas."
       ],
-      "Pro": "Une batterie usée se change : sur beaucoup de portables, c'est un réparateur qui le fait."
+      "Pro": "Une batterie usée se change : sur beaucoup de portables, c'est un réparateur qui le fait.",
+      "Piece": true
     },
     "prisecharge": {
       "Titre": "La prise de charge",
@@ -962,7 +987,8 @@
       "AFaire": [
         "Ne force pas sur le câble ; tiens-le droit."
       ],
-      "Pro": "Un réparateur peut changer la prise de charge."
+      "Pro": "Un réparateur peut changer la prise de charge.",
+      "Piece": true
     },
     "limitecharge": {
       "Titre": "La limite de charge",
@@ -1002,7 +1028,8 @@
         "Ne le recharge plus, ne perce pas et n'appuie pas sur la batterie.",
         "Pose-le sur une surface qui ne brûle pas (carrelage), loin de ce qui brûle."
       ],
-      "Pro": "Apporte-le vite à un réparateur pour changer la batterie. Ne jette jamais une batterie à la poubelle : déchetterie ou magasin."
+      "Pro": "Apporte-le vite à un réparateur pour changer la batterie. Ne jette jamais une batterie à la poubelle : déchetterie ou magasin.",
+      "Piece": true
     },
     "notifications": {
       "Titre": "Les notifications d'un site",
@@ -1145,7 +1172,8 @@
       "AFaire": [
         "Branche son adaptateur secteur, ou branche-le directement sur le PC."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "fichierabime": {
       "Titre": "Le fichier lui-même",
@@ -1277,7 +1305,8 @@
         "PC fixe : c'est une pile ronde CR2032 (quelques euros) sur la carte mère. PC éteint et débranché, change-la.",
         "Ensuite, dans le BIOS : F9 (réglages par défaut), F10 (enregistrer et quitter), et remets la bonne date dans Windows."
       ],
-      "Pro": "Sur un portable, un réparateur la change en quelques minutes."
+      "Pro": "Sur un portable, un réparateur la change en quelques minutes.",
+      "Piece": true
     },
     "explorateur": {
       "Titre": "L'Explorateur Windows",
@@ -1594,7 +1623,8 @@
         "Ça ne se répare pas, mais ça ne s'aggrave pas.",
         "Si l'écran est sous garantie et que plusieurs points sont touchés, renseigne-toi : beaucoup de marques l'échangent."
       ],
-      "Pro": "Seul le changement de l'écran le fait disparaître ; ça ne vaut le coup que si ça gêne vraiment."
+      "Pro": "Seul le changement de l'écran le fait disparaître ; ça ne vaut le coup que si ça gêne vraiment.",
+      "Piece": true
     },
     "tactiledesactive": {
       "Titre": "L'écran tactile désactivé",
@@ -1774,7 +1804,8 @@
       "AFaire": [
         "Garde le câble d'origine du téléphone pour transférer des fichiers."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "steammanette": {
       "Titre": "Les réglages de Steam",
@@ -1858,7 +1889,8 @@
         "PC fixe, éteint et débranché : vérifie que le petit câble du ventilateur est enfoncé sur la prise « CPU_FAN » de la carte mère, et que rien ne le bloque.",
         "S'il ne tourne toujours pas, il faut le changer."
       ],
-      "Pro": "Un réparateur change un ventilateur de processeur rapidement."
+      "Pro": "Un réparateur change un ventilateur de processeur rapidement.",
+      "Piece": true
     },
     "reglageventilo": {
       "Titre": "Un réglage du BIOS",
@@ -1880,7 +1912,8 @@
       "Pro": "Un réparateur peut vérifier tous les branchements.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "reglagecourant": {
       "Titre": "Un réglage du BIOS",
@@ -2035,7 +2068,8 @@
       "AFaire": [
         "Compare la « configuration minimale » du jeu (sur sa page Steam ou son site) avec ton PC : touche Windows + Pause, ou Paramètres, « Système », « Informations système »."
       ],
-      "Pro": "Un réparateur peut te dire quelle pièce changer pour ce jeu, ou si ça ne vaut pas le coup."
+      "Pro": "Un réparateur peut te dire quelle pièce changer pour ce jeu, ou si ça ne vaut pas le coup.",
+      "Piece": true
     },
     "anticheat": {
       "Titre": "L'anti-triche du jeu",
@@ -2185,7 +2219,8 @@
       "AFaire": [
         "Garde le câble fourni avec l'écran (DisplayPort, ou HDMI 2.0 ou plus récent)."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "cleartype": {
       "Titre": "Le lissage du texte",
@@ -2243,7 +2278,8 @@
       "AFaire": [
         "Pour les grosses copies, utilise un disque externe rapide (SSD) ou une clé USB 3 de marque."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "lecteurreseau": {
       "Titre": "Un lecteur réseau absent",
@@ -2285,7 +2321,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "attenuation": {
       "Titre": "L'atténuation des appels",
@@ -2395,7 +2432,8 @@
       "AFaire": [
         "Une petite clé Wi-Fi USB « Wi-Fi 5 » ou « Wi-Fi 6 » (environ 15 euros) règle le problème."
       ],
-      "Pro": "Un réparateur peut aussi changer la carte Wi-Fi d'une tour ou de certains portables."
+      "Pro": "Un réparateur peut aussi changer la carte Wi-Fi d'une tour ou de certains portables.",
+      "Piece": true
     },
     "carteeth": {
       "Titre": "La carte réseau du PC",
@@ -2405,7 +2443,8 @@
         "Gestionnaire de périphériques, « Cartes réseau », la carte Ethernet, onglet « Avancé » : « Vitesse et duplex » sur « Négociation automatique ».",
         "Fais les mises à jour de Windows."
       ],
-      "Pro": "Un réparateur peut tester la carte réseau."
+      "Pro": "Un réparateur peut tester la carte réseau.",
+      "Piece": true
     },
     "fnlock": {
       "Titre": "Le verrou de la touche Fn",
@@ -2477,7 +2516,8 @@
       "AFaire": [
         "Branche le dock sur la prise USB-C qui a un éclair ou le logo DisplayPort ; sinon, il faut un dock « DisplayLink » (avec son pilote)."
       ],
-      "Pro": "Rien à réparer."
+      "Pro": "Rien à réparer.",
+      "Piece": true
     },
     "pilotedock": {
       "Titre": "Le pilote du dock",
@@ -2526,7 +2566,8 @@
       "AFaire": [
         "Imprime une page de temps en temps, et lance un nettoyage si ça revient."
       ],
-      "Pro": "Si le nettoyage ne suffit pas, change la cartouche (ou les têtes, sur certaines imprimantes)."
+      "Pro": "Si le nettoyage ne suffit pas, change la cartouche (ou les têtes, sur certaines imprimantes).",
+      "Piece": true
     },
     "chargeurfaible": {
       "Titre": "Un chargeur trop faible",
@@ -2538,7 +2579,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "fixe"
-      ]
+      ],
+      "Piece": true
     },
     "veillecapot": {
       "Titre": "Le capot fermé (veille)",
@@ -2561,7 +2603,8 @@
         "Ne t'en sers plus : remplace-le par un chargeur identique (même marque, même puissance)."
       ],
       "Pro": "Le fabricant ou un réparateur fournit le bon chargeur.",
-      "Urgent": true
+      "Urgent": true,
+      "Piece": true
     },
     "prisemur": {
       "Titre": "La prise du mur",
@@ -2812,7 +2855,8 @@
         "Garde Windows 10 en sécurité : sur Windows Update, inscris-toi aux « mises à jour de sécurité étendues » si Windows te le propose.",
         "Ou passe à un PC plus récent."
       ],
-      "Pro": "Un réparateur peut te conseiller."
+      "Pro": "Un réparateur peut te conseiller.",
+      "Piece": true
     },
     "autrecondition": {
       "Titre": "Une autre condition",
@@ -3172,7 +3216,8 @@
       "AFaire": [
         "En attendant la réparation, coupe l'écran tactile : Gestionnaire de périphériques, « Périphériques d'interface utilisateur », « Écran tactile compatible HID », clic droit, « Désactiver l'appareil »."
       ],
-      "Pro": "Un réparateur peut changer la dalle tactile."
+      "Pro": "Un réparateur peut changer la dalle tactile.",
+      "Piece": true
     },
     "quarantaine": {
       "Titre": "Sécurité Windows",
@@ -3227,7 +3272,8 @@
         "Essaie-la dans l'appareil d'origine, ou sur un autre PC.",
         "Si elle n'a rien d'important : formate-la dans l'appareil qui s'en sert."
       ],
-      "Pro": "Un réparateur peut récupérer des photos sur une carte abîmée."
+      "Pro": "Un réparateur peut récupérer des photos sur une carte abîmée.",
+      "Piece": true
     },
     "lecteursd": {
       "Titre": "Le lecteur de cartes du PC",
@@ -3237,7 +3283,8 @@
         "Utilise un lecteur de cartes USB (quelques euros) en attendant.",
         "Fais les mises à jour de Windows."
       ],
-      "Pro": "Un réparateur peut le changer."
+      "Pro": "Un réparateur peut le changer.",
+      "Piece": true
     },
     "reparerword": {
       "Titre": "Le fichier abîmé",
@@ -3311,7 +3358,8 @@
         "Vérifie la carte graphique demandée dans la « configuration minimale » du jeu.",
         "Pour connaître la tienne : Gestionnaire de périphériques, « Cartes graphiques »."
       ],
-      "Pro": "Un réparateur peut te conseiller une carte graphique compatible avec ton PC."
+      "Pro": "Un réparateur peut te conseiller une carte graphique compatible avec ton PC.",
+      "Piece": true
     },
     "bibliotheque": {
       "Titre": "Le dossier de jeux de Steam",
@@ -3332,7 +3380,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "biosincompatible": {
       "Titre": "Le BIOS trop ancien pour le processeur",
@@ -3358,7 +3407,8 @@
       "Pro": "Un réparateur vérifie le processeur et son support, et peut redresser une broche.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "profilmemoire": {
       "Titre": "Les réglages de la mémoire (XMP / EXPO)",
@@ -3380,7 +3430,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "cablegpu": {
       "Titre": "Les câbles de la carte graphique",
@@ -3393,7 +3444,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "gpuplace": {
       "Titre": "La carte graphique mal enfoncée",
@@ -3405,7 +3457,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "cabledisque": {
       "Titre": "Le câble ou la fixation du disque",
@@ -3417,7 +3470,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "qcodenormal": {
       "Titre": "Un code normal",
@@ -3466,7 +3520,8 @@
       "AFaire": [
         "Ne plie jamais le câble fibre (pas d'angle serré, rien posé dessus)."
       ],
-      "Pro": "Si le câble fibre est abîmé, ton opérateur le change."
+      "Pro": "Si le câble fibre est abîmé, ton opérateur le change.",
+      "Piece": true
     },
     "portbox": {
       "Titre": "La prise de la box",
@@ -3475,7 +3530,8 @@
       "AFaire": [
         "Garde le câble sur une prise de la box qui marche."
       ],
-      "Pro": "Ton opérateur peut changer la box si plusieurs prises ne marchent plus."
+      "Pro": "Ton opérateur peut changer la box si plusieurs prises ne marchent plus.",
+      "Piece": true
     },
     "memoireplace": {
       "Titre": "La mémoire mal enfoncée",
@@ -3487,7 +3543,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "narrateur": {
       "Titre": "Le Narrateur",
@@ -3633,7 +3690,8 @@
       "Pro": "Rien à réparer.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "bouclemasse": {
       "Titre": "Un parasite électrique",
@@ -3694,7 +3752,8 @@
         "N'insiste pas : éteins le PC.",
         "Confie le disque à un spécialiste de la récupération de données (le prix dépend des dégâts)."
       ],
-      "Pro": "Un spécialiste de la récupération de données."
+      "Pro": "Un spécialiste de la récupération de données.",
+      "Piece": true
     },
     "cheminlong": {
       "Titre": "Un chemin trop long",
@@ -3740,7 +3799,8 @@
       "AFaire": [
         "Un lecteur DVD externe USB coûte une vingtaine d'euros."
       ],
-      "Pro": "Un réparateur peut changer le lecteur d'une tour."
+      "Pro": "Un réparateur peut changer le lecteur d'une tour.",
+      "Piece": true
     },
     "jaugebatterie": {
       "Titre": "La jauge de la batterie",
@@ -3752,7 +3812,8 @@
       "Pro": "Si ça continue, la batterie est sans doute usée : elle se change.",
       "Sauf": [
         "fixe"
-      ]
+      ],
+      "Piece": true
     },
     "secureboot": {
       "Titre": "Les clés du démarrage sécurisé",
@@ -4006,7 +4067,8 @@
       "AFaire": [
         "Sauvegarde tes fichiers en branchant un écran externe si besoin."
       ],
-      "Pro": "Un réparateur change l'écran ou sa nappe."
+      "Pro": "Un réparateur change l'écran ou sa nappe.",
+      "Piece": true
     },
     "chutedisque": {
       "Titre": "Le disque après la chute",
@@ -4015,7 +4077,8 @@
       "AFaire": [
         "Sauvegarde tes fichiers tout de suite, avant qu'il ne lâche."
       ],
-      "Pro": "Un réparateur peut remplacer le disque par un SSD et récupérer les fichiers."
+      "Pro": "Un réparateur peut remplacer le disque par un SSD et récupérer les fichiers.",
+      "Piece": true
     },
     "toucheclip": {
       "Titre": "Le petit clip de la touche",
@@ -4025,7 +4088,8 @@
         "Pose la touche bien droite au-dessus de son emplacement et appuie au centre jusqu'au double clic.",
         "Si le petit clip blanc est cassé ou perdu : on trouve des touches de remplacement pour le modèle exact du portable."
       ],
-      "Pro": "Un réparateur peut remettre ou changer la touche."
+      "Pro": "Un réparateur peut remettre ou changer la touche.",
+      "Piece": true
     },
     "analysedefender": {
       "Titre": "L'analyse de Sécurité Windows",
@@ -4066,7 +4130,8 @@
         "PC éteint et débranché : renfonce les barrettes jusqu'au clic, dans les emplacements A2 et B2.",
         "Si ça ne change rien, essaie chaque barrette seule : celle qui n'est pas vue est abîmée ou incompatible."
       ],
-      "Pro": "Un réparateur peut tester les barrettes."
+      "Pro": "Un réparateur peut tester les barrettes.",
+      "Piece": true
     },
     "memoirereservee": {
       "Titre": "La mémoire réservée",
@@ -4108,7 +4173,8 @@
         "Le logiciel gratuit H2testw (ou ValiDrive) vérifie la vraie taille d'une clé.",
         "Achète les clés chez un vendeur sérieux, de marque connue."
       ],
-      "Pro": "Rien à réparer : la clé est à jeter ou à rendre."
+      "Pro": "Rien à réparer : la clé est à jeter ou à rendre.",
+      "Piece": true
     },
     "erp": {
       "Titre": "Le courant USB à l'arrêt",
@@ -4138,7 +4204,8 @@
       "Pro": "Un réparateur peut vérifier le câblage.",
       "Sauf": [
         "portable"
-      ]
+      ],
+      "Piece": true
     },
     "mdpwifienregistre": {
       "Titre": "Le mot de passe gardé par le PC",
@@ -4246,7 +4313,8 @@
         "N'utilise plus cet appareil ou ce câble, ni cette prise.",
         "Prise en façade : ne t'en sers plus et fais-la vérifier."
       ],
-      "Pro": "Un réparateur peut vérifier les prises et leur câble."
+      "Pro": "Un réparateur peut vérifier les prises et leur câble.",
+      "Piece": true
     },
     "paume": {
       "Titre": "La paume sur le pavé tactile",
