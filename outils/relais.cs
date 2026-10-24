@@ -13,8 +13,8 @@ using System.Windows.Forms;
 [assembly: AssemblyTitle("Mindcare")]
 [assembly: AssemblyProduct("Mindcare")]
 [assembly: AssemblyDescription("Ouvre Mindcare (Mindset.exe, dans le même dossier).")]
-[assembly: AssemblyVersion("0.12.0.0")]
-[assembly: AssemblyFileVersion("0.12.0.0")]
+[assembly: AssemblyVersion("0.13.0.0")]
+[assembly: AssemblyFileVersion("0.13.0.0")]
 
 static class Relais
 {
