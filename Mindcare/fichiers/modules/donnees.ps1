@@ -119,7 +119,12 @@ function Save-JsonFile([string]$Path, $Object) {
 function Read-JsonFile([string]$Path) {
     foreach ($p in $Path, "$Path.bak") {
         if (-not [IO.File]::Exists($p)) { continue }
-        try { return ([IO.File]::ReadAllText($p, [Text.Encoding]::UTF8) | ConvertFrom-Json) }
+        try {
+            # (un fichier vide ne lève aucune erreur : sans ce contrôle, il passait pour un historique vide et écrasait le .bak)
+            $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8)
+            if ([string]::IsNullOrWhiteSpace($texte) -or $texte.Trim() -eq 'null') { throw 'fichier vide' }
+            return ($texte | ConvertFrom-Json)
+        }
         catch {
             Write-Log "Fichier illisible ($p) : $_"
             try { Copy-Item -LiteralPath $p -Destination "$p.abime-$(Get-Date -Format yyyyMMdd-HHmmss)" -Force } catch {}

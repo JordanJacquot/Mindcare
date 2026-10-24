@@ -202,6 +202,16 @@ Write-Resultat 'journal : réponse « aucune piste » sans double espace' ((Get-
 $f1 = Save-Resume 'premier'; $f2 = Save-Resume 'deuxième'
 Write-Resultat 'rapport : deux dans la même minute, le premier est gardé' ($f1 -ne $f2 -and [IO.File]::ReadAllText($f1, [Text.Encoding]::UTF8) -eq 'premier' -and [IO.File]::ReadAllText($f2, [Text.Encoding]::UTF8) -eq 'deuxième') "($([IO.Path]::GetFileName($f1)), $([IO.Path]::GetFileName($f2)))"
 
+# Un historique vide (coupure pendant l'écriture) : la copie de secours est reprise, et l'enregistrement suivant ne la perd pas
+$fj = Join-Path $env:TEMP "mindcare-essai-vide-$PID.json"
+try {
+    [IO.File]::WriteAllText("$fj.bak", '[{"Panne":"ecranbleu"},{"Panne":"pubs"}]', [Text.Encoding]::UTF8)
+    [IO.File]::WriteAllText($fj, '', [Text.Encoding]::UTF8)
+    $lu = @(Read-JsonFile $fj)
+    Save-JsonFile $fj $lu
+    $relu = @(Read-JsonFile $fj)
+    Write-Resultat 'données : fichier vide, la copie de secours est reprise et gardée' ($lu.Count -eq 2 -and $relu.Count -eq 2 -and $relu[1].Panne -eq 'pubs') "($($lu.Count) puis $($relu.Count))"
+} finally { Remove-Item -LiteralPath $fj, "$fj.bak", "$fj.tmp" -Force -ErrorAction SilentlyContinue; Get-ChildItem -Path "$fj.abime-*" -ErrorAction SilentlyContinue | Remove-Item -Force }
 Stop-LectureJournaux
 Get-ChildItem env: | Where-Object { $_.Name -like 'MINDCARE_*' } | ForEach-Object { Remove-Item "env:$($_.Name)" }
 if ($script:Ok) { Write-Host 'Tout est bon.' -ForegroundColor Green; exit 0 }
