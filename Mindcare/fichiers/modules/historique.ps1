@@ -2,7 +2,10 @@
 # en reprendre une, revoir sa réponse, ou en faire un rapport pour le réparateur. La dernière s'affiche sur la carte de
 # Mindset. Chargé par Mindcare.ps1 avant contenu.ps1.
 #
-#   Une enquête gardée : { Id, Panne, Choix (voir enquete.ps1), Debut, Maj (dates), Fini, Suspect (trouvé), Titre (la réponse) }
+#   Une enquête gardée : { Id, Panne, Choix (voir enquete.ps1), Reponses ([{ Etape, Reponse }] : chaque réponse avec l'Id
+#   de sa question), Debut, Maj (dates), Fini, Suspect (trouvé), Titre (la réponse), Indices (finie : ce que Windows avait
+#   noté, pour la revoir à l'identique) }. À la reprise, une réponse ne va qu'à la question qui porte son Id : rejouées
+#   par leur place (Choix seul, l'ancien format), elles se décalaient dès qu'une étape automatique changeait.
 
 $HistoriqueFichier = Join-Path $DataDir 'diagnostics.json'
 $HistoriqueMax     = 10
@@ -16,22 +19,41 @@ function Read-Historique {
 
 # Enregistre où en est une enquête, qui passe en tête de liste. Sans aucune réponse, elle n'est pas gardée.
 # Revoir une enquête sans rien y changer ne la déplace pas.
-function Save-Diagnostic([string]$Id, [string]$PanneId, [int[]]$LesChoix, [bool]$EstFini, $LeSuspect, [string]$LeTitre) {
+function Save-Diagnostic([string]$Id, [string]$PanneId, [int[]]$LesChoix, [bool]$EstFini, $LeSuspect, [string]$LeTitre, $LesReponses = @(), $LesIndices = $null) {
     $ancien = @($script:Historique | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1
     if ($ancien -and (@($ancien.Choix) -join ',') -eq (@($LesChoix) -join ',') -and [bool]$ancien.Fini -eq $EstFini -and [string]$ancien.Titre -eq $LeTitre) { return }
     $liste = @($script:Historique | Where-Object { $_.Id -ne $Id })
     if ($LesChoix.Count) {
         $maintenant = Get-Date -Format s
         $d = [pscustomobject][ordered]@{
-            Id = $Id; Panne = $PanneId; Choix = @($LesChoix)
+            Id = $Id; Panne = $PanneId; Choix = @($LesChoix); Reponses = @($LesReponses)
             Debut = $(if ($ancien) { [string]$ancien.Debut } else { $maintenant }); Maj = $maintenant
             Fini = $EstFini; Suspect = [string]$LeSuspect; Titre = $LeTitre
+        }
+        if ($EstFini -and $LesIndices -and $LesIndices.Count) {
+            $gardes = [ordered]@{}
+            foreach ($k in @($LesIndices.Keys | Sort-Object)) { $v = $LesIndices[$k]; $gardes[$k] = [ordered]@{ Vu = [bool]$v.Vu; Texte = [string]$v.Texte; TexteOk = [string]$v.TexteOk; Affiche = [bool]$v.Affiche; Partiel = [bool]$v.Partiel } }
+            $d | Add-Member -NotePropertyName Indices -NotePropertyValue $gardes
         }
         $liste = @($d) + $liste
     }
     $script:Historique = @($liste | Select-Object -First $HistoriqueMax)
     try { Save-JsonFile $HistoriqueFichier ([ordered]@{ Version = 2; Diagnostics = $script:Historique }) } catch { Write-Log "Enquêtes non enregistrées : $_" }
     Write-EtatMindset
+}
+
+# Les réponses d'une enquête avec l'Id de leur question (Faits et Choix vont ensemble : une réponse par question posée)
+function Get-Paires($E) {
+    @(for ($k = 0; $k -lt @($E.Faits).Count; $k++) { [ordered]@{ Etape = [string]@($E.Faits)[$k].Etape.Id; Reponse = [int]@($E.Choix)[$k] } })
+}
+
+# Les indices gardés avec une enquête finie (lus du JSON), comme Get-Indices les donne
+function ConvertTo-Indices($Gardes) {
+    $h = @{}
+    # (relus du fichier : un objet ; gardés pendant cette session : encore un dictionnaire)
+    $paires = if ($Gardes -is [Collections.IDictionary]) { @($Gardes.GetEnumerator() | ForEach-Object { [pscustomobject]@{ Name = [string]$_.Key; Value = $_.Value } }) } elseif ($Gardes) { @($Gardes.PSObject.Properties) } else { @() }
+    if ($Gardes) { foreach ($pr in $paires) { $v = $pr.Value; $h[$pr.Name] =[pscustomobject]@{ Vu = [bool]$v.Vu; Texte = [string]$v.Texte; TexteOk = [string]$v.TexteOk; Affiche = [bool]$v.Affiche; Partiel = [bool]$v.Partiel } } }
+    $h
 }
 
 function Format-Date([string]$Iso, [string]$Modele = "d MMMM 'à' HH'h'mm") {

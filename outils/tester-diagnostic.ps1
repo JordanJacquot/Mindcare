@@ -234,6 +234,73 @@ Write-Resultat 'journal : réponse « aucune piste » sans double espace' ((Get-
 $f1 = Save-Resume 'premier'; $f2 = Save-Resume 'deuxième'
 Write-Resultat 'rapport : deux dans la même minute, le premier est gardé' ($f1 -ne $f2 -and [IO.File]::ReadAllText($f1, [Text.Encoding]::UTF8) -eq 'premier' -and [IO.File]::ReadAllText($f2, [Text.Encoding]::UTF8) -eq 'deuxième') "($([IO.Path]::GetFileName($f1)), $([IO.Path]::GetFileName($f2)))"
 
+# ---------------------------------------------------------------------------
+# 11. Une enquête reprise (revue du 25/10, constat 16) : chaque réponse retourne à la question qui porte son Id, même si
+# ce que Windows a noté a changé entre-temps ; une enquête finie se revoit avec ce que Windows avait noté ce jour-là
+# ---------------------------------------------------------------------------
+# (les indices de Windows prennent la valeur voulue : une lecture finie, sans jamais lire le vrai PC)
+function Set-IndicesTest($Indices) { Stop-LectureJournaux; $script:Journaux = [hashtable]::Synchronized(@{ Indices = $Indices }); $script:JournauxTache = @{ Res = [pscustomobject]@{ IsCompleted = $true } }; $script:JournauxAbandon = $null; $script:JournauxNotes = $true }
+function New-IndiceTest([string]$Id, [bool]$Vu) { [pscustomobject]@{ Vu = $Vu; Texte = "$Id vu"; TexteOk = "$Id rien"; Affiche = $true; Partiel = $false } }
+$connus = @($script:Donnees.Pannes | ForEach-Object { Get-Etapes $script:Donnees $_ } | Where-Object { $_.Type -eq 'auto' } | ForEach-Object { [string]$_.Indice } | Select-Object -Unique)
+$hasard = New-Object Random 7
+$essais = 0; $decalesAvant = 0; $decales = 0; $exemple = ''
+foreach ($p in $script:Donnees.Pannes) {
+    $ets = @(Get-Etapes $script:Donnees $p)
+    $autos = @($ets | Where-Object { $_.Type -eq 'auto' } | ForEach-Object { [string]$_.Indice } | Select-Object -Unique)
+    if (-not $autos -or -not @($ets | Where-Object { $_.Id -eq 'cepc' })) { continue }
+    for ($k = 0; $k -lt 40; $k++) {
+        $A = @{}; foreach ($x in $connus) { $A[$x] = New-IndiceTest $x ($hasard.Next(2) -eq 1) }
+        $B = $A.Clone(); $chg = $autos[$hasard.Next($autos.Count)]; $B[$chg] = New-IndiceTest $chg (-not $A[$chg].Vu)
+        # Une enquête au hasard (« sur ce PC » : oui ; pas de danger), avec ce que Windows notait le jour A
+        $choix = @()
+        for ($n = 0; $n -lt 30; $n++) {
+            $e = Get-Enquete $script:Donnees $p $choix $A
+            if (-not $e.Etape) { break }
+            $c = if ($e.Etape.Id -eq 'cepc') { [array]::IndexOf(@($e.Etape.Reponses | ForEach-Object { $_.Note }), 'cepc') } elseif ($e.Etape.Id -eq 'danger') { @($e.Etape.Reponses).Count - 1 } else { $hasard.Next(@($e.Etape.Reponses).Count) }
+            $choix += $c
+        }
+        $ea = Get-Enquete $script:Donnees $p $choix $A
+        $gardees = @{}; foreach ($r in (Get-Paires $ea)) { $gardees[$r.Etape] = $r.Reponse }
+        # Reprise le jour B, comme Mindcare : l'enquête gardée, rouverte par Open-Diagnostic
+        Set-IndicesTest $B
+        $script:Historique = @([pscustomobject]@{ Id = "essai-$essais"; Panne = $p.Id; Choix = @($choix); Reponses = @(Get-Paires $ea); Fini = $false; Suspect = ''; Titre = '' })
+        Open-Diagnostic "essai-$essais"
+        $eb = Get-Enquete $script:Donnees $p $script:ChoixFaits $B
+        $faux = @(for ($j = 0; $j -lt @($eb.Faits).Count; $j++) { $id = [string]@($eb.Faits)[$j].Etape.Id; if ($gardees.ContainsKey($id) -and $gardees[$id] -ne @($eb.Choix)[$j]) { $id } })
+        if ($faux) { $decales++; if (-not $exemple) { $exemple = "$($p.Id) : $($faux -join ', ')" } }
+        # (contre-épreuve : rejouées par leur place, comme avant)
+        $ep = Get-Enquete $script:Donnees $p $choix $B
+        if (@(for ($j = 0; $j -lt @($ep.Faits).Count; $j++) { $id = [string]@($ep.Faits)[$j].Etape.Id; if ($gardees.ContainsKey($id) -and $gardees[$id] -ne @($ep.Choix)[$j]) { $id } }).Count) { $decalesAvant++ }
+        $essais++
+    }
+}
+Write-Resultat "reprise : $essais enquêtes rejouées avec un indice changé, aucune réponse sur une autre question" ($essais -ge 400 -and $decales -eq 0) "($decales décalées, par exemple $exemple)"
+Write-Resultat "reprise (contre-épreuve) : rejouées par leur place, $decalesAvant réponses tombaient sur une autre question" ($decalesAvant -gt 0) ''
+# Une enquête finie (le test de mémoire raté : la mémoire) revue alors que Windows ne note plus rien : même réponse
+$jourA = @{ 'testmemoire-erreurs' = [pscustomobject]@{ Vu = $true; Texte = 'Le test de mémoire du 3 octobre a trouvé des erreurs'; TexteOk = ''; Affiche = $true; Partiel = $false } }
+Set-IndicesTest $jourA
+$script:Historique = @()
+Start-EnqueteTest 'redemarre' 1, 0
+Show-Etape
+$finie = $script:Historique[0]
+Set-IndicesTest @{}
+Open-Diagnostic ([string]$finie.Id)
+Write-Resultat 'reprise : une enquête finie se revoit avec la même réponse' ($finie.Fini -and $finie.Suspect -eq 'memoire' -and @(Get-TextesEcran) -contains 'TROUVÉ' -and $script:Historique[0].Suspect -eq 'memoire') "(gardée : $($finie.Suspect) ; écran : $(@(Get-TextesEcran | Select-Object -First 2) -join ' / '))"
+# (le lendemain : relue du fichier diagnostics.json)
+Read-Historique
+Open-Diagnostic ([string]$finie.Id)
+Write-Resultat 'reprise : une enquête finie, relue du fichier, garde sa réponse' ($script:Historique[0].PSObject.Properties['Indices'] -and @(Get-TextesEcran) -contains 'TROUVÉ') ''
+# (contre-épreuve : sans les indices gardés, comme avant, la réponse changeait toute seule)
+$script:Historique = @($finie | Select-Object * -ExcludeProperty Indices)
+Open-Diagnostic ([string]$finie.Id)
+Write-Resultat 'reprise (contre-épreuve) : sans les indices gardés, la réponse changeait' (@(Get-TextesEcran) -notcontains 'TROUVÉ') ''
+# L'ancien format (les numéros seulement) se relit toujours
+$script:Historique = @([pscustomobject]@{ Id = 'ancien'; Panne = 'redemarre'; Choix = @(1, 1); Fini = $false; Suspect = ''; Titre = '' })
+Set-IndicesTest @{}
+Open-Diagnostic 'ancien'
+Write-Resultat 'reprise : l''ancien format (les numéros seulement) se relit' ((@($script:ChoixFaits) -join ',') -eq '1,1' -and $script:PanneEnCours.Id -eq 'redemarre') "(choix : $(@($script:ChoixFaits) -join ','))"
+Reset-Journaux 0
+
 # Un historique vide (coupure pendant l'écriture) : la copie de secours est reprise, et l'enregistrement suivant ne la perd pas
 $fj = Join-Path $env:TEMP "mindcare-essai-vide-$PID.json"
 try {

@@ -137,7 +137,7 @@ function Add-Ligne($Parent, [string]$CouleurPoint, $Texte, [string]$Marge = '0,8
 # ---------------------------------------------------------------------------
 function Show-Accueil([string]$Famille = '') {
     $script:FamilleChoisie = $Famille
-    $script:PanneEnCours = $null; $script:ChoixFaits = @(); $script:ReparateurOuvert = $false
+    $script:PanneEnCours = $null; $script:ChoixFaits = @(); $script:ReparateurOuvert = $false; $script:IndicesGardes = $null
     $script:FamillesAnimees = $false
     Clear-Contenu
     Set-BulleMascotte $(if ($Famille) { 'Choisis ce qui ressemble le plus à ce qui se passe.' } else { 'Un souci avec l''ordinateur ? Dis-moi ce qui se passe.' })
@@ -471,7 +471,7 @@ function New-DiagId { "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$((Get-Random -Maxi
 function Start-Diagnostic([string]$Id, [hashtable]$PreRempli = $null) {
     $script:PanneEnCours = Get-Panne $script:Donnees $Id
     if (-not $script:PanneEnCours) { Show-Accueil; return }
-    $script:ChoixFaits = @(); $script:DiagId = New-DiagId; $script:ReparateurOuvert = $false
+    $script:ChoixFaits = @(); $script:DiagId = New-DiagId; $script:ReparateurOuvert = $false; $script:IndicesGardes = $null
     $script:PreRempli = if ($PreRempli) { $PreRempli.Clone() } else { $null }   # (les réponses déjà données par la phrase, assistant)
     if ($script:PreRempli) { $script:PreRempli.Remove('danger') }   # (la question de sécurité est toujours posée)
     $script:IaCarte = $null
@@ -484,7 +484,17 @@ function Open-Diagnostic([string]$Id) {
     $d = @($script:Historique | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1
     $p = if ($d) { Get-Panne $script:Donnees ([string]$d.Panne) } else { $null }
     if (-not $p) { Write-Log "Enquête $Id introuvable"; Show-Accueil; return }
-    $script:PanneEnCours = $p; $script:ChoixFaits = @(foreach ($n in $d.Choix) { [int]$n }); $script:DiagId = $Id; $script:ReparateurOuvert = $false
+    $script:PanneEnCours = $p; $script:DiagId = $Id; $script:ReparateurOuvert = $false
+    # (finie : revue avec ce que Windows avait noté ce jour-là, pas celui d'aujourd'hui : sa réponse ne change pas toute seule)
+    $script:IndicesGardes = if ($d.Fini -and $d.PSObject.Properties['Indices'] -and $d.Indices) { ConvertTo-Indices $d.Indices } else { $null }
+    if ($d.PSObject.Properties['Reponses'] -and @($d.Reponses).Count) {
+        # Chaque réponse ne va qu'à la question qui porte son Id (Show-Etape) : une question qui n'est plus là est sautée,
+        # une nouvelle est posée, et les suivantes reprennent leur réponse
+        $script:ChoixFaits = @(); $script:PreRempli = @{}
+        foreach ($r in $d.Reponses) { $script:PreRempli[[string]$r.Etape] = [int]$r.Reponse }
+    } else {
+        $script:ChoixFaits = @(foreach ($n in $d.Choix) { [int]$n }); $script:PreRempli = $null   # (ancien format : les numéros seulement)
+    }
     Write-Log "Reprise de l'enquête $Id ($($p.Id))"
     Show-Etape
 }
@@ -492,7 +502,7 @@ function Open-Diagnostic([string]$Id) {
 # Rejoue l'enquête ; ouverte sur le PC en panne (réponse « cepc »), avec ce que Windows a noté
 function Get-EnqueteEnCours {
     $e = Get-Enquete $script:Donnees $script:PanneEnCours $script:ChoixFaits
-    if ($e.Notes -contains 'cepc') { $e = Get-Enquete $script:Donnees $script:PanneEnCours $script:ChoixFaits (Get-Indices) }
+    if ($e.Notes -contains 'cepc') { $e = Get-Enquete $script:Donnees $script:PanneEnCours $script:ChoixFaits $(if ($script:IndicesGardes) { $script:IndicesGardes } else { Get-Indices }) }
     $e
 }
 
@@ -502,7 +512,7 @@ function Get-EnqueteEnCours {
 # $AttenteJournauxMax secondes). Si la personne est partie ailleurs entre-temps, rien n'est réaffiché.
 $AttenteJournauxMax = 30
 function Wait-Journaux($E) {
-    if ($E.Notes -notcontains 'cepc' -or (Test-JournauxLus)) { return $false }
+    if ($E.Notes -notcontains 'cepc' -or $script:IndicesGardes -or (Test-JournauxLus)) { return $false }
     Clear-Contenu
     $carte = New-Card
     Add-Titre $carte 'Mindcare regarde ce que Windows a noté...' 'H1'
@@ -535,7 +545,7 @@ function Show-Etape {
     while ($e.Etape -and $script:PreRempli -and $script:PreRempli.ContainsKey([string]$e.Etape.Id)) {
         $n = [int]$script:PreRempli[[string]$e.Etape.Id]
         $script:PreRempli.Remove([string]$e.Etape.Id)
-        if ($n -lt 0 -or $n -ge @($e.Etape.Reponses).Count) { break }
+        if ($n -lt -1 -or $n -ge @($e.Etape.Reponses).Count) { break }   # (-1 : « Je ne sais pas », gardé dans une enquête reprise)
         $script:ChoixFaits = @($e.Choix) + $n
         $e = Get-EnqueteEnCours
         if (Wait-Journaux $e) { return }
@@ -544,7 +554,7 @@ function Show-Etape {
     if ($e.Etape) {
         # (une enquête déjà finie le reste dans l'historique tant qu'une nouvelle réponse ne la remplace pas)
         $ancien = @($script:Historique | Where-Object { $_.Id -eq $script:DiagId }) | Select-Object -First 1
-        if (-not ($ancien -and $ancien.Fini)) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null '' }
+        if (-not ($ancien -and $ancien.Fini)) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null '' (Get-Paires $e) }
         Show-EtapeEnquete $e
     } else { Show-Verdict $e }
 }
@@ -761,7 +771,10 @@ function Show-Verdict($E, [switch]$Reaffiche) {
     $supposee = $piece -and $v.Type -eq 'elimination'
     if ($supposee) { $titre = "À vérifier : $(Get-Minuscule ([string]$suspect.Titre))" }
     Set-BulleMascotte $(if ($supposee) { 'Tout le reste est écarté, mais cette pièce n''a pas été testée : fais-la vérifier avant d''acheter.' } else { switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } } })
-    if (-not $Reaffiche) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre }
+    if (-not $Reaffiche) {
+        $indices = if ($E.Notes -contains 'cepc') { if ($script:IndicesGardes) { $script:IndicesGardes } else { Get-Indices } } else { $null }
+        Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre (Get-Paires $E) $indices
+    }
     $script:ResumeDe = @{ Panne = $script:PanneEnCours; Enquete = $E; Titre = $titre }
     Clear-Contenu
 
