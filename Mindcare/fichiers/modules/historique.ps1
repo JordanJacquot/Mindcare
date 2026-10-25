@@ -85,6 +85,8 @@ function Get-ResumeTexte($Panne, $Enquete, [string]$Titre) {
         $l.Add(''); $l.Add('Ce que Mindcare a vérifié sur ce PC (ce que Windows a noté, la place libre, la batterie...) :')
         foreach ($a in $Enquete.Auto) { $l.Add("- $($a.Texte)") }
     }
+    # (le journal de Windows illisible, ou trop court : le réparateur doit savoir que ses indices n'ont pas tous servi)
+    if ($Enquete.Notes -contains 'cepc') { $j = (Get-Indices)['journal']; if ($j -and $j.TexteOk) { $l.Add(''); $l.Add("À savoir : $($j.TexteOk).") } }
     $l.Add(''); $l.Add('Les réponses :')
     foreach ($f in $Enquete.Faits) { $l.Add("- $($f.Texte)"); $l.Add("  $($f.Reponse)") }
     $l.Add(''); $l.Add("Fait avec Mindcare $AppVersion.")

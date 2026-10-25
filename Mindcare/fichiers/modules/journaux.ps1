@@ -52,12 +52,24 @@ $JournauxCode = {
         $depuis = (Get-Date).AddDays(-$Jours)
         $quand = { param($D) $t = $D.ToString('d MMMM', $fr); if ($t -match '^1 ') { '1er' + $t.Substring(1) } else { $t } }
         $i = @{}
-        $ajoute = { param($Id, $Vu, $Texte, $Ok, $Affiche = $true) $i[$Id] = [pscustomobject]@{ Vu = [bool]$Vu; Texte = [string]$Texte; TexteOk = [string]$Ok; Affiche = [bool]$Affiche } }
+        # (Partiel : le journal ne remonte pas assez loin ; s'il n'a rien vu, ça ne prouve rien : le moteur n'écarte aucune piste)
+        $ajoute = { param($Id, $Vu, $Texte, $Ok, $Affiche = $true, $Partiel = $false) $i[$Id] = [pscustomobject]@{ Vu = [bool]$Vu; Texte = [string]$Texte; TexteOk = [string]$Ok; Affiche = [bool]$Affiche; Partiel = [bool]$Partiel } }
         $dernier = { param($Ev) if ($Ev.Count -gt 1) { " (le dernier le $(& $quand $Ev[0].TimeCreated))" } else { " (le $(& $quand $Ev[0].TimeCreated))" } }
 
+        # La sonde : le journal Système se lit-il, et depuis quand ? Un journal illisible lu avec un filtre répond « aucun
+        # événement », comme un PC sans souci : sans la sonde, ce serait pris pour une bonne nouvelle, et des pistes écartées.
+        $illisible = ''; $debut = $null
+        try { $debut = @(Get-WinEvent -LogName System -MaxEvents 1 -Oldest -ErrorAction Stop)[0].TimeCreated } catch { $illisible = "$_" }
+        if (-not $illisible -and -not $debut) { $illisible = 'journal vide' }
+        $court = [bool]($debut -and $debut -gt $depuis)
+        $periode = if ($court) { "depuis le $(& $quand $debut)" } else { "ces $Jours jours" }
+        if ($illisible) { & $ajoute 'journal' $false '' "Le journal de Windows n'a pas pu être lu ($illisible) : Mindcare ne s'en est pas servie" '' $false }
+        elseif ($court) { & $ajoute 'journal' $false '' "Le journal de Windows ne remonte qu'au $(& $quand $debut) : ce qu'il n'a pas vu n'écarte aucune piste" '' $false }
+
+        if (-not $illisible) {
         # Redémarrages et coupures brutales (Windows ne s'est pas arrêté normalement)
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-Kernel-Power'; Id = 41; StartTime = $depuis }
-        & $ajoute 'coupures' $ev.Count "$(Get-Quantite $ev.Count 'redémarrage brutal' 'redémarrages brutaux') ces $Jours jours$(if ($ev.Count) { & $dernier $ev })" "Aucun redémarrage brutal ces $Jours jours"
+        & $ajoute 'coupures' $ev.Count "$(Get-Quantite $ev.Count 'redémarrage brutal' 'redémarrages brutaux') $periode$(if ($ev.Count) { & $dernier $ev })" "Aucun redémarrage brutal $periode" $true $court
 
         # Écrans bleus, et ce que leur code accuse
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-WER-SystemErrorReporting'; Id = 1001; StartTime = $depuis }
@@ -70,18 +82,20 @@ $JournauxCode = {
             if ($c) { $noms += $c[0]; $familles[$c[1]] = $true; $parFamille[$c[1]] = @($parFamille[$c[1]]) + $c[0] } else { $noms += ('0x{0:X}' -f $code) }
         }
         $noms = @($noms | Select-Object -Unique)
-        & $ajoute 'ecransbleus' $ev.Count "$(Get-Quantite $ev.Count 'écran bleu' 'écrans bleus') ces $Jours jours$(if ($noms) { " ($($noms -join ', '))" })" "Aucun écran bleu ces $Jours jours"
-        foreach ($f in 'memoire', 'pilote', 'disque', 'materiel') { & $ajoute "bsod-$f" $familles[$f] "Code d'écran bleu noté par Windows : $(@($parFamille[$f] | Where-Object { $_ } | Select-Object -Unique) -join ', ')" '' $false }
+        & $ajoute 'ecransbleus' $ev.Count "$(Get-Quantite $ev.Count 'écran bleu' 'écrans bleus') $periode$(if ($noms) { " ($($noms -join ', '))" })" "Aucun écran bleu $periode" $true $court
+        foreach ($f in 'memoire', 'pilote', 'disque', 'materiel') { & $ajoute "bsod-$f" $familles[$f] "Code d'écran bleu noté par Windows : $(@($parFamille[$f] | Where-Object { $_ } | Select-Object -Unique) -join ', ')" '' $false $court }
 
         # Erreurs matérielles graves, notées par le processeur ou la carte mère
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-WHEA-Logger'; Level = 1, 2; StartTime = $depuis }
-        & $ajoute 'materiel' $ev.Count "$(Get-Quantite $ev.Count 'erreur matérielle grave' 'erreurs matérielles graves') ces $Jours jours" 'Aucune erreur matérielle grave'
+        & $ajoute 'materiel' $ev.Count "$(Get-Quantite $ev.Count 'erreur matérielle grave' 'erreurs matérielles graves') $periode" "Aucune erreur matérielle grave $periode" $true $court
 
         # Le dernier test de la mémoire de Windows (sur 6 mois) : 1101 sans erreur, 1102 avec des erreurs
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-MemoryDiagnostics-Results'; Id = 1101, 1102; StartTime = (Get-Date).AddDays(-180) } 1
         $erreurs = $ev.Count -and $ev[0].Id -eq 1102
-        & $ajoute 'testmemoire-erreurs' $erreurs $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) a trouvé des erreurs" }) ''
-        & $ajoute 'testmemoire-ok' ($ev.Count -and -not $erreurs) $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) n'a trouvé aucune erreur" }) ''
+        $court6 = [bool]($debut -gt (Get-Date).AddDays(-180))
+        & $ajoute 'testmemoire-erreurs' $erreurs $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) a trouvé des erreurs" }) '' $true $court6
+        & $ajoute 'testmemoire-ok' ($ev.Count -and -not $erreurs) $(if ($ev.Count) { "Le test de mémoire du $(& $quand $ev[0].TimeCreated) n'a trouvé aucune erreur" }) '' $true $court6
+        }
 
         # Le disque du PC : ses erreurs, et ce que Windows dit de sa santé (les clés USB et disques externes ne comptent pas)
         $internes = $null; $lettres = $null
@@ -89,23 +103,27 @@ $JournauxCode = {
             $internes = @(Get-Disk -ErrorAction Stop | Where-Object { "$($_.BusType)" -ne 'USB' } | ForEach-Object { [int]$_.Number })
             $lettres = @(Get-Partition -ErrorAction Stop | Where-Object { $internes -contains [int]$_.DiskNumber -and "$($_.DriveLetter)" -match '^[A-Za-z]$' } | ForEach-Object { "$($_.DriveLetter)".ToUpperInvariant() })
         } catch { }
-        $ev = @(Select-ErreursDisque (@(Get-EvenementsSysteme @{ ProviderName = 'disk'; Id = 7, 51, 153; StartTime = $depuis }) + @(Get-EvenementsSysteme @{ ProviderName = 'Ntfs'; Id = 55; StartTime = $depuis })) $internes $lettres)
+        $ev = if ($illisible) { @() } else { @(Select-ErreursDisque (@(Get-EvenementsSysteme @{ ProviderName = 'disk'; Id = 7, 51, 153; StartTime = $depuis }) + @(Get-EvenementsSysteme @{ ProviderName = 'Ntfs'; Id = 55; StartTime = $depuis })) $internes $lettres) }
         $malades = @(try { Get-PhysicalDisk -ErrorAction Stop | Where-Object { "$($_.BusType)" -ne 'USB' -and $_.HealthStatus -and "$($_.HealthStatus)" -ne 'Healthy' } } catch { })
-        $texte = if ($malades) { "Windows dit qu'un disque du PC n'est pas en bonne santé ($($malades[0].FriendlyName))" } else { "Le disque du PC a signalé $(Get-Quantite $ev.Count 'erreur' 'erreurs') ces $Jours jours" }
-        & $ajoute 'disque' ($malades.Count -or $ev.Count) $texte 'Disques en bonne santé'
+        $texte = if ($malades) { "Windows dit qu'un disque du PC n'est pas en bonne santé ($($malades[0].FriendlyName))" } else { "Le disque du PC a signalé $(Get-Quantite $ev.Count 'erreur' 'erreurs') $periode" }
+        # (journal illisible : seul un disque que Windows dit malade compte ; « en bonne santé » ne se dit pas sans le journal)
+        if (-not $illisible -or $malades) { & $ajoute 'disque' ($malades.Count -or $ev.Count) $texte 'Disques en bonne santé' $true $court }
+
+        if (-not $illisible) {
 
         # Le pilote de la carte graphique qui plante (puis repart)
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Display'; Id = 4101; StartTime = $depuis }
-        & $ajoute 'pilotegraphique' $ev.Count "Le pilote de la carte graphique a planté $(Get-Quantite $ev.Count 'fois' 'fois') ces $Jours jours" 'Aucun plantage du pilote graphique'
+        & $ajoute 'pilotegraphique' $ev.Count "Le pilote de la carte graphique a planté $(Get-Quantite $ev.Count 'fois' 'fois') $periode" "Aucun plantage du pilote graphique $periode" $true $court
 
         # Redémarrages lancés par les mises à jour de Windows
         $ev = @(Get-EvenementsSysteme @{ ProviderName = 'User32'; Id = 1074; StartTime = $depuis } | Where-Object { "$($_.Properties[0].Value)" -match 'TrustedInstaller|MoUsoCoreWorker|UsoClient|wuauclt|musnotification' })
-        & $ajoute 'majredemarrage' $ev.Count "$(Get-Quantite $ev.Count 'redémarrage' 'redémarrages') pour les mises à jour de Windows$(if ($ev.Count) { & $dernier $ev })" "Aucun redémarrage pour les mises à jour ces $Jours jours"
+        & $ajoute 'majredemarrage' $ev.Count "$(Get-Quantite $ev.Count 'redémarrage' 'redémarrages') pour les mises à jour de Windows$(if ($ev.Count) { & $dernier $ev })" "Aucun redémarrage pour les mises à jour $periode" $true $court
 
         # Le processeur ralenti par la carte mère (événement 37 : « vitesse limitée par le microprogramme » ; sur un
         # portable, c'est souvent la gestion de l'énergie, sinon la chaleur)
         $ev = Get-EvenementsSysteme @{ ProviderName = 'Microsoft-Windows-Kernel-Processor-Power'; Id = 37; StartTime = $depuis }
-        & $ajoute 'freinage' $ev.Count "Le processeur a été ralenti $(Get-Quantite $ev.Count 'fois' 'fois') ces $Jours jours (souvent pour économiser l'énergie, parfois à cause de la chaleur)" "Processeur jamais ralenti ces $Jours jours"
+        & $ajoute 'freinage' $ev.Count "Le processeur a été ralenti $(Get-Quantite $ev.Count 'fois' 'fois') $periode (souvent pour économiser l'énergie, parfois à cause de la chaleur)" "Processeur jamais ralenti $periode" $true $court
+        }
 
         # La place libre sur le disque de Windows
         try {
@@ -177,7 +195,7 @@ function Get-Indices {
     if ($EnTest -and -not $script:JournauxTache) {
         $h = @{}
         if ($env:MINDCARE_TEST_JOURNAUX) {
-            try { foreach ($pr in ($env:MINDCARE_TEST_JOURNAUX | ConvertFrom-Json).PSObject.Properties) { $h[$pr.Name] = [pscustomobject]@{ Vu = [bool]$pr.Value.Vu; Texte = [string]$pr.Value.Texte; TexteOk = [string]$pr.Value.TexteOk; Affiche = ($pr.Value.Affiche -ne $false) } } }
+            try { foreach ($pr in ($env:MINDCARE_TEST_JOURNAUX | ConvertFrom-Json).PSObject.Properties) { $h[$pr.Name] = [pscustomobject]@{ Vu = [bool]$pr.Value.Vu; Texte = [string]$pr.Value.Texte; TexteOk = [string]$pr.Value.TexteOk; Affiche = ($pr.Value.Affiche -ne $false); Partiel = [bool]$pr.Value.Partiel } } }
             catch { Write-Log "MINDCARE_TEST_JOURNAUX illisible : $_" }
         }
         return $h
@@ -193,6 +211,7 @@ function Get-Indices {
     if (-not $script:JournauxNotes) {
         $script:JournauxNotes = $true
         Write-Log "Journaux de Windows : $(@($script:Journaux.Indices.GetEnumerator() | Where-Object { $_.Value.Vu } | ForEach-Object { $_.Key }) -join ', ')"
+        if ($script:Journaux.Indices['journal']) { Write-Log "Journaux de Windows : $($script:Journaux.Indices['journal'].TexteOk)" }
     }
     $script:Journaux.Indices
 }

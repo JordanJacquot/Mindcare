@@ -73,6 +73,8 @@ function Get-Enquete($Donnees, $Panne, [int[]]$Choix = @(), $Indices = $null) {
             if (-not $ind) { continue }
             $texte = if ($ind.Vu) { $ind.Texte } else { $ind.TexteOk }
             if ($texte -and -not @($auto | Where-Object { $_.Texte -eq $texte })) { $auto += [pscustomobject]@{ Texte = [string]$texte; Vu = [bool]$ind.Vu } }
+            # (un journal qui ne remonte pas assez loin et n'a rien vu ne prouve rien : aucune piste écartée)
+            if (-not $ind.Vu -and $ind.Partiel) { continue }
             & $applique $(if ($ind.Vu) { $et.SiVu } else { $et.SiNonVu }) ([string]$texte)
             continue
         }

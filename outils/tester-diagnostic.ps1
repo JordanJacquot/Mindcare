@@ -124,9 +124,15 @@ function New-FauxEvenement([string]$Source, [int]$Id, [string]$Message, [string]
     $v = New-Object FauxValeur; $v.Value = $Valeur; $e.Properties = @($v)
     $e
 }
-function Get-IndicesFauxPC($Evenements) {
+# (Sonde : la date du plus ancien événement du journal Système, ou « illisible » : le journal ne se lit pas)
+function Get-IndicesFauxPC($Evenements, $Sonde = (Get-Date).AddDays(-400)) {
     & {
-        function Get-WinEvent { throw 'Le test a voulu lire les vrais journaux de Windows' }   # (jamais le vrai PC)
+        function Get-WinEvent {
+            [CmdletBinding()] param([string]$LogName, [int]$MaxEvents, [switch]$Oldest, $FilterHashtable)
+            if ($FilterHashtable -or $LogName -ne 'System' -or -not $Oldest) { throw 'Le test a voulu lire les vrais journaux de Windows' }   # (jamais le vrai PC)
+            if ($Sonde -eq 'illisible') { throw 'Accès refusé (faux journal illisible)' }
+            $e = New-Object FauxEvenement; $e.TimeCreated = $Sonde; $e
+        }
         function Get-EvenementsSysteme([hashtable]$Filtre, [int]$Max = 200) { @($Evenements | Where-Object { $_.ProviderName -eq $Filtre.ProviderName -and @($Filtre.Id) -contains $_.Id }) }
         function Get-Disk { [pscustomobject]@{ Number = 0; BusType = 'NVMe' }; [pscustomobject]@{ Number = 2; BusType = 'USB' } }
         function Get-Partition { [pscustomobject]@{ DiskNumber = 0; DriveLetter = [char]'C' }; [pscustomobject]@{ DiskNumber = 2; DriveLetter = [char]'E' } }
@@ -149,6 +155,32 @@ Write-Resultat 'textes : le processeur ralenti n''est pas mis sur le dos de la c
 Write-Resultat 'textes : les erreurs d''une clé USB ne sont pas celles du disque du PC' (-not $i.disque.Vu -and $i.disque.Texte -notmatch 'Clé USB') "($($i.disque.Texte))"
 $i = Get-IndicesFauxPC ($usb + (New-FauxEvenement 'disk' 7 'Le périphérique \Device\Harddisk0\DR0 a un bloc défectueux.' '\Device\Harddisk0\DR0'))
 Write-Resultat 'textes : une erreur du disque du PC compte' ($i.disque.Vu -and $i.disque.Texte -match 'Le disque du PC a signalé 1 erreur ') "($($i.disque.Texte))"
+
+# Le journal Système illisible (service arrêté, stratégie, journal abîmé) : avec un filtre, Windows répond « aucun
+# événement », comme un PC sans souci. Jamais pris pour une bonne nouvelle : aucun indice du journal, rien d'écarté.
+$i = Get-IndicesFauxPC @() 'illisible'
+Write-Resultat 'journal illisible : aucun indice tiré du journal, et la raison notée' (-not $i.ContainsKey('majredemarrage') -and -not $i.ContainsKey('ecransbleus') -and -not $i.ContainsKey('coupures') -and -not $i.ContainsKey('disque') -and $i.journal.TexteOk -match "n'a pas pu être lu" -and $i.ContainsKey('placelibre')) "(clés : $(@($i.Keys) -join ', '))"
+$e = Get-Enquete $script:Donnees (Get-Panne $script:Donnees 'redemarre') @(1, 0, 0) $i
+Write-Resultat 'journal illisible : la piste « mises à jour » n''est pas écartée' (@($e.Ecartes | ForEach-Object { $_.Id }) -notcontains 'majnuit') "(écartés : $(@($e.Ecartes | ForEach-Object { $_.Id }) -join ', '))"
+# (contre-épreuve : ce que faisait l'ancien code, un « aucun redémarrage » sans preuve, écarte bien la piste)
+$ancien = @{ majredemarrage = [pscustomobject]@{ Vu = $false; Texte = ''; TexteOk = 'Aucun redémarrage pour les mises à jour ces 30 jours'; Affiche = $true } }
+$e = Get-Enquete $script:Donnees (Get-Panne $script:Donnees 'redemarre') @(1, 0, 0) $ancien
+Write-Resultat 'journal illisible (contre-épreuve) : l''ancien « aucun redémarrage » écartait la piste' (@($e.Ecartes | ForEach-Object { $_.Id }) -contains 'majnuit') ''
+$sauveIndices = $script:Journaux.Indices; $sauveTache = $script:JournauxTache
+$script:JournauxTache = @{ Res = [pscustomobject]@{ IsCompleted = $true } }; $script:Journaux.Indices = $i
+$e = Get-Enquete $script:Donnees (Get-Panne $script:Donnees 'redemarre') @(1, 0, 0) $i
+$rt = Get-ResumeTexte (Get-Panne $script:Donnees 'redemarre') $e 'Essai'
+$script:Journaux.Indices = $sauveIndices; $script:JournauxTache = $sauveTache
+Write-Resultat 'journal illisible : écrit dans le rapport pour le réparateur' ($rt -match "À savoir : Le journal de Windows n'a pas pu être lu") ''
+# Le journal ne remonte qu'à 10 jours : « depuis le ... » au lieu de « ces 30 jours », et ce qu'il n'a pas vu n'écarte rien
+$i = Get-IndicesFauxPC @() (Get-Date).AddDays(-10)
+Write-Resultat 'journal court : « depuis le » au lieu de « ces 30 jours »' ($i.ecransbleus.TexteOk -match '^Aucun écran bleu depuis le ' -and $i.majredemarrage.Partiel -and $i.journal.TexteOk -match "ne remonte qu'au") "($($i.ecransbleus.TexteOk))"
+$e = Get-Enquete $script:Donnees (Get-Panne $script:Donnees 'redemarre') @(1, 0, 0) $i
+Write-Resultat 'journal court : la piste « mises à jour » n''est pas écartée, le texte reste' (@($e.Ecartes | ForEach-Object { $_.Id }) -notcontains 'majnuit' -and @($e.Auto | Where-Object { $_.Texte -match 'mises à jour depuis le' }).Count -eq 1) "(écartés : $(@($e.Ecartes | ForEach-Object { $_.Id }) -join ', '))"
+# (contre-épreuve : un journal assez long qui n'a rien vu écarte bien la piste, comme avant)
+$i = Get-IndicesFauxPC @()
+$e = Get-Enquete $script:Donnees (Get-Panne $script:Donnees 'redemarre') @(1, 0, 0) $i
+Write-Resultat 'journal de plus de 30 jours (contre-épreuve) : rien vu, la piste est écartée' (@($e.Ecartes | ForEach-Object { $_.Id }) -contains 'majnuit' -and $i.majredemarrage.TexteOk -match 'ces 30 jours' -and -not $i.ContainsKey('journal')) ''
 
 # Le rapport : son titre dit bien ce qu'il contient (pas seulement 30 jours : aussi le test de mémoire, la batterie...)
 $jx = @{ 'testmemoire-erreurs' = [pscustomobject]@{ Vu = $true; Texte = 'Le test de mémoire du 3 octobre a trouvé des erreurs'; TexteOk = ''; Affiche = $true } }
