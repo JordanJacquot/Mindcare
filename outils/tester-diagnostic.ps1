@@ -30,7 +30,7 @@ $MainScript = Join-Path $AppDir 'Mindcare.ps1'
 $AppExe = Join-Path $racine 'Mindcare\Mindset.exe'
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase, System.Drawing, System.Windows.Forms
 Add-Type -TypeDefinition ([IO.File]::ReadAllText((Join-Path $ModulesDir 'natif.cs'), [Text.Encoding]::UTF8))
-foreach ($m in 'mindset', 'donnees', 'themes', 'interface', 'systeme', 'enquete', 'images', 'journaux', 'historique', 'ia', 'contenu') { . (Join-Path $ModulesDir "$m.ps1") }
+foreach ($m in 'mindset', 'donnees', 'themes', 'interface', 'systeme', 'enquete', 'images', 'journaux', 'historique', 'ia', 'dictee', 'contenu') { . (Join-Path $ModulesDir "$m.ps1") }
 $script:Donnees = Read-Enquetes
 $Journal = Join-Path $test 'journal.txt'
 function Get-Journal { if (Test-Path -LiteralPath $Journal) { [IO.File]::ReadAllText($Journal, [Text.Encoding]::UTF8) } else { '' } }
