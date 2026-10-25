@@ -321,7 +321,7 @@ function Request-Ia {
         foreach ($i in $idees) {
             $propose = @($i.Reponses.Keys) -join ','
             $i.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $i.Panne) $i.Reponses $script:IaCarte.Texte
-            Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($i.Panne) $(@($i.Reponses.Keys) -join ',') (proposé : $propose)$(if ($i -eq $idees[0]) { " (sûr à $([math]::Round(100 * $r.Confiance)) %)" })"
+            Write-Log "Assistant : ($($script:IaCarte.Texte.Length) caractères) -> $($i.Panne) $(@($i.Reponses.Keys) -join ',') (proposé : $propose)$(if ($i -eq $idees[0]) { " (sûr à $([math]::Round(100 * $r.Confiance)) %)" })"
         }
         # Sûr : l'enquête commence tout de suite. Il hésite : la question « Pour être sûr », sur ce qu'on voit
         if ($sur -or $idees.Count -lt 2) { Start-Diagnostic $idees[0].Panne $idees[0].Reponses }

@@ -301,6 +301,17 @@ Open-Diagnostic 'ancien'
 Write-Resultat 'reprise : l''ancien format (les numéros seulement) se relit' ((@($script:ChoixFaits) -join ',') -eq '1,1' -and $script:PanneEnCours.Id -eq 'redemarre') "(choix : $(@($script:ChoixFaits) -join ','))"
 Reset-Journaux 0
 
+# ---------------------------------------------------------------------------
+# 12. Ce qu'on écrit à l'assistant ne va pas dans journal.txt (revue du 25/10, constat 26) : seulement sa longueur
+# ---------------------------------------------------------------------------
+Show-Accueil
+$secret = 'ma voisine Ginette a renversé du thé, il s''éteint'
+$ui.Recherche.Text = $secret
+$env:MINDCARE_TEST_IA = '{"panne":"seteint","reponses":{}}'
+try { $script:IaAttente = $null; Request-Ia; Wait-Fenetre 8000 { (Get-Journal) -match 'Assistant : .+ -> seteint' } }
+finally { Remove-Item env:MINDCARE_TEST_IA -ErrorAction SilentlyContinue }
+Write-Resultat 'assistant : la phrase tapée n''est pas écrite dans le journal, seulement sa longueur' ((Get-Journal) -match "Assistant : \($($secret.Length) caractères\) -> seteint" -and (Get-Journal) -notmatch 'Ginette') "($(((Get-Journal) -split "`n" | Select-String 'Assistant :' | Select-Object -Last 1)))"
+
 # Un historique vide (coupure pendant l'écriture) : la copie de secours est reprise, et l'enregistrement suivant ne la perd pas
 $fj = Join-Path $env:TEMP "mindcare-essai-vide-$PID.json"
 try {

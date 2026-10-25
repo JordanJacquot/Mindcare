@@ -204,12 +204,17 @@ function Get-PortLibre {
 function Get-IaServeurLance {
     $copie = Join-Path (Split-Path $IaServeur -Parent) 'Mindset.exe'
     try {
+        # (vérifiée une fois par session : ensuite, tant que llama-server.exe et sa copie n'ont pas changé, pas de nouvelle empreinte)
+        $s = Get-Item -LiteralPath $IaServeur -ErrorAction Stop; $vu = "$($s.Length)|$($s.LastWriteTimeUtc.Ticks)"
+        $c = Get-Item -LiteralPath $copie -ErrorAction SilentlyContinue
+        if ($script:IaCopieVue -eq $vu -and $c -and $c.Length -eq $s.Length) { return $copie }
         $empreinte = (Get-FileHash -LiteralPath $IaServeur -Algorithm SHA256 -ErrorAction Stop).Hash
         $c = Get-Item -LiteralPath $copie -ErrorAction SilentlyContinue
         if (-not $c -or $c.Length -ne (Get-Item -LiteralPath $IaServeur).Length -or (Get-FileHash -LiteralPath $copie -Algorithm SHA256 -ErrorAction Stop).Hash -ne $empreinte) {
             Copy-Item -LiteralPath $IaServeur -Destination $copie -Force -ErrorAction Stop
             if ((Get-FileHash -LiteralPath $copie -Algorithm SHA256 -ErrorAction Stop).Hash -ne $empreinte) { throw 'copie différente de llama-server.exe' }
         }
+        $script:IaCopieVue = $vu
         $copie
     } catch { Write-Log "Assistant : copie Mindset.exe impossible, llama-server.exe lancé ($($_.Exception.Message))"; $IaServeur }
 }
@@ -219,6 +224,17 @@ function Get-IaServeurLance {
 function Start-Ia {
     $script:Ia.Derniere = Get-Date
     if ($script:Ia.Process -and -not $script:Ia.Process.HasExited) { return }
+    if ($script:Ia.Process -and -not $script:Ia.Arrete) {
+        # Arrêté tout seul (pas par Mindcare) : la cause au journal une seule fois (son code, ses dernières lignes), et pas
+        # de nouvel essai avant une minute (sinon un assistant qui plante serait relancé à chaque lettre tapée)
+        if (-not $script:Ia.FinNotee) {
+            $script:Ia.FinNotee = $true
+            $code = try { $script:Ia.Process.ExitCode } catch { '?' }
+            $lignes = if ($script:Ia.Sorties) { @($script:Ia.Sorties.Lignes()) } else { @() }
+            Write-Log "Assistant arrêté tout seul (code $code)$(if ($lignes) { " ; ses dernières lignes : $($lignes -join ' | ')" })"
+        }
+        if (((Get-Date) - $script:Ia.Lance).TotalSeconds -lt 60) { return }
+    }
     if (-not (Test-IaInstallee)) { return }
     try {
         $script:Ia.Port = Get-PortLibre
@@ -229,9 +245,15 @@ function Start-Ia {
         $si.UseShellExecute = $false; $si.CreateNoWindow = $true
         $si.RedirectStandardOutput = $true; $si.RedirectStandardError = $true
         $si.EnvironmentVariables['LLAMA_ARG_CHAT_TEMPLATE_KWARGS'] = '{"enable_thinking":false}'
+        # (une clé neuve à chaque lancement : un autre programme du PC ne peut pas questionner l'assistant ; par une variable
+        # d'environnement, car la ligne de commande se lit dans le Gestionnaire des tâches ; /health reste ouvert)
+        $script:Ia.Cle = -join @(1..2 | ForEach-Object { [guid]::NewGuid().ToString('N') })
+        $si.EnvironmentVariables['LLAMA_API_KEY'] = $script:Ia.Cle
         $script:Ia.Process = [Diagnostics.Process]::Start($si)
+        $script:Ia.Arrete = $false; $script:Ia.FinNotee = $false
+        $script:Ia.Sorties = try { New-Object MindcareSorties $script:Ia.Process, 20 } catch { $null }   # (avant de lire ses sorties)
         # (arrêté avec Mindcare, même si elle est fermée de force : sinon il resterait lancé, sans fenêtre, jusqu'au redémarrage)
-        try { if (-not [MindcareNatif]::ArreterAvecMindcare($script:Ia.Process.Handle)) { Write-Log 'Assistant : pas relié à Mindcare' } } catch { Write-Log "Assistant : pas relié à Mindcare ($_)" }
+        try { if (-not [MindcareNatif]::ArreterAvecMindcare($script:Ia.Process.Handle)) { Write-Log "Assistant : pas relié à Mindcare ($([MindcareNatif]::Erreur))" } } catch { Write-Log "Assistant : pas relié à Mindcare ($_)" }
         $script:Ia.Process.BeginOutputReadLine(); $script:Ia.Process.BeginErrorReadLine()   # (sinon ses messages bloquent)
         $script:Ia.Pret = $false; $script:Ia.Lance = Get-Date
         Write-Log "Assistant lancé (port $($script:Ia.Port), $([IO.Path]::GetFileName($modeleLance)), $([IO.Path]::GetFileName($programme)))"
@@ -261,6 +283,7 @@ function Stop-IaSiInutile([datetime]$Maintenant = (Get-Date)) {
 }
 
 function Stop-IaServeur {
+    $script:Ia.Arrete = $true   # (arrêté par Mindcare : relancé dès la prochaine question)
     try { if ($script:Ia.Process -and -not $script:Ia.Process.HasExited) { $script:Ia.Process.Kill(); [void]$script:Ia.Process.WaitForExit(3000) } } catch {}
     try { if ($script:Ia.Minuterie) { $script:Ia.Minuterie.Stop() } } catch {}
 }
@@ -272,12 +295,12 @@ function Stop-Ia {
 
 function Test-IaLancee { [bool]($script:Ia.Process -and -not $script:Ia.Process.HasExited) }
 
-# Pose la question en arrière-plan ; renvoie une tâche à suivre avec Get-IaReponse (sans figer la fenêtre)
 # La confiance au-dessus de laquelle l'assistant lance l'enquête tout seul (mesurée dans outils\ia\confiance.py : à 0,95,
 # 1 erreur sur 122 phrases écrites à la main) ; en dessous, Mindcare pose la question « Pour être sûr » avec son idée et les
 # deux premières de la recherche par mots (la bonne panne y est 31 fois sur 38, contre 27 avec ses propres autres idées)
 $IaSeuil = 0.95
 
+# Pose la question en arrière-plan ; renvoie une tâche à suivre avec Get-IaReponse (sans figer la fenêtre)
 function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
     if ($EnTest -and $env:MINDCARE_TEST_IA) { return @{ Faux = $env:MINDCARE_TEST_IA; Debut = Get-Date } }
     Start-Ia   # (lancé maintenant s'il ne l'était pas, ou arrêté faute de questions ; sinon : il sert, il reste)
@@ -286,7 +309,7 @@ function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
     $attente = if (((Get-Date) - $script:Ia.Lance).TotalSeconds -lt 60) { 100 } else { 40 }
     $ps = [PowerShell]::Create()
     [void]$ps.AddScript({
-        param($Port, $Phrase, $Pannes, $Systeme, $Attente)
+        param($Port, $Phrase, $Pannes, $Systeme, $Attente, $Cle)
         # (l'assistant peut encore charger son modèle : on attend qu'il soit prêt, le temps de la réponse en moins)
         $fin = (Get-Date).AddSeconds($Attente - 32)
         while ((Get-Date) -lt $fin) {
@@ -302,7 +325,7 @@ function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
                     type = 'object'; required = @('panne', 'reponses')
                     properties = @{ panne = @{ type = 'string'; enum = @($Permises) }; reponses = @{ type = 'object'; additionalProperties = @{ type = 'integer' } } } } } }
             } | ConvertTo-Json -Depth 10 -Compress
-            $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/v1/chat/completions" -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($corps)) -ContentType 'application/json; charset=utf-8' -TimeoutSec 30 -ErrorAction Stop
+            $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/v1/chat/completions" -Method Post -Headers @{ Authorization = "Bearer $Cle" } -Body ([Text.Encoding]::UTF8.GetBytes($corps)) -ContentType 'application/json; charset=utf-8' -TimeoutSec 30 -ErrorAction Stop
             $c = [string]$r.choices[0].message.content
             $p = 1.0
             try {
@@ -318,7 +341,7 @@ function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
             @{ c = $c; p = $p }
         }
         ConvertTo-Json -InputObject @(& $idee $Pannes) -Depth 3 -Compress
-    }).AddArgument($script:Ia.Port).AddArgument($Phrase).AddArgument(@($Pannes)).AddArgument($IaSysteme).AddArgument($attente)
+    }).AddArgument($script:Ia.Port).AddArgument($Phrase).AddArgument(@($Pannes)).AddArgument($IaSysteme).AddArgument($attente).AddArgument([string]$script:Ia.Cle)
     @{ PS = $ps; Res = $ps.BeginInvoke(); Debut = Get-Date; Attente = $attente }
 }
 

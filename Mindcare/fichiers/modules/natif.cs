@@ -1,6 +1,8 @@
 // Mindcare : fonctions de Windows dont l'appli a besoin (barre de titre sombre, icône dans la barre des tâches,
 // affichage dans Mindset, assistant arrêté avec Mindcare). Compilé au démarrage par Mindcare.ps1.
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 public static class MindcareNatif
@@ -96,9 +98,11 @@ public static class MindcareNatif
     // L'assistant (llama-server) s'arrête avec Mindcare, même quand Mindcare est arrêtée de force (Mindset la ferme ainsi
     // avant une mise à jour ou une désinstallation) : il est mis dans un « job » de Windows qui arrête tout ce qu'il
     // contient quand le dernier accès au job se ferme, c'est-à-dire quand le processus de Mindcare disparaît.
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] static extern IntPtr CreateJobObject(IntPtr attributs, string nom);
-    [DllImport("kernel32.dll")] static extern bool SetInformationJobObject(IntPtr job, int classe, ref LimitesJob infos, int taille);
-    [DllImport("kernel32.dll")] static extern bool AssignProcessToJobObject(IntPtr job, IntPtr processus);
+    // (Erreur : la cause d'un échec, avec le code d'erreur de Windows, pour le journal ; comme EMJob d'Evermind)
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] static extern IntPtr CreateJobObject(IntPtr attributs, string nom);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool SetInformationJobObject(IntPtr job, int classe, ref LimitesJob infos, int taille);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool AssignProcessToJobObject(IntPtr job, IntPtr processus);
+    public static string Erreur = "";
     [StructLayout(LayoutKind.Sequential)] struct LimitesJob
     {
         public long PerProcessUserTimeLimit, PerJobUserTimeLimit;
@@ -116,12 +120,34 @@ public static class MindcareNatif
         if (job == IntPtr.Zero)
         {
             IntPtr j = CreateJobObject(IntPtr.Zero, null);
-            if (j == IntPtr.Zero) return false;
+            if (j == IntPtr.Zero) { Erreur = "création du job (code " + Marshal.GetLastWin32Error() + ")"; return false; }
             LimitesJob l = new LimitesJob();
             l.LimitFlags = 0x2000;   // JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-            if (!SetInformationJobObject(j, 9, ref l, Marshal.SizeOf(typeof(LimitesJob)))) return false;   // JobObjectExtendedLimitInformation
+            if (!SetInformationJobObject(j, 9, ref l, Marshal.SizeOf(typeof(LimitesJob))))   // JobObjectExtendedLimitInformation
+            { Erreur = "réglage du job (code " + Marshal.GetLastWin32Error() + ")"; return false; }
             job = j;
         }
-        return AssignProcessToJobObject(job, processus);
+        if (!AssignProcessToJobObject(job, processus)) { Erreur = "ajout au job (code " + Marshal.GetLastWin32Error() + ")"; return false; }
+        return true;
     }
+}
+
+// Les dernières lignes d'erreur d'un programme lancé (l'assistant) : pour noter au journal pourquoi il s'est arrêté. En C#
+// parce que ces lignes arrivent sur un autre fil, où un bloc de script PowerShell ne peut pas tourner.
+public class MindcareSorties
+{
+    readonly Queue<string> lignes = new Queue<string>();
+    readonly int max;
+    public MindcareSorties(Process p, int max)
+    {
+        this.max = max;
+        p.ErrorDataReceived += Recevoir;
+        p.OutputDataReceived += Recevoir;
+    }
+    void Recevoir(object s, DataReceivedEventArgs e)
+    {
+        if (e.Data == null) return;
+        lock (lignes) { lignes.Enqueue(e.Data); while (lignes.Count > max) lignes.Dequeue(); }
+    }
+    public string[] Lignes() { lock (lignes) { return lignes.ToArray(); } }
 }

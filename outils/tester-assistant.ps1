@@ -65,10 +65,16 @@ function Wait-Installation([int]$Secondes = 30) {
 
 # Un faux assistant installé dans un dossier : llama-server (faux, qui attend 60 s), ses .dll et un modèle
 $csc = Join-Path $env:windir 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-function New-FauxAssistant([string]$Dossier, [switch]$PasUnProgramme, [switch]$SansDll) {
+# (-Plante : il écrit 25 lignes d'erreur, dont la présence de sa clé et ses arguments, puis s'arrête avec le code 3)
+function New-FauxAssistant([string]$Dossier, [switch]$PasUnProgramme, [switch]$SansDll, [switch]$Plante) {
     New-Item -ItemType Directory -Force -Path $Dossier | Out-Null
     $exe = Join-Path $Dossier 'llama-server.exe'
     if ($PasUnProgramme) { Set-Content -LiteralPath $exe -Value 'faux' }
+    elseif ($Plante) {
+        $src = Join-Path $Dossier 'faux-serveur.cs'
+        [IO.File]::WriteAllText($src, 'static class F { static int Main(string[] a) { for (int i = 1; i <= 23; i++) System.Console.Error.WriteLine("ligne " + i); System.Console.Error.WriteLine("cle=" + (System.Environment.GetEnvironmentVariable("LLAMA_API_KEY") ?? "absente")); System.Console.Error.WriteLine("arguments=" + string.Join(" ", a)); return 3; } }')
+        $null = & $csc /nologo /target:exe "/out:$exe" $src
+    }
     else {
         $src = Join-Path $Dossier 'faux-serveur.cs'
         [IO.File]::WriteAllText($src, 'static class F { static void Main() { System.Threading.Thread.Sleep(60000); } }')
@@ -246,6 +252,74 @@ try {
         $restes = @(Get-ChildItem -LiteralPath $IaDir -Filter '*.extraction')
         @{ Bon = ($fini -and -not $script:IaDl.Erreur -and (Test-IaMoteur) -and -not $restes.Count -and -not (Test-Path -LiteralPath (Join-Path $IaDir 'autre.txt'))); Vu = "fini : $fini, erreur : « $($script:IaDl.Erreur) », moteur : $(Test-IaMoteur), restes : $($restes.Count)" }
     }
+    # -----------------------------------------------------------------------------------------------------------------
+    # Revue du 25/10, constat 25 : un assistant qui plante n'est pas relancé à chaque lettre, et on sait pourquoi
+    # -----------------------------------------------------------------------------------------------------------------
+    New-FauxAssistant (Join-Path $test 'ia-plante') -Plante
+    $script:NbEmpreintes = 0
+    function Get-FileHash { $script:NbEmpreintes++; Microsoft.PowerShell.Utility\Get-FileHash @args }   # (compte les empreintes calculées)
+    $script:Ia.Process = $null; $script:Journal.Clear()
+    Start-Ia
+    if ($script:Ia.Process) { $mesProcessus.Add($script:Ia.Process.Id); [void]$script:Ia.Process.WaitForExit(10000); $script:Ia.Process.WaitForExit() }   # (et ses dernières lignes lues)
+    $cle = $script:Ia.Cle
+    $empreintes1 = $script:NbEmpreintes
+    for ($k = 0; $k -lt 5; $k++) { Start-Ia }   # (cinq lettres tapées juste après)
+    $j = $script:Journal -join "`n"
+    Test-Essai "assistant qui plante : pas relancé à chaque lettre (une fois par minute au plus)" {
+        $n = ([regex]::Matches($j, 'Assistant lancé')).Count
+        @{ Bon = ($n -eq 1); Vu = "$n lancement(s) pour 6 lettres" }
+    }
+    Test-Essai "assistant qui plante : son code et ses dernières lignes au journal, une seule fois" {
+        $n = ([regex]::Matches($j, 'Assistant arrêté tout seul \(code 3\)')).Count
+        @{ Bon = ($n -eq 1 -and $j -match 'ligne 23' -and $j -notmatch 'ligne 4 \|'); Vu = "$n fois ; journal : $($j.Substring(0, [math]::Min(300, $j.Length)))" }
+    }
+    Test-Essai "assistant qui plante : relancé une minute plus tard, sans nouvelle empreinte" {
+        $script:Ia.Lance = (Get-Date).AddSeconds(-61)
+        Start-Ia
+        if ($script:Ia.Process) { $mesProcessus.Add($script:Ia.Process.Id); [void]$script:Ia.Process.WaitForExit(10000) }
+        $n = ([regex]::Matches(($script:Journal -join "`n"), 'Assistant lancé')).Count
+        @{ Bon = ($n -eq 2 -and $empreintes1 -ge 1 -and $script:NbEmpreintes -eq $empreintes1); Vu = "$n lancement(s), empreintes : $empreintes1 puis $script:NbEmpreintes" }
+    }
+    Remove-Item function:Get-FileHash
+    # Constat 27 : une clé neuve à chaque lancement, donnée par une variable d'environnement, jamais sur la ligne de commande
+    Test-Essai "assistant : sa clé par une variable d'environnement, pas dans ses arguments" {
+        @{ Bon = ($cle.Length -ge 32 -and $j -match "cle=$cle" -and $j -match 'arguments=-m ' -and ([regex]::Match($j, 'arguments=([^|]*)').Groups[1].Value -notmatch $cle) -and $j -notmatch 'api-key'); Vu = "clé : $($cle.Length) caractères" }
+    }
+    Test-Essai "assistant : une clé neuve à chaque lancement" {
+        @{ Bon = ($script:Ia.Cle -and $script:Ia.Cle -ne $cle); Vu = '' }
+    }
+    # La question envoyée avec la clé (un faux llama-server sur ce PC, qui note l'en-tête reçu)
+    New-FauxAssistant (Join-Path $test 'ia-cle')
+    $script:Ia.Process = $null; Start-Ia
+    if ($script:Ia.Process) { $mesProcessus.Add($script:Ia.Process.Id) }
+    $recu = [hashtable]::Synchronized(@{})
+    $faux = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, 0); $faux.Start()
+    $fauxServeur = [PowerShell]::Create()
+    [void]$fauxServeur.AddScript({
+        param($Ecoute, $Recu)
+        while ($true) {
+            $c = $Ecoute.AcceptTcpClient()
+            try {
+                $s = $c.GetStream(); $lu = New-Object IO.StreamReader($s)
+                $ligne = $lu.ReadLine(); $longueur = 0
+                while ($h = $lu.ReadLine()) { if ($h -match '^Authorization:\s*(.*)$') { $Recu.Cle = $Matches[1] }; if ($h -match '^Content-Length:\s*(\d+)') { $longueur = [int]$Matches[1] } }
+                $n = 0; while ($n -lt $longueur) { $ch = $lu.Read(); if ($ch -lt 0) { break }; $n += [Text.Encoding]::UTF8.GetByteCount([string][char]$ch) }   # (la longueur est en octets, la phrase a des accents)
+                $corps = if ($ligne -match 'chat/completions') { '{"choices":[{"message":{"content":"{\"panne\":\"bruit\",\"reponses\":{}}"},"logprobs":{"content":[]}}]}' } else { '{"status":"ok"}' }
+                $o = [Text.Encoding]::UTF8.GetBytes($corps)
+                $t = [Text.Encoding]::ASCII.GetBytes("HTTP/1.1 200 OK`r`nContent-Type: application/json`r`nContent-Length: $($o.Length)`r`nConnection: close`r`n`r`n")
+                $s.Write($t, 0, $t.Length); $s.Write($o, 0, $o.Length); $s.Flush()
+            } catch {} finally { $c.Close() }
+        }
+    }).AddArgument($faux).AddArgument($recu)
+    $fauxTache = $fauxServeur.BeginInvoke()
+    $script:Ia.Port = $faux.LocalEndpoint.Port; $script:Ia.Lance = (Get-Date).AddMinutes(-5)
+    Test-Essai "assistant : la question est envoyée avec la clé du lancement" {
+        $tache = Start-IaQuestion 'mon pc fait du bruit' @('bruit')
+        $limite = (Get-Date).AddSeconds(20); while ($tache -and -not $tache.Res.IsCompleted -and (Get-Date) -lt $limite) { Start-Sleep -Milliseconds 50 }
+        $r = Get-IaReponse $tache
+        @{ Bon = ($r.Panne -eq 'bruit' -and $recu.Cle -eq "Bearer $($script:Ia.Cle)"); Vu = "panne : $($r.Panne) ; en-tête : $($recu.Cle) ; erreur : $($r.Erreur)" }
+    }
+    try { $faux.Stop() } catch {}; try { [void]$fauxServeur.BeginStop($null, $null) } catch {}
 } finally {
     try { Stop-Ia } catch {}
     foreach ($id in $mesProcessus) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }   # (seulement les faux assistants de ce test)
