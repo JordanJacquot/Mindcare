@@ -312,55 +312,68 @@ function Request-Ia {
             Write-Log "Assistant : $(if ($r.Erreur) { $r.Erreur } else { "panne inconnue ($($r.Panne))" })"
             $script:IaCarte = $null; Update-BandeauIa; Show-EchecIa; return
         }
-        $propose = @($r.Reponses.Keys) -join ','
-        $r.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $r.Panne) $r.Reponses $script:IaCarte.Texte
-        Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($r.Panne) $(@($r.Reponses.Keys) -join ',') (proposé : $propose)"
-        Show-CarteIa $r
-        if ($EnTest -and $env:MINDCARE_TEST_IA_CHOISIR) { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }
+        # (chaque idée garde seulement les réponses que la phrase dit vraiment : le garde-fou)
+        # (ses autres idées : les premières de la recherche par mots, plus justes que les siennes quand il hésite)
+        $sur = $r.Confiance -ge $IaSeuil
+        $mots = if ($sur) { @() } else { @(Find-Pannes $script:Donnees $script:IaCarte.Texte | Select-Object -First 3 | ForEach-Object { [pscustomobject]@{ Panne = [string]$_.Id; Reponses = @{} } }) }
+        $idees = @(@([pscustomobject]@{ Panne = $r.Panne; Reponses = $r.Reponses }) + $mots + $(if ($sur) { @() } else { @($r.Autres) }) | Where-Object { Get-Panne $script:Donnees $_.Panne } |
+                   Group-Object Panne | ForEach-Object { $_.Group[0] } | Select-Object -First 3)
+        foreach ($i in $idees) {
+            $propose = @($i.Reponses.Keys) -join ','
+            $i.Reponses = Select-PreRempli $script:Donnees (Get-Panne $script:Donnees $i.Panne) $i.Reponses $script:IaCarte.Texte
+            Write-Log "Assistant : « $($script:IaCarte.Texte) » -> $($i.Panne) $(@($i.Reponses.Keys) -join ',') (proposé : $propose)$(if ($i -eq $idees[0]) { " (sûr à $([math]::Round(100 * $r.Confiance)) %)" })"
+        }
+        # Sûr : l'enquête commence tout de suite. Il hésite : la question « Pour être sûr », sur ce qu'on voit
+        if ($sur -or $idees.Count -lt 2) { Start-Diagnostic $idees[0].Panne $idees[0].Reponses }
+        else { Show-PourEtreSur $idees }
     }))
     $script:IaAttente.Start()
 }
 
-# La carte « J'ai compris » : la panne de l'assistant (et ce qu'il a déjà compris), puis deux autres possibilités
-function Show-CarteIa($R) {
-    $z = $ui.ZoneIa; $z.Children.Clear()
-    Set-BulleMascotte 'J''ai une idée ! Regarde si c''est bien ça.'
-    $panne = Get-Panne $script:Donnees $R.Panne
-    $carte = New-Object System.Windows.Controls.Border
-    $carte.Style = $Window.FindResource('Card'); $carte.Margin = '0,0,0,16'
-    $carte.BorderBrush = Get-Brush '#B04BFF'; $carte.BorderThickness = 2
-    $sp = New-Object System.Windows.Controls.StackPanel
-    Add-Texte $sp "J'AI COMPRIS" 12 '#B04BFF' 'Bold'
-    $haut = New-Object System.Windows.Controls.DockPanel; $haut.Margin = '0,6,0,0'
-    $script:IaChoisie = @{ Panne = [string]$R.Panne; Reponses = $R.Reponses }
-    $b = New-Button "C'est ça" 'BtnPrimary'; $b.VerticalAlignment = 'Center'; $b.Margin = '14,0,0,0'
-    $b.Add_Click((Protect-Action { Start-Diagnostic $script:IaChoisie.Panne $script:IaChoisie.Reponses }))
-    [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$haut.Children.Add($b)
-    $tx = New-Object System.Windows.Controls.StackPanel
-    [void]$tx.Children.Add((New-Text ([string]$panne.Titre) 18 '#FFFFFF' 'SemiBold'))
-    $ph = New-Text ([string]$panne.Phrase) 13 '#A9A3C9'; $ph.Margin = '0,3,0,0'; [void]$tx.Children.Add($ph)
-    [void]$haut.Children.Add($tx)
-    [void]$sp.Children.Add($haut)
-    # Ce que la phrase a déjà dit (ces questions ne seront pas reposées)
-    $sus = foreach ($et in (Get-Etapes $script:Donnees $panne)) {
-        if ($R.Reponses.ContainsKey([string]$et.Id)) {
-            $n = [int]$R.Reponses[[string]$et.Id]
-            if ($n -ge 0 -and $n -lt @($et.Reponses).Count) { "$($et.Court) : $(Get-Minuscule ([string]@($et.Reponses)[$n].Texte))" }
-        }
+# L'assistant hésite : une étape « Pour être sûr » avant l'enquête, comme ses autres questions. Les réponses décrivent ce
+# qu'on voit (le titre et la phrase de chaque panne) ; « Aucune de ces phrases » ramène aux questions guidées de l'accueil.
+function Show-PourEtreSur($Idees) {
+    $script:IaIdees = @($Idees)
+    $phrase = $script:IaCarte.Texte
+    Clear-Contenu
+    $g = New-Object System.Windows.Controls.Grid
+    foreach ($l in 280, 22, 0) {
+        $cd = New-Object System.Windows.Controls.ColumnDefinition
+        $cd.Width = if ($l) { New-Object System.Windows.GridLength $l } else { New-Object System.Windows.GridLength 1, ([System.Windows.GridUnitType]::Star) }
+        [void]$g.ColumnDefinitions.Add($cd)
     }
-    if ($sus) { Add-Texte $sp "Déjà compris grâce à ta phrase : $(@($sus) -join ' ; ')." 13 '#C9C3DD' 'Normal' '0,10,0,0' }
-    # Ou peut-être : les deux premières pannes de la recherche par mots
-    $autres = @(Find-Pannes $script:Donnees $script:IaCarte.Texte | Where-Object { $_.Id -ne $R.Panne } | Select-Object -First 2)
-    if ($autres) {
-        Add-Texte $sp 'Ou peut-être :' 13 '#7E78A0' 'Normal' '0,12,0,4'
-        foreach ($a in $autres) {
-            $l = New-Text "›  $($a.Titre)" 14 '#EEEBF7'
-            $bt = Add-ChoixBouton $sp $l ([string]$a.Id) { param($s) Start-Diagnostic ([string]$s.Tag) }
-            $bt.Padding = '14,7'; $bt.Margin = '0,4,0,0'; $bt.HorizontalContentAlignment = 'Left'
-        }
+    [void]$ui.Contenu.Children.Add($g)
+    $gauche = New-CarteDans $g 0
+    Add-Titre $gauche 'Ce que tu as écrit' 'H2'
+    Add-Texte $gauche "« $phrase »" 14 '#C9C3DD' 'Normal' '0,8,0,0'
+    Add-Texte $gauche 'Plusieurs pannes y ressemblent : une question pour choisir la bonne enquête.' 13 '#7E78A0' 'Normal' '0,12,0,0'
+    $droite = New-CarteDans $g 2
+    Set-BulleMascotte 'Je veux être sûr de bien comprendre.'
+    Add-Texte $droite 'POUR ÊTRE SÛR' 13 '#00E5FF' 'Bold' '0,0,0,8'
+    Add-Titre $droite 'Laquelle de ces phrases ressemble le plus à ce qui se passe ?' 'H1'
+    $reponses = New-Object System.Windows.Controls.StackPanel; $reponses.Margin = '0,6,0,0'
+    [void]$droite.Children.Add($reponses)
+    $i = 0
+    foreach ($idee in $script:IaIdees) {
+        $p = Get-Panne $script:Donnees $idee.Panne
+        $sp = New-Object System.Windows.Controls.StackPanel
+        [void]$sp.Children.Add((New-Text ([string]$p.Titre) 15 '#F2EFFA' 'SemiBold'))
+        $ph = New-Text ([string]$p.Phrase) 13 '#A9A3C9'; $ph.Margin = '0,3,0,0'; [void]$sp.Children.Add($ph)
+        [void](Add-ChoixBouton $reponses $sp $i { param($s) Select-PourEtreSur ([int]$s.Tag) })
+        $i++
     }
-    $carte.Child = $sp
-    [void]$z.Children.Add($carte)
+    [void](Add-ChoixBouton $reponses (New-Text 'Aucune de ces phrases' 15 '#F2EFFA') -1 { param($s) Select-PourEtreSur -1 })
+    $rg = New-Rangee $droite
+    Add-Bouton $rg 'Accueil' { $script:IaCarte = $null; Show-Accueil }
+    Write-Log "Pour être sûr : $(@($script:IaIdees | ForEach-Object { $_.Panne }) -join ', ')"
+    if ($EnTest -and $env:MINDCARE_TEST_IA_CHOISIR) { Select-PourEtreSur ([int]$env:MINDCARE_TEST_IA_CHOISIR) }
+}
+
+function Select-PourEtreSur([int]$N) {
+    if ($N -lt 0 -or $N -ge @($script:IaIdees).Count) { Write-Log 'Pour être sûr : aucune de ces phrases'; $script:IaCarte = $null; Show-Accueil; return }
+    $idee = @($script:IaIdees)[$N]
+    Write-Log "Pour être sûr : $($idee.Panne)"
+    Start-Diagnostic $idee.Panne $idee.Reponses
 }
 
 # Sous la recherche : les familles, ou les pannes trouvées par les mots tapés

@@ -13,9 +13,10 @@ installe Mindset, puis Mindcare depuis Mindset, qui la garde ensuite à jour et 
   bruits et chaleur, son, internet, clavier et souris, batterie, virus et arnaques, fichiers, Windows et compte), et une recherche par mots (« bip », « wifi »,
   « écran bleu »...) qui marche sans internet.
 - Un assistant qui comprend les phrases (« mon pc s'éteint quand je joue ») : une petite IA entraînée sur le catalogue
-  (Qwen3 0.6B, outils\ia), installée à la demande depuis l'accueil (environ 700 Mo, une seule fois), qui marche ensuite
-  sans internet. Elle propose la panne (« J'ai compris : ... C'est bien ça ? ») et règle d'avance les questions dont la
-  phrase donne déjà la réponse (jamais la question de sécurité). Elle ne répond qu'avec le catalogue.
+  (Qwen3 0.6B, outils\ia), installée à la demande depuis l'accueil (environ 640 Mo, une seule fois), qui marche ensuite
+  sans internet. Quand il est sûr de lui, l'enquête commence tout de suite, en sautant les questions dont la phrase donne
+  déjà la réponse (jamais la question de sécurité). Quand il hésite, une question « Pour être sûr » : laquelle de ces
+  phrases ressemble le plus à ce qui se passe (ou « Aucune de ces phrases »). Il ne répond qu'avec le catalogue.
 - L'accueil en questions guidées : « 1. Ça concerne quoi ? » (15 familles), puis « 2. Qu'est-ce qui se passe ? » ;
   ou on écrit son problème avec ses mots, tout en haut.
 - Une enquête par élimination : les suspects à gauche, barrés au fur et à mesure ; une question ou un test à la fois

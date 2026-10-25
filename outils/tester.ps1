@@ -464,12 +464,21 @@ Remove-Item -LiteralPath (Join-Path $test 'fenetre') -Recurse -Force -ErrorActio
 $AppNom = $AppNomSauve; $AppExe = $AppExeSauve; $MainScript = $MainScriptSauve; $ico = $icoSauve; $Window = $WindowSauve
 Write-Resultat 'barre des tâches : identité JordanJacquot.Mindcare, épingle vers Mindset.exe (PowerShell sans lui), nom « Mindcare » et son icône' (-not $errI -and -not $fenetreEssais) "($($fenetreEssais -join ' ; '))"
 if (-not $SansFenetre) {
-    # L'assistant (ia.ps1) : sa carte « J'ai compris », puis une enquête où la phrase a déjà répondu à des questions
+    # L'assistant (ia.ps1) : sûr de lui, l'enquête commence tout de suite (après les questions déjà réglées par la phrase)
     $faux = '{"panne":"seteint","reponses":{"type":1,"maison":0}}'
-    $s = Test-Capture 'ia-comprise' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux }
-    Write-Resultat "assistant : la carte « J'ai compris » (journal)" ((Get-Journal $s) -match 'Assistant : .+ -> seteint') '(pas de proposition dans le journal)'
-    $s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc fixe s''éteint d''un coup, et les lumières de la maison aussi'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_CHOISIR = '1' }
+    $s = Test-Capture 'ia-sur' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux }
+    Write-Resultat "assistant sûr : l'enquête commence tout de suite, sans choix à faire" ((Get-Journal $s) -match 'Assistant : .+ -> seteint.+sûr à 100 %' -and (Get-Journal $s) -match 'Enquête : seteint' -and (Get-Journal $s) -notmatch 'Pour être sûr') '(pas d''enquête directe dans le journal)'
+    $s = Test-Capture 'ia-enquete' @{ MINDCARE_TEST_RECHERCHE = 'mon pc fixe s''éteint d''un coup, et les lumières de la maison aussi'; MINDCARE_TEST_IA = $faux }
     Write-Resultat "assistant : l'enquête commence après les questions déjà réglées par la phrase" ((Get-Journal $s) -match 'Enquête : seteint \(déjà su') '(pas de réponses pré-remplies dans le journal)'
+    # Il hésite : la question « Pour être sûr » (ses 3 idées, décrites, et « Aucune de ces phrases »), jamais une liste de pannes à deviner
+    $hesite = '[{"c":"{\"panne\":\"seteint\",\"reponses\":{}}","p":0.6},{"c":"{\"panne\":\"ecranseteint\",\"reponses\":{}}","p":0.2},{"c":"{\"panne\":\"redemarre\",\"reponses\":{}}","p":0.1}]'
+    $s = Test-Capture 'ia-pour-etre-sur' @{ MINDCARE_TEST_RECHERCHE = 'tout devient noir d''un coup'; MINDCARE_TEST_IA = $hesite }
+    Write-Resultat "assistant qui hésite : la question « Pour être sûr » avec ses 3 idées" ((Get-Journal $s) -match 'sûr à 60 %' -and (Get-Journal $s) -match 'Pour être sûr : seteint, \w+, \w+\s' -and (Get-Journal $s) -notmatch 'Enquête :') '(pas de question « Pour être sûr » dans le journal)'
+    $s = Test-Capture 'ia-pour-etre-sur-choix' @{ MINDCARE_TEST_RECHERCHE = 'tout devient noir d''un coup'; MINDCARE_TEST_IA = $hesite; MINDCARE_TEST_IA_CHOISIR = '1' }
+    $deuxieme = if ((Get-Journal $s) -match 'Pour être sûr : seteint, (\w+)') { $Matches[1] } else { '?' }
+    Write-Resultat "« Pour être sûr » : la réponse choisie lance son enquête" ((Get-Journal $s) -match "Enquête : $deuxieme") "(pas d'enquête $deuxieme dans le journal)"
+    $s = Test-Capture 'ia-pour-etre-sur-aucune' @{ MINDCARE_TEST_RECHERCHE = 'tout devient noir d''un coup'; MINDCARE_TEST_IA = $hesite; MINDCARE_TEST_IA_CHOISIR = '-1' }
+    Write-Resultat "« Pour être sûr » : « Aucune de ces phrases » ramène à l'accueil" ((Get-Journal $s) -match 'aucune de ces phrases' -and (Get-Journal $s) -notmatch 'Enquête :') '(pas de retour à l''accueil dans le journal)'
     # Entrée appuyée deux fois pendant que l'assistant lit : la deuxième est ignorée, Mindcare reste ouverte (avant, la
     # première minuterie arrêtait une minuterie déjà effacée et l'appli se fermait sans un mot)
     $s = Test-Capture 'ia-double-entree' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_DOUBLE = '1' }
@@ -503,7 +512,7 @@ if (-not $SansFenetre) {
     $ancien = Join-Path $test 'donnees-ia-maj\ia'
     Remove-Item -LiteralPath (Join-Path $test 'donnees-ia-maj') -Recurse -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $ancien | Out-Null
-    Set-Content -LiteralPath (Join-Path $ancien 'llama-server.exe') -Value 'faux' ; Set-Content -LiteralPath (Join-Path $ancien 'mindcare-0.6b-v1-q8_0.gguf') -Value 'faux'
+    foreach ($faux in 'llama-server.exe', 'llama.dll', 'ggml.dll', 'mindcare-0.6b-v1-q8_0.gguf') { Set-Content -LiteralPath (Join-Path $ancien $faux) -Value 'faux' }   # (le moteur complet : sans ses .dll, il passerait pour une installation coupée)
     foreach ($x in $IaMoteurDll) { Set-Content -LiteralPath (Join-Path $ancien $x) -Value 'faux' }
     $s = Test-Capture 'ia-maj' @{} -Dossier 'ia-maj'
     Write-Resultat "assistant : mise à jour proposée quand un ancien modèle est installé" ((Get-Journal $s) -match 'nouvelle version est proposée') '(pas de mise à jour proposée, ou ancien modèle non utilisé)'

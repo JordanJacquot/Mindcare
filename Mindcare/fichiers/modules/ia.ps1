@@ -12,13 +12,13 @@
 
 $IaDir    = Join-Path $DataDir 'ia'
 $IaServeur = if ($EnTest -and $env:MINDCARE_IA_SERVEUR) { $env:MINDCARE_IA_SERVEUR } else { Join-Path $IaDir 'llama-server.exe' }
-$IaModele  = if ($EnTest -and $env:MINDCARE_IA_MODELE) { $env:MINDCARE_IA_MODELE } else { Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf' }
+$IaModele  = if ($EnTest -and $env:MINDCARE_IA_MODELE) { $env:MINDCARE_IA_MODELE } else { Join-Path $IaDir 'mindcare-0.6b-v3-q8_0.gguf' }
 $IaFichiers = @(
     @{ Nom = 'moteur de l''assistant'; Url = 'https://github.com/ggml-org/llama.cpp/releases/download/b11541/llama-b11541-bin-win-vulkan-x64.zip'
        Sha256 = '37BBA511D120222F13C3D520DD875F739A530CC124E78F7CBCE0026DE0173D8A'; Taille = 33464528
        Extraire = '^(llama-server\.exe|llama-server-impl\.dll|llama\.dll|llama-common\.dll|ggml[^/]*\.dll|mtmd\.dll|libomp\.dll)$'; Garder = (Join-Path $IaDir 'llama-server.exe') }
-    @{ Nom = 'cerveau de l''assistant'; Url = 'https://github.com/JordanJacquot/Mindcare/releases/download/ia-v2/mindcare-0.6b-v2-q8_0.gguf'
-       Sha256 = '13246AB9F9F7D25E22066682A81BE9744E715DDC4A1B789DF5330E4D5BE0DE5C'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v2-q8_0.gguf') }
+    @{ Nom = 'cerveau de l''assistant'; Url = 'https://github.com/JordanJacquot/Mindcare/releases/download/ia-v3/mindcare-0.6b-v3-q8_0.gguf'
+       Sha256 = 'C9598811845651239AFCEFFEC641B89D01B96F5DD9D9721334D22562D58E6670'; Taille = 639446912; Garder = (Join-Path $IaDir 'mindcare-0.6b-v3-q8_0.gguf') }
 )
 $IaSysteme = "Tu es Mindcare. Une personne décrit le problème de son ordinateur. Réponds seulement en JSON : la panne du catalogue qui correspond, et les réponses qu'elle donne déjà."
 $IaRepos = 5   # minutes sans question : l'assistant est arrêté (il rend la mémoire de la carte graphique)
@@ -273,37 +273,60 @@ function Stop-Ia {
 function Test-IaLancee { [bool]($script:Ia.Process -and -not $script:Ia.Process.HasExited) }
 
 # Pose la question en arrière-plan ; renvoie une tâche à suivre avec Get-IaReponse (sans figer la fenêtre)
+# La confiance au-dessus de laquelle l'assistant lance l'enquête tout seul (mesurée dans outils\ia\confiance.py : à 0,95,
+# 1 erreur sur 122 phrases écrites à la main) ; en dessous, Mindcare pose la question « Pour être sûr » avec son idée et les
+# deux premières de la recherche par mots (la bonne panne y est 31 fois sur 38, contre 27 avec ses propres autres idées)
+$IaSeuil = 0.95
+
 function Start-IaQuestion([string]$Phrase, [string[]]$Pannes) {
     if ($EnTest -and $env:MINDCARE_TEST_IA) { return @{ Faux = $env:MINDCARE_TEST_IA; Debut = Get-Date } }
     Start-Ia   # (lancé maintenant s'il ne l'était pas, ou arrêté faute de questions ; sinon : il sert, il reste)
     if (-not (Test-IaLancee)) { return $null }
     # (juste lancé : il charge encore son modèle, plus long la première fois ou sur un disque lent)
     $attente = if (((Get-Date) - $script:Ia.Lance).TotalSeconds -lt 60) { 100 } else { 40 }
-    $corps = @{
-        messages = @(@{ role = 'system'; content = $IaSysteme }, @{ role = 'user'; content = $Phrase })
-        temperature = 0; max_tokens = 120
-        response_format = @{ type = 'json_schema'; json_schema = @{ name = 'r'; schema = @{
-            type = 'object'; required = @('panne', 'reponses')
-            properties = @{ panne = @{ type = 'string'; enum = @($Pannes) }; reponses = @{ type = 'object'; additionalProperties = @{ type = 'integer' } } } } } }
-    } | ConvertTo-Json -Depth 10 -Compress
     $ps = [PowerShell]::Create()
     [void]$ps.AddScript({
-        param($Port, $Corps, $Attente)
+        param($Port, $Phrase, $Pannes, $Systeme, $Attente)
         # (l'assistant peut encore charger son modèle : on attend qu'il soit prêt, le temps de la réponse en moins)
         $fin = (Get-Date).AddSeconds($Attente - 32)
         while ((Get-Date) -lt $fin) {
             try { if ((Invoke-WebRequest "http://127.0.0.1:$Port/health" -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200) { break } } catch { Start-Sleep -Milliseconds 500 }
         }
-        $octets = [Text.Encoding]::UTF8.GetBytes($Corps)
-        $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/v1/chat/completions" -Method Post -Body $octets -ContentType 'application/json; charset=utf-8' -TimeoutSec 30 -ErrorAction Stop
-        $r.choices[0].message.content
-    }).AddArgument($script:Ia.Port).AddArgument($corps).AddArgument($attente)
+        # Une idée : la panne (parmi celles permises) et la confiance, la probabilité des jetons qui écrivent son nom
+        $idee = {
+            param([string[]]$Permises)
+            $corps = @{
+                messages = @(@{ role = 'system'; content = $Systeme }, @{ role = 'user'; content = $Phrase })
+                temperature = 0; max_tokens = 120; logprobs = $true
+                response_format = @{ type = 'json_schema'; json_schema = @{ name = 'r'; schema = @{
+                    type = 'object'; required = @('panne', 'reponses')
+                    properties = @{ panne = @{ type = 'string'; enum = @($Permises) }; reponses = @{ type = 'object'; additionalProperties = @{ type = 'integer' } } } } } }
+            } | ConvertTo-Json -Depth 10 -Compress
+            $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/v1/chat/completions" -Method Post -Body ([Text.Encoding]::UTF8.GetBytes($corps)) -ContentType 'application/json; charset=utf-8' -TimeoutSec 30 -ErrorAction Stop
+            $c = [string]$r.choices[0].message.content
+            $p = 1.0
+            try {
+                $d = $c.IndexOf('"', $c.IndexOf(':', $c.IndexOf('"panne"'))) + 1; $f = $c.IndexOf('"', $d)
+                $pos = 0; $lp = 0.0
+                foreach ($j in $r.choices[0].logprobs.content) {
+                    $t = [string]$j.token
+                    if ($pos -lt $f -and $pos + $t.Length -gt $d) { $lp += [double]$j.logprob }
+                    $pos += $t.Length
+                }
+                $p = [math]::Exp($lp)
+            } catch { $p = 0.0 }
+            @{ c = $c; p = $p }
+        }
+        ConvertTo-Json -InputObject @(& $idee $Pannes) -Depth 3 -Compress
+    }).AddArgument($script:Ia.Port).AddArgument($Phrase).AddArgument(@($Pannes)).AddArgument($IaSysteme).AddArgument($attente)
     @{ PS = $ps; Res = $ps.BeginInvoke(); Debut = Get-Date; Attente = $attente }
 }
 
-# La réponse si elle est arrivée : $null (pas encore), ou { Panne, Reponses (hashtable id d'étape -> n°), Erreur }
+# La réponse si elle est arrivée : $null (pas encore), ou { Panne, Reponses (hashtable id d'étape -> n°), Confiance,
+# Autres (d'autres idées, seulement dans les tests : { Panne, Reponses }), Erreur }
 function Get-IaReponse($Tache) {
-    if (-not $Tache) { return [pscustomobject]@{ Panne = ''; Reponses = @{}; Erreur = 'pas d''assistant' } }
+    $vide = { param($Erreur) [pscustomobject]@{ Panne = ''; Reponses = @{}; Confiance = 0.0; Autres = @(); Erreur = $Erreur } }
+    if (-not $Tache) { return & $vide 'pas d''assistant' }
     $texte = $null
     if ($Tache.Faux -and $env:MINDCARE_TEST_IA_ATTENTE) { return $null }   # (tests : l'assistant lit encore, pour la capture de l'attente)
     if ($Tache.Faux) { $texte = $Tache.Faux }
@@ -312,7 +335,7 @@ function Get-IaReponse($Tache) {
         if (-not $Tache.Res.IsCompleted) {
             if (((Get-Date) - $Tache.Debut).TotalSeconds -lt $(if ($Tache.Attente) { $Tache.Attente } else { 40 })) { return $null }
             try { $Tache.PS.Stop() } catch {}
-            return [pscustomobject]@{ Panne = ''; Reponses = @{}; Erreur = "trop long ($([math]::Round(((Get-Date) - $Tache.Debut).TotalSeconds)) s)" }
+            return & $vide "trop long ($([math]::Round(((Get-Date) - $Tache.Debut).TotalSeconds)) s)"
         }
         # (la vraie cause d'un échec, pour le journal : l'erreur de la requête, ou l'assistant arrêté)
         $cause = ''
@@ -322,14 +345,21 @@ function Get-IaReponse($Tache) {
         if (-not $texte) {
             if (-not $cause) { $cause = 'réponse vide' }
             if (-not (Test-IaLancee)) { $cause = "l'assistant s'est arrêté ($cause)" }
-            return [pscustomobject]@{ Panne = ''; Reponses = @{}; Erreur = "pas de réponse : $cause" }
+            return & $vide "pas de réponse : $cause"
         }
     }
     try {
-        $j = ConvertFrom-Json $texte -ErrorAction Stop
-        if (-not $j.panne) { throw 'pas de panne' }
-        $rep = @{}
-        if ($j.reponses) { foreach ($pr in $j.reponses.PSObject.Properties) { $rep[$pr.Name] = [int]$pr.Value } }
-        [pscustomobject]@{ Panne = [string]$j.panne; Reponses = $rep; Erreur = '' }
-    } catch { [pscustomobject]@{ Panne = ''; Reponses = @{}; Erreur = "réponse illisible ($texte)" } }
+        # (les tests donnent une seule réponse de l'assistant, donc sûre, ou la liste de ses idées comme le vrai)
+        $brut = ConvertFrom-Json $texte -ErrorAction Stop
+        $idees = if ($brut -is [array] -or $brut.c) { @($brut) } else { @([pscustomobject]@{ c = $texte; p = 1.0 }) }
+        $lues = foreach ($i in $idees) {
+            $j = if ($i.c -is [string]) { ConvertFrom-Json $i.c -ErrorAction Stop } else { $i.c }
+            if (-not $j.panne) { throw 'pas de panne' }
+            $rep = @{}
+            if ($j.reponses) { foreach ($pr in $j.reponses.PSObject.Properties) { $rep[$pr.Name] = [int]$pr.Value } }
+            [pscustomobject]@{ Panne = [string]$j.panne; Reponses = $rep; Confiance = [double]$i.p }
+        }
+        $lues = @($lues)
+        [pscustomobject]@{ Panne = $lues[0].Panne; Reponses = $lues[0].Reponses; Confiance = $lues[0].Confiance; Autres = @($lues | Select-Object -Skip 1); Erreur = '' }
+    } catch { & $vide "réponse illisible ($texte)" }
 }
