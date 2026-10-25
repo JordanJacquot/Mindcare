@@ -17,13 +17,17 @@ Free code signing provided by [SignPath.io](https://about.signpath.io), certific
   small C# source file (`natif.cs`) that Windows compiles when Mindcare starts. `catalogue.zip`, published with each
   version for the phone app Mindcare Mobile, only contains `enquetes.json` and the drawings.
 - Files from other authors are never signed with this certificate, and they are not in `Mindcare.zip`. They are only
-  downloaded when the user asks for the assistant (see the privacy policy below):
+  downloaded when the user asks for the assistant or the dictation (see the privacy policy below):
   - llama.cpp (`llama-server.exe` and its DLLs), official Windows build `b11541` (Vulkan, x64) of
     [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp), MIT license. Mindcare checks its SHA-256 before using it.
   - The model of the assistant (`mindcare-0.6b-v2-q8_0.gguf`), a data file trained for Mindcare from
     [Qwen3 0.6B](https://huggingface.co/Qwen/Qwen3-0.6B) (Qwen team, Apache License 2.0), published in the
     [ia-v2](../../releases/tag/ia-v2) release of this repository under the same Apache License 2.0. Mindcare checks its
     SHA-256 before using it.
+  - For the dictation: whisper.cpp (`whisper-cli.exe` and its DLLs), official Windows build `v1.9.2` (x64) of
+    [ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), MIT license, and its model `ggml-small-q5_1.bin`
+    ([OpenAI Whisper](https://github.com/openai/whisper) small, MIT license, converted by the whisper.cpp authors on
+    [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp)). Mindcare checks their SHA-256 before using them.
 
 ## How a release is built and signed
 
@@ -64,11 +68,15 @@ everything that Mindcare can send, always after a click.
 | What | When | What is sent |
 |---|---|---|
 | Download of the assistant: llama.cpp from `github.com/ggml-org/llama.cpp` (about 33 MB) and the model from `github.com/JordanJacquot/Mindcare` (about 640 MB). GitHub serves the files from its download servers (`*.githubusercontent.com`) | When you press "Installer" (or "Mettre à jour", or "Réessayer") on the banner of the home page. The banner gives the size before you press it | Standard HTTPS requests for these two files (user agent `Mindcare`); nothing about you or your PC |
+| Download of the dictation: whisper.cpp from `github.com/ggml-org/whisper.cpp` (about 8 MB) and its French-capable model from `huggingface.co/ggerganov/whisper.cpp` (about 180 MB) | When you press the microphone of the search bar, then "Installer" (or "Réparer", or "Réessayer") on the banner that appears. The banner gives the size before you press it | Standard HTTPS requests for these two files (user agent `Mindcare`); nothing about you or your PC |
 | Mindset's download page, `github.com/JordanJacquot/Mindset/releases/latest` | Only when Mindcare is opened without Mindset installed, and you press "Télécharger Mindset" | It opens in your web browser |
 
 What never leaves your PC:
 - The assistant runs on your PC only. `llama-server` only listens on `127.0.0.1` (this PC): the sentences you type
   never leave the PC, and the assistant works without Internet once installed.
+- The dictation runs on your PC only. Your voice is recorded only while the microphone button is lit, written as text
+  by whisper.cpp on your PC, then the sound is deleted at once. Nothing is sent, and the sentence is not written in the
+  log (only its length).
 - What Windows has recorded (unexpected restarts, blue screens, memory test, disks) and the list of memory modules are
   read on your PC, without administrator rights, and only shown in Mindcare and in its report.
 - The report for the repairer is saved on your Desktop or copied, only when you press the button; you decide who
@@ -111,7 +119,7 @@ Signature gratuite du code fournie par [SignPath.io](https://about.signpath.io),
   (`.xml`) et un petit fichier source C# (`natif.cs`) que Windows compile au démarrage de Mindcare. `catalogue.zip`,
   publié avec chaque version pour l'appli de téléphone Mindcare Mobile, ne contient que `enquetes.json` et les dessins.
 - Les fichiers d'autres auteurs ne sont jamais signés avec ce certificat, et ne sont pas dans `Mindcare.zip`. Ils ne
-  sont téléchargés que si l'utilisateur demande l'assistant (voir la confidentialité plus bas) :
+  sont téléchargés que si l'utilisateur demande l'assistant ou la dictée (voir la confidentialité plus bas) :
   - llama.cpp (`llama-server.exe` et ses DLL), version Windows officielle `b11541` (Vulkan, x64) de
     [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp), licence MIT. Mindcare vérifie son empreinte SHA-256
     avant de s'en servir.
@@ -119,6 +127,11 @@ Signature gratuite du code fournie par [SignPath.io](https://about.signpath.io),
     [Qwen3 0.6B](https://huggingface.co/Qwen/Qwen3-0.6B) (équipe Qwen, licence Apache 2.0), publié dans la version
     [ia-v2](../../releases/tag/ia-v2) de ce dépôt sous la même licence Apache 2.0. Mindcare vérifie son empreinte
     SHA-256 avant de s'en servir.
+  - Pour la dictée : whisper.cpp (`whisper-cli.exe` et ses DLL), version Windows officielle `v1.9.2` (x64) de
+    [ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), licence MIT, et son modèle `ggml-small-q5_1.bin`
+    ([OpenAI Whisper](https://github.com/openai/whisper) small, licence MIT, converti par les auteurs de whisper.cpp sur
+    [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp)). Mindcare vérifie leur empreinte SHA-256 avant de
+    s'en servir.
 
 ## Comment une version est construite et signée
 
@@ -159,11 +172,15 @@ que Mindcare peut envoyer, toujours après un clic.
 | Quoi | Quand | Ce qui est envoyé |
 |---|---|---|
 | Téléchargement de l'assistant : llama.cpp depuis `github.com/ggml-org/llama.cpp` (environ 33 Mo) et le modèle depuis `github.com/JordanJacquot/Mindcare` (environ 640 Mo). GitHub donne les fichiers depuis ses serveurs de téléchargement (`*.githubusercontent.com`) | Quand tu appuies sur « Installer » (ou « Mettre à jour », ou « Réessayer ») dans le bandeau de l'accueil. Le bandeau donne la taille avant | Des demandes HTTPS ordinaires pour ces deux fichiers (nom du programme `Mindcare`) ; rien sur toi ni sur ton PC |
+| Téléchargement de la dictée : whisper.cpp depuis `github.com/ggml-org/whisper.cpp` (environ 8 Mo) et son modèle depuis `huggingface.co/ggerganov/whisper.cpp` (environ 180 Mo) | Quand tu appuies sur le micro de la barre de recherche, puis sur « Installer » (ou « Réparer », ou « Réessayer ») dans le bandeau qui apparaît. Le bandeau donne la taille avant | Des demandes HTTPS ordinaires pour ces deux fichiers (nom du programme `Mindcare`) ; rien sur toi ni sur ton PC |
 | La page de téléchargement de Mindset, `github.com/JordanJacquot/Mindset/releases/latest` | Seulement quand Mindcare est ouverte sans que Mindset soit installé, et que tu appuies sur « Télécharger Mindset » | Elle s'ouvre dans ton navigateur |
 
 Ce qui ne quitte jamais ton PC :
 - L'assistant tourne seulement sur ton PC. `llama-server` n'écoute que `127.0.0.1` (ce PC) : les phrases que tu écris
   ne sortent pas du PC, et l'assistant marche sans Internet une fois installé.
+- La dictée tourne seulement sur ton PC. Ta voix n'est enregistrée que pendant que le bouton micro est allumé, écrite
+  en texte par whisper.cpp sur ton PC, puis le son est effacé tout de suite. Rien n'est envoyé, et la phrase n'est pas
+  écrite dans le journal (seulement sa longueur).
 - Ce que Windows a noté (redémarrages brutaux, écrans bleus, test de mémoire, disques) et la liste des barrettes de
   mémoire sont lus sur ton PC, sans droits administrateur, et seulement montrés dans Mindcare et dans son rapport.
 - Le rapport pour le réparateur est enregistré sur ton Bureau ou copié, seulement quand tu appuies sur le bouton ;

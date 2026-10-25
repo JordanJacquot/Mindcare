@@ -151,3 +151,149 @@ public class MindcareSorties
     }
     public string[] Lignes() { lock (lignes) { return lignes.ToArray(); } }
 }
+
+// ---------------------------------------------------------------------------
+// La dictée (dictee.ps1) : le micro choisi dans Mindset (par son nom), sinon celui de Windows. Enregistre en 16 kHz mono,
+// ce que Whisper lit, et suit le niveau du son pour savoir quand on a fini de parler. Le même code qu'Evermind (EMMicro).
+// ---------------------------------------------------------------------------
+public class MindcareMicro
+{
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    struct CAPS { public ushort mid, pid; public uint ver; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string name; public uint fmts; public ushort ch, res; }
+    [StructLayout(LayoutKind.Sequential)]
+    struct WAVEFORMATEX { public ushort wFormatTag, nChannels; public uint nSamplesPerSec, nAvgBytesPerSec; public ushort nBlockAlign, wBitsPerSample, cbSize; }
+    [StructLayout(LayoutKind.Sequential)]
+    struct WAVEHDR { public IntPtr lpData; public uint dwBufferLength, dwBytesRecorded; public IntPtr dwUser; public uint dwFlags, dwLoops; public IntPtr lpNext, reserved; }
+
+    [DllImport("winmm.dll")] static extern uint waveInGetNumDevs();
+    [DllImport("winmm.dll", CharSet = CharSet.Unicode)] static extern int waveInGetDevCapsW(IntPtr id, ref CAPS c, int sz);
+    [DllImport("winmm.dll")] static extern int waveInOpen(out IntPtr h, uint dev, ref WAVEFORMATEX f, IntPtr cb, IntPtr inst, uint flags);
+    [DllImport("winmm.dll")] static extern int waveInPrepareHeader(IntPtr h, IntPtr hdr, uint size);
+    [DllImport("winmm.dll")] static extern int waveInUnprepareHeader(IntPtr h, IntPtr hdr, uint size);
+    [DllImport("winmm.dll")] static extern int waveInAddBuffer(IntPtr h, IntPtr hdr, uint size);
+    [DllImport("winmm.dll")] static extern int waveInStart(IntPtr h);
+    [DllImport("winmm.dll")] static extern int waveInReset(IntPtr h);
+    [DllImport("winmm.dll")] static extern int waveInClose(IntPtr h);
+
+    const uint WAVE_MAPPER = 0xFFFFFFFF, CALLBACK_EVENT = 0x50000, WHDR_DONE = 1;
+    const int Rate = 16000, BufBytes = 3200;   // tampons de 100 ms
+
+    IntPtr h = IntPtr.Zero;
+    readonly IntPtr[] hdrs = new IntPtr[4];
+    readonly System.Threading.AutoResetEvent ev = new System.Threading.AutoResetEvent(false);
+    readonly System.IO.MemoryStream data = new System.IO.MemoryStream();
+    System.Threading.Thread th;
+    volatile bool run;
+    double floor = 0; int floorCount = 0;
+
+    public volatile float Level;              // niveau du son, de 0 à 1 (pour l'animation)
+    public volatile int Millis;               // durée enregistrée
+    public volatile bool HeardVoice;          // on a entendu parler
+    public volatile int MillisSinceVoice;     // depuis combien de temps on s'est tu
+
+    // Noms des micros (Windows les coupe à 31 lettres), dans l'ordre de leurs numéros
+    public static string[] Noms()
+    {
+        uint n = waveInGetNumDevs();
+        string[] r = new string[n];
+        for (uint d = 0; d < n; d++) { CAPS c = new CAPS(); waveInGetDevCapsW((IntPtr)d, ref c, Marshal.SizeOf(c)); r[d] = c.name ?? ""; }
+        return r;
+    }
+    public static bool HasDevice() { return waveInGetNumDevs() > 0; }
+    static int HeaderSize { get { return Marshal.SizeOf(typeof(WAVEHDR)); } }
+
+    // 0 si l'enregistrement a commencé, sinon le code d'erreur de Windows (micro absent ou refusé).
+    // Micro : son numéro (Noms), ou 0xFFFFFFFF pour celui de Windows.
+    public int Start(uint micro)
+    {
+        WAVEFORMATEX f = new WAVEFORMATEX { wFormatTag = 1, nChannels = 1, nSamplesPerSec = Rate, wBitsPerSample = 16, nBlockAlign = 2, nAvgBytesPerSec = Rate * 2, cbSize = 0 };
+        int r = waveInOpen(out h, micro, ref f, ev.SafeWaitHandle.DangerousGetHandle(), IntPtr.Zero, CALLBACK_EVENT);
+        if (r != 0) { h = IntPtr.Zero; return r; }
+        for (int i = 0; i < hdrs.Length; i++)
+        {
+            WAVEHDR hd = new WAVEHDR { lpData = Marshal.AllocHGlobal(BufBytes), dwBufferLength = BufBytes };
+            hdrs[i] = Marshal.AllocHGlobal(HeaderSize);
+            Marshal.StructureToPtr(hd, hdrs[i], false);
+            waveInPrepareHeader(h, hdrs[i], (uint)HeaderSize);
+            waveInAddBuffer(h, hdrs[i], (uint)HeaderSize);
+        }
+        run = true;
+        th = new System.Threading.Thread(Loop) { IsBackground = true };
+        th.Start();
+        return waveInStart(h);
+    }
+
+    void Loop()
+    {
+        while (run)
+        {
+            ev.WaitOne(200);
+            for (int i = 0; i < hdrs.Length && run; i++)
+            {
+                WAVEHDR hd = (WAVEHDR)Marshal.PtrToStructure(hdrs[i], typeof(WAVEHDR));
+                if ((hd.dwFlags & WHDR_DONE) == 0) continue;
+                int n = (int)hd.dwBytesRecorded;
+                if (n > 0)
+                {
+                    byte[] b = new byte[n];
+                    Marshal.Copy(hd.lpData, b, 0, n);
+                    lock (data) data.Write(b, 0, n);
+                    Analyse(b, n);
+                }
+                waveInUnprepareHeader(h, hdrs[i], (uint)HeaderSize);
+                hd.dwFlags = 0; hd.dwBytesRecorded = 0;
+                Marshal.StructureToPtr(hd, hdrs[i], false);
+                waveInPrepareHeader(h, hdrs[i], (uint)HeaderSize);
+                waveInAddBuffer(h, hdrs[i], (uint)HeaderSize);
+            }
+        }
+    }
+
+    // Niveau du son ; le bruit de fond est mesuré sur les 300 premières millisecondes
+    void Analyse(byte[] b, int n)
+    {
+        double sum = 0; int count = n / 2;
+        for (int i = 0; i + 1 < n; i += 2) { short s = (short)(b[i] | (b[i + 1] << 8)); sum += (double)s * s; }
+        double rms = count > 0 ? Math.Sqrt(sum / count) / 32768.0 : 0;
+        int ms = count * 1000 / Rate;
+        Millis += ms;
+        Level = (float)Math.Min(1.0, rms * 8);
+        if (floorCount < 3) { floor = (floor * floorCount + rms) / (floorCount + 1); floorCount++; return; }
+        double seuil = Math.Max(0.012, floor * 3);
+        if (rms > seuil) { HeardVoice = true; MillisSinceVoice = 0; }
+        else MillisSinceVoice += ms;
+    }
+
+    public void Stop()
+    {
+        if (h == IntPtr.Zero) return;
+        run = false;
+        ev.Set();
+        if (th != null) th.Join(1000);
+        waveInReset(h);
+        for (int i = 0; i < hdrs.Length; i++)
+        {
+            if (hdrs[i] == IntPtr.Zero) continue;
+            WAVEHDR hd = (WAVEHDR)Marshal.PtrToStructure(hdrs[i], typeof(WAVEHDR));
+            waveInUnprepareHeader(h, hdrs[i], (uint)HeaderSize);
+            Marshal.FreeHGlobal(hd.lpData);
+            Marshal.FreeHGlobal(hdrs[i]);
+            hdrs[i] = IntPtr.Zero;
+        }
+        waveInClose(h);
+        h = IntPtr.Zero;
+    }
+
+    // Enregistre ce qui a été entendu dans un fichier .wav (effacé dès que Whisper l'a lu)
+    public void SaveWav(string path)
+    {
+        byte[] pcm; lock (data) pcm = data.ToArray();
+        using (System.IO.BinaryWriter w = new System.IO.BinaryWriter(System.IO.File.Create(path)))
+        {
+            w.Write(new[] { 'R', 'I', 'F', 'F' }); w.Write(36 + pcm.Length);
+            w.Write(new[] { 'W', 'A', 'V', 'E', 'f', 'm', 't', ' ' }); w.Write(16);
+            w.Write((short)1); w.Write((short)1); w.Write(Rate); w.Write(Rate * 2); w.Write((short)2); w.Write((short)16);
+            w.Write(new[] { 'd', 'a', 't', 'a' }); w.Write(pcm.Length); w.Write(pcm);
+        }
+    }
+}

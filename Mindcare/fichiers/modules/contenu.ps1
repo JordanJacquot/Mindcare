@@ -27,6 +27,12 @@ function Initialize-Contenu {
     if ($EnTest -and $script:Donnees) {
         if ($env:MINDCARE_TEST_REPRENDRE -and $script:Historique.Count) { Open-Diagnostic ([string]$script:Historique[0].Id); return }
         if ($env:MINDCARE_TEST_FAMILLE) { Show-Famille $env:MINDCARE_TEST_FAMILLE; return }
+        # La dictée, pour les captures : 'installer' (le bandeau), 'ecoute' (le micro allumé), 'texte' (la phrase écrite)
+        if ($env:MINDCARE_TEST_DICTEE) {
+            Show-Accueil
+            switch ($env:MINDCARE_TEST_DICTEE) { 'installer' { Invoke-BoutonMicro } 'ecoute' { Show-DicteeEcoute; Update-DicteeNiveau 0.3 } 'texte' { Set-DicteeTexte 'mon pc s''éteint quand je joue' } }
+            return
+        }
         if ($env:MINDCARE_TEST_RECHERCHE) { Show-Accueil; $ui.Recherche.Text = $env:MINDCARE_TEST_RECHERCHE; if ($env:MINDCARE_TEST_IA -or $env:MINDCARE_IA_MODELE) { Request-Ia; if ($env:MINDCARE_TEST_IA_DOUBLE) { Request-Ia } }; return }   # (DOUBLE : Entrée appuyée deux fois)
         # Une enquête toute faite : « redemarre » ou « redemarre:1,0,-1 » (outils\tester.ps1)
         if ($env:MINDCARE_TEST_PARCOURS) {
@@ -139,6 +145,7 @@ function Show-Accueil([string]$Famille = '') {
     $script:FamilleChoisie = $Famille
     $script:PanneEnCours = $null; $script:ChoixFaits = @(); $script:ReparateurOuvert = $false; $script:IndicesGardes = $null
     $script:FamillesAnimees = $false
+    Stop-DicteeSansSuite; $script:DicteeMessage = $null
     Clear-Contenu
     Set-BulleMascotte $(if ($Famille) { 'Choisis ce qui ressemble le plus à ce qui se passe.' } else { 'Un souci avec l''ordinateur ? Dis-moi ce qui se passe.' })
     if (-not $script:Donnees) {
@@ -157,6 +164,8 @@ function Show-Accueil([string]$Famille = '') {
     $loupe.Stroke = Get-Brush '#00E5FF'; $loupe.StrokeThickness = 2; $loupe.StrokeEndLineCap = 'Round'
     $loupe.Width = 18; $loupe.Height = 18; $loupe.Margin = '0,0,10,0'; $loupe.VerticalAlignment = 'Center'
     [System.Windows.Controls.DockPanel]::SetDock($loupe, 'Left'); [void]$dp.Children.Add($loupe)
+    $ui.BoutonMicro = New-BoutonMicro   # (parler au lieu d'écrire : dictee.ps1)
+    [System.Windows.Controls.DockPanel]::SetDock($ui.BoutonMicro, 'Right'); [void]$dp.Children.Add($ui.BoutonMicro)
     $zone = New-Object System.Windows.Controls.Grid
     $indice = New-Text $(if (Test-IaInstallee) { 'Raconte ton problème avec tes mots, puis appuie sur Entrée : « mon pc s''éteint quand je joue »...' } else { 'Tu peux aussi écrire ton problème avec tes mots : « bip », « le son grésille », « écran bleu »...' }) 14 '#7E78A0'
     $indice.IsHitTestVisible = $false; $indice.VerticalAlignment = 'Center'
@@ -165,12 +174,17 @@ function Show-Accueil([string]$Famille = '') {
     $saisie.Foreground = Get-Brush '#FFFFFF'; $saisie.CaretBrush = Get-Brush '#00E5FF'; $saisie.VerticalContentAlignment = 'Center'
     $saisie.Tag = $indice
     $saisie.Add_TextChanged((Protect-Action { param($s) $s.Tag.Visibility = $(if ($s.Text) { 'Collapsed' } else { 'Visible' }); if ($s.Text) { Start-Ia }; Clear-ZoneIa; Update-Accueil }))   # (l'assistant se prépare dès qu'on écrit)
-    $saisie.Add_KeyDown((Protect-Action { param($s, $ev) if ($ev.Key -eq 'Return') { Request-Ia } }))
+    $saisie.Add_KeyDown((Protect-Action { param($s, $ev) if ($ev.Key -eq 'Return') { if (-not $script:DicteeDl -or $script:DicteeDl.Fini) { $script:DicteeMessage = $null; Update-ZoneDictee }; Request-Ia } }))
     [void]$zone.Children.Add($indice); [void]$zone.Children.Add($saisie)
     [void]$dp.Children.Add($zone)
     $champ.Child = $dp
     [void]$ui.Contenu.Children.Add($champ)
-    $ui.Recherche = $saisie
+    $ui.Recherche = $saisie; $ui.ChampRecherche = $champ
+
+    # La dictée : ce qu'elle fait (j'écoute, j'écris...), ou le bandeau pour l'installer
+    $ui.ZoneDictee = New-Object System.Windows.Controls.StackPanel
+    [void]$ui.Contenu.Children.Add($ui.ZoneDictee)
+    Update-ZoneDictee
 
     # Une enquête pas finie : la reprendre est proposé tout de suite
     $dernier = if ($script:Historique.Count) { $script:Historique[0] } else { $null }
@@ -198,6 +212,122 @@ function Show-Accueil([string]$Famille = '') {
     $ui.ZoneAccueil = New-Object System.Windows.Controls.StackPanel
     [void]$ui.Contenu.Children.Add($ui.ZoneAccueil)
     Update-Accueil
+}
+
+# ---------------------------------------------------------------------------
+# La dictée (dictee.ps1) : le bouton micro de la barre, et ses messages juste en dessous
+# ---------------------------------------------------------------------------
+function New-BoutonMicro {
+    $b = New-Object System.Windows.Controls.Button
+    $b.Template = [System.Windows.Markup.XamlReader]::Parse('<ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="17"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate>')
+    $b.Width = 34; $b.Height = 34; $b.Margin = '10,0,0,0'; $b.Cursor = 'Hand'; $b.Focusable = $true
+    $b.Background = [System.Windows.Media.Brushes]::Transparent
+    $b.ToolTip = 'Parler au lieu d''écrire'
+    $p = New-Object System.Windows.Shapes.Path
+    $p.Data = [System.Windows.Media.Geometry]::Parse('M 9,1 A 3,3 0 0 1 12,4 L 12,9 A 3,3 0 0 1 6,9 L 6,4 A 3,3 0 0 1 9,1 Z M 3,9 A 6,6 0 0 0 15,9 M 9,15 L 9,18 M 6,18 L 12,18')
+    $p.Stroke = Get-Brush '#00E5FF'; $p.StrokeThickness = 2; $p.StrokeStartLineCap = 'Round'; $p.StrokeEndLineCap = 'Round'
+    $p.Width = 16; $p.Height = 19; $p.Stretch = 'Uniform'
+    $b.Content = $p
+    $b.Add_MouseEnter((Protect-Action { param($s) if (-not (Test-DicteeEcoute)) { $s.Background = Get-Brush '#2600E5FF' } }))
+    $b.Add_MouseLeave((Protect-Action { param($s) if (-not (Test-DicteeEcoute)) { $s.Background = [System.Windows.Media.Brushes]::Transparent } }))
+    $b.Add_Click((Protect-Action { Invoke-BoutonMicro }))
+    $b
+}
+
+function Invoke-BoutonMicro {
+    $r = Start-Dictee
+    switch ($r) {
+        'ecoute'    { Show-DicteeEcoute }
+        'fin'       { }   # (deuxième appui : Stop-Dictee a déjà montré la suite)
+        'occupee'   { }   # (Whisper écrit encore la phrase d'avant)
+        'installer' { $script:DicteeProposee = $true; Write-Log 'Dictée : installation proposée'; Update-ZoneDictee }
+        default     { Show-DicteeFin $r }
+    }
+}
+
+# Le bouton micro allumé pendant l'écoute ; sa lumière suit la voix
+function Set-BoutonMicroAllume([bool]$Allume) {
+    if (-not $ui.BoutonMicro) { return }
+    $ui.BoutonMicro.Background = if ($Allume) { Get-Brush '#6600E5FF' } else { [System.Windows.Media.Brushes]::Transparent }
+    $ui.BoutonMicro.ToolTip = if ($Allume) { 'Arrêter d''écouter' } else { 'Parler au lieu d''écrire' }
+}
+function Update-DicteeNiveau([double]$Niveau) {
+    if (-not $ui.BoutonMicro) { return }
+    $a = [int](255 * [math]::Min(1.0, 0.4 + 1.5 * $Niveau))
+    $ui.BoutonMicro.Background = Get-Brush ('#{0:X2}00E5FF' -f $a)
+}
+
+function Set-DicteeMessage([string]$Texte, [string]$Bulle) {
+    $script:DicteeMessage = $Texte
+    Update-ZoneDictee
+    if ($Bulle) { Set-BulleMascotte $Bulle }
+}
+function Show-DicteeEcoute {
+    Set-BoutonMicroAllume $true
+    Set-DicteeMessage 'Je t''écoute. Dis ce qui ne va pas : j''écris ta phrase dès que tu te tais.' 'Je t''écoute...'
+}
+function Show-DicteeEcrit {
+    Set-BoutonMicroAllume $false
+    Set-DicteeMessage 'J''écris ce que tu as dit...' 'J''écris ce que tu as dit...'
+}
+function Show-DicteeFin([string]$Texte) {
+    Set-BoutonMicroAllume $false
+    Set-DicteeMessage $Texte 'Je n''ai pas pu écrire ta phrase cette fois.'
+}
+# La phrase dite va dans la barre : la recherche se fait comme si elle avait été tapée, et Entrée la donne à l'assistant
+function Set-DicteeTexte([string]$Texte) {
+    Set-BoutonMicroAllume $false
+    if (-not $ui.Recherche -or -not $ui.Contenu.Children.Contains($ui.ChampRecherche)) { $script:DicteeMessage = $null; return }   # (on a quitté l'accueil entre-temps)
+    $ui.Recherche.Text = $Texte
+    $ui.Recherche.CaretIndex = $Texte.Length
+    [void]$ui.Recherche.Focus()
+    Set-DicteeMessage 'Voilà ce que j''ai compris. Corrige si besoin, puis appuie sur Entrée.' 'C''est bien ça ? Appuie sur Entrée.'
+}
+
+function Update-ZoneDictee {
+    $z = $ui.ZoneDictee
+    if (-not $z) { return }
+    $z.Children.Clear()
+    $enCours = $script:DicteeDl -and -not $script:DicteeDl.Fini
+    $erreur = $script:DicteeDl -and $script:DicteeDl.Fini -and $script:DicteeDl.Erreur
+    $proposer = $script:DicteeProposee -and -not (Test-DicteeInstallee)
+    if (-not $enCours -and -not $erreur -and -not $proposer -and -not $script:DicteeMessage) { return }
+    $bandeau = New-BandeauIa
+    $dp = New-Object System.Windows.Controls.DockPanel
+    if (($proposer -or $erreur) -and -not $enCours) {
+        $b = New-Button $(if ($erreur) { 'Réessayer' } elseif (Test-Path -LiteralPath $DicteeExe) { 'Réparer' } else { 'Installer' }) 'BtnPrimary'
+        $b.Add_Click((Protect-Action { Start-DicteeInstall; Start-SuiviDictee; Update-ZoneDictee }))
+        [System.Windows.Controls.DockPanel]::SetDock($b, 'Right'); [void]$dp.Children.Add($b)
+    }
+    $texte = if ($enCours) {
+        $pc = if ($script:DicteeDl.Total) { [math]::Floor(100 * $script:DicteeDl.Recu / $script:DicteeDl.Total) } else { 0 }
+        "Installation de la dictée : $pc % ($($script:DicteeDl.Etape)). Tu peux continuer à te servir de Mindcare."
+    } elseif ($erreur) {
+        "La dictée n'a pas pu s'installer : $($script:DicteeDl.Erreur)."
+    } elseif ($proposer) {
+        "Pour parler au lieu d'écrire, installe la dictée : environ $(Get-DicteeTaille) Mo, une seule fois. Elle marche ensuite sans internet, et ta voix n'est jamais gardée."
+    } else { $script:DicteeMessage }
+    $t = New-Text $texte 14 '#C9C3DD'; $t.VerticalAlignment = 'Center'; $t.Margin = '0,0,12,0'; $t.TextWrapping = 'Wrap'
+    [void]$dp.Children.Add($t)
+    $bandeau.Child = $dp
+    [void]$z.Children.Add($bandeau)
+}
+
+# Suit l'installation de la dictée
+function Start-SuiviDictee {
+    if ($script:DicteeSuiviDl) { return }
+    $script:DicteeSuiviDl = New-Object System.Windows.Threading.DispatcherTimer
+    $script:DicteeSuiviDl.Interval = [TimeSpan]::FromMilliseconds(500)
+    $script:DicteeSuiviDl.Add_Tick((Protect-Action {
+        param($s)
+        if ($script:DicteeDl -and $script:DicteeDl.Fini) {
+            $s.Stop(); $script:DicteeSuiviDl = $null
+            if ($script:DicteeDl.Erreur) { Write-Log "Dictée non installée : $($script:DicteeDl.Erreur)" }
+            else { Write-Log 'Dictée installée'; $script:DicteeProposee = $false; $script:DicteeMessage = 'La dictée est prête : appuie sur le micro, à droite de la barre, et dis ce qui ne va pas.' }
+        }
+        if ($ui.ZoneDictee -and $ui.ZoneDictee.IsLoaded) { Update-ZoneDictee }
+    }))
+    $script:DicteeSuiviDl.Start()
 }
 
 # ---------------------------------------------------------------------------
@@ -884,4 +1014,4 @@ function Add-Reparateur {
 function Get-ResumeEnCours { Get-ResumeTexte $script:ResumeDe.Panne $script:ResumeDe.Enquete $script:ResumeDe.Titre }
 
 # À la fermeture : arrêter ce qui tourne (minuteries, travaux de fond), sinon rien ne doit rester ouvert
-function Stop-Contenu { Stop-LectureJournaux; Stop-ThemeVisuels; Stop-Ia }
+function Stop-Contenu { Stop-LectureJournaux; Stop-ThemeVisuels; Stop-Ia; Stop-Dictees }

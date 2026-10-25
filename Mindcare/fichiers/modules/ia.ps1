@@ -66,21 +66,28 @@ function Get-PlaceLibre([string]$Dossier) {
 # ---------------------------------------------------------------------------
 function Start-IaInstall {
     if ($script:IaDl -and -not $script:IaDl.Fini) { return }
-    $manquants = Get-IaManquants
-    $script:IaDl = [hashtable]::Synchronized(@{ Recu = 0L; Total = [long](($manquants | ForEach-Object { $_.Taille }) | Measure-Object -Sum).Sum; Etape = ''; Erreur = ''; Fini = $false })
-    # Assez de place ? (ce qui reste à télécharger, plus le moteur une fois extrait et une marge)
+    $script:IaDl = Start-Telechargement (Get-IaManquants) $IaDir 200MB
+    if (-not $script:IaDl.Fini) { Write-Log "Installation de l'assistant ($([math]::Round($script:IaDl.Total / 1MB)) Mo)" }
+}
+
+# Télécharge des fichiers (liste comme $IaFichiers) dans un dossier, en arrière-plan ; renvoie l'état à suivre
+# { Recu, Total, Etape, Erreur, Fini }. Sert aussi à la dictée (dictee.ps1). $Marge : la place gardée en plus sur le disque.
+function Start-Telechargement($Manquants, [string]$Dossier, [long]$Marge) {
+    $manquants = @($Manquants)
+    $etat = [hashtable]::Synchronized(@{ Recu = 0L; Total = [long](($manquants | ForEach-Object { $_.Taille }) | Measure-Object -Sum).Sum; Etape = ''; Erreur = ''; Fini = $false })
+    # Assez de place ? (ce qui reste à télécharger, plus les programmes une fois extraits et une marge)
     $reste = 0L
     foreach ($f in $manquants) {
-        $tmp = Join-Path $IaDir ([IO.Path]::GetFileName($f.Url) + '.telechargement')
+        $tmp = Join-Path $Dossier ([IO.Path]::GetFileName($f.Url) + '.telechargement')
         $deja = if (Test-Path -LiteralPath $tmp) { (Get-Item -LiteralPath $tmp).Length } else { 0L }
         $reste += [math]::Max(0L, [long]$f.Taille - $deja)
     }
-    $besoin = $reste + 200MB
+    $besoin = $reste + $Marge
     $libre = Get-PlaceLibre $DataDir
     if ($libre -ge 0 -and $libre -lt $besoin) {
-        $script:IaDl.Erreur = "il n'y a pas assez de place sur le disque (il faut environ $([math]::Ceiling($besoin / 1MB)) Mo de libre, il en reste $([math]::Floor($libre / 1MB)) Mo). Fais de la place (la corbeille, les vieux téléchargements), puis réessaie"
-        $script:IaDl.Fini = $true
-        return
+        $etat.Erreur = "il n'y a pas assez de place sur le disque (il faut environ $([math]::Ceiling($besoin / 1MB)) Mo de libre, il en reste $([math]::Floor($libre / 1MB)) Mo). Fais de la place (la corbeille, les vieux téléchargements), puis réessaie"
+        $etat.Fini = $true
+        return $etat
     }
     $ps = [PowerShell]::Create()
     [void]$ps.AddScript({
@@ -145,7 +152,8 @@ function Start-IaInstall {
                     Add-Type -AssemblyName System.IO.Compression.FileSystem
                     $zip = [IO.Compression.ZipFile]::OpenRead($tmp)
                     # (chaque fichier extrait à côté puis renommé : jamais de fichier à moitié écrit sous son vrai nom ; et
-                    # llama-server.exe en dernier : s'il est là, ses .dll aussi, même si Mindcare a été fermée pendant)
+                    # le programme (llama-server.exe, whisper-cli.exe) en dernier : s'il est là, ses .dll aussi, même si
+                    # Mindcare a été fermée pendant)
                     $exe = [IO.Path]::GetFileName($f.Garder)
                     try {
                         foreach ($e in @($zip.Entries | Where-Object { $_.Name -match $f.Extraire } | Sort-Object { $_.Name -eq $exe })) {
@@ -161,10 +169,10 @@ function Start-IaInstall {
             $Etat.Erreur = if (& $estPlein $_) { "il n'y a plus assez de place sur le disque. Fais de la place (la corbeille, les vieux téléchargements), puis réessaie" } else { $_.Exception.Message }
         }
         $Etat.Fini = $true
-    }).AddArgument($script:IaDl).AddArgument($manquants).AddArgument($IaDir).AddArgument($script:IaPause)
-    $script:IaDl.PS = $ps
-    $script:IaDl.Handle = $ps.BeginInvoke()
-    Write-Log "Installation de l'assistant ($([math]::Round($script:IaDl.Total / 1MB)) Mo)"
+    }).AddArgument($etat).AddArgument($manquants).AddArgument($Dossier).AddArgument($script:IaPause)
+    $etat.PS = $ps
+    $etat.Handle = $ps.BeginInvoke()
+    $etat
 }
 
 # Garde-fou : une réponse réglée d'avance n'est gardée que si la phrase en parle vraiment (un mot de la question ou de

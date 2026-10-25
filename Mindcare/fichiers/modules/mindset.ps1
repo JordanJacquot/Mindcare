@@ -6,7 +6,8 @@
 #   { "theme": "neon" | "pack:<id>", "applis": { "mindcare": "<dossier de Mindcare>", ... }, "micro": "...", "casque": "..." }
 # Mindcare est « gérée par Mindset » si applis.mindcare est le dossier de cette copie.
 # Sécurité : n'importe quel programme de l'utilisateur peut modifier ce fichier. On n'y accepte qu'un nom de thème connu,
-# et le dossier ne sert qu'à comparer avec le nôtre : rien n'y est jamais lancé ni ouvert.
+# et le dossier ne sert qu'à comparer avec le nôtre : rien n'y est jamais lancé ni ouvert. Le micro (pour la dictée) n'est
+# qu'un nom comparé à ceux des micros du PC.
 
 $SuiteFile   = if ($EnTest) { $env:MINDCARE_SUITE } else { Join-Path $env:LOCALAPPDATA 'Mindset\suite.json' }   # (tests : un faux fichier, ou aucun)
 $ThemesSuite = @('neon', 'crepuscule', 'terminal', 'arcade', 'rubis')
@@ -18,9 +19,9 @@ function Get-CheminNormal([string]$Chemin) {
     try { [IO.Path]::GetFullPath($Chemin).TrimEnd('\') } catch { $null }
 }
 
-# Ce qu'on garde de suite.json : le thème (connu, ou « pack:<id> » au nom valable) et le dossier de Mindcare
+# Ce qu'on garde de suite.json : le thème (connu, ou « pack:<id> » au nom valable), le dossier de Mindcare et le micro
 function Read-Suite {
-    $s = @{ Existe = $false; Lisible = $false; Theme = $null; Dossier = $null }
+    $s = @{ Existe = $false; Lisible = $false; Theme = $null; Dossier = $null; Micro = '' }
     if (-not $SuiteFile -or -not [IO.File]::Exists($SuiteFile)) { return $s }
     $s.Existe = $true
     try {
@@ -28,6 +29,7 @@ function Read-Suite {
         if ($j.theme -is [string] -and $j.theme -in $ThemesSuite) { $s.Theme = $j.theme.ToLowerInvariant() }
         elseif ($j.theme -is [string] -and $j.theme -cmatch '^pack:[a-z0-9-]{1,40}$') { $s.Theme = $j.theme }
         if ($j.applis -and $j.applis.$AppId -is [string]) { $s.Dossier = Get-CheminNormal $j.applis.$AppId }
+        if ($j.micro -is [string] -and $j.micro.Length -le 64 -and $j.micro -notmatch '[\x00-\x1F]') { $s.Micro = $j.micro }   # (vide : celui de Windows)
         $s.Lisible = $true
     } catch {}   # (illisible, ou en train d'être remplacé par Mindset)
     $s

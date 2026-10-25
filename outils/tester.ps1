@@ -330,7 +330,8 @@ $rates = @($essais | Where-Object { -not $_.Bon } | ForEach-Object { "$($_.Nom) 
 Write-Resultat "assistant : lancé sous le nom Mindset.exe (copie de llama-server.exe), sinon llama-server.exe" (-not $rates -and $essais.Count -eq 4) "($($rates -join ' ; '))"
 # Aucun envoi automatique sur Internet (CODE_SIGNING.md, confidentialité) : seulement les adresses connues, et le
 # téléchargement de l'assistant ne part que d'un clic. Un nouvel envoi doit être ajouté ici ET dans CODE_SIGNING.md.
-$connues = 'https://github.com/ggml-org/llama.cpp/releases/download/', 'https://github.com/JordanJacquot/Mindcare/releases/download/', 'https://github.com/JordanJacquot/Mindset/releases/latest', 'http://127.0.0.1:'
+$connues = 'https://github.com/ggml-org/llama.cpp/releases/download/', 'https://github.com/JordanJacquot/Mindcare/releases/download/', 'https://github.com/JordanJacquot/Mindset/releases/latest', 'http://127.0.0.1:',
+           'https://github.com/ggml-org/whisper.cpp/releases/download/', 'https://huggingface.co/ggerganov/whisper.cpp/resolve/'
 $reseau = @()
 foreach ($f in Get-ChildItem -LiteralPath $AppDir -Recurse -File | Where-Object { $_.Extension -in '.ps1', '.cs' }) {
     $n = 0
@@ -341,10 +342,11 @@ foreach ($f in Get-ChildItem -LiteralPath $AppDir -Recurse -File | Where-Object 
             if (-not @($connues | Where-Object { $m.Value.StartsWith($_) }).Count) { $reseau += "$($f.Name) ligne $n : $($m.Value)" }
         }
         if ($l -match 'WebClient|Net\.Http\.|HttpClient|BitsTransfer|Sockets\.(TcpClient|UdpClient)|Resolve-DnsName|Test-Connection|Test-NetConnection|Net\.NetworkInformation') { $reseau += "$($f.Name) ligne $n : $($l.Trim())" }
-        if ($l -match 'Start-IaInstall' -and $l -notmatch '^\s*function ' -and $l -notmatch 'Add_Click') { $reseau += "$($f.Name) ligne $n : installation de l'assistant hors d'un clic" }
+        if ($l -match 'Start-IaInstall|Start-DicteeInstall' -and $l -notmatch '^\s*function ' -and $l -notmatch 'Add_Click') { $reseau += "$($f.Name) ligne $n : installation de l'assistant ou de la dictée hors d'un clic" }
+        if (($l -replace '#.*$', '') -match 'Start-Telechargement' -and $l -notmatch '^\s*function ' -and $l -notmatch '^\s*\$script:(Ia|Dictee)Dl = Start-Telechargement') { $reseau += "$($f.Name) ligne $n : téléchargement hors de l'installation de l'assistant ou de la dictée" }
     }
 }
-Write-Resultat 'aucun envoi automatique sur Internet (adresses connues, assistant sur un clic)' (-not $reseau) "($($reseau -join ' ; '))"
+Write-Resultat 'aucun envoi automatique sur Internet (adresses connues, assistant et dictée sur un clic)' (-not $reseau) "($($reseau -join ' ; '))"
 # Le filet contre les plantages (donnees.ps1), avec son vrai code, dans des boucles de messages WPF de test
 # (DispatcherFrame : le Dispatcher de ce script reste utilisable ensuite). Dans chaque boucle, une minuterie d'essai
 # (toutes les 15 ms) et une minuterie de fin (8 tours de 40 ms) ; une minuterie en C# arrête tout après 5 secondes au
@@ -484,6 +486,13 @@ if (-not $SansFenetre) {
     $s = Test-Capture 'ia-double-entree' @{ MINDCARE_TEST_RECHERCHE = 'mon pc s''éteint d''un coup quand je joue'; MINDCARE_TEST_IA = $faux; MINDCARE_TEST_IA_DOUBLE = '1' }
     $propositions = @([regex]::Matches((Get-Journal $s), 'Assistant : .+ -> seteint')).Count
     Write-Resultat "assistant : Entrée appuyée deux fois, une seule proposition et l'appli reste ouverte" ((Test-Path -LiteralPath $s.Capture) -and -not (Get-Erreurs $s) -and $propositions -eq 1 -and (Get-Journal $s) -notmatch 'Erreur imprévue') "($propositions proposition(s))"
+    # La dictée (dictee.ps1) : le bouton micro dans la barre ; pas installée, le bandeau qui la propose ; l'écoute ; la phrase écrite
+    $s = Test-Capture 'dictee-installer' @{ MINDCARE_TEST_DICTEE = 'installer' }
+    Write-Resultat "dictée pas installée : le micro propose de l'installer" ((Get-Journal $s) -match 'Dictée : installation proposée' -and -not (Get-Erreurs $s)) '(pas de proposition dans le journal)'
+    $s = Test-Capture 'dictee-ecoute' @{ MINDCARE_TEST_DICTEE = 'ecoute' }
+    Write-Resultat 'dictée : l''écoute s''affiche sans erreur' ((Test-Path -LiteralPath $s.Capture) -and -not (Get-Erreurs $s)) "($(Get-Erreurs $s))"
+    $s = Test-Capture 'dictee-texte' @{ MINDCARE_TEST_DICTEE = 'texte' }
+    Write-Resultat 'dictée : la phrase va dans la barre et la recherche se fait' ((Test-Path -LiteralPath $s.Capture) -and -not (Get-Erreurs $s) -and (Get-Journal $s) -notmatch 'Erreur imprévue') "($(Get-Erreurs $s))"
     # Le filet dans la vraie appli : une minuterie qui se trompe à chaque tour (toutes les 50 ms) ; Mindcare continue
     # jusqu'à sa capture, l'erreur est notée 3 fois avec son script et sa ligne, et signalée une seule fois
     $s = Start-Scenario 'filet' @{ MINDCARE_CAPTURE = (Join-Path $test 'capture-filet.png'); MINDCARE_TEST_ERREUR = '1' }

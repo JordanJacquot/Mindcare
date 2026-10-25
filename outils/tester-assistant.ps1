@@ -38,7 +38,7 @@ function New-ChargementTheme([double]$Taille) { $null }
 function Stop-ChargementTheme {}
 function Protect-Action([scriptblock]$Action) { $Action }
 function Get-Panne($Donnees, $Id) { $null }
-foreach ($m in 'ia', 'contenu') { . (Join-Path $Modules "$m.ps1") }
+foreach ($m in 'ia', 'dictee', 'contenu') { . (Join-Path $Modules "$m.ps1") }
 try { Add-Type -TypeDefinition ([IO.File]::ReadAllText((Join-Path $racine 'Mindcare\fichiers\modules\natif.cs'), [Text.Encoding]::UTF8)) } catch {}   # (le faux assistant s'arrête avec ce test)
 $script:Donnees = [pscustomobject]@{ Pannes = @() }
 $IaFichiersVrais = $IaFichiers
