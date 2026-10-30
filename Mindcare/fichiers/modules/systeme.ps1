@@ -87,10 +87,11 @@ function Update-SuiteSurveillance {
     if (-not $GereParMindset -or -not $SuiteFile) { return }
     $fi = New-Object IO.FileInfo $SuiteFile
     $date = if ($fi.Exists) { $fi.LastWriteTimeUtc } else { [datetime]::MinValue }
-    if ($null -eq $script:SuiteDate) { $script:SuiteDate = $date; return }
+    # (suite.json pris au lancement : son thème n'a pas pu être lu, il l'est au premier tour où il est libre)
+    if ($null -eq $script:SuiteDate -and -not $script:Suite.Pris) { $script:SuiteDate = $date; return }
     if ($date -eq $script:SuiteDate) { return }
-    $s = Read-Suite
-    if ($s.Existe -and -not $s.Lisible) { return }   # en train d'être remplacé : relu au prochain tour
+    $s = Read-Suite 1   # (un seul essai : la fenêtre ne se fige pas, le tour suivant réessaie)
+    if ($s.Existe -and -not $s.Lisible) { return }   # en train d'être remplacé, ou pris : relu au prochain tour
     $script:SuiteDate = $date
     if ($s.Theme -and $s.Theme -ne $ThemeSetting) {
         Write-Log "Thème de la suite changé : $($s.Theme), relance"
