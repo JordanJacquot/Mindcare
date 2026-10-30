@@ -1,0 +1,18 @@
+[package]
+name = "mindcare-moteur"
+version = "0.1.0"
+description = "Le moteur des enquêtes de Mindcare (portage exact de modules/enquete.ps1), sans écran et sans Windows"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Versions figées (« = ») : une nouvelle version n'entre que par un changement relu.
+# Le catalogue (enquetes.json) est lu tel quel, comme ConvertFrom-Json. « preserve_order » garde l'ordre des champs du
+# fichier : la validation du catalogue cite les suspects dans l'ordre du fichier, comme PowerShell.
+serde_json = { version = "=1.0.154", features = ["preserve_order"] }
+# La recherche par mots enlève les accents comme .NET (Normalize(FormD), puis sans les signes combinants)
+unicode-normalization = "=0.1.24"
+
+[lints]
+workspace = true

@@ -1,0 +1,21 @@
+# Le Rust de Mindcare (plan « Mindcare en Rust », 30/10/2026). Rien ici n'est livré aux utilisateurs pour l'instant :
+# Mindcare publiée reste celle en PowerShell. Réglages repris du Rust de Mindset (D:\Projets\Mindset\rust).
+[workspace]
+resolver = "3"
+members = ["mindcare-moteur"]
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+# Les tests optimisés : les juges rejouent des dizaines de milliers d'enquêtes et de recherches (sans cela, plus
+# d'une minute)
+[profile.test]
+opt-level = 2
