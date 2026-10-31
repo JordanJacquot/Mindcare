@@ -109,20 +109,51 @@ function Register-FiletErreurs {
 }
 
 # Écrit un fichier JSON sans risque de le perdre : à côté, puis remplacé d'un coup (l'ancien reste dans « .bak »)
+# Un fichier qu'un autre programme gardait ouvert à la lecture ($script:FichiersPris) n'est jamais écrit : on n'en a
+# peut-être que la sauvegarde en mémoire, et l'écrire ferait perdre la dernière version (comme dans Evermind).
+$script:FichiersPris = @{}
 function Save-JsonFile([string]$Path, $Object) {
+    if ($script:FichiersPris[$Path]) { throw "$(Split-Path $Path -Leaf) est en lecture seule pour l'instant (un autre programme le garde ouvert)" }
     $tmp = "$Path.tmp"
     [IO.File]::WriteAllText($tmp, (ConvertTo-Json -InputObject $Object -Depth 8), $Utf8NoBom)
     if ([IO.File]::Exists($Path)) { [IO.File]::Replace($tmp, $Path, "$Path.bak") } else { [IO.File]::Move($tmp, $Path) }
 }
 
 # Lit un fichier JSON. Un fichier abîmé est mis de côté (rien n'est jamais effacé) et on repart de la sauvegarde.
+# Un fichier qu'un autre programme garde ouvert un instant (antivirus, OneDrive au démarrage de Windows) n'est pas
+# abîmé : 5 essais à 300 ms, puis il est noté « pris » ($script:FichiersPris) : on lit sa sauvegarde pour montrer quelque
+# chose, mais rien n'est enregistré tant qu'il n'a pas été relu (sinon la dernière enquête, poussée vers « .bak », serait
+# écrasée au tour suivant). Il n'est jamais mis de côté.
+function Test-ErreurFichierPris($Erreur) {
+    for ($e = $Erreur; $e; $e = $e.InnerException) {
+        if ($e -is [IO.IOException] -and (($e.HResult -band 0xFFFF) -in 32, 33)) { return $true }   # (partage, verrou)
+    }
+    $false
+}
+
 function Read-JsonFile([string]$Path) {
+    $script:FichiersPris.Remove($Path)
     foreach ($p in $Path, "$Path.bak") {
         if (-not [IO.File]::Exists($p)) { continue }
+        $texte = $null; $pris = $false
+        for ($essai = 1; $essai -le 5; $essai++) {
+            try { $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8); $pris = $false; break }
+            catch {
+                $pris = Test-ErreurFichierPris $_.Exception
+                if (-not $pris) { break }
+                if ($essai -lt 5) { Start-Sleep -Milliseconds 300 }
+            }
+        }
+        if ($pris) {
+            Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $p"
+            if ($p -eq $Path) { $script:FichiersPris[$Path] = $true }
+            continue
+        }
         try {
+            if ($null -eq $texte) { $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8) }   # (autre erreur : vue ici, comme abîmé)
             # (un fichier vide ne lève aucune erreur : sans ce contrôle, il passait pour un historique vide et écrasait le .bak)
-            $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8)
             if ([string]::IsNullOrWhiteSpace($texte) -or $texte.Trim() -eq 'null') { throw 'fichier vide' }
+            if ($p -ne $Path) { Write-Log "Fichier repris de sa sauvegarde : $p" }
             return ($texte | ConvertFrom-Json)
         }
         catch {
@@ -133,14 +164,33 @@ function Read-JsonFile([string]$Path) {
     $null
 }
 
+# Un fichier noté « pris » est relu avant d'être enregistré : Libre = on peut l'enregistrer ; Relu = il vient d'être
+# relu (Contenu : ce qu'il contient, à fusionner avec ce qui a changé pendant qu'il était pris). Encore pris : rien n'est
+# écrit, et le prochain enregistrement réessaiera.
+function Get-FichierRelu([string]$Path) {
+    if (-not $script:FichiersPris[$Path]) { return @{ Libre = $true; Relu = $false; Contenu = $null } }
+    $j = Read-JsonFile $Path
+    if ($script:FichiersPris[$Path]) { return @{ Libre = $false; Relu = $false; Contenu = $null } }
+    Write-Log "Fichier de nouveau libre, relu avant d'enregistrer : $Path"
+    @{ Libre = $true; Relu = $true; Contenu = $j }
+}
+
 # ---------------------------------------------------------------------------
 # Réglages (reglages.json)
 # ---------------------------------------------------------------------------
 $script:Settings = @{}
+$script:SettingsChanges = @{}   # (les réglages changés depuis le lancement : gardés si le fichier était pris)
 $j = Read-JsonFile $SettingsFile
 if ($j) { foreach ($p in $j.PSObject.Properties) { $script:Settings[$p.Name] = $p.Value } }
 function Get-Setting([string]$Nom, $Defaut) { if ($script:Settings.ContainsKey($Nom)) { $script:Settings[$Nom] } else { $Defaut } }
+# (fichier pris au lancement : le réglage est gardé en mémoire, et enregistré avec ceux du fichier dès qu'il est libre)
 function Set-Setting([string]$Nom, $Valeur) {
     $script:Settings[$Nom] = $Valeur
+    $script:SettingsChanges[$Nom] = $true
+    $f = Get-FichierRelu $SettingsFile
+    if (-not $f.Libre) { Write-Log "Réglage $Nom gardé en mémoire : le fichier des réglages est pris, il sera enregistré plus tard"; return }
+    if ($f.Relu -and $f.Contenu) {
+        foreach ($p in $f.Contenu.PSObject.Properties) { if (-not $script:SettingsChanges.ContainsKey($p.Name)) { $script:Settings[$p.Name] = $p.Value } }
+    }
     try { Save-JsonFile $SettingsFile $script:Settings } catch { Write-Log "Réglages non enregistrés : $_" }
 }
