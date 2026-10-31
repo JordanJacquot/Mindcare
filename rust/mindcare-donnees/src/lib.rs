@@ -4,8 +4,9 @@
 //! modules\contenu.ps1 (enquête en cours, reprise par Id, textes du rapport).
 //!
 //! La référence reste Mindcare PowerShell : les tests (tests\) rejouent les cas exportés depuis ses vrais modules par
-//! outils\exporter-juges-donnees.ps1, et doivent trouver exactement les mêmes réponses. La seule différence voulue
-//! (constat 23 : un fichier vide n'est jamais rangé en copie de secours) est écrite dans tests\juges\divergences.json.
+//! outils\exporter-juges-donnees.ps1, et doivent trouver exactement les mêmes réponses. Les seules différences voulues
+//! (constat 23 : un fichier vide n'est jamais rangé en copie de secours ; une copie « .bak » abîmée est déplacée de
+//! côté par json_sur) sont écrites dans tests\juges\divergences.json.
 //!
 //! Ce que Windows doit fournir est donné par l'appelant (l'autre crate) : l'heure locale ([`Horloge`]), les
 //! variables d'environnement, le modèle du PC ([`rapport::LecturePc`]), les barrettes de mémoire, les indices du

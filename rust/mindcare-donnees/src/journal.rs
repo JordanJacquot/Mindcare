@@ -92,7 +92,7 @@ pub fn raccourcir(fichier: &Path) {
         return;
     }
     let Ok(octets) = std::fs::read(fichier) else { return };
-    let texte = crate::fichiers::decoder(&octets);
+    let texte = suite_commun::json_sur::texte_du_fichier(&octets);
     let toutes = lignes(&texte);
     let gardees = &toutes[toutes.len().saturating_sub(LIGNES_GARDEES)..];
     let mut sortie = String::new();

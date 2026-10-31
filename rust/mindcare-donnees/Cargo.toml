@@ -13,8 +13,9 @@ mindcare-moteur = { path = "../mindcare-moteur" }
 # Les fichiers JSON (diagnostics.json, reglages.json, etat.json) : lus avec l'ordre de leurs champs, comme ConvertFrom-Json
 serde_json = { version = "=1.0.154", features = ["preserve_order"] }
 # L'écriture et la lecture sûres des JSON de la suite (json_sur), et les chemins comme .NET : la bibliothèque commune de
-# Mindset, épinglée à une révision relue (jamais une copie du code)
-suite-commun = { git = "https://github.com/JordanJacquot/Mindset", rev = "b1fcd6e6bcb84020d5d48f8bb22be2bc780c5e28" }
+# Mindset, épinglée à une révision relue (jamais une copie du code). Sans ses options par défaut : ni la signature
+# (ring), ni les zips (zip), ni l'heure de Windows ; les fichiers mis de côté prennent l'heure du journal de Mindcare.
+suite-commun = { git = "https://github.com/JordanJacquot/Mindset", rev = "c187f50d6687f557ac0a048b2f0c8fa0b6a72371", default-features = false }
 
 [lints]
 workspace = true

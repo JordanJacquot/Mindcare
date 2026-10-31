@@ -262,7 +262,7 @@ fn etat_session(s: &EnqueteEnCours, vu: &Value) -> Value {
 
 /// Le texte d'un fichier comme ReadAllText.
 fn texte_fichier(p: &Path) -> String {
-    mindcare_donnees::fichiers::decoder(&std::fs::read(p).unwrap_or_default())
+    suite_commun::json_sur::texte_du_fichier(&std::fs::read(p).unwrap_or_default())
 }
 
 /// Rejoue un scénario d'un juge ; rend ce que l'exporteur a noté pour lui (Resultats, Historique, Reglages,

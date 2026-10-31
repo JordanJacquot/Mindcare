@@ -5,10 +5,11 @@
 # rapports), et des cas sans fichier (dates, lignes coupées, cartes, rapports, réponses en attente, indices, chemins,
 # suite.json). Les tests Rust (cargo test, dans rust\) rejouent exactement les mêmes et doivent trouver pareil.
 #
-# Divergence voulue (constat 23 : un fichier vide n'est jamais rangé en copie de secours) : chaque scénario est joué deux
-# fois, avec les vrais modules puis avec Read-JsonFile et Save-JsonFile tels que le Rust les fait (json_sur de
-# suite-commun : le fichier vide ou abîmé est déplacé de côté et sa copie remise en place ; un fichier vide n'est jamais
-# poussé dans .bak). Un scénario où les deux réponses diffèrent va dans divergences.json, avec les deux réponses.
+# Divergences voulues (constat 23 : un fichier vide n'est jamais rangé en copie de secours ; une copie .bak abîmée est
+# déplacée de côté, pas copiée) : chaque scénario est joué deux fois, avec les vrais modules puis avec Read-JsonFile et
+# Save-JsonFile tels que le Rust les fait (json_sur de suite-commun : le fichier vide ou abîmé est déplacé de côté et sa
+# copie remise en place ; seul un fichier qui contient un objet JSON est poussé dans .bak ; une copie abîmée est
+# déplacée de côté). Un scénario où les deux réponses diffèrent va dans divergences.json, avec les deux réponses.
 #
 # Rien n'est lu ni modifié sur le PC : tout se passe dans un dossier temporaire neuf, effacé à la fin (aucune fenêtre,
 # aucun réseau, aucun registre). L'heure et le hasard sont figés (Get-Date et Get-Random remplacés), le modèle du PC et
@@ -116,78 +117,101 @@ $RemplacementsVoulus = {
         if ([string]::IsNullOrWhiteSpace($Texte) -or $Texte.Trim() -eq 'null') { return $false }
         try { $o = $Texte | ConvertFrom-Json; return ($o -is [Management.Automation.PSCustomObject]) } catch { return $false }
     }
+    function Test-TexteVide([string]$Texte) { [string]::IsNullOrWhiteSpace($Texte) -or $Texte.Trim() -eq 'null' }
+    # Pourquoi un texte n'est pas un objet JSON ($null : c'en est un)
+    function Get-RaisonAbime([string]$Texte) {
+        if (Test-TexteVide $Texte) { return 'fichier vide' }
+        try { $o = $Texte | ConvertFrom-Json } catch { return "$_" }
+        if ($o -is [Management.Automation.PSCustomObject]) { $null } else { 'pas un objet' }
+    }
+    # Le texte d'un fichier, 5 essais à 300 ms s'il est pris (Texte, Pris, Erreur)
+    function Read-TexteEssais([string]$P) {
+        $r = @{ Texte = $null; Pris = $false; Erreur = $null }
+        for ($essai = 1; $essai -le 5; $essai++) {
+            try { $r.Texte = [IO.File]::ReadAllText($P, [Text.Encoding]::UTF8); $r.Pris = $false; break }
+            catch { $r.Pris = Test-ErreurFichierPris $_.Exception; $r.Erreur = $_; if (-not $r.Pris) { break }; if ($essai -lt 5) { Start-Sleep -Milliseconds 300 } }
+        }
+        $r
+    }
+    # json_sur : un nom libre <fichier>.abime-<date>, puis -2, -3... (deux mises de côté dans la même seconde ne
+    # s'écrasent jamais)
+    function Get-NomDeCote([string]$Fichier) {
+        $base = "$Fichier.abime-$(Get-Date -Format yyyyMMdd-HHmmss)"
+        $de = $base; $n = 1
+        while ([IO.File]::Exists($de)) { $n++; $de = "$base-$n" }
+        $de
+    }
+    # json_sur : un fichier abîmé est déplacé de côté (jamais effacé) ; le journal de json_sur le note
+    function Move-DeCote([string]$Fichier, [string]$Ligne) {
+        $de = Get-NomDeCote $Fichier
+        [IO.File]::Move($Fichier, $de)
+        Write-Log "$Ligne $(Split-Path $de -Leaf)"
+    }
     function Read-JsonFile([string]$Path) {
         $script:FichiersPris.Remove($Path)
-        $abime = $null
+        $nom = Split-Path $Path -Leaf
         if ([IO.File]::Exists($Path)) {
-            $texte = $null; $pris = $false; $erreur = $null
-            for ($essai = 1; $essai -le 5; $essai++) {
-                try { $texte = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8); $pris = $false; break }
-                catch { $pris = Test-ErreurFichierPris $_.Exception; $erreur = $_; if (-not $pris) { break }; if ($essai -lt 5) { Start-Sleep -Milliseconds 300 } }
-            }
-            if ($pris) { Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $Path"; $script:FichiersPris[$Path] = $true }
-            elseif ($null -eq $texte) { $abime = "$erreur" }
-            elseif ([string]::IsNullOrWhiteSpace($texte) -or $texte.Trim() -eq 'null') { $abime = 'fichier vide' }
+            $r = Read-TexteEssais $Path
+            if ($r.Pris) { Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $Path"; $script:FichiersPris[$Path] = $true }
+            elseif ($null -eq $r.Texte) { Write-Log "Fichier illisible ($Path) : $($r.Erreur)" }
             else {
-                $o = $null
-                try { $o = $texte | ConvertFrom-Json } catch { $abime = "$_" }
-                if ($null -eq $abime) { if ($o -is [Management.Automation.PSCustomObject]) { return $o } else { $abime = 'pas un objet' } }
-            }
-        }
-        if ($null -ne $abime) {
-            # json_sur::lire : déplacé de côté, sa copie reprise et remise en place
-            Write-Log "Fichier illisible ($Path) : $abime"
-            $nom = Split-Path $Path -Leaf
-            $de = "$Path.abime-$(Get-Date -Format yyyyMMdd-HHmmss)"
-            Move-Item -LiteralPath $Path -Destination $de -Force
-            Write-Log "$nom abîmé (illisible) : mis de côté dans $(Split-Path $de -Leaf)"
-            $bak = "$Path.bak"
-            if ([IO.File]::Exists($bak)) {
-                $t = [IO.File]::ReadAllText($bak, [Text.Encoding]::UTF8)
-                if (Test-ObjetJson $t) {
-                    Write-Log "$nom abîmé : repris de sa copie ($nom.bak)"
-                    if (-not [IO.File]::Exists($Path)) { Copy-Item -LiteralPath $bak -Destination $Path }
-                    return ($t | ConvertFrom-Json)
+                $abime = Get-RaisonAbime $r.Texte
+                if ($null -eq $abime) { return ($r.Texte | ConvertFrom-Json) }
+                # json_sur::lire_avec : déplacé de côté, sa copie reprise et remise en place ; une copie abîmée est
+                # déplacée de côté elle aussi
+                Write-Log "Fichier illisible ($Path) : $abime"
+                Move-DeCote $Path "$nom abîmé (illisible) : mis de côté dans"
+                $bak = "$Path.bak"
+                if ([IO.File]::Exists($bak)) {
+                    $rb = Read-TexteEssais $bak
+                    if ($rb.Pris) {
+                        Write-Log "$nom : sa copie ($nom.bak) est prise par un autre programme"
+                        Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $bak"
+                        return $null
+                    }
+                    if ($null -eq $rb.Texte) { Write-Log "$nom : sa copie ($nom.bak) ne peut pas être lue ($($rb.Erreur))" }
+                    elseif ($null -eq (Get-RaisonAbime $rb.Texte)) {
+                        Write-Log "$nom abîmé : repris de sa copie ($nom.bak)"
+                        if (-not [IO.File]::Exists($Path)) { Copy-Item -LiteralPath $bak -Destination $Path }
+                        return ($rb.Texte | ConvertFrom-Json)
+                    } else {
+                        Write-Log "$nom : sa copie ($nom.bak) est illisible aussi"
+                        Move-DeCote $bak "$nom.bak mis de côté dans"
+                    }
                 }
-                Write-Log "$nom : sa copie ($nom.bak) est illisible aussi"
+                Write-Log "$nom : aucune copie lisible, il repart de zéro"
+                return $null
             }
-            Write-Log "$nom : aucune copie lisible, il repart de zéro"
-            return $null
         }
-        # La sauvegarde d'un fichier absent ou pris : comme Mindcare 0.15.1
+        # La sauvegarde d'un fichier absent, pris ou illisible : les lignes de Mindcare 0.15.1, puis json_sur::lire_copie
+        # déplace de côté une copie abîmée (PowerShell la copiait)
         $p = "$Path.bak"
         if (-not [IO.File]::Exists($p)) { return $null }
-        $texte = $null; $pris = $false
-        for ($essai = 1; $essai -le 5; $essai++) {
-            try { $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8); $pris = $false; break }
-            catch { $pris = Test-ErreurFichierPris $_.Exception; if (-not $pris) { break }; if ($essai -lt 5) { Start-Sleep -Milliseconds 300 } }
-        }
-        if ($pris) { Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $p"; return $null }
-        try {
-            if ($null -eq $texte) { $texte = [IO.File]::ReadAllText($p, [Text.Encoding]::UTF8) }
-            if ([string]::IsNullOrWhiteSpace($texte) -or $texte.Trim() -eq 'null') { throw 'fichier vide' }
-            # (« repris » est noté avant de lire le JSON, comme Mindcare 0.15.1 : suivi de « illisible » s'il est abîmé)
-            Write-Log "Fichier repris de sa sauvegarde : $p"
-            $o = $texte | ConvertFrom-Json
-            if ($o -isnot [Management.Automation.PSCustomObject]) { throw 'pas un objet' }
-            return $o
-        } catch {
-            Write-Log "Fichier illisible ($p) : $_"
-            try { Copy-Item -LiteralPath $p -Destination "$p.abime-$(Get-Date -Format yyyyMMdd-HHmmss)" -Force } catch {}
-        }
+        $r = Read-TexteEssais $p
+        if ($r.Pris) { Write-Log "Fichier pris par un autre programme, en lecture seule pour l'instant : $p"; return $null }
+        if ($null -eq $r.Texte) { Write-Log "Fichier illisible ($p) : $($r.Erreur)"; return $null }
+        # (« repris » est noté avant de lire le JSON, comme Mindcare 0.15.1 : suivi de « illisible » s'il est abîmé)
+        if (-not (Test-TexteVide $r.Texte)) { Write-Log "Fichier repris de sa sauvegarde : $p" }
+        $abime = Get-RaisonAbime $r.Texte
+        if ($null -eq $abime) { return ($r.Texte | ConvertFrom-Json) }
+        Write-Log "Fichier illisible ($p) : $abime"
+        Write-Log "$nom : sa copie ($nom.bak) est illisible aussi"
+        Move-DeCote $p "$nom.bak mis de côté dans"
         $null
     }
     function Save-JsonFile([string]$Path, $Object) {
         if ($script:FichiersPris[$Path]) { throw "$(Split-Path $Path -Leaf) est en lecture seule pour l'instant (un autre programme le garde ouvert)" }
         $tmp = "$Path.tmp"
         [IO.File]::WriteAllText($tmp, (ConvertTo-Json -InputObject $Object -Depth 8), $Utf8NoBom)
-        # (constat 23 : un fichier vide n'est jamais poussé dans .bak)
-        $fi = New-Object IO.FileInfo $Path
-        if ($fi.Exists -and $fi.Length -le 4096) {
+        # json_sur::ecrire_avec : l'ancien ne va dans .bak que s'il contient un objet JSON (constat 23) ; vide, il est
+        # simplement remplacé ; abîmé, il est d'abord copié de côté
+        if ([IO.File]::Exists($Path)) {
             $t = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8)
-            if ([string]::IsNullOrWhiteSpace($t) -or $t.Trim() -eq 'null') { [IO.File]::Delete($Path) }
+            if ($null -eq (Get-RaisonAbime $t)) { [IO.File]::Replace($tmp, $Path, "$Path.bak"); return }
+            if (-not (Test-TexteVide $t)) { [IO.File]::Copy($Path, (Get-NomDeCote $Path)) }
+            [IO.File]::Delete($Path)
         }
-        if ([IO.File]::Exists($Path)) { [IO.File]::Replace($tmp, $Path, "$Path.bak") } else { [IO.File]::Move($tmp, $Path) }
+        [IO.File]::Move($tmp, $Path)
     }
 }
 
@@ -208,7 +232,7 @@ function Get-Fichiers {
     foreach ($x in @(Get-ChildItem -LiteralPath $script:Dir -File | Sort-Object Name)) {
         if ($x.Name -eq 'journal.txt' -or $x.Name -like '*.tmp') { continue }
         $t = [IO.File]::ReadAllText($x.FullName, [Text.Encoding]::UTF8)
-        if ($x.Name -match '^(.*)\.abime-\d{8}-\d{6}$') { $ab.Add([ordered]@{ De = $Matches[1]; Texte = $t }) } else { $f[$x.Name] = $t }
+        if ($x.Name -match '^(.*)\.abime-\d{8}-\d{6}(-\d+)?$') { $ab.Add([ordered]@{ De = $Matches[1]; Texte = $t }) } else { $f[$x.Name] = $t }
     }
     [ordered]@{ Fichiers = $f; Abimes = @($ab.ToArray() | Sort-Object { $_.De }, { $_.Texte }) }
 }
@@ -650,6 +674,8 @@ $Nommes = @(
     (New-Nomme 'coupé, copie bonne' @{ 'diagnostics.json' = (B64 $histo3.Substring(0, 200)); 'diagnostics.json.bak' = (B64 $histoBak) } ($debut + @((Op 'Carte'), (& $sauverNeuf '20261030-140500-bbbb'))))
     (New-Nomme 'coupé, copie abîmée aussi' @{ 'diagnostics.json' = (B64 $histo3.Substring(0, 120)); 'diagnostics.json.bak' = (B64 '{"Version":2,"Diag') } ($debut + @((Op 'Carte'), (& $sauverNeuf '20261030-140500-bbbc'))))
     (New-Nomme 'copie seule (le fichier manque)' @{ 'diagnostics.json.bak' = (B64 $histoBak) } ($debut + @((Op 'Carte'), (& $sauverNeuf '20261030-140500-cccc'))))
+    (New-Nomme 'copie seule abîmée (le fichier manque) : mise de côté une seule fois' @{ 'diagnostics.json.bak' = (B64 '{"Version":2,"Diag'); 'reglages.json.bak' = (B64 '') } @((Op 'Demarrer'), (Op 'LireHistorique'), (Op 'Demarrer'), (Op 'LireHistorique'), (& $sauverNeuf '20261030-140500-ccca')))
+    (New-Nomme 'pris au lancement, copie abîmée : mise de côté' @{ 'diagnostics.json' = (B64 $histo3); 'diagnostics.json.bak' = (B64 '[1,2]') } ($debut + @((Op 'Carte'), (Op 'Liberer' @{ Fichier = 'diagnostics.json' }), (& $sauverNeuf '20261030-140500-cccb'), (Op 'Carte'))) @('diagnostics.json'))
     (New-Nomme 'avec BOM UTF-8' @{ 'diagnostics.json' = (B64Bom $histo3) } ($debut + @((Op 'Carte'))))
     (New-Nomme 'en UTF-16' @{ 'diagnostics.json' = (B64Utf16 $histo3); 'reglages.json' = (B64Utf16 '{"Theme":"rubis"}') } ($debut + @((Op 'Carte'), (Op 'Reglage' @{ Nom = 'THEME'; Defaut = 'null' }), (& $sauverNeuf '20261030-140500-dddd'))))
     (New-Nomme 'un tableau au lieu d''un objet' @{ 'diagnostics.json' = (B64 '[1,2]'); 'diagnostics.json.bak' = (B64 $histoBak); 'reglages.json' = (B64 '[1,2]') } ($debut + @((Op 'Reglage' @{ Nom = 'Count'; Defaut = 'null' }), (& $sauverNeuf '20261030-140500-eeee'))))
@@ -710,7 +736,7 @@ for ($i = 0; $i -lt $egaux.Count; $i += 50) {
     Write-Juge ('scenarios-{0:000}-{1:000}.json' -f $i, ($i + $bout.Count - 1)) ([ordered]@{ Catalogue = (J $catalogue); Graine = (J $Graine); Explication = (J $explScenarios); Scenarios = ('[' + ($bout -join ',') + ']') })
     $n++
 }
-$explDivergences = 'Divergence voulue avec Mindcare PowerShell, constat 23 de l''audit : un fichier vide n''est jamais rangé en copie de secours. PowerShell (PowerShell) copiait un fichier vide, abîmé ou qui n''est pas un objet JSON à côté (.abime-<date>) mais le laissait en place : l''enregistrement suivant le poussait dans .bak, et la bonne copie était perdue. Le Rust (Voulu) passe par json_sur de suite-commun : le fichier est déplacé de côté et sa copie remise à sa place ; un fichier vidé entre la lecture et l''écriture est retiré avant d''écrire. Un fichier qui n''est pas un objet JSON (un tableau, un nombre) est abîmé pour json_sur (PowerShell le lisait tel quel). Voulu est joué par l''exporteur avec Read-JsonFile et Save-JsonFile tels que le Rust les fait.'
+$explDivergences = 'Divergence voulue avec Mindcare PowerShell, constat 23 de l''audit : un fichier vide n''est jamais rangé en copie de secours. PowerShell (PowerShell) copiait un fichier vide, abîmé ou qui n''est pas un objet JSON à côté (.abime-<date>) mais le laissait en place : l''enregistrement suivant le poussait dans .bak, et la bonne copie était perdue. Le Rust (Voulu) passe par json_sur de suite-commun : le fichier est déplacé de côté et sa copie remise à sa place ; un fichier vidé entre la lecture et l''écriture est retiré avant d''écrire. Un fichier qui n''est pas un objet JSON (un tableau, un nombre) est abîmé pour json_sur (PowerShell le lisait tel quel). Suites de json_sur : une copie .bak abîmée est déplacée de côté (.bak.abime-<date>, avec les lignes de journal de json_sur) au lieu d''être copiée à chaque lecture et laissée en place ; à l''écriture, seul un fichier qui contient un objet JSON est gardé dans .bak (abîmé, il est d''abord copié de côté) ; deux mises de côté dans la même seconde prennent les noms suivants (-2, -3). Voulu est joué par l''exporteur avec Read-JsonFile et Save-JsonFile tels que le Rust les fait.'
 Write-Juge 'divergences.json' ([ordered]@{ Catalogue = (J $catalogue); Graine = (J $Graine); Constat = '23'; Explication = (J $explDivergences); Scenarios = ('[' + ($divergents -join ',') + ']') })
 [Console]::Error.WriteLine("scénarios : $($egaux.Count) pareils, $($divergents.Count) divergents")
 

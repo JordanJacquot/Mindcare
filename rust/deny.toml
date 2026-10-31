@@ -48,28 +48,9 @@ allow = [
     "unicode-ident",
     "mindcare-donnees",
     # la bibliothèque commune de la suite (dépôt Mindset, révision épinglée) : json_sur et les chemins comme .NET.
-    # Elle apporte aussi ce dont ses autres parties ont besoin (signature, zips), relu dans le dépôt Mindset (mêmes
-    # versions que son Cargo.lock).
+    # Prise sans ses options par défaut (mindcare-donnees\Cargo.toml) : ni signature (ring), ni zips (zip), ni heure
+    # de Windows ; elle n'apporte que serde_json.
     "suite-commun",
-    # signature (ring) et sa construction
-    "ring",
-    "untrusted",
-    "cc",
-    "find-msvc-tools",
-    "shlex",
-    "cfg-if",
-    "getrandom",
-    "windows-sys",
-    # zip (deflate seulement)
-    "zip",
-    "crc32fast",
-    "flate2",
-    "zlib-rs",
-    "zopfli",
-    "bumpalo",
-    "log",
-    "simd-adler32",
-    "typed-path",
     # JSON (le catalogue, les données), avec l'ordre des champs du fichier (indexmap)
     "serde_json",
     "serde_core",

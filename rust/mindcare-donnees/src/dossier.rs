@@ -14,9 +14,9 @@ use std::time::Duration;
 
 use serde_json::Value;
 use suite_commun::chemins::{chemin_complet, commence_par_disque, egal, feuille, joindre, parent};
+use suite_commun::json_sur::{erreur_fichier_pris, texte_du_fichier};
 
 use crate::carte::longueur;
-use crate::fichiers::{decoder, erreur_fichier_pris};
 use mindcare_moteur::ps::{champ, vrai};
 
 /// Le nom de l'appli (ses dossiers).
@@ -103,7 +103,7 @@ pub fn lire_suite(fichier: Option<&Path>, essais: u32) -> Suite {
     for i in 1..=essais {
         match std::fs::read(f) {
             Ok(o) => {
-                texte = Some(decoder(&o));
+                texte = Some(texte_du_fichier(&o));
                 s.pris = false;
                 break;
             }
