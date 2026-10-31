@@ -46,7 +46,31 @@ allow = [
     "quote",
     "syn",
     "unicode-ident",
-    # JSON (le catalogue), avec l'ordre des champs du fichier (indexmap)
+    "mindcare-donnees",
+    # la bibliothèque commune de la suite (dépôt Mindset, révision épinglée) : json_sur et les chemins comme .NET.
+    # Elle apporte aussi ce dont ses autres parties ont besoin (signature, zips), relu dans le dépôt Mindset (mêmes
+    # versions que son Cargo.lock).
+    "suite-commun",
+    # signature (ring) et sa construction
+    "ring",
+    "untrusted",
+    "cc",
+    "find-msvc-tools",
+    "shlex",
+    "cfg-if",
+    "getrandom",
+    "windows-sys",
+    # zip (deflate seulement)
+    "zip",
+    "crc32fast",
+    "flate2",
+    "zlib-rs",
+    "zopfli",
+    "bumpalo",
+    "log",
+    "simd-adler32",
+    "typed-path",
+    # JSON (le catalogue, les données), avec l'ordre des champs du fichier (indexmap)
     "serde_json",
     "serde_core",
     "itoa",
@@ -65,4 +89,5 @@ allow = [
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = []
+# La bibliothèque commune de la suite (suite-commun), épinglée par sa révision dans mindcare-donnees\Cargo.toml
+allow-git = ["https://github.com/JordanJacquot/Mindset"]

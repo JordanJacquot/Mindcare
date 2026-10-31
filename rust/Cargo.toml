@@ -2,7 +2,7 @@
 # Mindcare publiée reste celle en PowerShell. Réglages repris du Rust de Mindset (D:\Projets\Mindset\rust).
 [workspace]
 resolver = "3"
-members = ["mindcare-moteur", "mindcare-windows"]
+members = ["mindcare-moteur", "mindcare-windows", "mindcare-donnees"]
 
 [workspace.package]
 edition = "2024"
