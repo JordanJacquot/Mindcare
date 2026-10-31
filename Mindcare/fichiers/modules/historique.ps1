@@ -6,22 +6,40 @@
 #   de sa question), Debut, Maj (dates), Fini, Suspect (trouvé), Titre (la réponse), Indices (finie : ce que Windows avait
 #   noté, pour la revoir à l'identique) }. À la reprise, une réponse ne va qu'à la question qui porte son Id : rejouées
 #   par leur place (Choix seul, l'ancien format), elles se décalaient dès qu'une étape automatique changeait.
+#   Reponses peut aussi garder, après une reprise, des réponses à des questions pas encore revenues (contenu.ps1,
+#   Get-PairesEnAttente) : elles seront rejouées quand leur question reviendra.
 
 $HistoriqueFichier = Join-Path $DataDir 'diagnostics.json'
 $HistoriqueMax     = 10
 $script:Historique = @()   # de la plus récente à la plus ancienne
+$script:HistoriqueChanges = @{}
 $script:Fr         = [Globalization.CultureInfo]::GetCultureInfo('fr-FR')
 
 function Read-Historique {
     $j = Read-JsonFile $HistoriqueFichier
     $script:Historique = @(if ($j) { foreach ($d in $j.Diagnostics) { if ($d.Id -and $d.Panne) { $d } } })
+    $script:HistoriqueChanges = @{}   # (les enquêtes enregistrées depuis : gardées si le fichier était pris au lancement)
 }
 
-# Enregistre où en est une enquête, qui passe en tête de liste. Sans aucune réponse, elle n'est pas gardée.
+# Enregistre où en est une enquête, qui passe en tête de liste. Sans aucune réponse, elle n'est pas gardée, sauf une
+# enquête reprise ($Reprise) dont aucune réponse n'a pu être rejouée : elle reste alors telle quelle, jamais vidée.
 # Revoir une enquête sans rien y changer ne la déplace pas.
-function Save-Diagnostic([string]$Id, [string]$PanneId, [int[]]$LesChoix, [bool]$EstFini, $LeSuspect, [string]$LeTitre, $LesReponses = @(), $LesIndices = $null) {
+# diagnostics.json pris au lancement (donnees.ps1, Get-FichierRelu) : il est relu d'abord, et ses enquêtes sont gardées
+# avec celles enregistrées depuis (sinon la dernière, absente de la sauvegarde lue à la place, serait perdue).
+function Save-Diagnostic([string]$Id, [string]$PanneId, [int[]]$LesChoix, [bool]$EstFini, $LeSuspect, [string]$LeTitre, $LesReponses = @(), $LesIndices = $null, [switch]$Reprise) {
     $ancien = @($script:Historique | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1
-    if ($ancien -and (@($ancien.Choix) -join ',') -eq (@($LesChoix) -join ',') -and [bool]$ancien.Fini -eq $EstFini -and [string]$ancien.Titre -eq $LeTitre) { return }
+    # (les réponses aussi : après une reprise, les mêmes numéros peuvent aller à d'autres questions)
+    $memesReponses = -not ($ancien -and $ancien.PSObject.Properties['Reponses']) -or (@($ancien.Reponses | ForEach-Object { "$($_.Etape)=$($_.Reponse)" }) -join ',') -eq (@($LesReponses | ForEach-Object { "$($_.Etape)=$($_.Reponse)" }) -join ',')
+    if ($ancien -and (@($ancien.Choix) -join ',') -eq (@($LesChoix) -join ',') -and [bool]$ancien.Fini -eq $EstFini -and [string]$ancien.Titre -eq $LeTitre -and $memesReponses) { return }
+    if ($Reprise -and $ancien -and -not $LesChoix.Count) { return }
+    $script:HistoriqueChanges[$Id] = $true
+    $f = Get-FichierRelu $HistoriqueFichier
+    if ($f.Relu) {
+        # (celles de cette session d'abord, en tête comme avant ; puis celles du fichier, dans leur ordre)
+        $session = @($script:Historique | Where-Object { $script:HistoriqueChanges.ContainsKey([string]$_.Id) })
+        $script:Historique = $session + @(if ($f.Contenu) { foreach ($d in $f.Contenu.Diagnostics) { if ($d.Id -and $d.Panne -and -not $script:HistoriqueChanges.ContainsKey([string]$d.Id)) { $d } } })
+        $ancien = @($script:Historique | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1
+    }
     $liste = @($script:Historique | Where-Object { $_.Id -ne $Id })
     if ($LesChoix.Count) {
         $maintenant = Get-Date -Format s

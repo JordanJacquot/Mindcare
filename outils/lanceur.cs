@@ -16,8 +16,8 @@ using System.Windows.Forms;
 [assembly: AssemblyTitle("Mindset")]   // (le nom de la ligne commune dans le Gestionnaire des tâches)
 [assembly: AssemblyProduct("Mindcare")]
 [assembly: AssemblyDescription("Trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.")]
-[assembly: AssemblyVersion("0.15.0.0")]
-[assembly: AssemblyFileVersion("0.15.0.0")]
+[assembly: AssemblyVersion("0.15.1.0")]
+[assembly: AssemblyFileVersion("0.15.1.0")]
 
 static class Lanceur
 {

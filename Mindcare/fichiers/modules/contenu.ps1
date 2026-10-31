@@ -601,7 +601,7 @@ function New-DiagId { "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$((Get-Random -Maxi
 function Start-Diagnostic([string]$Id, [hashtable]$PreRempli = $null) {
     $script:PanneEnCours = Get-Panne $script:Donnees $Id
     if (-not $script:PanneEnCours) { Show-Accueil; return }
-    $script:ChoixFaits = @(); $script:DiagId = New-DiagId; $script:ReparateurOuvert = $false; $script:IndicesGardes = $null
+    $script:ChoixFaits = @(); $script:DiagId = New-DiagId; $script:ReparateurOuvert = $false; $script:IndicesGardes = $null; $script:Reprise = $null
     $script:PreRempli = if ($PreRempli) { $PreRempli.Clone() } else { $null }   # (les réponses déjà données par la phrase, assistant)
     if ($script:PreRempli) { $script:PreRempli.Remove('danger') }   # (la question de sécurité est toujours posée)
     $script:IaCarte = $null
@@ -617,11 +617,14 @@ function Open-Diagnostic([string]$Id) {
     $script:PanneEnCours = $p; $script:DiagId = $Id; $script:ReparateurOuvert = $false
     # (finie : revue avec ce que Windows avait noté ce jour-là, pas celui d'aujourd'hui : sa réponse ne change pas toute seule)
     $script:IndicesGardes = if ($d.Fini -and $d.PSObject.Properties['Indices'] -and $d.Indices) { ConvertTo-Indices $d.Indices } else { $null }
+    $script:Reprise = $null
     if ($d.PSObject.Properties['Reponses'] -and @($d.Reponses).Count) {
         # Chaque réponse ne va qu'à la question qui porte son Id (Show-Etape) : une question qui n'est plus là est sautée,
         # une nouvelle est posée, et les suivantes reprennent leur réponse
         $script:ChoixFaits = @(); $script:PreRempli = @{}
         foreach ($r in $d.Reponses) { $script:PreRempli[[string]$r.Etape] = [int]$r.Reponse }
+        # (le catalogue a pu changer depuis : ce qui n'a pas pu être rejoué n'est jamais effacé, voir Show-Etape)
+        $script:Reprise = @{ Id = $Id; Reponses = @($d.Reponses) }
     } else {
         $script:ChoixFaits = @(foreach ($n in $d.Choix) { [int]$n }); $script:PreRempli = $null   # (ancien format : les numéros seulement)
     }
@@ -682,11 +685,28 @@ function Show-Etape {
     }
     $script:ChoixFaits = $e.Choix
     if ($e.Etape) {
-        # (une enquête déjà finie le reste dans l'historique tant qu'une nouvelle réponse ne la remplace pas)
+        # (une enquête déjà finie le reste dans l'historique tant qu'une nouvelle réponse ne la remplace pas ; une enquête
+        # reprise sans aucune réponse rejouée reste telle quelle, Save-Diagnostic -Reprise)
         $ancien = @($script:Historique | Where-Object { $_.Id -eq $script:DiagId }) | Select-Object -First 1
-        if (-not ($ancien -and $ancien.Fini)) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null '' (Get-Paires $e) }
+        if (-not ($ancien -and $ancien.Fini)) { Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $false $null '' (@(Get-Paires $e) + @(Get-PairesEnAttente $e)) -Reprise:(Test-Reprise) }
         Show-EtapeEnquete $e
     } else { Show-Verdict $e }
+}
+
+# Une enquête reprise de l'historique (Open-Diagnostic), et pas une nouvelle
+function Test-Reprise { [bool]($script:Reprise -and $script:Reprise.Id -eq $script:DiagId) }
+
+# Les réponses d'une enquête reprise pas encore rejouées (leur question n'est pas encore revenue) et toujours valables
+# (la question existe encore dans le catalogue, et cette réponse aussi) : gardées avec elle, pour être rejouées quand
+# leur question reviendra. Celles d'une question disparue sont laissées.
+function Get-PairesEnAttente($E) {
+    if (-not (Test-Reprise) -or -not $script:PreRempli -or -not $script:PreRempli.Count) { return @() }
+    $nb = @{}; foreach ($x in @(Get-Etapes $script:Donnees $script:PanneEnCours)) { if ($x.Type -ne 'auto') { $nb[[string]$x.Id] = @($x.Reponses).Count } }
+    $faites = @($E.Faits | ForEach-Object { [string]$_.Etape.Id })
+    @(foreach ($r in $script:Reprise.Reponses) {
+        $id = [string]$r.Etape; $n = [int]$r.Reponse
+        if ($script:PreRempli.ContainsKey($id) -and $nb.ContainsKey($id) -and $faites -notcontains $id -and $n -ge -1 -and $n -lt $nb[$id]) { [ordered]@{ Etape = $id; Reponse = $n } }
+    })
 }
 function Add-Choix([int]$N) { $script:ChoixFaits = @($script:ChoixFaits) + $N; Show-Etape }
 function Undo-Choix {
@@ -903,7 +923,7 @@ function Show-Verdict($E, [switch]$Reaffiche) {
     Set-BulleMascotte $(if ($supposee) { 'Tout le reste est écarté, mais cette pièce n''a pas été testée : fais-la vérifier avant d''acheter.' } else { switch ($v.Type) { 'trouve' { 'Trouvé ! Regarde la réponse.' } 'elimination' { 'Tout le reste est écarté : voilà la piste.' } default { 'Je n''ai pas tout trouvé : un réparateur saura voir la suite.' } } })
     if (-not $Reaffiche) {
         $indices = if ($E.Notes -contains 'cepc') { if ($script:IndicesGardes) { $script:IndicesGardes } else { Get-Indices } } else { $null }
-        Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre (Get-Paires $E) $indices
+        Save-Diagnostic $script:DiagId $script:PanneEnCours.Id $script:ChoixFaits $true $v.Suspect $titre (Get-Paires $E) $indices -Reprise:(Test-Reprise)
     }
     $script:ResumeDe = @{ Panne = $script:PanneEnCours; Enquete = $E; Titre = $titre }
     Clear-Contenu

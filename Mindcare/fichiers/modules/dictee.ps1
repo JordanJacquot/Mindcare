@@ -41,7 +41,7 @@ function Start-DicteeInstall {
 
 # Le numéro du micro choisi dans Mindset, ou 0xFFFFFFFF (celui de Windows) s'il n'y en a pas, ou s'il est débranché
 function Get-DicteeMicro {
-    $nom = [string](Read-Suite).Micro
+    $nom = [string](Read-Suite 3).Micro   # (pris plus d'une demi-seconde : celui de Windows, cette fois)
     if (-not $nom) { return [uint32]::MaxValue }
     $i = [array]::IndexOf(@([MindcareMicro]::Noms()), $nom)
     if ($i -ge 0) { return [uint32]$i }
