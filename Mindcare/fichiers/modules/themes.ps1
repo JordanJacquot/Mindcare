@@ -29,6 +29,37 @@ $AppThemes = [ordered]@{
 # Un nom de fichier du pack : simple, sans dossier (rien ne peut sortir du dossier du pack)
 function Test-NomFichierPack($Nom) { $Nom -is [string] -and $Nom -match '^[\w .()-]{1,80}$' -and $Nom -notmatch '\.\.' }
 
+# Les couleurs d'un réglage de pack (Colors), la même règle que Mindset (packs.ps1), Evermind et Nevermind : P, S et T en
+# « #RRGGBB », les clés et valeurs de Map en « RRGGBB » (le # est permis), rien d'autre ; NH et NS des nombres (NS pas
+# négatif), comme Evermind et la bibliothèque Rust. Elles sont mises telles quelles dans le texte de la fenêtre : une
+# valeur avec des guillemets ou des balises en changerait la description, et une simple faute (« red », « #0F0 »)
+# empêcherait l'appli de s'ouvrir.
+function Test-CouleursPack($Colors) {
+    if ($null -eq $Colors) { return $true }
+    if ($Colors -is [string] -or $Colors -isnot [pscustomobject]) { return $false }
+    foreach ($n in 'P', 'S', 'T') {
+        $v = $Colors.PSObject.Properties[$n]
+        if ($v -and ($v.Value -isnot [string] -or $v.Value -cnotmatch '^#[0-9A-Fa-f]{6}\z')) { return $false }
+    }
+    $map = $Colors.PSObject.Properties['Map']
+    if ($map -and $null -ne $map.Value) {
+        if ($map.Value -isnot [pscustomobject]) { return $false }
+        foreach ($pr in $map.Value.PSObject.Properties) { if ($pr.Name -cnotmatch '^#?[0-9A-Fa-f]{6}\z' -or $pr.Value -isnot [string] -or $pr.Value -cnotmatch '^#?[0-9A-Fa-f]{6}\z') { return $false } }
+    }
+    foreach ($n in 'NH', 'NS') {
+        $v = $Colors.PSObject.Properties[$n]
+        if (-not $v -or $null -eq $v.Value) { continue }
+        $x = 0.0
+        if ($v.Value -isnot [string] -and $v.Value -isnot [ValueType]) { return $false }
+        if (-not [double]::TryParse([string]$v.Value, [Globalization.NumberStyles]::Float, [Globalization.CultureInfo]::InvariantCulture, [ref]$x) -or [double]::IsNaN($x) -or [double]::IsInfinity($x)) { return $false }
+        if ($n -eq 'NS' -and $x -lt 0) { return $false }
+    }
+    $true
+}
+
+# Une lueur (LogoGlow) : « #RRGGBB » ou « #AARRGGBB », sinon aucune (comme Evermind)
+function Get-CouleurGlow($Valeur) { if ($Valeur -is [string] -and $Valeur -match '^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})\z') { $Valeur } else { '' } }
+
 # Un thème perso : son réglage pour Mindcare, sinon celui de Mindset (mêmes images). $null s'il n'existe pas.
 function Get-ThemePack([string]$Id) {
     if ($Id -notmatch '^[a-z0-9-]{1,40}$') { return $null }
@@ -40,7 +71,7 @@ function Get-ThemePack([string]$Id) {
         $fichier = { param($n) if ((Test-NomFichierPack $n) -and [IO.File]::Exists((Join-Path $dir ([string]$n)))) { Join-Path $dir ([string]$n) } else { $null } }
         $p = @{ Id = $Id; Dir = $dir; Name = [string]$j.Name; Hello = [string]$j.Hello; Base = 'neon'; Font = $null; FontScope = 'titres' }
         $p.Logo = & $fichier $j.Logo
-        $p.LogoFrames = [math]::Max(1, [int]$j.LogoFrames); $p.LogoDelay = [math]::Max(30, [int]$j.LogoDelay); $p.LogoGlow = [string]$j.LogoGlow
+        $p.LogoFrames = [math]::Max(1, [int]$j.LogoFrames); $p.LogoDelay = [math]::Max(30, [int]$j.LogoDelay); $p.LogoGlow = Get-CouleurGlow $j.LogoGlow
         $p.Mascotte = $null
         if ($j.Mascotte -and (& $fichier $j.Mascotte.File)) { $p.Mascotte = @{ File = (& $fichier $j.Mascotte.File); Frames = [math]::Max(1, [int]$j.Mascotte.Frames); Delay = [math]::Max(40, [int]$j.Mascotte.Delay); Flip = [bool]$j.Mascotte.Flip; Vignette = [bool]$j.Mascotte.Vignette } }
         $p.Loader = $null
@@ -54,8 +85,10 @@ function Get-ThemePack([string]$Id) {
         $p.BackgroundAlignY = if ($al -match 'bas') { 'Bottom' } elseif ($al -match 'haut') { 'Top' } else { 'Center' }
         if (& $fichier $j.Font) { $p.Font = & $fichier $j.Font; if ([string]$j.FontScope -eq 'tout') { $p.FontScope = 'tout' } }
         $p.FontPixel = if ($null -ne $j.FontPixel) { [bool]$j.FontPixel } else { $true }
-        # Ses couleurs : les siennes (un thème « pack-<id> »), sinon un thème de base
-        if ($j.Colors -and $j.Colors.P -and $j.Colors.S -and $j.Colors.T) {
+        # Ses couleurs : les siennes (un thème « pack-<id> »), sinon un thème de base (mal écrites : ignorées, comme Mindset)
+        $couleursOk = Test-CouleursPack $j.Colors
+        if (-not $couleursOk) { Write-Log "Thème $Id : couleurs mal écrites, ignorées (thème de base)" }
+        if ($couleursOk -and $j.Colors -and $j.Colors.P -and $j.Colors.S -and $j.Colors.T) {
             $map = @{}
             if ($j.Colors.Map) { foreach ($pr in $j.Colors.Map.PSObject.Properties) { $map[$pr.Name.TrimStart('#').ToUpper()] = ([string]$pr.Value).TrimStart('#').ToUpper() } }
             $AppThemes["pack-$Id"] = @{ P = [string]$j.Colors.P; S = [string]$j.Colors.S; T = [string]$j.Colors.T; Map = $map; Font = $null; Decor = $null

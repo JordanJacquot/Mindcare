@@ -224,6 +224,62 @@ foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') {
     }
 }
 Write-Resultat "images ($($citees.Count) citées ; en attente d'une famille : $($enAttente.Count))" (-not $pbImages) "($($pbImages -join ' ; '))"
+# Les couleurs d'un thème perso (constat 7 de l'audit du 25/10) : seulement « #RRGGBB » pour P, S, T et « RRGGBB » pour
+# Map ; sinon le thème de base du pack (ou Néon), noté au journal, et la fenêtre se lit quand même (jamais montrée).
+# Packs inventés, dans un dossier temporaire ; le vrai code de themes.ps1, dans un bloc à part (rien ne reste ensuite).
+& {
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) "mindcare-test-themes-$([guid]::NewGuid().ToString('N'))"
+    $DataDir = Join-Path $tmp 'Mindcare'
+    $GereParMindset = $false; $EnTest = $false; $ModulesDir = Join-Path $AppDir 'modules'
+    $journal = New-Object Collections.Generic.List[string]
+    function Write-Log([string]$Texte) { $journal.Add($Texte) }
+    function Get-Setting($Nom, $Defaut) { $Defaut }
+    . (Join-Path $ModulesDir 'themes.ps1')
+    $xamlBrut = [IO.File]::ReadAllText((Join-Path $ModulesDir 'interface.xaml'), [Text.Encoding]::UTF8)
+    $piege = '"/><Button xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Content="piege"/><Border Tag="'
+    $bonnes = @{ P = '#1E5BFF'; S = '#7FB2FF'; T = '#0A2A66'; NH = 220; NS = 0.6; Map = @{ '0C0920' = '0A1230'; '#06050F' = '#050A1A' } }
+    function Copie($H, $Changes) { $c = @{}; foreach ($k in $H.Keys) { $c[$k] = $H[$k] }; foreach ($k in $Changes.Keys) { $c[$k] = $Changes[$k] }; $c }
+    # Chaque cas : le pack.json, puis le thème attendu (« pack » : ses propres couleurs)
+    $casThemes = @(
+        @{ Id = 'essai-bleu'; Pack = @{ Name = 'Essai bleu'; Colors = $bonnes; LogoGlow = '#FFD6E4FF' }; Attendu = 'pack' }
+        @{ Id = 'essai-rouge-mot'; Pack = @{ Base = 'crepuscule'; Colors = (Copie $bonnes @{ P = 'red' }) }; Attendu = 'crepuscule' }
+        @{ Id = 'essai-court'; Pack = @{ Colors = (Copie $bonnes @{ S = '#0F0' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-guillemets'; Pack = @{ Base = 'terminal'; Colors = (Copie $bonnes @{ T = '#FF0000" Foreground="Red' }) }; Attendu = 'terminal' }
+        @{ Id = 'essai-balise'; Pack = @{ Colors = (Copie $bonnes @{ P = "#00FF00$piege" }) }; Attendu = 'neon' }
+        @{ Id = 'essai-retour-ligne'; Pack = @{ Colors = (Copie $bonnes @{ P = "#00FF00`n" }) }; Attendu = 'neon' }
+        @{ Id = 'essai-map-cle'; Pack = @{ Base = 'arcade'; Colors = (Copie $bonnes @{ Map = @{ "0C0920$piege" = '112233' } }) }; Attendu = 'arcade' }
+        @{ Id = 'essai-map-valeur'; Pack = @{ Colors = (Copie $bonnes @{ Map = @{ '0C0920' = "112233$piege" } }) }; Attendu = 'neon' }
+        @{ Id = 'essai-map-texte'; Pack = @{ Colors = (Copie $bonnes @{ Map = 'rouge' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-nombre'; Pack = @{ Colors = (Copie $bonnes @{ NS = -2 }) }; Attendu = 'neon' }
+        @{ Id = 'essai-teinte'; Pack = @{ Colors = (Copie $bonnes @{ NH = 'NaN' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-police'; Pack = @{ Colors = $bonnes; Font = "police$piege.ttf"; FontScope = 'tout'; LogoGlow = "#FFFFFF$piege" }; Attendu = 'pack'; Police = $true }
+        @{ Id = 'essai-police-dossier'; Pack = @{ Colors = $bonnes; Font = '..\police.ttf' }; Attendu = 'pack'; Police = $true }
+    )
+    $ratesThemes = @()
+    try {
+        foreach ($k in $casThemes) { try {
+            $dir = Join-Path $DataDir "packs\$($k.Id)"
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            [IO.File]::WriteAllText((Join-Path $dir 'pack.json'), (ConvertTo-Json $k.Pack -Depth 5), (New-Object Text.UTF8Encoding($false)))
+            [IO.File]::WriteAllText((Join-Path $DataDir 'packs\police.ttf'), 'pas une police')   # (hors du dossier du pack)
+            $journal.Clear()
+            $pk = Get-ThemePack $k.Id
+            $attendu = if ($k.Attendu -eq 'pack') { "pack-$($k.Id)" } else { $k.Attendu }
+            $note = @($journal | Where-Object { $_ -like "Thème $($k.Id) : couleurs mal écrites*" }).Count
+            if (-not $pk) { $ratesThemes += "$($k.Id) : pas lu"; continue }
+            if ($pk.Base -ne $attendu) { $ratesThemes += "$($k.Id) : thème $($pk.Base) au lieu de $attendu" }
+            if (($k.Attendu -eq 'pack') -eq ($note -gt 0)) { $ratesThemes += "$($k.Id) : journal « $($journal -join ' | ') »" }
+            if ($k.Police -and ($pk.Font -or $pk.LogoGlow)) { $ratesThemes += "$($k.Id) : police « $($pk.Font) », lueur « $($pk.LogoGlow) » gardées" }
+            # La fenêtre, traduite dans ce thème : sans le piège, et lisible
+            $ThemePack = $pk; $ThemeId = $pk.Base; $Theme = $AppThemes[$ThemeId]; $PackFont = $null; $script:ThemeCache = @{}
+            $x = Convert-ThemeXaml $xamlBrut
+            if ($x -match 'piege|Foreground="Red') { $ratesThemes += "$($k.Id) : le piège est dans la fenêtre" }
+            try { $w = [Windows.Markup.XamlReader]::Parse($x); $w.Close() } catch { $ratesThemes += "$($k.Id) : fenêtre illisible ($($_.Exception.Message))" }
+            if ($k.Id -eq 'essai-bleu' -and ((ConvertTo-ThemeHex '#00E5FF') -ne '#1E5BFF' -or (ConvertTo-ThemeHex '#0C0920') -ne '#0A1230' -or (ConvertTo-ThemeHex '#06050F') -ne '#050A1A' -or $pk.LogoGlow -ne '#FFD6E4FF')) { $ratesThemes += "essai-bleu : couleurs du pack non reprises" }
+        } catch { $ratesThemes += "$($k.Id) : erreur ($($_.Exception.Message))" } }
+    } finally { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+    Write-Resultat "thème perso : couleurs, police et lueur contrôlées ($($casThemes.Count) packs inventés : bonnes couleurs, « red », « #0F0 », guillemets, balise, Map, nombres, police piégée)" (-not $ratesThemes) "($($ratesThemes -join ' ; '))"
+}
 # La vraie lecture des journaux, sur ce PC, en lecture seule (rien n'est modifié) : tous les indices, dans un temps raisonnable
 if (-not $SansFenetre) {
     . (Join-Path $AppDir 'modules\journaux.ps1')
