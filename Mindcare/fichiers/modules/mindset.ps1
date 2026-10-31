@@ -20,12 +20,32 @@ function Get-CheminNormal([string]$Chemin) {
 }
 
 # Ce qu'on garde de suite.json : le thème (connu, ou « pack:<id> » au nom valable), le dossier de Mindcare et le micro
-function Read-Suite {
-    $s = @{ Existe = $false; Lisible = $false; Theme = $null; Dossier = $null; Micro = '' }
+# Un fichier tenu un instant par un autre programme (antivirus, OneDrive, Mindset qui le remplace) n'est ni abîmé ni
+# illisible : $Essais lectures espacées de 300 ms, puis « Pris » (on ne sait pas encore ce qu'il dit). Comme Evermind.
+# (chargé avant donnees.ps1 : sa propre reconnaissance d'un fichier pris)
+function Test-SuitePrise($Erreur) {
+    for ($e = $Erreur; $e; $e = $e.InnerException) {
+        if ($e -is [IO.IOException] -and (($e.HResult -band 0xFFFF) -in 32, 33)) { return $true }   # (partage, verrou)
+    }
+    $false
+}
+
+function Read-Suite([int]$Essais = 10) {
+    $s = @{ Existe = $false; Lisible = $false; Pris = $false; Theme = $null; Dossier = $null; Micro = '' }
     if (-not $SuiteFile -or -not [IO.File]::Exists($SuiteFile)) { return $s }
     $s.Existe = $true
+    $texte = $null
+    for ($i = 1; $i -le $Essais; $i++) {
+        try { $texte = [IO.File]::ReadAllText($SuiteFile, [Text.Encoding]::UTF8); $s.Pris = $false; break }
+        catch {
+            $s.Pris = Test-SuitePrise $_.Exception
+            if (-not $s.Pris) { break }
+            if ($i -lt $Essais) { Start-Sleep -Milliseconds 300 }
+        }
+    }
+    if ($null -eq $texte) { return $s }
     try {
-        $j = [IO.File]::ReadAllText($SuiteFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+        $j = $texte | ConvertFrom-Json
         if ($j.theme -is [string] -and $j.theme -in $ThemesSuite) { $s.Theme = $j.theme.ToLowerInvariant() }
         elseif ($j.theme -is [string] -and $j.theme -cmatch '^pack:[a-z0-9-]{1,40}$') { $s.Theme = $j.theme }
         if ($j.applis -and $j.applis.$AppId -is [string]) { $s.Dossier = Get-CheminNormal $j.applis.$AppId }
@@ -37,7 +57,21 @@ function Read-Suite {
 
 $AppRacine = Get-CheminNormal (Split-Path $AppDir -Parent)   # le dossier de cette copie (celui de Mindset.exe et Mindcare.exe)
 $script:Suite = Read-Suite
-$GereParMindset = [bool]($AppRacine -and $script:Suite.Dossier -and $script:Suite.Dossier -ieq $AppRacine)
+
+# Gérée par Mindset : suite.json le dit. suite.json encore pris après 3 secondes (au démarrage de Windows) : on ne
+# conclut pas « pas gérée » (Mindcare se bloquerait) ; une copie dans un dossier de programmes de Mindset
+# (<X>:\Mindset\Programmes, ou Program Files\Mindset : seul un administrateur peut y écrire) est gérée.
+function Test-GereeParMindset($Suite, [string]$Racine) {
+    if (-not $Racine) { return $false }
+    if ($Suite.Dossier -and $Suite.Dossier -ieq $Racine) { return $true }
+    if (-not $Suite.Pris) { return $false }
+    $p = Split-Path $Racine -Parent
+    $m = if ($p) { Split-Path $p -Parent } else { $null }
+    if ($m -and (Split-Path $p -Leaf) -ieq 'Programmes' -and (Split-Path $m -Leaf) -ieq 'Mindset') { return $true }
+    foreach ($pf in $env:ProgramFiles, $env:ProgramW6432) { if ($pf -and $p -ieq (Join-Path $pf 'Mindset')) { return $true } }
+    $false
+}
+$GereParMindset = Test-GereeParMindset $script:Suite $AppRacine
 
 # Le programme de Mindset, donné par son installation (HKLM, modifiable seulement par un administrateur), jamais par suite.json
 function Get-MindsetExe {

@@ -322,6 +322,145 @@ try {
     $relu = @(Read-JsonFile $fj)
     Write-Resultat 'données : fichier vide, la copie de secours est reprise et gardée' ($lu.Count -eq 2 -and $relu.Count -eq 2 -and $relu[1].Panne -eq 'pubs') "($($lu.Count) puis $($relu.Count))"
 } finally { Remove-Item -LiteralPath $fj, "$fj.bak", "$fj.tmp" -Force -ErrorAction SilentlyContinue; Get-ChildItem -Path "$fj.abime-*" -ErrorAction SilentlyContinue | Remove-Item -Force }
+
+# ---------------------------------------------------------------------------
+# 13. Un fichier tenu un instant par un autre programme (revue du 25/10, constat 19) : l'antivirus ou OneDrive le
+# gardent ouvert une demi-seconde au démarrage. Il n'est ni abîmé ni mis de côté, et la dernière enquête n'est pas perdue.
+# ---------------------------------------------------------------------------
+# (un autre « programme » : le fichier ouvert sans partage, relâché par un autre fil d'exécution au bout de Ms)
+Add-Type -TypeDefinition 'public static class VerrouTest { public static void LibererApres(System.IDisposable d, int ms) { new System.Threading.Thread(() => { System.Threading.Thread.Sleep(ms); d.Dispose(); }).Start(); } }'
+function Lock-Fichier([string]$Chemin, [int]$Ms = 0) {
+    $fs = [IO.File]::Open($Chemin, 'Open', 'Read', 'None')
+    if ($Ms) { [VerrouTest]::LibererApres($fs, $Ms) }
+    $fs
+}
+function Get-Abimes([string]$Chemin) { @(Get-ChildItem -Path "$Chemin.abime-*", "$Chemin.bak.abime-*" -ErrorAction SilentlyContinue) }
+$utf8 = New-Object Text.UTF8Encoding($false)
+
+# a. Read-JsonFile : tenu 700 ms, il est relu (la bonne version, pas la sauvegarde), et rien n'est mis de côté
+$fj = Join-Path $test 'pris.json'
+[IO.File]::WriteAllText("$fj.bak", '{"N":1}', $utf8); [IO.File]::WriteAllText($fj, '{"N":2}', $utf8)
+try {
+    $avant = Get-Journal
+    $null = Lock-Fichier $fj 700
+    $chrono = [Diagnostics.Stopwatch]::StartNew(); $j = Read-JsonFile $fj; $duree = $chrono.ElapsedMilliseconds
+    $illisible = (Get-Journal).Substring($avant.Length) -match 'Fichier illisible'
+    Write-Resultat "fichier pris 700 ms : relu après une courte attente ($duree ms), jamais dit abîmé" ($j.N -eq 2 -and -not (Get-Abimes $fj) -and -not $illisible -and $duree -lt 3000) "(lu : N = $($j.N) ; mis de côté : $((Get-Abimes $fj).Count) ; « illisible » au journal : $illisible)"
+} catch { Write-Resultat 'fichier pris 700 ms : relu après une courte attente' $false "($_)" }
+
+# b. Tenu plus longtemps que les essais : la sauvegarde est montrée, rien n'est mis de côté, rien n'est écrit (la bonne
+# version n'est pas écrasée), puis, une fois le fichier libre, il est relu avant d'enregistrer
+Wait-Fenetre 900   # (le verrou du a est relâché)
+try {
+    $fs = Lock-Fichier $fj
+    try {
+        $j = Read-JsonFile $fj
+        $refuse = try { Save-JsonFile $fj ([ordered]@{ N = 3 }); $false } catch { $true }
+    } finally { $fs.Dispose() }
+    $brut = [IO.File]::ReadAllText($fj, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    $r = Get-FichierRelu $fj
+    Write-Resultat 'fichier pris longtemps : sauvegarde montrée, rien écrit, rien mis de côté, relu une fois libre' ($j.N -eq 1 -and $refuse -and $brut.N -eq 2 -and -not (Get-Abimes $fj) -and $r.Libre -and $r.Relu -and $r.Contenu.N -eq 2) "(lu : $($j.N) ; écriture refusée : $refuse ; dans le fichier : $($brut.N) ; relu : $($r.Contenu.N))"
+} catch { Write-Resultat 'fichier pris longtemps : relu une fois libre' $false "($_)" }
+
+# c. Le cas de la revue : diagnostics.json tenu au lancement, la dernière enquête n'est pas perdue
+function New-EnqueteGardee([string]$Id, [string]$Maj) { [ordered]@{ Id = $Id; Panne = 'seteint'; Choix = @(1, 1); Reponses = @([ordered]@{ Etape = 'danger'; Reponse = 1 }, [ordered]@{ Etape = 'type'; Reponse = 1 }); Debut = $Maj; Maj = $Maj; Fini = $false; Suspect = ''; Titre = '' } }
+function Set-HistoriqueTest([object[]]$Fichier, [object[]]$Bak) {
+    Remove-Item -LiteralPath $HistoriqueFichier, "$HistoriqueFichier.bak" -Force -ErrorAction SilentlyContinue
+    Get-Abimes $HistoriqueFichier | Remove-Item -Force
+    [IO.File]::WriteAllText($HistoriqueFichier, (ConvertTo-Json -InputObject ([ordered]@{ Version = 2; Diagnostics = $Fichier }) -Depth 6), $utf8)
+    if ($Bak) { [IO.File]::WriteAllText("$HistoriqueFichier.bak", (ConvertTo-Json -InputObject ([ordered]@{ Version = 2; Diagnostics = $Bak }) -Depth 6), $utf8) }
+}
+function Get-IdsGardes { @(([IO.File]::ReadAllText($HistoriqueFichier, [Text.Encoding]::UTF8) | ConvertFrom-Json).Diagnostics | ForEach-Object { [string]$_.Id }) }
+$derniere = New-EnqueteGardee 'derniere' '2026-10-24T20:00:00'; $vieille = New-EnqueteGardee 'vieille' '2026-10-20T20:00:00'
+try {
+    Set-HistoriqueTest @($derniere, $vieille) @($vieille)
+    $null = Lock-Fichier $HistoriqueFichier 700
+    Read-Historique
+    $lus = @($script:Historique | ForEach-Object { [string]$_.Id }) -join ','
+    Start-EnqueteTest 'seteint' 1; Show-Etape   # (une nouvelle enquête enregistrée ensuite)
+    $ids = Get-IdsGardes
+    Write-Resultat 'diagnostics.json pris 700 ms au lancement : la dernière enquête est gardée' ($lus -eq 'derniere,vieille' -and $ids -contains 'derniere' -and $ids.Count -eq 3 -and -not (Get-Abimes $HistoriqueFichier)) "(lues : $lus ; dans le fichier : $($ids -join ','))"
+} catch { Write-Resultat 'diagnostics.json pris 700 ms au lancement : la dernière enquête est gardée' $false "($_)" }
+
+# d. Pris plus longtemps que les essais au lancement (seule la sauvegarde est lue), puis libre : l'enregistrement suivant
+# relit le fichier et garde la dernière enquête avec la nouvelle
+try {
+    Set-HistoriqueTest @($derniere, $vieille) @($vieille)
+    $fs = Lock-Fichier $HistoriqueFichier
+    try { Read-Historique; $lus = @($script:Historique | ForEach-Object { [string]$_.Id }) -join ',' } finally { $fs.Dispose() }
+    Start-EnqueteTest 'seteint' 1; Show-Etape
+    $ids = Get-IdsGardes
+    Write-Resultat 'diagnostics.json pris longtemps au lancement : relu avant d''enregistrer, rien de perdu' ($lus -eq 'vieille' -and $ids.Count -eq 3 -and $ids[0] -eq $script:DiagId -and $ids[1] -eq 'derniere' -and $ids[2] -eq 'vieille' -and -not (Get-Abimes $HistoriqueFichier)) "(lues : $lus ; dans le fichier : $($ids -join ','))"
+} catch { Write-Resultat 'diagnostics.json pris longtemps au lancement : rien de perdu' $false "($_)" }
+
+# e. suite.json (mindset.ps1) tenu 700 ms : lu quand même (avant : illisible, Mindcare se croyait hors de Mindset)
+$sauveSuite = $SuiteFile
+try {
+    $SuiteFile = Join-Path $test 'suite.json'
+    [IO.File]::WriteAllText($SuiteFile, '{"theme":"rubis","applis":{"mindcare":"C:\\Program Files\\Mindset\\Mindcare"}}', $utf8)
+    $null = Lock-Fichier $SuiteFile 700
+    $s = Read-Suite
+    Write-Resultat 'suite.json pris 700 ms : lu quand même' ($s.Lisible -and $s.Theme -eq 'rubis' -and $s.Dossier -eq 'C:\Program Files\Mindset\Mindcare') "(lisible : $($s.Lisible) ; thème : $($s.Theme))"
+    # Encore pris après les essais : « pris », pas « illisible » ; une copie dans un dossier de Mindset reste gérée
+    Wait-Fenetre 900
+    $fs = Lock-Fichier $SuiteFile
+    try { $s = Read-Suite 2 } finally { $fs.Dispose() }
+    Write-Resultat 'suite.json pris longtemps : « pris », la copie de Mindset reste gérée, une autre copie non' ($s.Pris -and -not $s.Lisible -and (Test-GereeParMindset $s 'C:\Program Files\Mindset\Mindcare') -and (Test-GereeParMindset $s 'D:\Mindset\Programmes\Mindcare') -and -not (Test-GereeParMindset $s 'C:\Users\x\Bureau\Mindcare')) "(pris : $($s.Pris))"
+} catch { Write-Resultat 'suite.json pris : lu quand même' $false "($_)" }
+finally { $SuiteFile = $sauveSuite }
+
+# ---------------------------------------------------------------------------
+# 14. Reprendre une enquête pas finie dont une question a changé dans le catalogue (revue du 25/10, constat 22) : les
+# réponses encore valables sont gardées et rejouées ; s'il n'y en a aucune à rejouer, l'enquête reste telle quelle
+# ---------------------------------------------------------------------------
+function Get-Garde([string]$Id) { @(([IO.File]::ReadAllText($HistoriqueFichier, [Text.Encoding]::UTF8) | ConvertFrom-Json).Diagnostics | Where-Object { $_.Id -eq $Id }) | Select-Object -First 1 }
+function Get-TextePaires($D) { @($D.Reponses | ForEach-Object { "$($_.Etape)=$($_.Reponse)" }) -join ',' }
+function New-Reprise([string]$Id, [object[]]$Paires) {
+    $d = [ordered]@{ Id = $Id; Panne = 'seteint'; Choix = @($Paires | ForEach-Object { $_[1] }); Reponses = @($Paires | ForEach-Object { [ordered]@{ Etape = $_[0]; Reponse = $_[1] } }); Debut = '2026-10-24T20:00:00'; Maj = '2026-10-24T20:05:00'; Fini = $false; Suspect = ''; Titre = '' }
+    Set-HistoriqueTest @($d)
+    Read-Historique
+}
+Set-IndicesTest @{}
+# a. La première question a changé (son Id n'existe plus) : rien n'est rejoué, l'enquête reste telle quelle dans le fichier
+try {
+    New-Reprise 'reprise-a' @(@('danger-ancien', 1), @('type', 1), @('maison', 1))
+    $avant = [IO.File]::ReadAllText($HistoriqueFichier, [Text.Encoding]::UTF8)
+    Open-Diagnostic 'reprise-a'
+    $g = Get-Garde 'reprise-a'
+    Write-Resultat 'reprise : première question changée, l''enquête reste telle quelle' ($g -and (Get-TextePaires $g) -eq 'danger-ancien=1,type=1,maison=1' -and $g.Debut -eq '2026-10-24T20:00:00' -and [IO.File]::ReadAllText($HistoriqueFichier, [Text.Encoding]::UTF8) -eq $avant -and $script:Historique.Count -eq 1) "(gardée : $(if ($g) { Get-TextePaires $g } else { 'effacée' }))"
+    # La nouvelle question est posée ; une fois répondue, les réponses suivantes encore valables sont rejouées
+    Add-Choix 1
+    $g = Get-Garde 'reprise-a'
+    Write-Resultat 'reprise : la nouvelle question répondue, les suivantes sont rejouées, la date de début gardée' ((@($script:ChoixFaits) -join ',') -eq '1,1,1' -and [string]$script:PanneEnCours.Id -eq 'seteint' -and $g -and (Get-TextePaires $g) -eq 'danger=1,type=1,maison=1' -and $g.Debut -eq '2026-10-24T20:00:00') "(choix : $(@($script:ChoixFaits) -join ',') ; gardée : $(if ($g) { Get-TextePaires $g } else { 'effacée' }))"
+} catch { Write-Resultat 'reprise : première question changée' $false "($_)" }
+# b. Aucune réponse valable (des questions qui n'existent plus, une réponse hors limites) : gardée telle quelle
+try {
+    New-Reprise 'reprise-b' @(@('disparue-1', 0), @('disparue-2', 1), @('danger', 7))
+    Open-Diagnostic 'reprise-b'
+    $g = Get-Garde 'reprise-b'
+    Write-Resultat 'reprise : aucune réponse valable, l''enquête reste telle quelle' ($g -and (Get-TextePaires $g) -eq 'disparue-1=0,disparue-2=1,danger=7' -and $g.Maj -eq '2026-10-24T20:05:00') "(gardée : $(if ($g) { Get-TextePaires $g } else { 'effacée' }))"
+} catch { Write-Resultat 'reprise : aucune réponse valable' $false "($_)" }
+# c. Une question du milieu a changé : les réponses d'avant sont rejouées, celles d'après (encore valables) restent gardées
+# pour plus tard, la réponse à la question disparue est laissée
+try {
+    New-Reprise 'reprise-c' @(@('danger', 1), @('type-ancien', 1), @('maison', 1), @('chaleur', 2))
+    Open-Diagnostic 'reprise-c'
+    $g = Get-Garde 'reprise-c'
+    Write-Resultat 'reprise : question du milieu changée, les réponses suivantes valables restent gardées' ((@($script:ChoixFaits) -join ',') -eq '1' -and $g -and (Get-TextePaires $g) -eq 'danger=1,maison=1,chaleur=2' -and $g.Debut -eq '2026-10-24T20:00:00') "(choix : $(@($script:ChoixFaits) -join ',') ; gardée : $(if ($g) { Get-TextePaires $g } else { 'effacée' }))"
+    Read-Historique; Open-Diagnostic 'reprise-c'   # (le lendemain : relue du fichier, puis la question changée répondue)
+    Add-Choix 1
+    Write-Resultat 'reprise : relue du fichier, les réponses gardées sont rejouées ensuite' ((@($script:ChoixFaits) -join ',') -eq '1,1,1,2') "(choix : $(@($script:ChoixFaits) -join ','))"
+} catch { Write-Resultat 'reprise : question du milieu changée' $false "($_)" }
+# d. (inchangé) Une nouvelle enquête ramenée à zéro réponse n'est toujours pas gardée
+try {
+    Set-HistoriqueTest @(); Read-Historique
+    Start-EnqueteTest 'seteint' 1; Show-Etape
+    $id = $script:DiagId; $garde = [bool](Get-Garde $id)
+    $script:ChoixFaits = @(); Show-Etape
+    Write-Resultat 'nouvelle enquête ramenée à zéro réponse : retirée, comme avant' ($garde -and -not (Get-Garde $id) -and -not $script:Historique.Count) "(gardée d'abord : $garde)"
+} catch { Write-Resultat 'nouvelle enquête ramenée à zéro réponse' $false "($_)" }
+Remove-Item -LiteralPath $HistoriqueFichier, "$HistoriqueFichier.bak" -Force -ErrorAction SilentlyContinue
+$script:Historique = @()
 Stop-LectureJournaux
 Get-ChildItem env: | Where-Object { $_.Name -like 'MINDCARE_*' } | ForEach-Object { Remove-Item "env:$($_.Name)" }
 if ($script:Ok) { Write-Host 'Tout est bon.' -ForegroundColor Green; exit 0 }
