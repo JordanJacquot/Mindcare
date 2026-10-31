@@ -28,6 +28,24 @@ allow-wildcard-paths = true
 allow = [
     # les nôtres
     "mindcare-moteur",
+    "mindcare-windows",
+    # Windows (Microsoft) : la lecture du journal, de WMI et des disques (mindcare-windows), comme le Rust de Mindset
+    "windows",
+    "windows-core",
+    "windows-collections",
+    "windows-future",
+    "windows-numerics",
+    "windows-threading",
+    "windows-result",
+    "windows-strings",
+    "windows-implement",
+    "windows-interface",
+    "windows-link",
+    # macros de windows (construction seulement)
+    "proc-macro2",
+    "quote",
+    "syn",
+    "unicode-ident",
     # JSON (le catalogue), avec l'ordre des champs du fichier (indexmap)
     "serde_json",
     "serde_core",
