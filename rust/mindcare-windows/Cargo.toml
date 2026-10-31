@@ -1,0 +1,44 @@
+[package]
+name = "mindcare-windows"
+version = "0.1.0"
+description = "Ce que Mindcare lit dans Windows (portage de modules/journaux.ps1) : les règles sans Windows, et le seul module qui lui parle"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Les indices rendus au moteur d'enquête (ses `Indices`)
+mindcare-moteur = { path = "../mindcare-moteur" }
+
+# Le module qui parle à Windows (src/windows) : seulement sous Windows. Versions figées (« = ») : une nouvelle version
+# n'entre que par un changement relu. La même version que le Rust de Mindset.
+[target.'cfg(windows)'.dependencies.windows]
+version = "=0.62.2"
+features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Com",
+    "Win32_System_EventLog",
+    "Win32_System_Ole",
+    "Win32_System_Rpc",
+    "Win32_System_SystemInformation",
+    "Win32_System_Time",
+    "Win32_System_Variant",
+    "Win32_System_Wmi",
+]
+
+[dev-dependencies]
+# Les juges exportés depuis PowerShell (tests/juges)
+serde_json = "=1.0.154"
+
+# Pas `workspace = true` : le module Windows a besoin d'autoriser le code « unsafe », que le reste du dépôt interdit
+# tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src/windows qui l'autorise (comme le
+# mini-installateur de Mindset).
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
