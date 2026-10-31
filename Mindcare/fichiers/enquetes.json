@@ -4399,6 +4399,9 @@
     "cepc": {
       "Type": "question",
       "Court": "Sur ce PC ?",
+      "SaufNote": [
+        "horswindows"
+      ],
       "Texte": "Mindcare est-il ouvert sur le PC qui a le problème ?",
       "Aide": "Si oui, Mindcare regarde tout de suite ce que Windows a noté (redémarrages, écrans bleus, erreurs du disque, tests...), sans rien modifier, et t'évite des questions.",
       "Reponses": [
@@ -4513,6 +4516,9 @@
       "Court": "Le test de la mémoire",
       "Pour": [
         "memoire"
+      ],
+      "SaufNote": [
+        "horswindows"
       ],
       "Duree": "une dizaine de minutes",
       "Texte": "Fais tester la mémoire par Windows",
@@ -6277,6 +6283,9 @@
       "Court": "Réparer les fichiers de Windows",
       "Pour": [
         "fichierssysteme"
+      ],
+      "SaufNote": [
+        "horswindows"
       ],
       "Duree": "une demi-heure",
       "Texte": "Laisse Windows vérifier et réparer ses fichiers",
@@ -14111,6 +14120,70 @@
           "Preuve": "Le format n'y était pour rien"
         }
       ]
+    },
+    "test-reparation-demarrage": {
+      "Type": "test",
+      "Court": "La réparation du démarrage",
+      "Pour": [
+        "windowsabime"
+      ],
+      "SiNote": [
+        "horswindows"
+      ],
+      "Duree": "jusqu'à une heure",
+      "Texte": "Laisse Windows réparer son démarrage, depuis l'écran de secours",
+      "Aide": "Ça se fait sans Windows : l'écran de secours de Windows (fond bleu, « Choisir une option ») marche même quand Windows ne démarre plus.",
+      "Gestes": [
+        "Si l'écran « Réparation automatique » ou « Choisir une option » ne vient pas tout seul : allume le PC et, dès que le logo apparaît, maintiens le bouton d'allumage jusqu'à ce qu'il s'éteigne. Fais-le trois fois de suite : la quatrième fois, Windows ouvre cet écran.",
+        "Si cet écran ne vient toujours pas : avec une clé d'installation de Windows (un proche peut la préparer sur un autre PC), allume le PC en appuyant sur la touche du menu de démarrage (souvent F12, F11, F8 ou Échap), choisis la clé, puis « Suivant » et « Réparer l'ordinateur » en bas à gauche.",
+        "Choisis « Dépannage », puis « Options avancées », puis « Outil de redémarrage système » (ou « Réparation du démarrage »). Choisis ton compte et tape son mot de passe s'il le demande.",
+        "Laisse faire jusqu'au bout, puis laisse le PC redémarrer."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Windows démarre",
+          "Confirme": "windowsabime",
+          "Detail": "réparé par l'outil de redémarrage",
+          "Preuve": "Après la réparation du démarrage, Windows démarre"
+        },
+        {
+          "Texte": "Il n'a pas pu réparer, ou toujours pareil",
+          "Preuve": "La réparation du démarrage n'a rien changé"
+        }
+      ]
+    },
+    "test-sfc-secours": {
+      "Type": "test",
+      "Court": "Réparer les fichiers sans Windows",
+      "Pour": [
+        "windowsabime"
+      ],
+      "SiNote": [
+        "horswindows"
+      ],
+      "Duree": "une demi-heure",
+      "Texte": "Fais réparer les fichiers de Windows depuis l'écran de secours",
+      "Aide": "Les commandes se tapent à la main : recopie-les lettre par lettre, avec les espaces. Sur cet écran, Windows n'est pas toujours sur la lettre C, d'où la deuxième étape.",
+      "Gestes": [
+        "Sur l'écran « Choisir une option » (pour y arriver : maintiens le bouton d'allumage pendant le logo, trois fois de suite) : « Dépannage », puis « Options avancées », puis « Invite de commandes ». Choisis ton compte et tape son mot de passe s'il le demande.",
+        "Dans la fenêtre noire, tape  dir C:\\Windows  puis Entrée. Si la liste contient « System32 », Windows est sur C. Sinon, essaie avec D, puis avec E, et garde la lettre qui marche.",
+        "Tape  sfc /scannow /offbootdir=C:\\ /offwindir=C:\\Windows  puis Entrée, avec ta lettre à la place de C aux deux endroits. Laisse finir (jusqu'à 20 minutes).",
+        "Ferme la fenêtre noire, puis choisis « Continuer » pour démarrer Windows."
+      ],
+      "Reponses": [
+        {
+          "Texte": "Il a réparé des fichiers, et Windows démarre",
+          "Confirme": "windowsabime",
+          "Preuve": "Windows a réparé ses fichiers depuis l'écran de secours, et il démarre"
+        },
+        {
+          "Texte": "Rien trouvé, ou toujours pareil",
+          "Preuve": "La réparation des fichiers depuis l'écran de secours n'a rien changé"
+        },
+        {
+          "Texte": "Un message d'erreur, ou aucune lettre ne marche"
+        }
+      ]
     }
   },
   "Pannes": [
@@ -14500,6 +14573,7 @@
             },
             {
               "Texte": "Non, l'écran bleu revient à chaque démarrage",
+              "Note": "horswindows",
               "Garde": [
                 "windowsabime",
                 "disque",
@@ -14784,10 +14858,19 @@
           "Ref": "test-memoire"
         },
         {
+          "Ref": "test-memoire-demarrage",
+          "SiNote": [
+            "horswindows"
+          ]
+        },
+        {
           "Ref": "test-pilote"
         },
         {
           "Ref": "test-nettoyage"
+        },
+        {
+          "Ref": "test-reparation-demarrage"
         },
         {
           "Ref": "test-sfc",
@@ -14805,6 +14888,9 @@
               "Preuve": "La réparation des fichiers de Windows n'a rien changé"
             }
           ]
+        },
+        {
+          "Ref": "test-sfc-secours"
         },
         {
           "Ref": "test-restauration"
@@ -17964,7 +18050,46 @@
           "Ref": "test-laisser-verifier"
         },
         {
+          "Id": "q-windows-ouvre",
+          "Type": "question",
+          "Court": "Windows s'ouvre-t-il ?",
+          "Texte": "Après la vérification, Windows finit-il par s'ouvrir ?",
+          "Reponses": [
+            {
+              "Texte": "Oui, j'arrive sur Windows"
+            },
+            {
+              "Texte": "Non, il recommence sans arriver sur Windows",
+              "Note": "horswindows",
+              "Preuve": "Windows ne s'ouvre plus après la vérification"
+            }
+          ]
+        },
+        {
           "Ref": "test-sfc"
+        },
+        {
+          "Ref": "test-sfc-secours",
+          "Pour": [
+            "fichierssysteme"
+          ],
+          "Reponses": [
+            {
+              "Texte": "Il a réparé des fichiers, et Windows démarre",
+              "Confirme": "fichierssysteme",
+              "Preuve": "Windows a réparé ses fichiers depuis l'écran de secours, et il démarre"
+            },
+            {
+              "Texte": "Rien trouvé, ou toujours pareil",
+              "Ecarte": [
+                "fichierssysteme"
+              ],
+              "Preuve": "La réparation des fichiers depuis l'écran de secours n'a rien changé"
+            },
+            {
+              "Texte": "Un message d'erreur, ou aucune lettre ne marche"
+            }
+          ]
         }
       ]
     },

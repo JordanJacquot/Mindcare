@@ -125,7 +125,11 @@ $cas = @(
     @{ Nom = 'multiprise : branché au mur, il tient'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 0, 0; Type = 'trouve'; Suspect = 'prise' }
     @{ Nom = 'PC fixe au mur, frais : alimentation par élimination'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 1; Type = 'elimination'; Suspect = 'alimentation' }
     @{ Nom = 'écran bleu depuis une nouvelle manette'; Panne = 'ecranbleu'; Choix = 0, 1, 6, 0, 0; Type = 'trouve'; Suspect = 'appareil' }
-    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 1, 3, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
+    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
+    # Windows ne démarre plus : seulement des gestes faisables depuis l'écran de secours (cas de Jordan, octobre 2026)
+    @{ Nom = 'écran bleu à chaque démarrage : réparé par l''outil de redémarrage'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
+    @{ Nom = 'écran bleu à chaque démarrage : fichiers réparés depuis l''écran de secours'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
+    @{ Nom = 'vérification du disque, Windows ne s''ouvre plus : fichiers réparés depuis l''écran de secours'; Panne = 'chkdsk'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'fichierssysteme' }
     @{ Nom = 'écran bleu, Windows dit que le disque est malade'; Panne = 'ecranbleu'; Choix = 0, 0; Indices = @{ disque = (New-Indice $true 'Windows dit qu''un disque n''est pas en bonne santé') }; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'jeu : écran noir qui revient, réglé par le pilote'; Panne = 'jeu'; Choix = 1, 1, 1, 2, 1, 0; Type = 'trouve'; Suspect = 'pilote' }
     @{ Nom = 'jeu : des traits bizarres, frais : la carte graphique'; Panne = 'jeu'; Choix = 1, 1, 1, 3, 1; Type = 'elimination'; Suspect = 'gpu' }
@@ -169,15 +173,24 @@ $av = @(foreach ($c in @(@(), @(1), @(1, 1, 1, 1, 1))) { $e = Get-Enquete $donne
 Write-Resultat 'avancement « étape N sur M » (son qui grésille)' (($av -join ' ') -eq '1/8 2/7 6/7') "($($av -join ' '))"
 # Des centaines d'enquêtes au hasard (toujours les mêmes) : chacune finit, avec une réponse
 $mauvais = @(); $types = @{}
+# (et, une fois dit que Windows ne démarre plus, plus aucun geste qui demande Windows ouvert)
+$demandeWindows = 'touche Windows|bouton Démarrer|menu Démarrer|/Online|Ctrl \+ Maj \+ Échap|Windows Update|Panneau de configuration|Mindcare est-il ouvert'
+$horsWindows = @()
 $hasard = New-Object Random 42
 foreach ($p in $donnees.Pannes) {
     for ($t = 0; $t -lt 300; $t++) {
         $choix = @(); $e = Get-Enquete $donnees $p @()
         while ($e.Etape -and $choix.Count -lt 40) { $choix += $hasard.Next(-1, @($e.Etape.Reponses).Count); $e = Get-Enquete $donnees $p $choix }
         if ($e.Etape -or -not $e.Verdict) { $mauvais += "$($p.Id):$($choix -join ',')" } else { $types[$e.Verdict.Type] = 1 + [int]$types[$e.Verdict.Type] }
+        $hors = $false
+        foreach ($f in $e.Faits) {
+            if ($hors -and "$($f.Etape.Texte) $($f.Etape.Aide) $(@($f.Etape.Gestes) -join ' ')" -match $demandeWindows) { $horsWindows += "$($p.Id):$($f.Etape.Id)" }
+            if (@($f.Etape.Reponses | Where-Object { $_.Texte -eq $f.Reponse -and $_.Note -eq 'horswindows' })) { $hors = $true }
+        }
     }
 }
 Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() | Sort-Object Name | ForEach-Object { "$($_.Name) $($_.Value)" }) -join ', '))" (-not $mauvais) "($($mauvais | Select-Object -First 3))"
+Write-Resultat 'Windows ne démarre plus : aucun geste qui demande Windows' (-not $horsWindows) "($(@($horsWindows | Select-Object -Unique -First 5) -join ', '))"
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
