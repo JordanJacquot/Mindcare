@@ -1,0 +1,20 @@
+[package]
+name = "mindcare-donnees"
+version = "0.1.0"
+description = "Les données de Mindcare (portage exact de modules/donnees.ps1 et historique.ps1, et de la partie sans écran de contenu.ps1), sans écran et sans appel à Windows"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Le moteur des enquêtes (le rapport et la reprise rejouent une enquête)
+mindcare-moteur = { path = "../mindcare-moteur" }
+# Versions figées (« = ») : une nouvelle version n'entre que par un changement relu.
+# Les fichiers JSON (diagnostics.json, reglages.json, etat.json) : lus avec l'ordre de leurs champs, comme ConvertFrom-Json
+serde_json = { version = "=1.0.154", features = ["preserve_order"] }
+# L'écriture et la lecture sûres des JSON de la suite (json_sur), et les chemins comme .NET : la bibliothèque commune de
+# Mindset, épinglée à une révision relue (jamais une copie du code)
+suite-commun = { git = "https://github.com/JordanJacquot/Mindset", rev = "b1fcd6e6bcb84020d5d48f8bb22be2bc780c5e28" }
+
+[lints]
+workspace = true
