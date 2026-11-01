@@ -14698,7 +14698,8 @@
               "Garde": [
                 "pilote",
                 "gpu",
-                "surchauffe"
+                "surchauffe",
+                "windowsabime"
               ],
               "Note": "codelu",
               "Preuve": "Le code d'arrêt (VIDEO_TDR_FAILURE...) accuse la carte graphique ou son pilote"
@@ -18178,10 +18179,24 @@
           "Aide": "Pour entrer quand même : en bas à droite de l'écran de connexion, touche l'icône d'accessibilité puis « Clavier visuel », et tape le mot de passe à la souris (ou au doigt)."
         },
         {
-          "Ref": "test-demarrage-rapide"
+          "Ref": "test-demarrage-rapide",
+          "Gestes": [
+            "D'abord, connecte-toi : en bas à droite de l'écran de connexion, clique sur l'icône d'accessibilité, puis « Clavier visuel », et tape ton mot de passe à la souris. Si la souris ne marche pas non plus, branche un autre clavier ou une autre souris (même prêtés) le temps de ce test.",
+            "Appuie sur la touche Windows du clavier, tape « Panneau de configuration » et ouvre-le.",
+            "Clique sur « Matériel et audio », puis « Options d'alimentation ».",
+            "À gauche : « Choisir l'action des boutons d'alimentation ».",
+            "Clique sur « Modifier des paramètres actuellement non disponibles » (Windows peut demander une autorisation : accepte).",
+            "Décoche « Activer le démarrage rapide », puis « Enregistrer les modifications ».",
+            "Essaie de nouveau, pendant quelques jours."
+          ]
         },
         {
-          "Ref": "test-pilote-periph"
+          "Ref": "test-pilote-periph",
+          "Gestes": [
+            "D'abord, connecte-toi : en bas à droite de l'écran de connexion, clique sur l'icône d'accessibilité, puis « Clavier visuel », et tape ton mot de passe à la souris. Si la souris ne marche pas non plus, branche un autre clavier ou une autre souris (même prêtés) le temps de ce test.",
+            "Touche Windows, « Windows Update » : installe tout, y compris les mises à jour facultatives.",
+            "Redémarre le PC."
+          ]
         }
       ]
     },

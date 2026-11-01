@@ -130,6 +130,7 @@ $cas = @(
     @{ Nom = 'écran bleu à chaque démarrage : réparé par l''outil de redémarrage'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
     @{ Nom = 'écran bleu à chaque démarrage : fichiers réparés depuis l''écran de secours'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
     @{ Nom = 'vérification du disque, Windows ne s''ouvre plus : fichiers réparés depuis l''écran de secours'; Panne = 'chkdsk'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'fichierssysteme' }
+    @{ Nom = 'écran bleu VIDEO_TDR_FAILURE à chaque démarrage : réparé par l''outil de redémarrage'; Panne = 'ecranbleu'; Choix = 1, 2, 0; Type = 'trouve'; Suspect = 'windowsabime' }
     @{ Nom = 'écran bleu, Windows dit que le disque est malade'; Panne = 'ecranbleu'; Choix = 0, 0; Indices = @{ disque = (New-Indice $true 'Windows dit qu''un disque n''est pas en bonne santé') }; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'jeu : écran noir qui revient, réglé par le pilote'; Panne = 'jeu'; Choix = 1, 1, 1, 2, 1, 0; Type = 'trouve'; Suspect = 'pilote' }
     @{ Nom = 'jeu : des traits bizarres, frais : la carte graphique'; Panne = 'jeu'; Choix = 1, 1, 1, 3, 1; Type = 'elimination'; Suspect = 'gpu' }
@@ -191,6 +192,9 @@ foreach ($p in $donnees.Pannes) {
 }
 Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() | Sort-Object Name | ForEach-Object { "$($_.Name) $($_.Value)" }) -join ', '))" (-not $mauvais) "($($mauvais | Select-Object -First 3))"
 Write-Resultat 'Windows ne démarre plus : aucun geste qui demande Windows' (-not $horsWindows) "($(@($horsWindows | Select-Object -Unique -First 5) -join ', '))"
+# Clavier sans effet sur l'écran de connexion : un test qui se fait dans Windows commence par s'y connecter
+$sansConnexion = @(Get-Etapes $donnees (Get-Panne $donnees 'clavierconnexion') | Where-Object { "$(@($_.Gestes) -join ' ')" -match $demandeWindows -and "$(@($_.Gestes)[0])" -notmatch 'connecte-toi' } | ForEach-Object { $_.Id })
+Write-Resultat 'clavier à la connexion : se connecter avant les gestes dans Windows' (-not $sansConnexion) "($($sansConnexion -join ', '))"
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
