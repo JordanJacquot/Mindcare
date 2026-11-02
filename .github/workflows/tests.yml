@@ -81,13 +81,34 @@ jobs:
       - name: "Tests Rust : le moteur rejoue tous les juges (cargo test)"
         run: cargo test --locked --workspace
 
+      - name: "Construction du programme de Mindcare en Rust (Tauri, versions du Cargo.lock)"
+        run: cargo build --locked -p mindcare-appli
+
+      - name: "Aucun plugin de Tauri interdit (shell, fs, updater, single-instance, global-shortcut)"
+        run: |
+          # (le shell powershell de GitHub arrête tout à la première erreur : cargo écrit ses messages sur stderr)
+          $ErrorActionPreference = 'Continue'
+          $interdits = 'tauri-plugin-shell', 'tauri-plugin-fs', 'tauri-plugin-updater', 'tauri-plugin-single-instance', 'tauri-plugin-global-shortcut'
+          $lock = [IO.File]::ReadAllText((Join-Path (Get-Location) 'Cargo.lock'))
+          $trouves = @()
+          foreach ($p in $interdits) {
+            # 1. le Cargo.lock (toutes les plateformes)
+            if ($lock -match ('(?m)^name = "' + [regex]::Escape($p) + '"\r?$')) { $trouves += "$p (Cargo.lock)" }
+            # 2. cargo tree -i : la bibliothèque ne doit être tirée par rien, sur aucune plateforme
+            $sortie = (cmd /c "cargo tree --locked -i $p --target all -e all 2>&1") | Out-String
+            if ($LASTEXITCODE -eq 0) { $trouves += "$p (cargo tree)" }
+            elseif ($sortie -notmatch 'did not match any packages') { Write-Host $sortie; Write-Host "cargo tree n'a pas pu répondre pour $p."; exit 1 }
+          }
+          if ($trouves.Count) { Write-Host "Plugins interdits trouvés : $($trouves -join ', ')"; exit 1 }
+          Write-Host 'Aucun plugin interdit.'
+
       - name: "Clippy strict (aucun avertissement permis)"
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
       - name: "Mise en forme (cargo fmt)"
         run: cargo fmt --all --check
 
-      - name: "cargo deny : licences compatibles MIT, failles connues, liste blanche des bibliothèques"
+      - name: "cargo deny : licences compatibles MIT, failles connues, liste blanche des bibliothèques (Tauri compris), plugins interdits"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

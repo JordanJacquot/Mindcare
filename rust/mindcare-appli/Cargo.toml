@@ -1,0 +1,35 @@
+[package]
+name = "mindcare-appli"
+version = "0.1.0"
+description = "Mindcare en Rust : le programme (Mindset.exe dans le dossier de Mindcare), sa fenêtre Tauri dans Mindset"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# Le programme s'appelle Mindset.exe comme celui de chaque appli de la suite : le Gestionnaire des tâches range toute
+# la suite sur une seule ligne « Mindset » (contrat-appli, partie 4).
+[[bin]]
+name = "Mindset"
+path = "src/main.rs"
+
+[dependencies]
+# Versions figées (« = ») : une nouvelle version n'entre que par un changement relu.
+# Tauri sans ses options par défaut (ni « dynamic-acl », ni « x11 », ni « dbus ») ; jamais « devtools » (règle 5 de
+# regles-tauri.md). « custom-protocol » en dur : sans lui, l'exe chercherait un serveur de développement.
+tauri = { version = "=2.12.5", default-features = false, features = ["wry", "compression", "common-controls-v6", "custom-protocol"] }
+
+# Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
+# webview2-com, et que le Rust de Mindset.
+[target.'cfg(windows)'.dependencies.windows]
+version = "=0.62.2"
+features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+[lints]
+workspace = true
