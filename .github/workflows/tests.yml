@@ -101,6 +101,8 @@ jobs:
           }
           if ($trouves.Count) { Write-Host "Plugins interdits trouvés : $($trouves -join ', ')"; exit 1 }
           Write-Host 'Aucun plugin interdit.'
+          # (sinon GitHub reprend le code de sortie du dernier cargo tree, qui échoue justement quand rien n'est trouvé)
+          exit 0
 
       - name: "Clippy strict (aucun avertissement permis)"
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
