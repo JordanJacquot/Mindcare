@@ -5,7 +5,8 @@
 //! - [`synchro`] : le verrou `Local\Mindcare-Instance` (`CreateMutexW`, `WaitForSingleObject`) et le signal
 //!   d'affichage `Local\Mindcare-Afficher` (`CreateEventW`, `OpenEventW`, `SetEvent`) ;
 //! - [`fenetre`] : accrochée dans Mindset (`GetWindowLongPtrW`, `GetParent`), visible (`IsWindowVisible`, `IsIconic`),
-//!   montrée sans prendre la main (`ShowWindow(SW_SHOWNA)`) ;
+//!   montrée sans prendre la main (`ShowWindow(SW_SHOWNA)`), taille minimale gardée quand Mindset change la
+//!   taille (`SetWindowSubclass`, `WM_WINDOWPOSCHANGING`) ;
 //! - [`registre`] : `InstallLocation` de Mindset dans HKLM (lecture seule) ;
 //! - [`webview2`] : les réglages de WebView2 que Tauri ne transmet pas, et la veille de la page (`SetIsVisible`) ;
 //! - [`identite`] : `SetCurrentProcessExplicitAppUserModelID("JordanJacquot.Mindcare")` (la barre des tâches) ;

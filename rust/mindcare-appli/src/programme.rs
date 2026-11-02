@@ -255,6 +255,10 @@ fn ouvrir_fenetre(app: &App, suite: &Path, donnees: &Path, montree: bool, journa
         journal.ecrire(&format!("Écran : dossier de la suite non pris, repli ({r})"));
     }
     let h = f.hwnd().map(|h| h.0 as usize).unwrap_or(0);
+    // (contrat-appli, partie 7 : la taille minimale revient une fois libérée, même quand Mindset change la taille)
+    if !crate::windows::fenetre::garder_taille_minimale(h) {
+        journal.ecrire("Écran : taille minimale non gardée (sous-classe refusée)");
+    }
     let pour_reglages = journal.clone();
     if let Err(e) = webview2::couper_reglages(&f, move |t| pour_reglages.ecrire(t)) {
         journal.ecrire(&format!("Écran : réglages de WebView2 non posés ({e})"));

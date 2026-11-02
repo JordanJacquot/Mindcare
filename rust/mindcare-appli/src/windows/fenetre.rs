@@ -1,14 +1,63 @@
 //! La fenêtre principale vue par Windows : accrochée dans Mindset ou non, visible ou non (elle et ses parents),
 //! montrée sans prendre la main. Et [`FenetreTauri`], le trait `Fenetre` de mindcare-vie rempli avec la vraie
-//! fenêtre (ces appels, et ceux de Tauri pour la montrer au premier plan et changer sa taille minimale).
+//! fenêtre (ces appels, et ceux de Tauri pour la montrer au premier plan et changer sa taille minimale). Et la
+//! taille minimale gardée quand Mindset change la taille par `SetWindowPos` ([`garder_taille_minimale`]).
 
 use mindcare_vie::{Fenetre, Niveau, Taille};
 use tauri::{LogicalSize, WebviewWindow};
+use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::UI::Shell::{DefSubclassProc, SetWindowSubclass};
 use windows::Win32::UI::WindowsAndMessaging::{
-    GWL_STYLE, GetParent, GetWindowLongPtrW, IsIconic, IsWindow, IsWindowVisible, SW_SHOWNA, ShowWindow, WS_CHILD,
+    GWL_STYLE, GetParent, GetWindowLongPtrW, IsIconic, IsWindow, IsWindowVisible, MINMAXINFO, SW_SHOWNA, SWP_NOSIZE,
+    SendMessageW, ShowWindow, WINDOWPOS, WM_GETMINMAXINFO, WM_WINDOWPOSCHANGING, WS_CHILD, WS_MINIMIZE,
 };
 
 use super::hwnd;
+
+/// Le numéro de la sous-classe de [`garder_taille_minimale`] (« MCMI »).
+const SOUS_CLASSE_TAILLE: usize = 0x4D43_4D49;
+
+/// Garde la taille minimale de la fenêtre quand un AUTRE programme change sa taille (`SetWindowPos`) : Mindset,
+/// qui la rend à 150 x 120 puis la libère (natif.cs, `Redimensionner` et `Liberer` ; contrat-appli, partie 7).
+///
+/// WPF (Mindcare PowerShell, le témoin) respecte sa taille minimale partout. Tao, sous Tauri, répond lui-même à
+/// `WM_WINDOWPOSCHANGING` sans passer par `DefWindowProc` (tao 0.37.2, event_loop.rs:1061-1146), or c'est
+/// `DefWindowProc` qui demande `WM_GETMINMAXINFO` et borne la taille : la taille minimale de Tauri ne tenait donc qu'à
+/// la souris. Cette sous-classe, appelée avant tao, borne chaque nouvelle taille d'une fenêtre de premier niveau à
+/// celle que tao donne dans `WM_GETMINMAXINFO` (rien une fois accrochée : `WS_CHILD`, et Mindcare n'y a plus de
+/// taille minimale). `false` si Windows l'a refusée. À appeler une fois, sur le fil de la fenêtre.
+pub fn garder_taille_minimale(h: usize) -> bool {
+    // SAFETY : une fenêtre de ce programme, sur ce fil (exigé par SetWindowSubclass) ; la procédure ne garde
+    // aucune donnée (dwrefdata 0) et vit autant que le programme
+    existe(h) && unsafe { SetWindowSubclass(hwnd(h), Some(taille_minimale), SOUS_CLASSE_TAILLE, 0) }.as_bool()
+}
+
+/// La procédure de [`garder_taille_minimale`] : tout le reste passe tel quel au suivant (tao).
+unsafe extern "system" fn taille_minimale(
+    h: HWND,
+    message: u32,
+    wparam: WPARAM,
+    lparam: LPARAM,
+    _sous_classe: usize,
+    _donnees: usize,
+) -> LRESULT {
+    if message == WM_WINDOWPOSCHANGING && lparam.0 != 0 {
+        // SAFETY : pour WM_WINDOWPOSCHANGING, lparam est un WINDOWPOS que Windows laisse modifier pendant l'appel ;
+        // GetWindowLongPtrW est une lecture
+        let (pos, style) = unsafe { (&mut *(lparam.0 as *mut WINDOWPOS), GetWindowLongPtrW(h, GWL_STYLE) as u32) };
+        // (comme DefWindowProc : ni une taille inchangée, ni une fenêtre réduite ; ici, ni une fenêtre accrochée)
+        if !pos.flags.contains(SWP_NOSIZE) && style & (WS_CHILD.0 | WS_MINIMIZE.0) == 0 {
+            let mut mm = MINMAXINFO::default();
+            // SAFETY : la fenêtre de ce fil (appel direct) ; mm vit pendant l'appel ; tao n'y remplit que la taille
+            // minimale (rien : 0, aucune borne)
+            unsafe { SendMessageW(h, WM_GETMINMAXINFO, None, Some(LPARAM(&mut mm as *mut MINMAXINFO as isize))) };
+            pos.cx = pos.cx.max(mm.ptMinTrackSize.x);
+            pos.cy = pos.cy.max(mm.ptMinTrackSize.y);
+        }
+    }
+    // SAFETY : le message tel que reçu, au suivant de la chaîne
+    unsafe { DefSubclassProc(h, message, wparam, lparam) }
+}
 
 /// Au plus tant de niveaux de parents (une chaîne plus longue n'arrive pas ; c'est une garde contre une boucle).
 const NIVEAUX_MAX: usize = 64;
@@ -172,7 +221,10 @@ mod tests {
     /// Fait tourner `essai` sur un bureau Windows à part, dans un fil neuf (sans fenêtre : il peut changer de bureau).
     fn sur_un_bureau_a_part(essai: impl FnOnce() + Send + 'static) {
         std::thread::spawn(move || {
-            let nom = HSTRING::from(format!("MindcareEssai-{}-fenetre", std::process::id()));
+            // (un nom par essai : les essais tournent en même temps, chacun sur son bureau)
+            static NUMERO: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+            let n = NUMERO.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            let nom = HSTRING::from(format!("MindcareEssai-{}-fenetre-{n}", std::process::id()));
             // SAFETY : nom valide ; bureau neuf, jamais affiché (seul SwitchDesktop l'afficherait, jamais appelé)
             let bureau =
                 unsafe { CreateDesktopW(&nom, PCWSTR::null(), None, DESKTOP_CONTROL_FLAGS(0), GENERIC_ALL.0, None) }
@@ -224,6 +276,67 @@ mod tests {
                 detruire(h);
             }
             assert!(!existe(appli) && !est_accrochee(appli) && niveaux(appli).is_empty());
+        });
+    }
+
+    /// Comme tao (event_loop.rs:1061-1146 et 1783-1811) : `WM_WINDOWPOSCHANGING` répondu sans `DefWindowProc` (aucune
+    /// borne), et une taille minimale de 300 x 200 donnée dans `WM_GETMINMAXINFO`
+    unsafe extern "system" fn comme_tao(
+        h: HWND,
+        message: u32,
+        wparam: WPARAM,
+        lparam: LPARAM,
+        _sous_classe: usize,
+        _donnees: usize,
+    ) -> LRESULT {
+        match message {
+            WM_WINDOWPOSCHANGING => LRESULT(0),
+            WM_GETMINMAXINFO => {
+                // SAFETY : pour WM_GETMINMAXINFO, lparam est un MINMAXINFO modifiable pendant l'appel
+                let mm = unsafe { &mut *(lparam.0 as *mut MINMAXINFO) };
+                mm.ptMinTrackSize.x = 300;
+                mm.ptMinTrackSize.y = 200;
+                LRESULT(0)
+            }
+            // SAFETY : le message tel que reçu, au suivant de la chaîne
+            _ => unsafe { DefSubclassProc(h, message, wparam, lparam) },
+        }
+    }
+
+    /// La taille de la fenêtre, après un `SetWindowPos` comme celui de Mindset (natif.cs, `Redimensionner`)
+    fn redimensionner(h: usize, largeur: i32, hauteur: i32) -> (i32, i32) {
+        use windows::Win32::Foundation::RECT;
+        use windows::Win32::UI::WindowsAndMessaging::{GetWindowRect, SWP_NOACTIVATE, SWP_NOZORDER, SetWindowPos};
+        let mut r = RECT::default();
+        // SAFETY : fenêtre d'essai de ce fil, sur le bureau à part
+        unsafe {
+            SetWindowPos(hwnd(h), None, 0, 0, largeur, hauteur, SWP_NOZORDER | SWP_NOACTIVATE).expect("SetWindowPos");
+            GetWindowRect(hwnd(h), &mut r).expect("GetWindowRect");
+        }
+        (r.right - r.left, r.bottom - r.top)
+    }
+
+    #[test]
+    fn taille_minimale_gardee_quand_un_autre_programme_redimensionne() {
+        sur_un_bureau_a_part(|| {
+            let appli = creer(WS_OVERLAPPEDWINDOW, None);
+            // SAFETY : fenêtre d'essai de ce fil
+            assert!(unsafe { SetWindowSubclass(hwnd(appli), Some(comme_tao), 1, 0) }.as_bool());
+            // Le défaut : comme tao, rien ne borne un SetWindowPos (Mindset la réduisait à 100 x 100)
+            assert_eq!(redimensionner(appli, 100, 100), (100, 100), "sans la sous-classe, aucune borne");
+            assert!(garder_taille_minimale(appli));
+            assert_eq!(redimensionner(appli, 100, 100), (300, 200), "bornée à la taille minimale de tao");
+            assert_eq!(redimensionner(appli, 250, 500), (300, 500), "chaque côté à part");
+            assert_eq!(redimensionner(appli, 640, 480), (640, 480), "plus grande : inchangée");
+            // Accrochée (WS_CHILD, natif.cs:86) : Mindset lui donne la taille qu'il veut
+            // SAFETY : fenêtre d'essai de ce fil
+            unsafe {
+                let style = GetWindowLongPtrW(hwnd(appli), GWL_STYLE);
+                SetWindowLongPtrW(hwnd(appli), GWL_STYLE, style | WS_CHILD.0 as isize);
+            }
+            assert_eq!(redimensionner(appli, 150, 120), (150, 120), "accrochée : aucune borne");
+            detruire(appli);
+            assert!(!garder_taille_minimale(appli), "une fenêtre détruite : refusé");
         });
     }
 
