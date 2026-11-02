@@ -32,14 +32,15 @@ impl Drop for Essai {
 }
 
 fn appli() -> App<MockRuntime> {
-    let page = Page::new(commandes::etat_page("0.1.0", true, None), |_| {});
+    let page = Page::new(commandes::etat_page("0.1.0", true, &[]), |_| {});
     mindcare_appli::preparer(mock_builder(), page).build(mindcare_appli::contexte()).expect("appli d'essai")
 }
 
 /// La fenêtre « principale », créée par le vrai code de l'appli (avec le faux Windows de Tauri)
 fn principale(app: &App<MockRuntime>, essai: &Essai) -> WebviewWindow<MockRuntime> {
     let (f, choix) =
-        fenetre::creer_principale(app, &essai.0.join("suite"), &essai.0.join("Mindcare")).expect("fenêtre");
+        fenetre::creer_principale(app, &essai.0.join("suite"), &essai.0.join("Mindcare"), std::sync::Arc::new(|_| {}))
+            .expect("fenêtre");
     // Le dossier WebView2 est celui de la suite, sous le dossier d'essai
     assert_eq!(choix.dossier, essai.0.join("suite").join("WebView2-Tauri").join("Mindcare"));
     assert!(!choix.repli);

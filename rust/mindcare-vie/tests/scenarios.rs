@@ -32,6 +32,7 @@ fn env(racine: &str) -> Environnement {
         program_files: Some(PF.to_string()),
         program_w6432: Some(PF.to_string()),
         version: "0.16.0".to_string(),
+        donnees_essai: None,
     }
 }
 

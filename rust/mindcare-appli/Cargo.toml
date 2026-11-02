@@ -20,6 +20,13 @@ name = "Mindset"
 path = "src/main.rs"
 test = false
 
+# La construction d'essai (`cargo build --features essai`), jamais livrée : seule à lire un dossier de données d'essai
+# (MINDCARE_DONNEES) et à faire une capture de sa fenêtre. Elle ne lit pas HKLM et ne lance que elle-même (jamais le
+# vrai Mindset du PC). L'exe livré (sans l'option) ne connaît rien de tout cela : la CI cherche ces noms dans l'exe
+# de publication.
+[features]
+essai = []
+
 [dependencies]
 # Versions figées (« = ») : une nouvelle version n'entre que par un changement relu.
 # Tauri sans ses options par défaut (ni « dynamic-acl », ni « x11 », ni « dbus ») ; jamais « devtools » (règle 5 de
@@ -30,6 +37,9 @@ serde_json = { version = "=1.0.154", features = ["preserve_order"] }
 # Le dossier WebView2 des applis Tauri et les options fixes du navigateur (règle 7), la lecture des fichiers de pack
 # (règle 6) : la bibliothèque commune, à la révision épinglée dans le Cargo.toml de l'espace de travail
 suite-commun.workspace = true
+# La vie de l'appli avec Mindset (démarrage, verrou, surveillances), ses données (dossier, journal, etat.json, réglages)
+mindcare-vie = { path = "../mindcare-vie" }
+mindcare-donnees = { path = "../mindcare-donnees" }
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
 # webview2-com, et que le Rust de Mindset.
@@ -37,12 +47,20 @@ suite-commun.workspace = true
 version = "=0.62.2"
 features = [
     "Win32_Foundation",
+    "Win32_Graphics_Gdi",
     "Win32_Security",
+    "Win32_Storage_Xps",
     "Win32_System_Registry",
+    "Win32_System_StationsAndDesktops",
+    "Win32_System_SystemInformation",
     "Win32_System_Threading",
     "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",
 ]
+# Les réglages de WebView2 que Tauri ne transmet pas (menu du clic droit, raccourcis du navigateur, saisie
+# automatique) et sa veille (SetIsVisible) : la même version que celle de wry (déjà dans le Cargo.lock)
+[target.'cfg(windows)'.dependencies.webview2-com]
+version = "=0.39.1"
 
 [build-dependencies]
 # La construction de Tauri : le manifeste des commandes (règle 2), l'icône et la fiche de version de l'exe
@@ -54,5 +72,12 @@ tauri-build = { version = "=2.7.4", default-features = false }
 # fenêtre, aucune page chargée). Les options de développement n'entrent que dans les tests, jamais dans l'exe.
 tauri = { version = "=2.12.5", default-features = false, features = ["wry", "compression", "common-controls-v6", "custom-protocol", "test"] }
 
-[lints]
-workspace = true
+# Pas `workspace = true` : le module Windows (src\windows) a besoin d'autoriser le code « unsafe », que le reste du
+# dépôt interdit tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src\windows qui l'autorise, comme
+# mindcare-windows.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

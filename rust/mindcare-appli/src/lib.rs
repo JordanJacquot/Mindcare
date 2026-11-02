@@ -1,4 +1,4 @@
-//! Mindcare en Rust : la fenêtre de Mindcare dans Mindset (étape 4 du plan « Mindcare en Rust »), sans rien lancer.
+//! Mindcare en Rust : la fenêtre de Mindcare dans Mindset et son programme (étape 4 du plan « Mindcare en Rust »).
 //!
 //! - [`fenetre`] : la fenêtre « principale », créée dans le code (jamais dans tauri.conf.json), cachée et sans
 //!   prendre la main, titre exact « Mindcare », dossier WebView2 et options du navigateur de suite-commun
@@ -6,14 +6,27 @@
 //! - [`commandes`] : les deux seules commandes que la page peut appeler (`suivre_page`, `noter_visibilite`),
 //!   déclarées dans build.rs et autorisées à la seule fenêtre « principale » (capabilities\principale.json) ;
 //! - [`pack`] : la réponse du protocole `pack` (les images et polices du thème, règle 6), par suite-commun ;
-//! - [`preparer`] et [`contexte`] : ce que le programme (étape 4.4) et les tests donnent à Tauri.
+//! - [`preparer`] et [`contexte`] : ce que le programme et les tests donnent à Tauri ;
+//! - `programme` : le programme Mindset.exe tout branché (étape 4.4 : démarrage, verrou, fenêtre, surveillances) ;
+//! - `windows` : le seul module où le code « unsafe » est permis (verrou, signal, fenêtre, registre, WebView2) ;
+//! - `essai` et `png` : la construction d'essai seulement (option cargo `essai`, jamais livrée).
 //!
-//! Le programme Mindset.exe (src\main.rs) s'en sert à l'étape 4.4 ; les tests (tests\permissions.rs) le font
-//! tourner avec le faux Windows de Tauri (option « test ») : aucune vraie fenêtre, aucune page chargée.
+//! Le programme (src\main.rs) appelle `programme::lancer` ; les tests (tests\permissions.rs) font tourner la
+//! fenêtre avec le faux Windows de Tauri (option « test ») : aucune vraie fenêtre, aucune page chargée.
+
+#![deny(unsafe_code)]
 
 pub mod commandes;
+#[cfg(feature = "essai")]
+pub mod essai;
 pub mod fenetre;
 pub mod pack;
+#[cfg(any(feature = "essai", test))]
+pub mod png;
+#[cfg(windows)]
+pub mod programme;
+#[cfg(windows)]
+pub mod windows;
 
 pub use commandes::Page;
 

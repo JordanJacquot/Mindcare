@@ -38,6 +38,9 @@ pub struct Environnement {
     pub program_w6432: Option<String>,
     /// La version de Mindcare (pour le journal)
     pub version: String,
+    /// Le dossier de données d'un essai (`MINDCARE_DONNEES`, donnees.ps1:18) : rempli seulement par la construction
+    /// d'essai de mindcare-appli (option cargo `essai`), jamais par l'exe livré
+    pub donnees_essai: Option<String>,
 }
 
 impl Environnement {
@@ -166,8 +169,10 @@ pub fn demarrer(
     // Mindcare.ps1:54 : le signal que lèvera un second lancement
     systeme.creer_signal(&noms.signal);
 
-    // donnees.ps1:18-21 : le dossier de données, créé s'il manque (le dossier de test n'existe pas ici)
-    let dossier = PathBuf::from(dossier_donnees(None, gere, racine.as_deref(), &env.localappdata));
+    // donnees.ps1:18-21 : le dossier de données, créé s'il manque (celui d'un essai seulement dans la construction
+    // d'essai)
+    let dossier =
+        PathBuf::from(dossier_donnees(env.donnees_essai.as_deref(), gere, racine.as_deref(), &env.localappdata));
     let _ = disque.creer_dossier(&dossier);
     disque.ouvrir_donnees(&dossier);
     // systeme.ps1:14 : une vieille demande refermerait l'appli tout de suite

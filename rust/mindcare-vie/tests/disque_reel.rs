@@ -99,6 +99,7 @@ fn demarrage_complet_sur_le_disque() {
         program_files: None,
         program_w6432: None,
         version: "0.16.0".into(),
+        donnees_essai: None,
     };
     let mut systeme = faux::FauxSysteme::default();
     let mut disque = DisqueReel::nouveau(horloge(), Box::new(|| {}));

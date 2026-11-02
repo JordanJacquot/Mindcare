@@ -162,8 +162,19 @@ jobs:
           if ($problemes.Count) { $problemes | ForEach-Object { Write-Host $_ }; exit 1 }
           Write-Host 'Dossier de Mindcare en Rust conforme.'
 
+      - name: "L'exe livré ne connaît pas la construction d'essai (MINDCARE_DONNEES, capture : seulement avec l'option cargo essai)"
+        run: |
+          & ..\outils\verifier-sans-essai.ps1 -Exe (Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare\Mindset.exe')
+          exit $LASTEXITCODE
+
+      - name: "Tests de la construction d'essai (cargo test --features essai)"
+        run: cargo test --locked -p mindcare-appli --features essai
+
       - name: "Clippy strict (aucun avertissement permis)"
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      - name: "Clippy strict sur la construction d'essai (option cargo essai de mindcare-appli)"
+        run: cargo clippy --locked -p mindcare-appli --all-targets --features essai -- -D warnings
 
       - name: "Mise en forme (cargo fmt)"
         run: cargo fmt --all --check

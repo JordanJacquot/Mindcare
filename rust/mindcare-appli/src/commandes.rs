@@ -4,15 +4,30 @@
 
 use std::sync::{Mutex, MutexGuard};
 
-use serde_json::{Value, json};
-use suite_commun::themes::Couleurs;
+use serde_json::{Map, Value, json};
 use tauri::State;
 use tauri::ipc::Channel;
 
-/// Ce que la page affiche (titre, version, gérée par Mindset ou non, couleurs du thème), en JSON. Seules les trois
-/// couleurs de la marque du thème sont passées, au format « #RRGGBB » vérifié par suite-commun.
-pub fn etat_page(version: &str, geree: bool, couleurs: Option<&Couleurs>) -> Value {
-    let couleurs = couleurs.map(|c| json!({ "p": c.p, "s": c.s, "t": c.t })).unwrap_or_else(|| json!({}));
+/// Une couleur que la page accepte : « #RRGGBB » (celles des thèmes de suite-commun, vérifiées à la lecture).
+fn couleur_valable(c: &str) -> bool {
+    c.len() == 7 && c.starts_with('#') && c[1..].bytes().all(|b| b.is_ascii_hexdigit())
+}
+
+/// Un nom de variable CSS que la page accepte : des lettres et des chiffres (« P », « fond2 »).
+fn nom_valable(n: &str) -> bool {
+    (1..=16).contains(&n.len()) && n.bytes().all(|b| b.is_ascii_alphanumeric())
+}
+
+/// Ce que la page affiche (titre, version, gérée par Mindset ou non, couleurs du thème), en JSON. Les couleurs sont
+/// les variables CSS du thème (`suite_commun::themes::Theme::variables_css` : `--P`, `--S`, `--T`, `--fond`,
+/// `--fond2`) ; une variable au nom ou à la couleur mal écrits n'est pas passée (la page vérifie aussi).
+pub fn etat_page(version: &str, geree: bool, variables: &[(&str, String)]) -> Value {
+    let mut couleurs = Map::new();
+    for (nom, valeur) in variables {
+        if nom_valable(nom) && couleur_valable(valeur) {
+            couleurs.insert((*nom).to_string(), json!(valeur));
+        }
+    }
     json!({ "titre": crate::NOM_APPLI, "version": version, "geree": geree, "couleurs": couleurs })
 }
 
@@ -60,6 +75,10 @@ impl Page {
     }
 }
 
+/// Les lignes du journal quand la page change de visibilité
+pub const JOURNAL_CACHEE: &str = "Écran : caché, en pause";
+pub const JOURNAL_VISIBLE: &str = "Écran : de nouveau à l'écran";
+
 /// La page commence à suivre l'état de l'appli : il lui est envoyé tout de suite, puis à chaque changement
 /// ([`Page::changer`]).
 #[tauri::command]
@@ -69,12 +88,13 @@ pub fn suivre_page(canal: Channel<Value>, page: State<'_, Page>) -> Result<(), S
     Ok(())
 }
 
-/// La page est devenue visible ou cachée (document.visibilityState) : noté au journal quand cela change.
+/// La page est devenue visible ou cachée (document.visibilityState) : noté au journal quand cela change. Cachée,
+/// WebView2 met la page en pause (la veille, `SetIsVisible`, décidée par la vie de l'appli).
 #[tauri::command]
 pub fn noter_visibilite(visible: bool, page: State<'_, Page>) {
     let avant = tenir(&page.visible).replace(visible);
     if avant != Some(visible) {
-        (page.journal)(if visible { "Page : visible" } else { "Page : cachée" });
+        (page.journal)(if visible { JOURNAL_VISIBLE } else { JOURNAL_CACHEE });
     }
 }
 
@@ -84,21 +104,31 @@ mod tests {
 
     #[test]
     fn etat_page_avec_et_sans_theme() {
-        let c = Couleurs {
-            p: "#00E5FF".into(),
-            s: "#B04BFF".into(),
-            t: "#FF2EB5".into(),
-            nh: None,
-            ns: 1.0,
-            map: Default::default(),
-        };
-        let e = etat_page("0.1.0", true, Some(&c));
+        let theme = suite_commun::themes::Theme::neon();
+        let e = etat_page("0.1.0", true, &theme.variables_css());
         assert_eq!(e["titre"], "Mindcare");
         assert_eq!(e["version"], "0.1.0");
         assert_eq!(e["geree"], true);
-        assert_eq!(e["couleurs"], json!({ "p": "#00E5FF", "s": "#B04BFF", "t": "#FF2EB5" }));
-        let e = etat_page("0.1.0", false, None);
+        assert_eq!(
+            e["couleurs"],
+            json!({ "P": "#00E5FF", "S": "#B04BFF", "T": "#FF2EB5", "fond": "#06050F", "fond2": "#0C0920" })
+        );
+        let e = etat_page("0.1.0", false, &[]);
         assert_eq!(e["geree"], false);
         assert_eq!(e["couleurs"], json!({}));
+    }
+
+    /// Une couleur ou un nom mal écrits ne vont pas à la page (contre-épreuve : sans le contrôle, ils passeraient).
+    #[test]
+    fn variables_mal_ecrites_ecartees() {
+        let v = [
+            ("P", "#00E5FF".to_string()),
+            ("S", "red".to_string()),
+            ("T", "#FF2EB5;background:url(x)".to_string()),
+            ("fond", "#80112233".to_string()),
+            ("x}y", "#000000".to_string()),
+            ("", "#000000".to_string()),
+        ];
+        assert_eq!(etat_page("0.1.0", true, &v)["couleurs"], json!({ "P": "#00E5FF" }));
     }
 }
