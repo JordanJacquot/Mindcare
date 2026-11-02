@@ -11,8 +11,8 @@ publish.workspace = true
 mindcare-donnees = { path = "../mindcare-donnees" }
 # La comparaison sans tenir compte des majuscules, comme PowerShell
 mindcare-moteur = { path = "../mindcare-moteur" }
-# Les chemins comme .NET (Join-Path, Split-Path) : la même révision relue que mindcare-donnees, sans ses options
-suite-commun = { git = "https://github.com/JordanJacquot/Mindset", rev = "c187f50d6687f557ac0a048b2f0c8fa0b6a72371", default-features = false }
+# Les chemins comme .NET (Join-Path, Split-Path) : la révision épinglée dans le Cargo.toml de l'espace de travail
+suite-commun.workspace = true
 
 [lints]
 workspace = true

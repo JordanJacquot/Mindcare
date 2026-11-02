@@ -5,18 +5,31 @@ description = "Mindcare en Rust : le programme (Mindset.exe dans le dossier de M
 edition.workspace = true
 license.workspace = true
 publish.workspace = true
+build = "build.rs"
+
+# La bibliothèque : la fenêtre « principale », ses commandes et sa page, sans rien lancer. Le programme (étape 4.4)
+# et les tests (avec le faux Windows de Tauri, sans aucune fenêtre à l'écran) s'en servent.
+[lib]
+name = "mindcare_appli"
+path = "src/lib.rs"
 
 # Le programme s'appelle Mindset.exe comme celui de chaque appli de la suite : le Gestionnaire des tâches range toute
 # la suite sur une seule ligne « Mindset » (contrat-appli, partie 4).
 [[bin]]
 name = "Mindset"
 path = "src/main.rs"
+test = false
 
 [dependencies]
 # Versions figées (« = ») : une nouvelle version n'entre que par un changement relu.
 # Tauri sans ses options par défaut (ni « dynamic-acl », ni « x11 », ni « dbus ») ; jamais « devtools » (règle 5 de
 # regles-tauri.md). « custom-protocol » en dur : sans lui, l'exe chercherait un serveur de développement.
 tauri = { version = "=2.12.5", default-features = false, features = ["wry", "compression", "common-controls-v6", "custom-protocol"] }
+# L'état envoyé à la page (le même serde_json que mindcare-donnees et suite-commun)
+serde_json = { version = "=1.0.154", features = ["preserve_order"] }
+# Le dossier WebView2 des applis Tauri et les options fixes du navigateur (règle 7), la lecture des fichiers de pack
+# (règle 6) : la bibliothèque commune, à la révision épinglée dans le Cargo.toml de l'espace de travail
+suite-commun.workspace = true
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
 # webview2-com, et que le Rust de Mindset.
@@ -30,6 +43,16 @@ features = [
     "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",
 ]
+
+[build-dependencies]
+# La construction de Tauri : le manifeste des commandes (règle 2), l'icône et la fiche de version de l'exe
+# (FileDescription = productName = « Mindset »), le runtime C rangé dans l'exe (aucune VCRUNTIME140.dll à installer)
+tauri-build = { version = "=2.7.4", default-features = false }
+
+[dev-dependencies]
+# Les tests des permissions : la même dépendance, plus l'option « test » de Tauri (son faux Windows : aucune vraie
+# fenêtre, aucune page chargée). Les options de développement n'entrent que dans les tests, jamais dans l'exe.
+tauri = { version = "=2.12.5", default-features = false, features = ["wry", "compression", "common-controls-v6", "custom-protocol", "test"] }
 
 [lints]
 workspace = true

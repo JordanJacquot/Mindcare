@@ -1,0 +1,6 @@
+{
+  "identifier": "principale",
+  "description": "La fenêtre de Mindcare dans Mindset : seulement les deux commandes dont sa page se sert.",
+  "windows": ["principale"],
+  "permissions": ["allow-suivre-page", "allow-noter-visibilite"]
+}

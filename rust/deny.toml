@@ -83,6 +83,8 @@ allow = [
     # nom par nom. Les plugins de Tauri n'y sont pas : ils sont refusés plus bas.
     # les nôtres (étape 4)
     "mindcare-appli", "mindcare-vie",
+    # le relais Mindcare.exe (étape 4.5) : seulement windows, déjà dans la liste
+    "mindcare-relais",
     # Tauri 2.12.5, figé dans mindcare-appli\Cargo.toml (tauri-build est tiré par tauri lui-même pour sa construction)
     "tauri", "tauri-build", "tauri-codegen", "tauri-macros", "tauri-runtime", "tauri-runtime-wry", "tauri-utils",
     "tauri-winres",
@@ -127,5 +129,6 @@ allow = [
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-# La bibliothèque commune de la suite (suite-commun), épinglée par sa révision dans mindcare-donnees\Cargo.toml
+# La bibliothèque commune de la suite (suite-commun), épinglée par sa révision dans le Cargo.toml de l'espace de
+# travail ([workspace.dependencies])
 allow-git = ["https://github.com/JordanJacquot/Mindset"]

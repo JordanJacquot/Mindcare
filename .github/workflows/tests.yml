@@ -104,6 +104,64 @@ jobs:
           # (sinon GitHub reprend le code de sortie du dernier cargo tree, qui échoue justement quand rien n'est trouvé)
           exit 0
 
+      - name: "Récupérer les règles Tauri de la suite (dépôt Mindset, commit épinglé : outils\\verifier-tauri.ps1, outils\\verifier-imports.ps1)"
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: JordanJacquot/Mindset
+          ref: 5a21aaa86d5070e6899b8e2ace652d43c6896d34
+          path: _mindset
+          persist-credentials: false
+
+      - name: "Règles Tauri de la suite (verifier-tauri.ps1 sur rust\\mindcare-appli : configuration, capabilities, CSP, plugins, outils de développement, WebView2)"
+        run: |
+          & ..\_mindset\outils\verifier-tauri.ps1 -Projet mindcare-appli
+          exit $LASTEXITCODE
+
+      - name: "Construction de publication et dossier de Mindcare en Rust (outils\\construire-rust.ps1 : Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt)"
+        run: |
+          & ..\outils\construire-rust.ps1 -Sortie (Join-Path $env:RUNNER_TEMP 'mindcare-rust')
+          if (-not $?) { exit 1 }
+
+      - name: "Le dossier construit : fiches de version (Mindset pour l'hôte, Mindcare pour le relais), aucun runtime C à part (VCRUNTIME*, MSVCP*), version.json"
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare'
+          $problemes = @()
+          # La version : celle du Cargo.toml de mindcare-appli, la seule source
+          $section = ''; $version = $null
+          foreach ($l in [IO.File]::ReadAllLines((Join-Path (Get-Location) 'mindcare-appli\Cargo.toml'))) {
+            $l = $l.Trim()
+            if ($l.StartsWith('[')) { $section = $l; continue }
+            if ($section -eq '[package]' -and $l -match '^version\s*=\s*"([^"]*)"') { $version = $Matches[1]; break }
+          }
+          Write-Host "Version de Mindcare (Cargo.toml) : $version"
+          # Les fiches de version : la description est ce qu'affiche le Gestionnaire des tâches (contrat-appli, partie 4)
+          foreach ($e in @(@('Mindset.exe', 'Mindset'), @('Mindcare.exe', 'Mindcare'))) {
+            $f = Join-Path $d $e[0]
+            if (-not (Test-Path -LiteralPath $f -PathType Leaf)) { $problemes += "$($e[0]) manque"; continue }
+            $v = (Get-Item -LiteralPath $f).VersionInfo
+            Write-Host "$($e[0]) : description « $($v.FileDescription) », produit « $($v.ProductName) », version $($v.ProductVersion)"
+            if ($v.FileDescription -cne $e[1]) { $problemes += "$($e[0]) : description « $($v.FileDescription) » au lieu de « $($e[1]) »" }
+            if ($v.ProductName -cne $e[1]) { $problemes += "$($e[0]) : produit « $($v.ProductName) » au lieu de « $($e[1]) »" }
+            $p = @(([string]$v.ProductVersion).Split('.')); $a = @($version.Split('.'))
+            while ($p.Count -lt 4) { $p += '0' }; while ($a.Count -lt 4) { $a += '0' }
+            if (($p -join '.') -ne ($a -join '.')) { $problemes += "$($e[0]) : version $($v.ProductVersion) au lieu de $version" }
+          }
+          # Aucun runtime C à installer à part (le contrôle de Mindset, lu dans la table des imports, sans rien lancer)
+          & ..\_mindset\outils\verifier-imports.ps1 -Fichiers (Join-Path $d 'Mindset.exe'), (Join-Path $d 'Mindcare.exe') -Liste
+          if ($LASTEXITCODE) { $problemes += 'un programme a besoin d''un runtime C à part' }
+          # version.json : lu comme Mindset le lit (un objet JSON, UTF-8 sans marque)
+          $o = [IO.File]::ReadAllBytes((Join-Path $d 'version.json'))
+          if ($o.Length -ge 3 -and $o[0] -eq 0xEF -and $o[1] -eq 0xBB -and $o[2] -eq 0xBF) { $problemes += 'version.json a une marque UTF-8 (BOM)' }
+          $j = [Text.Encoding]::UTF8.GetString($o).TrimStart([char]0xFEFF) | ConvertFrom-Json
+          Write-Host "version.json : appli $($j.appli), version $($j.version), mindset_min $($j.mindset_min)"
+          if ($j.appli -cne 'mindcare') { $problemes += "version.json : appli « $($j.appli) »" }
+          if ($j.version -cne $version) { $problemes += "version.json : version $($j.version) au lieu de $version" }
+          if ($j.mindset_min -cne '2.15.0') { $problemes += "version.json : mindset_min $($j.mindset_min) au lieu de 2.15.0" }
+          if (-not (Test-Path -LiteralPath (Join-Path $d 'LISEZMOI.txt') -PathType Leaf)) { $problemes += 'LISEZMOI.txt manque' }
+          if ($problemes.Count) { $problemes | ForEach-Object { Write-Host $_ }; exit 1 }
+          Write-Host 'Dossier de Mindcare en Rust conforme.'
+
       - name: "Clippy strict (aucun avertissement permis)"
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 

@@ -1,0 +1,40 @@
+/* Couleurs de départ (thème Néon de la suite) ; page.js les remplace par celles du thème choisi dans Mindset */
+:root {
+  --couleur-p: #00E5FF;
+  --couleur-s: #B04BFF;
+  --couleur-t: #FF2EB5;
+  --fond: #07060d;
+  --texte: #f0f0f0;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: "Segoe UI", sans-serif;
+  /* rien à sélectionner ni à glisser : c'est un écran d'appli, pas une page web */
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+main {
+  padding: 32px;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--couleur-p);
+}
+
+#version {
+  margin: 0 0 8px;
+  color: var(--couleur-s);
+}
+
+#geree {
+  margin: 0;
+  color: var(--couleur-t);
+}

@@ -1708,7 +1708,10 @@ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 name = "mindcare-appli"
 version = "0.1.0"
 dependencies = [
+ "serde_json",
+ "suite-commun",
  "tauri",
+ "tauri-build",
  "windows",
 ]
 
@@ -1727,6 +1730,13 @@ version = "0.1.0"
 dependencies = [
  "serde_json",
  "unicode-normalization",
+]
+
+[[package]]
+name = "mindcare-relais"
+version = "0.1.0"
+dependencies = [
+ "windows",
 ]
 
 [[package]]
@@ -2882,7 +2892,7 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 [[package]]
 name = "suite-commun"
 version = "0.1.0"
-source = "git+https://github.com/JordanJacquot/Mindset?rev=c187f50d6687f557ac0a048b2f0c8fa0b6a72371#c187f50d6687f557ac0a048b2f0c8fa0b6a72371"
+source = "git+https://github.com/JordanJacquot/Mindset?rev=0aad77c0fd1cd92983775bec64646e1486cc857e#0aad77c0fd1cd92983775bec64646e1486cc857e"
 dependencies = [
  "serde_json",
 ]
