@@ -1,7 +1,7 @@
-﻿# Essai du kit d'écrans dans la fenêtre Tauri de Mindcare (étape 5.1), avec la CONSTRUCTION D'ESSAI. À lancer
-# SEULEMENT sur un bureau Windows à part (outils\sur-bureau.ps1). Captures : accueil (3D), puis une page ; un clic
-# simulé (messages de souris et de clavier envoyés à la fenêtre de WebView2) doit arriver au journal par la commande
-# action.
+﻿# Essai du kit d'écrans dans la fenêtre Tauri de Mindcare (étape 5.1, avec les vraies pages depuis l'étape 5.3), avec la
+# CONSTRUCTION D'ESSAI. À lancer SEULEMENT sur un bureau Windows à part (outils\sur-bureau.ps1). Captures : accueil
+# (3D), puis une page ; un clic simulé (messages de souris et de clavier envoyés à la fenêtre de WebView2) doit
+# arriver au journal par la commande action.
 param(
     [Parameter(Mandatory = $true)][string]$Exe,
     [Parameter(Mandatory = $true)][string]$Resultats
@@ -71,6 +71,8 @@ $local = Join-Path $racine 'Local'
 New-Item -ItemType Directory -Force -Path $programmes, $donnees, (Join-Path $local 'Mindset') | Out-Null
 $exeEssai = Join-Path $programmes 'Mindset.exe'
 Copy-Item -LiteralPath $Exe -Destination $exeEssai
+# (le catalogue des enquêtes, à côté du programme comme dans le dossier construit)
+Copy-Item -LiteralPath (Join-Path (Split-Path $PSScriptRoot -Parent) 'Mindcare\fichiers\enquetes.json') -Destination (Join-Path $programmes 'enquetes.json')
 New-Item -ItemType Directory -Force -Path $Resultats | Out-Null
 $nomEssai = "kit-$PID"
 $j = [ordered]@{ theme = 'neon'; micro = ''; casque = ''; applis = [ordered]@{ mindcare = $programmes }; modifie = (Get-Date -Format s) }
@@ -125,23 +127,29 @@ try {
         Verifier (Attendre { (Compter 'Écran : montre raconte') -gt $avant } 5000) 'clic sur la tuile du milieu : page « raconte » (message « ecran » au journal)'
         Start-Sleep -Milliseconds 1500
         Capturer 'kit-page-raconte.png'
-        # 2. Échap : retour à l'accueil ; flèche droite, Entrée : la tuile « Ça concerne quoi ? » (sans page) envoie son action
+        # 2. Échap : retour à l'accueil ; flèche droite, Entrée : la tuile « Ça concerne quoi ? » ouvre la page des familles
+        #    (étape 5.3 : les vraies pages, elle a sa page)
+        $accueils = Compter 'Écran : montre accueil'
         [EssaiKit]::Touche($cible, 0x1B)
-        Verifier (Attendre { (Compter 'Écran : montre accueil') -ge 1 } 5000) 'Échap : retour à l''accueil (journal)'
+        Verifier (Attendre { (Compter 'Écran : montre accueil') -gt $accueils } 5000) 'Échap : retour à l''accueil (journal)'
         Start-Sleep -Milliseconds 1200
         [EssaiKit]::Touche($cible, 0x27)
         Start-Sleep -Milliseconds 700
         [EssaiKit]::Touche($cible, 0x0D)
-        $okAction = Attendre { (Compter 'Écran : action familles') -ge 1 } 5000
+        $okAction = Attendre { (Compter 'Écran : montre familles') -ge 1 } 5000
         if (-not $okAction) {
             # (si le clavier n'arrive pas : un clic sur la tuile choisie)
             [EssaiKit]::Clic($cible, [int]($l / 2), [int]($h / 2))
-            $okAction = Attendre { (Compter 'Écran : action familles') -ge 1 } 5000
+            $okAction = Attendre { (Compter 'Écran : montre familles') -ge 1 } 5000
         }
-        Verifier $okAction 'la tuile « Ça concerne quoi ? » envoie l''action « familles » (journal, commande action)'
+        Verifier $okAction 'la tuile « Ça concerne quoi ? » ouvre les familles (message « ecran » au journal)'
         Start-Sleep -Milliseconds 800
-        Capturer 'kit-accueil-apres.png'
-        # 3. Le rond « Comment ça marche » (page avec une image de ui\images et des questions)
+        Capturer 'kit-familles.png'
+        # 3. Échap : retour à l'accueil, puis Échap sur l'accueil : le message « menu »
+        $accueils = Compter 'Écran : montre accueil'
+        [EssaiKit]::Touche($cible, 0x1B)
+        Verifier (Attendre { (Compter 'Écran : montre accueil') -gt $accueils } 5000) 'Échap : retour à l''accueil (journal)'
+        Start-Sleep -Milliseconds 1200
         [EssaiKit]::Touche($cible, 0x1B)
         Verifier (Attendre { (Compter 'Écran : retour au menu de Mindset demandé') -ge 1 } 5000) 'Échap sur l''accueil : message « menu » (journal)'
     }

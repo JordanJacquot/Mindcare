@@ -95,6 +95,21 @@ impl Page {
         self.envoyer(self.etat());
     }
 
+    /// Un nouvel état, et l'écran où aller tout de suite (`ecran` de kit.js) : l'état est gardé SANS l'écran (une page
+    /// rechargée, ou un nouvel habillage, ne ramène pas sur cet écran), et envoyé avec lui.
+    pub fn changer_et_aller(&self, etat: Value, ecran: Option<&str>) {
+        let mut etat = etat;
+        if let Value::Object(m) = &mut etat {
+            m.remove("ecran");
+        }
+        *tenir(&self.etat) = etat;
+        let mut envoi = self.etat();
+        if let (Some(e), Value::Object(m)) = (ecran, &mut envoi) {
+            m.insert("ecran".into(), Value::String(e.to_string()));
+        }
+        self.envoyer(envoi);
+    }
+
     /// Le thème pour l'écran (thème de la suite, couleurs et images d'un pack), ajouté à chaque état envoyé, comme
     /// `Send-Vue` ; l'état est renvoyé tout de suite.
     pub fn habiller(&self, habillage: Habillage) {

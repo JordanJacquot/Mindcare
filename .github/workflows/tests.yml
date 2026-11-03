@@ -118,7 +118,7 @@ jobs:
           & ..\_mindset\outils\verifier-tauri.ps1 -Projet mindcare-appli
           exit $LASTEXITCODE
 
-      - name: "Construction de publication et dossier de Mindcare en Rust (outils\\construire-rust.ps1 : Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt)"
+      - name: "Construction de publication et dossier de Mindcare en Rust (outils\\construire-rust.ps1 : Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt, enquetes.json)"
         run: |
           & ..\outils\construire-rust.ps1 -Sortie (Join-Path $env:RUNNER_TEMP 'mindcare-rust')
           if (-not $?) { exit 1 }
@@ -160,6 +160,10 @@ jobs:
           if ($j.version -cne $version) { $problemes += "version.json : version $($j.version) au lieu de $version" }
           if ($j.mindset_min -cne '2.15.0') { $problemes += "version.json : mindset_min $($j.mindset_min) au lieu de 2.15.0" }
           if (-not (Test-Path -LiteralPath (Join-Path $d 'LISEZMOI.txt') -PathType Leaf)) { $problemes += 'LISEZMOI.txt manque' }
+          # Le catalogue des enquêtes : le même que celui de Mindcare, lisible
+          $cat = Join-Path $d 'enquetes.json'
+          if (-not (Test-Path -LiteralPath $cat -PathType Leaf)) { $problemes += 'enquetes.json manque' }
+          elseif ((Get-FileHash -LiteralPath $cat).Hash -ne (Get-FileHash -LiteralPath '..\Mindcare\fichiers\enquetes.json').Hash) { $problemes += 'enquetes.json différent de Mindcare\fichiers\enquetes.json' }
           if ($problemes.Count) { $problemes | ForEach-Object { Write-Host $_ }; exit 1 }
           Write-Host 'Dossier de Mindcare en Rust conforme.'
 

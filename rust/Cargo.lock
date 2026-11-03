@@ -1711,6 +1711,7 @@ dependencies = [
  "mindcare-donnees",
  "mindcare-moteur",
  "mindcare-vie",
+ "mindcare-windows",
  "serde_json",
  "suite-commun",
  "tauri",

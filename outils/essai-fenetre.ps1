@@ -76,6 +76,8 @@ $local = Join-Path $racine 'Local'
 New-Item -ItemType Directory -Force -Path $programmes, $donnees, (Join-Path $local 'Mindset') | Out-Null
 $exeEssai = Join-Path $programmes 'Mindset.exe'
 Copy-Item -LiteralPath $Exe -Destination $exeEssai
+# (le catalogue des enquêtes, à côté du programme comme dans le dossier construit)
+Copy-Item -LiteralPath (Join-Path (Split-Path $PSScriptRoot -Parent) 'Mindcare\fichiers\enquetes.json') -Destination (Join-Path $programmes 'enquetes.json')
 New-Item -ItemType Directory -Force -Path $Resultats | Out-Null
 $nomEssai = "fenetre-$PID"
 $suite = Join-Path $local 'Mindset\suite.json'

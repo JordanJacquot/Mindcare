@@ -31,6 +31,12 @@ mod reponse;
 #[cfg(test)]
 mod tests;
 
+/// Les ids des actions des pages, et ceux de l'accueil (reprendre l'enquête en cours, revoir la dernière).
+pub use accueil::{DERNIERE, REPRENDRE};
+pub use actions::{PLUS_TARD_MESSAGE, ids};
+/// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
+pub use raconte::PANNE;
+
 use serde_json::{Map, Value, json};
 
 use mindcare_donnees::{Avance, EnqueteEnCours, IndicesGardes};

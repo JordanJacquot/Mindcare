@@ -11,6 +11,8 @@
 //! - [`webview2`] : les réglages de WebView2 que Tauri ne transmet pas, et la veille de la page (`SetIsVisible`) ;
 //! - [`identite`] : `SetCurrentProcessExplicitAppUserModelID("JordanJacquot.Mindcare")` (la barre des tâches) ;
 //! - [`heure`] : l'heure locale du journal (`GetLocalTime`) ;
+//! - [`presse_papiers`] : le presse-papiers (`OpenClipboard`, `SetClipboardData`) et le Bureau
+//!   (`SHGetKnownFolderPath`), pour le rapport (exe livré seulement : jamais dans la construction d'essai) ;
 //! - [`message`] : la boîte « Mindcare s'utilise avec Mindset » (`MessageBoxW`) ;
 //! - `capture` (construction d'essai seulement) : l'image de la fenêtre (`PrintWindow`).
 //!
@@ -25,6 +27,8 @@ pub mod fenetre;
 pub mod heure;
 pub mod identite;
 pub mod message;
+#[cfg(not(feature = "essai"))]
+pub mod presse_papiers;
 pub mod registre;
 pub mod synchro;
 pub mod systeme;

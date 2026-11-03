@@ -7,9 +7,13 @@
 //! 3. Tauri : la page et ses deux commandes, le protocole `pack` (les images du thème), la fenêtre « principale »
 //!    créée une seule fois, cachée et sans prendre la main (même lancée sans `-Demarrage` : elle se montre ensuite),
 //!    titre exact « Mindcare », jamais recréée. Les réglages de WebView2 que Tauri ne transmet pas sont coupés.
+//!    Les pages (étape 5.3, src\effets.rs) : le catalogue des enquêtes (enquetes.json, à côté du programme, comme
+//!    Mindcare.ps1), l'état des pages envoyé au kit, chaque message du kit appliqué aux pages et leurs effets exécutés
+//!    (enquête gardée, rapport sur le Bureau, presse-papiers, retour au menu), et ce que Windows a noté, lu dès le
+//!    démarrage sur un fil à part.
 //! 4. Les surveillances : un pas de 100 ms sur le fil de la fenêtre, qui fait avancer la vie de l'appli (ses tours de
 //!    500 ms : accrochage et taille minimale, signal d'affichage, veille de la page, quitter.demande, suite.json,
-//!    etat.json). La croix et `WM_CLOSE` (le bouton « Fermer » de Mindset) quittent.
+//!    etat.json, avec la vraie situation des enquêtes), et la lecture de Windows attendue par une enquête. La croix et `WM_CLOSE` (le bouton « Fermer » de Mindset) quittent.
 //! 5. La fin : la relance si le thème a changé (comme aujourd'hui), puis `std::process::exit` (aucun fil ne garde
 //!    le processus en vie sans fenêtre, contrat-appli partie 3).
 //!
@@ -19,6 +23,7 @@
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use mindcare_donnees::{Donnees, Journal};
@@ -30,7 +35,7 @@ use serde_json::{Value, json};
 use suite_commun::themes;
 use tauri::{App, AppHandle, Manager, Window, WindowEvent};
 
-use crate::commandes::etat_page;
+use crate::effets::{ATTENTE_WINDOWS_MAX, Branchement, Exterieur, LectureWindows, Monde as MondePages};
 use crate::fenetre::{LABEL, TAILLE_MIN, creer_principale};
 use crate::windows::fenetre::FenetreTauri;
 use crate::windows::systeme::SystemeWindows;
@@ -51,6 +56,14 @@ struct Etat {
     /// La fin décidée (quitter ou relancer), une seule fois
     fin: Option<Fin>,
     journal: Journal,
+    /// Les données (aussi écrites par la vie de l'appli : etat.json)
+    donnees: Rc<RefCell<Option<Donnees>>>,
+    /// Les pages, le catalogue, la lecture de Windows
+    pages: Branchement,
+    /// Le dossier de Mindset (retour à sa console)
+    dossier_mindset: PathBuf,
+    /// Tauri, une fois la fenêtre créée (la page partagée)
+    app: Option<AppHandle>,
     /// Le dossier de données (construction d'essai : la demande de capture)
     #[cfg(feature = "essai")]
     dossier: PathBuf,
@@ -102,6 +115,45 @@ fn donnees_suite(l: &Lancement) -> PathBuf {
     }
 }
 
+/// Le catalogue des enquêtes : enquetes.json à côté du programme (`$EnquetesFichier`, enquete.ps1:10).
+fn charger_catalogue() -> Result<Arc<mindcare_moteur::Catalogue>, String> {
+    let dossier = dossier_programme().ok_or("dossier du programme introuvable")?;
+    crate::effets::charger_catalogue(&Path::new(&dossier).join("enquetes.json"))
+}
+
+/// Le vrai Bureau et le vrai presse-papiers (l'exe livré seulement).
+#[cfg(not(feature = "essai"))]
+struct ExterieurWindows;
+
+#[cfg(not(feature = "essai"))]
+impl Exterieur for ExterieurWindows {
+    fn bureau(&self) -> Result<PathBuf, String> {
+        crate::windows::presse_papiers::bureau()
+    }
+    fn copier(&mut self, texte: &str) -> Result<(), String> {
+        crate::windows::presse_papiers::copier(texte)
+    }
+}
+
+/// Construction d'essai : un faux Bureau (`<local d'essai>\Bureau`) et un faux presse-papiers
+/// (`<local d'essai>\presse-papiers.txt`), jamais ceux de la personne.
+#[cfg(feature = "essai")]
+struct ExterieurEssai {
+    local: PathBuf,
+}
+
+#[cfg(feature = "essai")]
+impl Exterieur for ExterieurEssai {
+    fn bureau(&self) -> Result<PathBuf, String> {
+        let b = self.local.join("Bureau");
+        std::fs::create_dir_all(&b).map_err(|e| e.to_string())?;
+        Ok(b)
+    }
+    fn copier(&mut self, texte: &str) -> Result<(), String> {
+        std::fs::write(self.local.join("presse-papiers.txt"), texte).map_err(|e| e.to_string())
+    }
+}
+
 /// Un texte venu de la page, coupé pour le journal.
 fn court(t: &str) -> String {
     t.chars().take(120).collect()
@@ -139,24 +191,30 @@ pub fn lancer() -> ! {
     let _ = identite::poser();
     let demarrage = demarrage_demande(std::env::args_os().skip(1));
     #[cfg(feature = "essai")]
-    let (env, noms) = match crate::essai::lire() {
-        Ok(e) => (environnement_essai(&e), e.noms()),
+    let (env, noms, essai) = match crate::essai::lire() {
+        Ok(e) => (environnement_essai(&e), e.noms(), e),
         // (sans son dossier d'essai, la construction d'essai ne fait rien du tout)
         Err(_) => std::process::exit(4),
     };
     #[cfg(not(feature = "essai"))]
     let (env, noms) = (environnement(), mindcare_vie::Noms::mindcare());
 
-    // Le disque de la vie de l'appli : etat.json passe par les données, ouvertes une fois le dossier connu
+    // Le catalogue des enquêtes (illisible : la page du problème, et la carte de Mindset sans lui)
+    let catalogue = charger_catalogue();
+    let cat_etat = catalogue.as_ref().ok().cloned();
+
+    // Le disque de la vie de l'appli : etat.json passe par les données, ouvertes une fois le dossier connu, avec le
+    // catalogue (la carte de Mindcare dans Mindset : enquête en cours, dernière enquête)
     let horloge = heure::horloge();
     let donnees: Rc<RefCell<Option<Donnees>>> = Rc::new(RefCell::new(None));
     let pour_etat = Rc::clone(&donnees);
     let mut disque = DisqueReel::nouveau(
         horloge.clone(),
         Box::new(move || {
-            if let Some(d) = pour_etat.borrow_mut().as_mut() {
-                // (le catalogue des enquêtes arrive à l'étape 5 : en attendant, la carte de départ)
-                d.ecrire_etat(None);
+            if let Ok(mut d) = pour_etat.try_borrow_mut()
+                && let Some(d) = d.as_mut()
+            {
+                d.ecrire_etat(cat_etat.as_deref());
             }
         }),
     );
@@ -171,8 +229,10 @@ pub fn lancer() -> ! {
     };
 
     // Les données et le thème (themes.ps1:104 : celui de la suite pour une copie gérée, sinon le réglage)
-    let d = Donnees::ouvrir(&l.dossier_donnees, horloge, l.gere);
+    let mut d = Donnees::ouvrir(&l.dossier_donnees, horloge, l.gere);
     let journal = d.journal().clone();
+    // (Read-Historique : les enquêtes gardées, pour l'accueil et la carte de Mindset)
+    d.lire_historique();
     let reglage = match d.reglages.lire("Theme", json!("neon")) {
         Value::String(t) => t,
         _ => "neon".to_string(),
@@ -187,28 +247,41 @@ pub fn lancer() -> ! {
     for r in &theme.raisons {
         journal.ecrire(&format!("Thème : {r}"));
     }
+    // Les pages : ce que Windows a noté est lu dès maintenant, sur un fil à part (Start-LectureJournaux)
+    #[cfg(not(feature = "essai"))]
+    let (source, exterieur): (_, Box<dyn Exterieur>) =
+        (mindcare_windows::windows::WindowsReel::default(), Box::new(ExterieurWindows));
+    #[cfg(feature = "essai")]
+    let (source, exterieur): (_, Box<dyn Exterieur>) = {
+        let local = PathBuf::from(&essai.local);
+        let temp = local.join("Temp");
+        let _ = std::fs::create_dir_all(&temp);
+        (mindcare_windows::windows::WindowsReel { dossier_temp: temp }, Box::new(ExterieurEssai { local }))
+    };
+    let mut lecture = LectureWindows::nouvelle(
+        Arc::new(source),
+        Arc::new(mindcare_windows::windows::HorlogeWindows),
+        ATTENTE_WINDOWS_MAX,
+    );
+    lecture.lancer();
+    let pages = Branchement::nouveau(VERSION, theme.theme_ecran(), catalogue, &d, lecture, exterieur);
     *donnees.borrow_mut() = Some(d);
 
     let pour_page = journal.clone();
-    let page = Page::new(etat_page(VERSION, l.gere, &[]), move |t| pour_page.ecrire(t));
+    let page = Page::new(pages.etat_kit(), move |t| pour_page.ecrire(t));
     // (les couleurs du thème et d'un pack viennent de l'habillage, comme Get-PackVue de vue.ps1)
     page.habiller(crate::pont::Habillage::depuis(&theme, crate::pont::soir(heure::maintenant().heure)));
-    let dossier_mindset = l.dossier_mindset.clone();
     let pour_receveur = journal.clone();
-    page.recevoir(move |m| match m {
-        crate::pont::MessagePage::Menu => ETAT.with(|e| {
-            let Ok(mut e) = e.try_borrow_mut() else { return };
-            let Some(etat) = e.as_mut() else { return };
-            let ligne = if etat.vie.dans_mindset() {
-                crate::pont::demander_menu(&dossier_mindset, &mut etat.systeme, &mut etat.disque)
-            } else {
-                // (hors de Mindset : rien à ramener, la demande est seulement notée)
-                crate::pont::ligne_journal(&crate::pont::MessagePage::Menu)
+    page.recevoir(move |m| {
+        ETAT.with(|e| {
+            let Ok(mut e) = e.try_borrow_mut() else {
+                pour_receveur.ecrire(&format!("Écran : message laissé, appli occupée ({})", ligne_courte(&m)));
+                return;
             };
-            etat.journal.ecrire(&ligne);
-        }),
-        // (étape 5.3 : vers les pages)
-        autre => pour_receveur.ecrire(&crate::pont::ligne_journal(&autre)),
+            if let Some(etat) = e.as_mut() {
+                etat.recevoir(&m);
+            }
+        })
     });
     let dossier_pack = theme.pack.as_ref().map(|p| p.dossier.clone());
     let taille_min = Taille { largeur: TAILLE_MIN.0, hauteur: TAILLE_MIN.1 };
@@ -221,6 +294,10 @@ pub fn lancer() -> ! {
             debut: Instant::now(),
             fin: None,
             journal: journal.clone(),
+            donnees: Rc::clone(&donnees),
+            pages,
+            dossier_mindset: l.dossier_mindset.clone(),
+            app: None,
             #[cfg(feature = "essai")]
             dossier: l.dossier_donnees.clone(),
         })
@@ -294,6 +371,7 @@ fn ouvrir_fenetre(app: &App, suite: &Path, donnees: &Path, montree: bool, journa
         let mut e = e.borrow_mut();
         let Some(etat) = e.as_mut() else { return };
         etat.fenetre = Some(fenetre);
+        etat.app = Some(app.handle().clone());
         etat.debut = Instant::now();
         let Etat { vie, systeme, disque, fenetre, .. } = etat;
         if let Some(fenetre) = fenetre.as_mut() {
@@ -331,6 +409,9 @@ fn tour(app: &AppHandle) {
         let Etat { vie, systeme, disque, fenetre, .. } = &mut *etat;
         let fenetre = fenetre.as_mut()?;
         let fin = vie.avancer(maintenant, &mut Monde { systeme, disque, fenetre });
+        if fin.is_none() {
+            etat.tour_pages();
+        }
         #[cfg(feature = "essai")]
         capture_demandee(etat);
         etat.fin = fin;
@@ -338,6 +419,42 @@ fn tour(app: &AppHandle) {
     });
     if fin.is_some() {
         app.exit(0);
+    }
+}
+
+/// Un message de la page, en court pour le journal.
+fn ligne_courte(m: &crate::pont::MessagePage) -> String {
+    court(&crate::pont::ligne_journal(m))
+}
+
+impl Etat {
+    /// Ce dont les pages ont besoin pour un message ou un tour : la page partagée de Tauri, les données, et le retour
+    /// à la console de Mindset (seulement dans Mindset ; sinon la demande est seulement notée).
+    fn avec_pages(&mut self, f: impl FnOnce(&mut Branchement, &mut MondePages)) {
+        let Some(app) = self.app.clone() else { return };
+        let page = app.state::<Page>();
+        let donnees = Rc::clone(&self.donnees);
+        let Ok(mut d) = donnees.try_borrow_mut() else { return };
+        let Some(d) = d.as_mut() else { return };
+        let Etat { vie, systeme, disque, pages, dossier_mindset, .. } = self;
+        let mut menu = || {
+            if vie.dans_mindset() {
+                crate::pont::demander_menu(dossier_mindset, systeme, disque)
+            } else {
+                crate::pont::ligne_journal(&crate::pont::MessagePage::Menu)
+            }
+        };
+        f(pages, &mut MondePages { page: page.inner(), donnees: d, menu: &mut menu });
+    }
+
+    /// Un message du kit, donné aux pages.
+    fn recevoir(&mut self, m: &crate::pont::MessagePage) {
+        self.avec_pages(|pages, monde| pages.recevoir(m, monde));
+    }
+
+    /// Le pas de la minuterie pour les pages (la lecture de Windows attendue).
+    fn tour_pages(&mut self) {
+        self.avec_pages(|pages, monde| pages.tour(Instant::now(), monde));
     }
 }
 

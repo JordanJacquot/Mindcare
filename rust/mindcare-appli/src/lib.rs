@@ -5,6 +5,8 @@
 //!   (docs\regles-tauri.md du dépôt Mindset, règle 7), navigation fermée, aucune nouvelle fenêtre ;
 //! - [`commandes`] : les deux seules commandes que la page peut appeler (`suivre_page`, `noter_visibilite`),
 //!   déclarées dans build.rs et autorisées à la seule fenêtre « principale » (capabilities\principale.json) ;
+//! - [`pages`] et [`effets`] : les pages de Mindcare pour le kit d'écrans, et leurs effets exécutés (enquête gardée,
+//!   rapport, presse-papiers, lecture de Windows) ;
 //! - [`pack`] : la réponse du protocole `pack` (les images et polices du thème, règle 6), par suite-commun ;
 //! - [`preparer`] et [`contexte`] : ce que le programme et les tests donnent à Tauri ;
 //! - `programme` : le programme Mindset.exe tout branché (étape 4.4 : démarrage, verrou, fenêtre, surveillances) ;
@@ -17,6 +19,7 @@
 #![deny(unsafe_code)]
 
 pub mod commandes;
+pub mod effets;
 #[cfg(feature = "essai")]
 pub mod essai;
 pub mod fenetre;

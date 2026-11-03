@@ -42,6 +42,9 @@ mindcare-vie = { path = "../mindcare-vie" }
 mindcare-donnees = { path = "../mindcare-donnees" }
 # Le moteur des enquêtes et son catalogue : les pages (src\pages) montrent ses étapes et sa réponse finale
 mindcare-moteur = { path = "../mindcare-moteur" }
+# Ce que Windows a noté (les étapes automatiques « ce PC »), les barrettes et le modèle du PC, lus sans droits
+# administrateur sur un fil à part (src\effets.rs)
+mindcare-windows = { path = "../mindcare-windows" }
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
 # webview2-com, et que le Rust de Mindset.
@@ -52,6 +55,10 @@ features = [
     "Win32_Graphics_Gdi",
     "Win32_Security",
     "Win32_Storage_Xps",
+    "Win32_System_Com",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
+    "Win32_System_Ole",
     "Win32_System_Registry",
     "Win32_System_StationsAndDesktops",
     "Win32_System_SystemInformation",

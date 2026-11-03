@@ -12,7 +12,8 @@
 #     version.json      <- { "appli": "mindcare", "version": <version du Cargo.toml de mindcare-appli>,
 #                            "mindset_min": "2.15.0" } (contrat-appli, partie 10 : une seule source pour la version)
 #     LISEZMOI.txt      <- le même que celui de Mindcare (Mindcare\LISEZMOI.txt)
-#   (enquetes.json et les images viennent à l'étape 5)
+#     enquetes.json     <- le catalogue des enquêtes (Mindcare\fichiers\enquetes.json), lu à côté du programme comme
+#                          Mindcare.ps1 le lit (les images des pages sont rangées dans l'exe, ui\images)
 #
 # Construction en release seulement, avec les versions du Cargo.lock (--locked) : un exe de mise au point n'est
 # jamais livré (règle 5 de docs\regles-tauri.md, dépôt Mindset). Le dossier <dossier>\Mindcare est vidé d'abord.
@@ -67,6 +68,7 @@ foreach ($exe in 'Mindset.exe', 'Mindcare.exe') {
 $json = [ordered]@{ appli = 'mindcare'; version = $version; mindset_min = $MindsetMin } | ConvertTo-Json -Compress
 [IO.File]::WriteAllText((Join-Path $dossier 'version.json'), $json, (New-Object Text.UTF8Encoding($false)))
 Copy-Item -LiteralPath (Join-Path $racine 'Mindcare\LISEZMOI.txt') -Destination (Join-Path $dossier 'LISEZMOI.txt')
+Copy-Item -LiteralPath (Join-Path $racine 'Mindcare\fichiers\enquetes.json') -Destination (Join-Path $dossier 'enquetes.json')
 
 "OK : $dossier (Mindcare $version)"
 Get-ChildItem -LiteralPath $dossier | ForEach-Object { "  $($_.Name) ($($_.Length) octets)" }
