@@ -6,6 +6,8 @@
 //!   relié à lui par le Job Object), note son numéro dans `pid.txt` (à côté de lui), puis s'arrête aussitôt ; le
 //!   programme lancé doit s'arrêter avec lui ;
 //! - « code N <phrase> » : il écrit la phrase et sort avec le code N ;
+//! - « lent <phrase> » : il attend 2 secondes, puis écrit la phrase (l'essai sur un bureau à part voit « J'écris ce
+//!   que tu as dit... ») ;
 //! - sinon : il écrit la consigne telle quelle dans le fichier -of + « .txt », comme whisper.
 //!
 //! Il n'écrit que dans son dossier et dans le fichier -of, et ne lance que le faux whisper d'un dossier d'essai.
@@ -33,6 +35,13 @@ fn main() {
         std::thread::sleep(std::time::Duration::from_secs(60));
         return;
     }
+    let consigne = match consigne.strip_prefix("lent ") {
+        Some(reste) => {
+            std::thread::sleep(std::time::Duration::from_secs(2));
+            reste.to_string()
+        }
+        None => consigne,
+    };
     let (code, phrase) = match consigne.strip_prefix("code ").and_then(|r| r.split_once(' ')) {
         Some((c, p)) => (c.parse().unwrap_or(1), p.to_string()),
         None => (0, consigne),

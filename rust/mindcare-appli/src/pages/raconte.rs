@@ -1,11 +1,13 @@
-//! « Raconte ton problème » : la recherche par mots du moteur (Find-Pannes), les plus proches d'abord. L'assistant et
-//! la dictée viendront à l'étape 6.
+//! « Raconte ton problème » : la recherche par mots du moteur (Find-Pannes), les plus proches d'abord ; avec
+//! l'assistant et la dictée (étape 6.4, src\pages\aides.rs) : le bouton Parler, les lignes « La dictée » et
+//! « L'assistant », et « Demander à l'assistant » juste sous le champ dès qu'une phrase est écrite.
 
 use serde_json::{Value, json};
 
 use mindcare_moteur::{Catalogue, chercher};
 
 use super::Etat;
+use super::aides;
 use super::outils::t;
 
 /// L'id du champ de recherche.
@@ -16,11 +18,22 @@ pub const PANNE: &str = "panne:";
 pub const MONTREES: usize = 8;
 
 pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
+    let a = &etat.aides;
+    let indice = if a.assistant_installe() {
+        aides::textes::INDICE_ASSISTANT
+    } else {
+        "Par exemple : « bip », « le son grésille », « écran bleu »..."
+    };
     let mut blocs = vec![json!({
-        "type": "champ", "id": RECHERCHE, "recherche": true, "valeur": etat.recherche,
-        "indice": "Par exemple : « bip », « le son grésille », « écran bleu »...",
+        "type": "champ", "id": RECHERCHE, "recherche": true, "valeur": etat.recherche, "indice": indice,
     })];
     let texte = etat.recherche.trim();
+    // (juste sous le champ, pas sous les 8 pannes : un bouton qu'il faut faire défiler pour voir est souvent manqué)
+    if !texte.is_empty() {
+        blocs.extend(aides::bouton_demander(etat));
+    }
+    blocs.extend(aides::ligne_dictee(a));
+    blocs.extend(aides::ligne_assistant(a));
     if texte.is_empty() {
         blocs.push(json!({ "type": "note",
             "texte": "Écris ce qui se passe avec tes mots : les pannes qui ressemblent s'affichent juste en dessous." }));
@@ -50,10 +63,19 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
             }
         }
     }
-    json!({
+    let sous = if a.branchees() {
+        "Avec tes mots ou avec ta voix : Mindcare trouve la bonne enquête."
+    } else {
+        "Avec tes mots : Mindcare trouve la bonne enquête."
+    };
+    let mut page = json!({
         "titre": "Raconte ton problème",
-        "sous": "Avec tes mots : Mindcare trouve la bonne enquête.",
+        "sous": sous,
         "icone": "loupe", "couleur": "P",
         "blocs": blocs,
-    })
+    });
+    if let Some(actions) = aides::actions(a) {
+        page["actions"] = actions;
+    }
+    page
 }

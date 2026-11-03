@@ -18,6 +18,9 @@ use mindcare_moteur::ps::{champ, champ_v, egal, parcours, tableau, texte, vrai};
 use mindcare_moteur::{Catalogue, Enquete, INDICES_CONNUS, Indices, Objet, TypeVerdict, chercher, enquete};
 
 use super::actions::{PLUS_TARD_MESSAGE, ids};
+
+/// Les pages de l'assistant et de la dictée (étape 6.4).
+mod aides;
 use super::outils::{gestes_materiel, suspects_montres, t, textes};
 use super::{Effet, Etat, Vue, ecrans, etat_sans_catalogue};
 
@@ -103,6 +106,8 @@ struct Banc {
     menu: bool,
     inconnues: Vec<String>,
     erreurs_kit: Vec<String>,
+    /// Les effets de l'assistant et de la dictée demandés (exécutés par effets.rs, testés dans effets\aides.rs)
+    aides: Vec<Effet>,
 }
 
 impl Banc {
@@ -128,6 +133,7 @@ impl Banc {
             menu: false,
             inconnues: Vec::new(),
             erreurs_kit: Vec::new(),
+            aides: Vec::new(),
         }
     }
 
@@ -192,6 +198,14 @@ impl Banc {
                 Effet::CopierCommande { numero, .. } => file.extend(self.etat.commande_copiee(numero, Ok(()))),
                 Effet::MenuMindset => self.menu = true,
                 Effet::Inconnue(x) => self.inconnues.push(x),
+                Effet::DemarrerAssistant
+                | Effet::Demander { .. }
+                | Effet::OublierQuestion
+                | Effet::InstallerAssistant
+                | Effet::InstallerDictee
+                | Effet::Parler
+                | Effet::AnnulerDictee
+                | Effet::EffacerMessageDictee => self.aides.push(e),
             }
         }
     }
@@ -416,6 +430,11 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
             if !texte_plein(&a["id"]) || !texte_plein(&a["texte"]) {
                 ep(format!("action sans id ou texte : {a}"));
             }
+            if let Some(i) = a.get("icone").and_then(Value::as_str)
+                && !ICONES.contains(&i)
+            {
+                ep(format!("action : icône inconnue {i}"));
+            }
         }
         if let Some(m) = p.get("module") {
             if !texte_plein(&m["titre"]) {
@@ -466,6 +485,7 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
                         || b.get("ton").and_then(Value::as_str).is_some_and(|t| !TONS.contains(&t))
                         || b.get("icone").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i))
                         || b.get("couleur").and_then(Value::as_str).is_some_and(|c| !COULEURS.contains(&c))
+                        || b.get("barre").is_some_and(|x| !x.as_f64().is_some_and(|v| (0.0..=100.0).contains(&v)))
                 }
                 "case" => manque(&["id", "texte"]) || !b["oui"].is_boolean(),
                 "bouton" => {
@@ -1437,8 +1457,16 @@ fn code_propre() {
         concat!("do", "fus"),
     ];
     let mut vus = 0;
-    for f in std::fs::read_dir(&dossier).unwrap() {
-        let f = f.unwrap().path();
+    // (les fichiers des pages, et ceux de leurs sous-dossiers : tests\aides.rs)
+    let mut fichiers = Vec::new();
+    let mut dossiers = vec![dossier];
+    while let Some(d) = dossiers.pop() {
+        for f in std::fs::read_dir(&d).unwrap() {
+            let f = f.unwrap().path();
+            if f.is_dir() { dossiers.push(f) } else { fichiers.push(f) }
+        }
+    }
+    for f in fichiers {
         let texte = std::fs::read_to_string(&f).unwrap();
         vus += 1;
         assert!(!texte.contains('\u{2013}') && !texte.contains('\u{2014}'), "{} : tiret long", f.display());

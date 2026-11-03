@@ -45,6 +45,11 @@ mindcare-moteur = { path = "../mindcare-moteur" }
 # Ce que Windows a noté (les étapes automatiques « ce PC »), les barrettes et le modèle du PC, lus sans droits
 # administrateur sur un fil à part (src\effets.rs)
 mindcare-windows = { path = "../mindcare-windows" }
+# L'assistant et la dictée (étape 6) : leurs téléchargements, llama-server, whisper et le micro, sans écran ; les pages
+# montrent leurs lignes dans « Raconte ton problème » et la page « Pour être sûr » (src\pages\aides.rs)
+mindcare-telechargement = { path = "../mindcare-telechargement" }
+mindcare-assistant = { path = "../mindcare-assistant" }
+mindcare-dictee = { path = "../mindcare-dictee" }
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
 # webview2-com, et que le Rust de Mindset.
@@ -80,6 +85,11 @@ tauri-build = { version = "=2.7.4", default-features = false }
 # Les tests des permissions : la même dépendance, plus l'option « test » de Tauri (son faux Windows : aucune vraie
 # fenêtre, aucune page chargée). Les options de développement n'entrent que dans les tests, jamais dans l'exe.
 tauri = { version = "=2.12.5", default-features = false, features = ["wry", "compression", "common-controls-v6", "custom-protocol", "test"] }
+# Les juges de l'assistant et de la dictée côté écrans (tests\aides.rs) reprennent les faux des tests des crates
+# (le faux serveur de téléchargement, ses zips faits à la main, ses empreintes) : les mêmes versions qu'elles, déjà dans
+# Cargo.lock, rien de nouveau.
+sha2 = "=0.10.9"
+flate2 = { version = "=1.1.10", default-features = false, features = ["rust_backend"] }
 
 # Pas `workspace = true` : le module Windows (src\windows) a besoin d'autoriser le code « unsafe », que le reste du
 # dépôt interdit tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src\windows qui l'autorise, comme

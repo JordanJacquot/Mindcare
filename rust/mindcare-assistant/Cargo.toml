@@ -30,6 +30,14 @@ features = [
     "Win32_System_Threading",
 ]
 
+# Le faux llama-server de la construction d'essai de Mindcare (outils\essai-aides.ps1, servi par le faux serveur de
+# l'essai sur ce PC). Jamais livré : seul l'essai s'en sert, comme le faux whisper de mindcare-dictee.
+[[bin]]
+name = "faux-llama-server"
+path = "src/bin/faux_llama_server.rs"
+test = false
+doc = false
+
 # Les essais avec de vrais programmes (le programme de test lui-même joue le faux llama-server et la fausse
 # Mindcare) : il a sa propre fonction main, pour lire les arguments de llama-server avant le lanceur de tests.
 [[test]]

@@ -10,6 +10,12 @@
 //! - [`Exterieur`] : le Bureau et le presse-papiers. Le programme livré donne les vrais (src\windows) ; la
 //!   construction d'essai et les tests en donnent des faux, dans leur dossier d'essai (jamais ceux de la personne).
 //!
+//! - [`Outils`] (étape 6.4) : l'assistant (llama-server), la dictée (le micro et whisper) et leurs deux installations.
+//!   Rien ne se fige : la phrase est posée sur un fil à part, la dictée vit sur le sien, les téléchargements aussi ; le
+//!   programme regarde où ils en sont à chaque pas de sa minuterie, et en fait une photo pour les pages
+//!   ([`pages::Aides`]). Le programme livré donne les vrais ; la construction d'essai, de faux micros et des fichiers
+//!   pris sur un faux serveur sur ce PC ; les tests, des faux sans aucun programme lancé.
+//!
 //! Rien ici ne dépend de Tauri : la page est vue par [`VersLaPage`] (la vraie [`crate::Page`], ou un faux dans les
 //! tests).
 
@@ -18,14 +24,109 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mindcare_assistant::{Assistant, Question, Tache, decider};
+use mindcare_dictee::{Appui, DicteeEnFond, Etat as EtatDictee};
 use mindcare_donnees::rapport::enregistrer_rapport;
 use mindcare_donnees::{Donnees, IndiceGarde, IndicesGardes, LecturePc, SurLePc, infos_pc};
 use mindcare_moteur::Catalogue;
+use mindcare_telechargement::{Disque, Etat as EtatInstallation, Fin, Installation, Transport};
 use mindcare_windows::{Horloge, IndicesWindows, LectureJournaux, SourceWindows, a_relire, barrettes};
 use serde_json::{Value, json};
 
 use crate::pages::{self, Effet};
 use crate::pont::{self, MessagePage};
+
+/// La photo des aides est reprise tous les 5 pas de la minuterie (500 ms, comme `Start-SuiviIa`) ; la dictée et la
+/// phrase posée sont suivies à chaque pas pendant qu'elles travaillent.
+const PAS_PHOTO: u32 = 5;
+
+/// L'assistant, la dictée et leurs installations, tels que l'appli les garde pendant qu'elle tourne.
+pub struct Outils {
+    pub assistant: Assistant,
+    pub installation_assistant: Installation,
+    pub dictee: DicteeEnFond,
+    pub installation_dictee: Installation,
+    /// Le réseau des téléchargements (WinHTTP ; une erreur : aucune installation possible, dite au journal)
+    pub transport: Result<Arc<dyn Transport>, String>,
+    pub disque: Arc<dyn Disque>,
+    /// La phrase posée et sa réponse attendue
+    question: Option<(String, Tache)>,
+    pas: u32,
+    /// « Assistant : une nouvelle version est proposée » est déjà au journal
+    maj_notee: bool,
+}
+
+impl Outils {
+    pub fn nouveaux(
+        assistant: Assistant,
+        installation_assistant: Installation,
+        dictee: DicteeEnFond,
+        installation_dictee: Installation,
+        transport: Result<Arc<dyn Transport>, String>,
+        disque: Arc<dyn Disque>,
+    ) -> Outils {
+        Outils {
+            assistant,
+            installation_assistant,
+            dictee,
+            installation_dictee,
+            transport,
+            disque,
+            question: None,
+            pas: 0,
+            maj_notee: false,
+        }
+    }
+
+    /// Une phrase est posée et sa réponse pas encore lue.
+    pub fn question_en_cours(&self) -> bool {
+        self.question.is_some()
+    }
+
+    /// La photo pour les pages : les installations, l'assistant, la dictée (le niveau du son mis à 0 : la page n'est
+    /// pas redessinée à chaque son). Une mise à jour proposée est notée au journal, une fois (`Update-BandeauIa`).
+    fn photo(&mut self, a: &mut pages::Aides, journal: Option<&mindcare_donnees::Journal>) {
+        a.installation_assistant = Some(self.installation_assistant.etat());
+        a.assistant = Some(self.assistant.etat());
+        a.installation_dictee = Some(self.installation_dictee.etat());
+        a.dictee = Some(match self.dictee.etat() {
+            EtatDictee::Ecoute { .. } => EtatDictee::Ecoute { niveau: 0.0 },
+            e => e,
+        });
+        if matches!(a.installation_assistant, Some(EtatInstallation::AMettreAJour { .. }))
+            && !self.maj_notee
+            && let Some(j) = journal
+        {
+            self.maj_notee = true;
+            j.ecrire("Assistant : une nouvelle version est proposée");
+        }
+    }
+
+    /// Lance une installation (`Start-IaInstall`, `Start-DicteeInstall`) : rien si elle tourne déjà. Rend la ligne du
+    /// journal.
+    fn installer(&mut self, assistant: bool) -> Option<String> {
+        let transport = match &self.transport {
+            Ok(t) => Arc::clone(t),
+            Err(e) => return Some(format!("Installation impossible : {e}")),
+        };
+        let (inst, nom) = if assistant {
+            (&mut self.installation_assistant, "Installation de l'assistant")
+        } else {
+            (&mut self.installation_dictee, "Installation de la dictée")
+        };
+        inst.lancer(transport, self.disque.as_ref()).map(|mo| format!("{nom} ({mo} Mo)"))
+    }
+
+    /// Mindcare se ferme (`Stop-Ia`, `Stop-Dictees`) : llama-server arrêté, la dictée arrêtée sans suite (whisper
+    /// arrêté, le son effacé), les téléchargements arrêtés (ce qui est commencé reste pour la reprise).
+    pub fn arreter(&mut self) {
+        self.question = None;
+        self.dictee.annuler();
+        self.assistant.arreter_serveur();
+        self.installation_assistant.annuler();
+        self.installation_dictee.annuler();
+    }
+}
 
 /// `$AttenteJournauxMax` (contenu.ps1) : une enquête n'attend pas Windows plus longtemps.
 pub const ATTENTE_WINDOWS_MAX: Duration = Duration::from_secs(30);
@@ -244,6 +345,9 @@ pub struct Branchement {
     pub cat: Option<Arc<Catalogue>>,
     pub windows: LectureWindows,
     pub exterieur: Box<dyn Exterieur>,
+    /// L'assistant et la dictée ([`Branchement::brancher`]) ; sans eux, « Raconte ton problème » est celle de
+    /// l'étape 5
+    pub outils: Option<Outils>,
     hasard: u64,
 }
 
@@ -298,7 +402,25 @@ impl Branchement {
             cat: cat.ok(),
             windows,
             exterieur,
+            outils: None,
             hasard: graine | 1,
+        }
+    }
+
+    /// L'assistant et la dictée rejoignent les pages (avec un catalogue lisible seulement : sans lui, la page du
+    /// problème n'a rien à en faire). Rien n'est lancé : llama-server attend qu'on écrive, le micro qu'on appuie.
+    pub fn brancher(&mut self, mut outils: Outils) {
+        if self.cat.is_none() {
+            return;
+        }
+        outils.photo(&mut self.pages.aides, None);
+        self.outils = Some(outils);
+    }
+
+    /// Mindcare se ferme : l'assistant, la dictée et les téléchargements s'arrêtent.
+    pub fn arreter(&mut self) {
+        if let Some(o) = self.outils.as_mut() {
+            o.arreter();
         }
     }
 
@@ -355,6 +477,77 @@ impl Branchement {
         {
             self.pages.barrettes = b;
         }
+        let effets = self.tour_aides(monde);
+        if !effets.is_empty() {
+            self.executer(effets, monde);
+        }
+    }
+
+    /// Le pas de la minuterie pour l'assistant et la dictée : le journal de la dictée, la fin d'une installation
+    /// (`Start-SuiviIa`, `Start-SuiviDictee`), la phrase dictée, la réponse de l'assistant (`$script:IaAttente`), puis
+    /// la photo : la page est redessinée seulement si quelque chose a changé.
+    fn tour_aides(&mut self, monde: &mut Monde) -> Vec<Effet> {
+        let journal = monde.donnees.journal().clone();
+        let Some(cat) = self.cat.clone() else { return Vec::new() };
+        let Some(o) = self.outils.as_mut() else { return Vec::new() };
+        o.pas = o.pas.wrapping_add(1);
+        let mut effets = Vec::new();
+        let mut photo = self.pages.aides.dictee_occupee()
+            || o.installation_assistant.en_cours()
+            || o.installation_dictee.en_cours()
+            || o.pas % PAS_PHOTO == 0;
+        for l in o.dictee.prendre_journal() {
+            journal.ecrire(&l);
+            photo = true;
+        }
+        let (fin_assistant, fin_dictee) = (o.installation_assistant.fin(), o.installation_dictee.fin());
+        photo |= fin_assistant.is_some() || fin_dictee.is_some();
+        match fin_assistant {
+            Some(Fin::Installe) => {
+                // (l'ancien llama-server peut encore lire l'ancien modèle : arrêté d'abord, relancé à la prochaine
+                // phrase, puis les anciens modèles effacés)
+                journal.ecrire("Assistant installé");
+                o.assistant.arreter_serveur();
+                for l in o.installation_assistant.paquet.effacer_anciens() {
+                    journal.ecrire(&l);
+                }
+            }
+            Some(Fin::Erreur(e)) => journal.ecrire(&format!("Assistant non installé : {e}")),
+            Some(Fin::Annule) | None => {}
+        }
+        match fin_dictee {
+            Some(Fin::Installe) => {
+                journal.ecrire("Dictée installée");
+                self.pages.aides.message_dictee = Some(pages::textes_aides::DICTEE_PRETE.to_string());
+            }
+            Some(Fin::Erreur(e)) => journal.ecrire(&format!("Dictée non installée : {e}")),
+            Some(Fin::Annule) | None => {}
+        }
+        if let Some(phrase) = o.dictee.prendre_phrase() {
+            effets.extend(self.pages.phrase_dictee(phrase));
+        }
+        let reponse = o.question.as_ref().and_then(|(phrase, t)| t.reponse().map(|r| (phrase.clone(), r)));
+        if let Some((phrase, r)) = reponse {
+            o.question = None;
+            monde.page.ordre(json!({ "kit": "occupe", "texte": "" }));
+            let d = decider(&cat, &phrase, &r, &|l| journal.ecrire(l));
+            let mut graine = self.hasard;
+            effets.extend(self.pages.decision_assistant(&cat, d, &mut || {
+                mindcare_donnees::nouvel_id(&journal.maintenant(), hasard(&mut graine))
+            }));
+            self.hasard = graine;
+        }
+        let Some(o) = self.outils.as_mut() else { return effets };
+        // (la photo touche au disque : tous les 5 pas, ou tout de suite quand quelque chose bouge)
+        if !photo && effets.is_empty() {
+            return effets;
+        }
+        let avant = self.pages.aides.clone();
+        o.photo(&mut self.pages.aides, Some(&journal));
+        if self.pages.aides != avant && !effets.iter().any(|e| matches!(e, Effet::Afficher { .. })) {
+            effets.push(Effet::Afficher { ecran: None });
+        }
+        effets
     }
 
     /// La lecture de Windows attendue est finie (ou abandonnée) : l'enquête qui l'attendait avance. Rien sinon.
@@ -406,6 +599,10 @@ impl Branchement {
                     && self.pages.rapport_a_refaire(cat)
                 {
                     self.pages.rapport = self.rapport(cat, monde.donnees);
+                }
+                // (l'assistant et la dictée tels qu'ils sont à cet instant)
+                if let Some(o) = self.outils.as_mut() {
+                    o.photo(&mut self.pages.aides, Some(&journal));
                 }
                 monde.page.etat(self.etat_kit(), ecran.as_deref());
                 Vec::new()
@@ -463,6 +660,78 @@ impl Branchement {
             }
             Effet::Inconnue(x) => {
                 journal.ecrire(&format!("Écran : inconnu ({})", x.chars().take(120).collect::<String>()));
+                Vec::new()
+            }
+            Effet::DemarrerAssistant => {
+                if let Some(o) = &self.outils {
+                    o.assistant.demarrer();
+                }
+                Vec::new()
+            }
+            Effet::Demander { phrase } => {
+                let (Some(o), Some(cat)) = (self.outils.as_mut(), cat) else {
+                    return self.pages.question_impossible(false);
+                };
+                let permises: Vec<String> = cat
+                    .pannes()
+                    .iter()
+                    .map(|p| mindcare_moteur::ps::texte(mindcare_moteur::ps::champ(p, "Id")))
+                    .collect();
+                match o.assistant.poser(&phrase, &permises) {
+                    Question::SansAssistant => self.pages.question_impossible(false),
+                    Question::NeDemarrePas { .. } => self.pages.question_impossible(true),
+                    Question::EnCours(t) => {
+                        o.question = Some((phrase, t));
+                        monde.page.ordre(json!({ "kit": "occupe", "texte": pages::textes_aides::LIT }));
+                        Vec::new()
+                    }
+                }
+            }
+            Effet::OublierQuestion => {
+                if let Some(o) = self.outils.as_mut()
+                    && o.question.take().is_some()
+                {
+                    monde.page.ordre(json!({ "kit": "occupe", "texte": "" }));
+                }
+                Vec::new()
+            }
+            Effet::InstallerAssistant | Effet::InstallerDictee => {
+                let assistant = e == Effet::InstallerAssistant;
+                if let Some(o) = self.outils.as_mut()
+                    && let Some(l) = o.installer(assistant)
+                {
+                    journal.ecrire(&l);
+                }
+                Vec::new()
+            }
+            Effet::Parler => {
+                let Some(o) = &self.outils else { return Vec::new() };
+                let mut suite = Vec::new();
+                match o.dictee.appui() {
+                    // (`Invoke-BoutonMicro` : l'installation proposée ; la ligne de la dictée a son bouton)
+                    Appui::Installer => {
+                        journal.ecrire("Dictée : installation proposée");
+                        suite
+                            .push(Effet::Message { texte: pages::textes_aides::INSTALLE_D_ABORD.into(), bravo: false });
+                    }
+                    Appui::Ecoute | Appui::Fin | Appui::Occupee | Appui::Erreur(_) => {}
+                }
+                self.pages.aides.message_dictee = None;
+                for l in o.dictee.prendre_journal() {
+                    journal.ecrire(&l);
+                }
+                suite
+            }
+            Effet::AnnulerDictee => {
+                if let Some(o) = &self.outils {
+                    o.dictee.annuler();
+                }
+                Vec::new()
+            }
+            Effet::EffacerMessageDictee => {
+                if let Some(o) = &self.outils {
+                    o.dictee.effacer_message();
+                }
                 Vec::new()
             }
         }

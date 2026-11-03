@@ -1,12 +1,18 @@
 //! Les messages du kit appliqués à l'état : `{ type: 'action', id, valeur, ecran }`, `{ type: 'menu' }`,
 //! `{ type: 'ecran', id }` et `{ type: 'pret' }`. Chaque action rend la liste des effets à exécuter.
 
+use std::cell::RefCell;
+
 use serde_json::Value;
 
+use mindcare_assistant::Decision;
+use mindcare_dictee::Etat as EtatDictee;
+use mindcare_donnees::PreRempli;
 use mindcare_moteur::Catalogue;
 use mindcare_moteur::ps::{champ, champ_v, egal, tableau, texte, vrai};
 
 use super::accueil::{DERNIERE, REPRENDRE};
+use super::aides::{POUR_ETRE_SUR, PourEtreSur, ids as ia, textes as textes_aides};
 use super::familles::FAMILLE;
 use super::raconte::{PANNE, RECHERCHE};
 use super::{Effet, Etat, Vue, ecrans};
@@ -61,7 +67,7 @@ impl Etat {
             "pret" => vec![Effet::rafraichir()],
             "ecran" => {
                 self.ecran = texte(message.get("id"));
-                Vec::new()
+                self.ecran_change()
             }
             "action" => {
                 let id = texte(message.get("id"));
@@ -80,8 +86,27 @@ impl Etat {
         ecran: &str,
         nouvel_id: &mut dyn FnMut() -> String,
     ) -> Vec<Effet> {
+        // (l'assistant lit une phrase, et on fait autre chose : sa réponse ne nous emmènera pas ailleurs)
+        let garde = matches!(id, RECHERCHE | ia::DEMANDER | ia::PARLER | ia::INSTALLER_IA | ia::INSTALLER_DICTEE);
+        let mut effets = Vec::new();
+        if self.aides.lit && !garde {
+            self.aides.lit = false;
+            effets.push(Effet::OublierQuestion);
+        }
+        effets.extend(self.action_page(cat, id, valeur, ecran, nouvel_id));
+        effets
+    }
+
+    fn action_page(
+        &mut self,
+        cat: &Catalogue,
+        id: &str,
+        valeur: Option<&Value>,
+        ecran: &str,
+        nouvel_id: &mut dyn FnMut() -> String,
+    ) -> Vec<Effet> {
         if let Some(p) = id.strip_prefix(PANNE) {
-            return self.commencer(cat, p, nouvel_id);
+            return self.commencer(cat, p, None, nouvel_id);
         }
         if let Some(f) = id.strip_prefix(FAMILLE) {
             if cat.famille(f).is_none() {
@@ -101,10 +126,16 @@ impl Etat {
         }
         match id {
             ecrans::RACONTE | ecrans::FAMILLES | ecrans::AIDE => vec![Effet::afficher(id)],
-            RECHERCHE => {
-                self.recherche = texte(valeur);
-                vec![Effet::rafraichir()]
-            }
+            RECHERCHE => self.recherche_tapee(texte(valeur)),
+            ia::DEMANDER => self.demander(),
+            ia::PARLER => vec![Effet::Parler, Effet::rafraichir()],
+            ia::INSTALLER_IA => vec![Effet::InstallerAssistant, Effet::rafraichir()],
+            ia::INSTALLER_DICTEE => vec![Effet::InstallerDictee, Effet::rafraichir()],
+            ia::IDEE => match entier(valeur) {
+                Some(n) => self.pour_etre_sur_choisi(cat, n, nouvel_id),
+                None => vec![Effet::Inconnue(format!("{id} sans numéro"))],
+            },
+            ia::AUCUNE => self.pour_etre_sur_choisi(cat, -1, nouvel_id),
             REPRENDRE | DERNIERE => self.reprendre(cat),
             ids::REP | ids::NSP => {
                 let n = if id == ids::NSP { Some(-1) } else { entier(valeur) };
@@ -179,15 +210,23 @@ impl Etat {
         }
     }
 
-    /// `Start-Diagnostic` : une nouvelle enquête sur cette panne.
-    fn commencer(&mut self, cat: &Catalogue, panne: &str, nouvel_id: &mut dyn FnMut() -> String) -> Vec<Effet> {
+    /// `Start-Diagnostic` : une nouvelle enquête sur cette panne (`pre_rempli` : les réponses que la phrase donnée à
+    /// l'assistant dit déjà).
+    fn commencer(
+        &mut self,
+        cat: &Catalogue,
+        panne: &str,
+        pre_rempli: Option<&PreRempli>,
+        nouvel_id: &mut dyn FnMut() -> String,
+    ) -> Vec<Effet> {
+        self.aides.pour_etre_sur = None;
         if cat.panne(panne).is_none() {
             self.retour_accueil();
             return vec![Effet::afficher(ecrans::ACCUEIL)];
         }
         let diag_id = nouvel_id();
         self.nouvelle_page_enquete();
-        let Some(ligne) = self.en_cours.preparer(cat, panne, None, diag_id) else {
+        let Some(ligne) = self.en_cours.preparer(cat, panne, pre_rempli, diag_id) else {
             self.retour_accueil();
             return vec![Effet::afficher(ecrans::ACCUEIL)];
         };
@@ -212,6 +251,144 @@ impl Etat {
                 vec![Effet::Journal(ligne), Effet::afficher(ecrans::ACCUEIL)]
             }
         }
+    }
+
+    /// Le texte de la recherche envoyé par le kit : pendant qu'on tape (un court instant après la dernière touche), ou
+    /// Entrée. Le kit envoie les deux de la même façon ; Entrée renvoie la phrase déjà reçue (tapée puis Entrée, ou
+    /// écrite par la dictée puis Entrée) : c'est `Request-Ia`. Une phrase nouvelle : `TextChanged` (l'assistant se
+    /// prépare dès qu'on écrit, `Clear-ZoneIa` : son dernier échec et la phrase en cours sont oubliés).
+    fn recherche_tapee(&mut self, v: String) -> Vec<Effet> {
+        if !self.aides.branchees() {
+            self.recherche = v;
+            return vec![Effet::rafraichir()];
+        }
+        if v == self.recherche && !v.trim().is_empty() {
+            return self.demander();
+        }
+        self.recherche = v;
+        self.aides.echec = false;
+        let mut effets = Vec::new();
+        if self.aides.lit {
+            self.aides.lit = false;
+            effets.push(Effet::OublierQuestion);
+        }
+        if !self.recherche.trim().is_empty() && self.aides.assistant_installe() {
+            effets.push(Effet::DemarrerAssistant);
+        }
+        effets.push(Effet::rafraichir());
+        effets
+    }
+
+    /// `Request-Ia` : la phrase de la recherche est posée à l'assistant (rien sans assistant, ni sans phrase ; une
+    /// deuxième fois pendant qu'il lit : ignorée). Le message de la dictée est lu.
+    fn demander(&mut self) -> Vec<Effet> {
+        let mut effets = Vec::new();
+        if self.aides.message_dictee.take().is_some() || matches!(self.aides.dictee, Some(EtatDictee::Erreur(_))) {
+            effets.push(Effet::EffacerMessageDictee);
+        }
+        let phrase = self.recherche.trim().to_string();
+        if !self.aides.lit && !phrase.is_empty() && self.aides.assistant_installe() {
+            self.aides.lit = true;
+            self.aides.echec = false;
+            effets.push(Effet::Demander { phrase });
+        }
+        effets.push(Effet::rafraichir());
+        effets
+    }
+
+    /// Le kit a changé d'écran. En quittant « Raconte ton problème » (l'accueil du PowerShell, `Show-Accueil`) : la
+    /// dictée s'arrête sans suite, son message est oublié, et la phrase posée à l'assistant aussi.
+    fn ecran_change(&mut self) -> Vec<Effet> {
+        if self.ecran == ecrans::RACONTE || !self.aides.branchees() {
+            return Vec::new();
+        }
+        let mut effets = Vec::new();
+        if self.aides.dictee_occupee() {
+            effets.push(Effet::AnnulerDictee);
+        }
+        if self.aides.message_dictee.take().is_some() || matches!(self.aides.dictee, Some(EtatDictee::Erreur(_))) {
+            effets.push(Effet::EffacerMessageDictee);
+        }
+        if self.aides.lit {
+            self.aides.lit = false;
+            effets.push(Effet::OublierQuestion);
+        }
+        if !effets.is_empty() {
+            effets.push(Effet::rafraichir());
+        }
+        effets
+    }
+
+    /// `Select-PourEtreSur` : l'enquête de la phrase choisie (avec ses réponses déjà données), ou « Aucune de ces
+    /// phrases » (`n` hors de la liste) : les questions guidées (« Ça concerne quoi ? »).
+    fn pour_etre_sur_choisi(&mut self, cat: &Catalogue, n: i64, nouvel_id: &mut dyn FnMut() -> String) -> Vec<Effet> {
+        let Some(p) = self.aides.pour_etre_sur.take() else { return vec![Effet::rafraichir()] };
+        let lignes = RefCell::new(Vec::new());
+        let choisi = mindcare_assistant::choisir(&p.choix, n, &|l| lignes.borrow_mut().push(l.to_string()));
+        let mut effets: Vec<Effet> = lignes.into_inner().into_iter().map(Effet::Journal).collect();
+        match choisi {
+            Some((panne, reponses)) => {
+                effets.extend(self.commencer(cat, &panne, Some(&PreRempli(reponses)), nouvel_id))
+            }
+            None => effets.push(Effet::afficher(ecrans::FAMILLES)),
+        }
+        effets
+    }
+
+    /// La réponse de l'assistant, décidée (`Request-Ia`) : l'enquête commence tout de suite (avec les réponses que la
+    /// phrase donne déjà), ou « Pour être sûr », ou le message d'échec (la recherche par mots reste). Une phrase
+    /// oubliée entre-temps (on a écrit autre chose, ou quitté la page) : rien.
+    pub fn decision_assistant(
+        &mut self,
+        cat: &Catalogue,
+        d: Decision,
+        nouvel_id: &mut dyn FnMut() -> String,
+    ) -> Vec<Effet> {
+        if !self.aides.lit {
+            return Vec::new();
+        }
+        self.aides.lit = false;
+        match d {
+            Decision::Enquete { panne, reponses } => self.commencer(cat, &panne, Some(&PreRempli(reponses)), nouvel_id),
+            Decision::PourEtreSur { phrase, choix } => {
+                self.aides.pour_etre_sur = Some(PourEtreSur { phrase, choix });
+                vec![Effet::afficher(POUR_ETRE_SUR)]
+            }
+            Decision::Echec { .. } => {
+                self.aides.echec = true;
+                vec![Effet::rafraichir()]
+            }
+        }
+    }
+
+    /// La phrase n'a pas pu partir : l'assistant n'est pas installé (rien à dire, la recherche par mots reste), ou il
+    /// ne démarre pas (le message d'échec).
+    pub fn question_impossible(&mut self, installe: bool) -> Vec<Effet> {
+        self.aides.lit = false;
+        self.aides.echec = installe;
+        vec![Effet::rafraichir()]
+    }
+
+    /// La phrase écrite par la dictée (`Set-DicteeTexte`) : dans la recherche, à corriger avant Entrée. Seulement si
+    /// « Raconte ton problème » est toujours à l'écran (sinon elle est laissée).
+    pub fn phrase_dictee(&mut self, phrase: String) -> Vec<Effet> {
+        if self.ecran != ecrans::RACONTE {
+            self.aides.message_dictee = None;
+            return Vec::new();
+        }
+        self.recherche = phrase;
+        self.aides.echec = false;
+        self.aides.message_dictee = Some(textes_aides::DICTEE_COMPRIS.to_string());
+        let mut effets = Vec::new();
+        if self.aides.lit {
+            self.aides.lit = false;
+            effets.push(Effet::OublierQuestion);
+        }
+        if self.aides.assistant_installe() {
+            effets.push(Effet::DemarrerAssistant);
+        }
+        effets.push(Effet::rafraichir());
+        effets
     }
 
     /// `Undo-Choix` : la réponse d'avant ; à la première question, la famille de la panne.

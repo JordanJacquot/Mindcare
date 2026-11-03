@@ -156,6 +156,24 @@ impl Exterieur for ExterieurEssai {
     }
 }
 
+/// L'assistant et la dictée de Mindcare (l'exe livré) : le vrai llama-server et le vrai whisper (sans fenêtre, arrêtés
+/// avec Mindcare), le micro choisi dans Mindset, les vrais téléchargements (WinHTTP, avec le proxy du PC), dans le
+/// dossier de données de Mindcare.
+#[cfg(not(feature = "essai"))]
+fn outils(donnees: &Path, suite_json: &Path, journal: &mindcare_donnees::Journal) -> crate::effets::Outils {
+    use mindcare_telechargement::{Installation, Paquet, Transport, windows};
+    let j = journal.clone();
+    let transport = windows::WinHttp::nouveau().map(|t| Arc::new(t) as Arc<dyn Transport>);
+    crate::effets::Outils::nouveaux(
+        mindcare_assistant::assistant(donnees, Arc::new(move |t: &str| j.ecrire(t))),
+        Installation::nouvelle(Paquet::assistant(donnees)),
+        mindcare_dictee::dictee_de_mindcare(donnees, Some(suite_json.to_path_buf())),
+        Installation::nouvelle(Paquet::dictee(donnees)),
+        transport,
+        Arc::new(windows::PlaceWindows),
+    )
+}
+
 /// Un texte venu de la page, coupé pour le journal.
 fn court(t: &str) -> String {
     t.chars().take(120).collect()
@@ -266,7 +284,12 @@ pub fn lancer() -> ! {
         ATTENTE_WINDOWS_MAX,
     );
     lecture.lancer();
-    let pages = Branchement::nouveau(VERSION, theme.theme_ecran(), catalogue, &d, lecture, exterieur);
+    let mut pages = Branchement::nouveau(VERSION, theme.theme_ecran(), catalogue, &d, lecture, exterieur);
+    // L'assistant et la dictée (étape 6.4) : rien n'est lancé avant qu'on écrive ou qu'on appuie sur Parler
+    #[cfg(not(feature = "essai"))]
+    pages.brancher(outils(&l.dossier_donnees, &l.fichier_suite, &journal));
+    #[cfg(feature = "essai")]
+    pages.brancher(crate::essai::outils(&l.dossier_donnees, &l.fichier_suite, Path::new(&essai.local), &journal));
     *donnees.borrow_mut() = Some(d);
 
     let pour_page = journal.clone();
@@ -580,6 +603,9 @@ fn finir() -> ! {
             if etat.fin.is_none() {
                 etat.journal.ecrire("Fermeture : la fenêtre a disparu");
             }
+            // (Stop-Contenu : llama-server, whisper et le micro arrêtés, les téléchargements aussi ; si Mindcare est
+            // tuée, les Job Objects arrêtent llama-server et whisper avec elle)
+            etat.pages.arreter();
             let fin = etat.fin.unwrap_or(Fin::Quitter);
             etat.vie.terminer(fin, &mut etat.systeme, &mut etat.disque);
         }

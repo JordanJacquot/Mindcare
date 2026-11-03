@@ -18,8 +18,10 @@ pub const DERNIERE: &str = "derniere";
 pub fn accueil(etat: &Etat, cat: &Catalogue) -> Value {
     let familles = cat.familles().len();
     let pannes = cat.pannes().len();
+    // (avec la dictée : « ou ta voix », la maquette validée)
+    let sous = if etat.aides.branchees() { "Avec tes mots ou ta voix" } else { "Avec tes mots" };
     let mut tuiles = vec![
-        json!({ "id": ecrans::RACONTE, "nom": "Raconte ton problème", "icone": "loupe", "sous": "Avec tes mots",
+        json!({ "id": ecrans::RACONTE, "nom": "Raconte ton problème", "icone": "loupe", "sous": sous,
                 "couleur": "P" }),
         json!({ "id": ecrans::FAMILLES, "nom": "Ça concerne quoi ?", "icone": "liste",
                 "sous": format!("{}, {}", nombre(familles, "famille", "familles"), nombre(pannes, "panne", "pannes")),

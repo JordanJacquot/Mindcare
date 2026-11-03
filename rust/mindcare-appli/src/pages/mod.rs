@@ -22,6 +22,7 @@
 
 mod accueil;
 mod actions;
+mod aides;
 mod enquete;
 mod familles;
 #[cfg(test)]
@@ -36,6 +37,8 @@ mod tests;
 /// Les ids des actions des pages, et ceux de l'accueil (reprendre l'enquête en cours, revoir la dernière).
 pub use accueil::{DERNIERE, REPRENDRE};
 pub use actions::{PLUS_TARD_MESSAGE, ids};
+/// L'assistant et la dictée dans les pages (étape 6.4) : leur photo, leurs ids d'action, leurs textes.
+pub use aides::{Aides, POUR_ETRE_SUR, PourEtreSur, ids as ids_aides, textes as textes_aides};
 /// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
 pub use raconte::PANNE;
 
@@ -89,6 +92,25 @@ pub enum Effet {
     MenuMindset,
     /// Un message ou une action que les pages n'ont jamais envoyé (noté au journal, rien d'autre).
     Inconnue(String),
+    /// On écrit dans la recherche : l'assistant se prépare (`Start-Ia` : llama-server lancé s'il ne tourne pas, sans
+    /// attendre la phrase).
+    DemarrerAssistant,
+    /// « Demander à l'assistant » (Entrée) : la phrase posée sur un fil à part (`Start-IaQuestion`), la fenêtre ne se
+    /// fige pas ; la réponse est attendue par la minuterie, puis donnée à [`Etat::decision_assistant`]. Sans
+    /// assistant : [`Etat::question_impossible`].
+    Demander { phrase: String },
+    /// La phrase posée n'intéresse plus (on a écrit autre chose, ou quitté la page) : sa réponse sera laissée.
+    OublierQuestion,
+    /// Installer (réparer, mettre à jour, réessayer) l'assistant : un seul téléchargement à la fois (`Start-IaInstall`).
+    InstallerAssistant,
+    /// Installer (réparer, réessayer) la dictée (`Start-DicteeInstall`).
+    InstallerDictee,
+    /// Le bouton Parler (`Start-Dictee`) : écouter, ou arrêter d'écouter.
+    Parler,
+    /// On a quitté « Raconte ton problème » : la dictée s'arrête sans suite (`Stop-DicteeSansSuite`).
+    AnnulerDictee,
+    /// Le message de la dictée est lu (`$script:DicteeMessage = $null`).
+    EffacerMessageDictee,
 }
 
 impl Effet {
@@ -147,6 +169,8 @@ pub struct Etat {
     pub rapport: Option<String>,
     /// Le dernier écran dit par le kit (`{ type: 'ecran', id }`)
     pub ecran: String,
+    /// L'assistant et la dictée (étape 6.4) : leur photo, prise par effets.rs
+    pub aides: Aides,
 }
 
 /// Où en est l'enquête montrée.
@@ -191,6 +215,9 @@ impl Etat {
                 pages.insert(ecrans::REPARATEUR.into(), reparateur::page(self));
             }
             None => {}
+        }
+        if let Some(p) = &self.aides.pour_etre_sur {
+            pages.insert(POUR_ETRE_SUR.into(), aides::page_pour_etre_sur(p));
         }
         pages.insert(ecrans::AIDE.into(), accueil::page_aide());
         let mut etat = json!({

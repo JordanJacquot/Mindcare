@@ -139,6 +139,11 @@ fn court(t: &str) -> String {
 pub fn ligne_journal(m: &MessagePage) -> String {
     match m {
         MessagePage::Pret => "Écran prêt".into(),
+        // (le texte de la recherche n'est jamais écrit au journal, seulement sa longueur : c'est la phrase donnée à
+        // l'assistant, ou dictée, comme dans le PowerShell)
+        MessagePage::Action { id, valeur: Value::String(t), ecran } if id == "recherche" => {
+            format!("Écran : action {id} (écran {ecran}, {} caractères)", t.encode_utf16().count())
+        }
         MessagePage::Action { id, valeur, ecran } => {
             format!("Écran : action {id} (écran {ecran}, valeur {})", court(&valeur.to_string()))
         }
@@ -335,6 +340,15 @@ mod tests {
     use std::io;
     use std::path::PathBuf;
     use std::time::Duration;
+
+    #[test]
+    fn la_phrase_de_la_recherche_jamais_au_journal() {
+        let m =
+            MessagePage::Action { id: "recherche".into(), valeur: json!("mon pc s'éteint"), ecran: "raconte".into() };
+        assert_eq!(ligne_journal(&m), "Écran : action recherche (écran raconte, 15 caractères)");
+        let m = MessagePage::Action { id: "idee".into(), valeur: json!("1"), ecran: "pourEtreSur".into() };
+        assert_eq!(ligne_journal(&m), "Écran : action idee (écran pourEtreSur, valeur \"1\")");
+    }
 
     #[test]
     fn messages_du_kit_lus() {
