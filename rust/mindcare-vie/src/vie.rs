@@ -78,7 +78,8 @@ impl Reglages {
 }
 
 /// `Update-EchelleMindset` (systeme.ps1:42-48) : dans Mindset, plus petite que la taille minimale, tout le contenu
-/// est réduit à l'échelle (rien n'est coupé ni tassé). 1 sinon.
+/// est réduit à l'échelle (rien n'est coupé ni tassé) : la plus petite des deux, largeur et hauteur, rapportée à la
+/// taille minimale, jamais plus de 1. 1 hors de Mindset, ou si une taille est nulle.
 pub fn echelle(dans_mindset: bool, largeur: f64, hauteur: f64, min: Taille) -> f64 {
     if dans_mindset && largeur > 0.0 && hauteur > 0.0 && min.largeur > 0.0 && min.hauteur > 0.0 {
         (largeur / min.largeur).min(hauteur / min.hauteur).min(1.0)
@@ -103,11 +104,22 @@ pub struct Vie {
     suite_date: Option<Date>,
     /// `$script:Quitting` (systeme.ps1:134-135)
     quitte: bool,
+    /// L'échelle donnée à la fenêtre (1 au départ : la page à sa taille normale)
+    echelle: f64,
 }
 
 impl Vie {
     pub fn nouvelle(reglages: Reglages) -> Vie {
-        Vie { reglages, tours: 0, prochain: TOUR, dans_mindset: false, page: None, suite_date: None, quitte: false }
+        Vie {
+            reglages,
+            tours: 0,
+            prochain: TOUR,
+            dans_mindset: false,
+            page: None,
+            suite_date: None,
+            quitte: false,
+            echelle: 1.0,
+        }
     }
 
     /// Affichée dans Mindset (accrochée).
@@ -123,6 +135,31 @@ impl Vie {
     /// Les tours faits depuis le début.
     pub fn tours(&self) -> u64 {
         self.tours
+    }
+
+    /// L'échelle donnée à la fenêtre ([`Vie::ajuster_echelle`]).
+    pub fn echelle(&self) -> f64 {
+        self.echelle
+    }
+
+    /// `Update-EchelleMindset` (systeme.ps1:42-48), appelée après chaque changement d'accrochage (systeme.ps1:38) et
+    /// quand la taille de la fenêtre change (`SizeChanged`, systeme.ps1:125 : le programme l'appelle quand Tauri
+    /// signale une nouvelle taille, et à chaque pas de sa minuterie). [`echelle`], arrondie au millième vers le bas
+    /// (la page ne déborde jamais du panneau d'un pixel), n'est donnée à la fenêtre que si elle change : une fois
+    /// libérée, ou dans un panneau de nouveau assez grand, elle revient à 1.
+    pub fn ajuster_echelle(&mut self, m: &mut Monde) {
+        if !m.fenetre.existe() {
+            return;
+        }
+        let e = match m.fenetre.taille() {
+            Some(t) => echelle(self.dans_mindset, t.largeur, t.hauteur, self.reglages.taille_min),
+            None => 1.0,
+        };
+        let e = (e * 1000.0).floor() / 1000.0;
+        if e != self.echelle {
+            self.echelle = e;
+            m.fenetre.poser_echelle(e);
+        }
     }
 
     /// Le début des surveillances (systeme.ps1:123-124) : la carte de Mindset écrite tout de suite.
@@ -219,6 +256,8 @@ impl Vie {
         }
         // systeme.ps1:37
         m.disque.journal(if dans { "Affichée dans Mindset" } else { "Plus affichée dans Mindset" });
+        // systeme.ps1:38
+        self.ajuster_echelle(m);
     }
 
     /// `Show-MainWindow` (systeme.ps1:53-62).

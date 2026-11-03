@@ -78,7 +78,14 @@ $nomEssai = "kit-$PID"
 $j = [ordered]@{ theme = 'neon'; micro = ''; casque = ''; applis = [ordered]@{ mindcare = $programmes }; modifie = (Get-Date -Format s) }
 [IO.File]::WriteAllText((Join-Path $local 'Mindset\suite.json'), ($j | ConvertTo-Json -Depth 4), (New-Object Text.UTF8Encoding($false)))
 $journal = Join-Path $donnees 'journal.txt'
-function Get-Journal { if (Test-Path -LiteralPath $journal) { @([IO.File]::ReadAllLines($journal, [Text.Encoding]::UTF8)) } else { @() } }
+# Le journal lu sans gêner l'appli qui y écrit (FileShare.ReadWrite : ReadAllLines le bloquerait en écriture le temps
+# de la lecture, et la ligne écrite à ce moment-là serait perdue)
+function Get-Journal {
+    if (-not (Test-Path -LiteralPath $journal)) { return @() }
+    $f = New-Object IO.FileStream($journal, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+    try { $l = (New-Object IO.StreamReader($f, [Text.Encoding]::UTF8)).ReadToEnd() } finally { $f.Dispose() }
+    @($l -split "`r`n" | Where-Object { $_ })
+}
 function Compter([string]$Motif) { @(Get-Journal | Where-Object { $_ -like "*$Motif*" }).Count }
 function Attendre([scriptblock]$Condition, [int]$Ms) {
     $t = [Diagnostics.Stopwatch]::StartNew()

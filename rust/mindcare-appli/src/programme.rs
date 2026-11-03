@@ -13,7 +13,9 @@
 //!    démarrage sur un fil à part.
 //! 4. Les surveillances : un pas de 100 ms sur le fil de la fenêtre, qui fait avancer la vie de l'appli (ses tours de
 //!    500 ms : accrochage et taille minimale, signal d'affichage, veille de la page, quitter.demande, suite.json,
-//!    etat.json, avec la vraie situation des enquêtes), et la lecture de Windows attendue par une enquête. La croix et `WM_CLOSE` (le bouton « Fermer » de Mindset) quittent.
+//!    etat.json, avec la vraie situation des enquêtes), et la lecture de Windows attendue par une enquête. L'échelle
+//!    de la page dans un panneau de Mindset plus petit que la fenêtre (`Update-EchelleMindset`) suit chaque nouvelle
+//!    taille (`Resized`), et chaque pas. La croix et `WM_CLOSE` (le bouton « Fermer » de Mindset) quittent.
 //! 5. La fin : la relance si le thème a changé (comme aujourd'hui), puis `std::process::exit` (aucun fil ne garde
 //!    le processus en vie sans fenêtre, contrat-appli partie 3).
 //!
@@ -410,6 +412,8 @@ fn tour(app: &AppHandle) {
         let fenetre = fenetre.as_mut()?;
         let fin = vie.avancer(maintenant, &mut Monde { systeme, disque, fenetre });
         if fin.is_none() {
+            // (SizeChanged, systeme.ps1:125 : une taille manquée par `Resized`, la fenêtre occupée, est vue ici)
+            vie.ajuster_echelle(&mut Monde { systeme, disque, fenetre });
             etat.tour_pages();
         }
         #[cfg(feature = "essai")]
@@ -468,8 +472,26 @@ fn evenement_fenetre(w: &Window, ev: &WindowEvent) {
         }
         // Détruite quand même (elle n'est jamais recréée) : l'appli quitte
         WindowEvent::Destroyed => w.app_handle().exit(0),
+        // Mindset change la taille du panneau (`SizeChanged`, systeme.ps1:125) : l'échelle suit tout de suite
+        WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => echelle_tout_de_suite(),
         _ => {}
     }
+}
+
+/// `Update-EchelleMindset` sur une nouvelle taille. La fenêtre occupée (un tour en cours) : au prochain pas de la
+/// minuterie.
+fn echelle_tout_de_suite() {
+    ETAT.with(|e| {
+        let Ok(mut e) = e.try_borrow_mut() else { return };
+        let Some(etat) = e.as_mut() else { return };
+        if etat.fin.is_some() {
+            return;
+        }
+        let Etat { vie, systeme, disque, fenetre, .. } = &mut *etat;
+        if let Some(fenetre) = fenetre.as_mut() {
+            vie.ajuster_echelle(&mut Monde { systeme, disque, fenetre });
+        }
+    });
 }
 
 /// La croix, traitée sur le fil de la fenêtre dès qu'il est libre.

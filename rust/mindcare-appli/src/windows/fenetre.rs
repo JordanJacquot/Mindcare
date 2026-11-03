@@ -1,7 +1,15 @@
 //! La fenêtre principale vue par Windows : accrochée dans Mindset ou non, visible ou non (elle et ses parents),
 //! montrée sans prendre la main. Et [`FenetreTauri`], le trait `Fenetre` de mindcare-vie rempli avec la vraie
-//! fenêtre (ces appels, et ceux de Tauri pour la montrer au premier plan et changer sa taille minimale). Et la
-//! taille minimale gardée quand Mindset change la taille par `SetWindowPos` ([`garder_taille_minimale`]).
+//! fenêtre (ces appels, et ceux de Tauri pour la montrer au premier plan, changer sa taille minimale, lire sa place
+//! et poser l'échelle de la page). Et la taille minimale gardée quand Mindset change la taille par `SetWindowPos`
+//! ([`garder_taille_minimale`]).
+//!
+//! L'échelle (`Update-EchelleMindset`, systeme.ps1:42-48 : `LayoutTransform` sur tout le contenu de la fenêtre WPF)
+//! est le facteur de zoom de WebView2 posé par le programme (`WebviewWindow::set_zoom` de Tauri, qui appelle
+//! `ICoreWebView2Controller::SetZoomFactor`, wry 0.57.1 webview2/mod.rs:1549) : toute la page est mise en page dans
+//! une place de largeur / échelle sur hauteur / échelle (au moins la taille minimale), puis dessinée à l'échelle,
+//! comme le fait `LayoutTransform`. Le zoom de l'utilisateur reste coupé (`IsZoomControlEnabled` à faux, règle 5 de
+//! docs\regles-tauri.md) : il ne bloque que Ctrl + molette et les raccourcis, pas ce facteur.
 
 use mindcare_vie::{Fenetre, Niveau, Taille};
 use tauri::{LogicalSize, WebviewWindow};
@@ -173,6 +181,27 @@ impl Fenetre for FenetreTauri {
     fn page_visible(&mut self, visible: bool) {
         if let Err(e) = super::webview2::page_visible(&self.fenetre, visible) {
             (self.journal)(&format!("Veille de l'écran : {e}"));
+        }
+    }
+
+    fn taille(&self) -> Option<Taille> {
+        // (la place de la page : l'intérieur de la fenêtre, en pixels de l'écran ramenés à son échelle d'affichage)
+        let t = self.fenetre.inner_size().ok()?.to_logical::<f64>(self.fenetre.scale_factor().ok()?);
+        Some(Taille { largeur: t.width, hauteur: t.height })
+    }
+
+    fn poser_echelle(&mut self, echelle: f64) {
+        match self.fenetre.set_zoom(echelle) {
+            Err(e) => (self.journal)(&format!("Écran : échelle {echelle} non posée ({e})")),
+            // (construction d'essai : notée, pour l'essai de l'échelle ; l'exe livré ne la note pas, elle change à
+            // chaque taille du panneau)
+            #[cfg(feature = "essai")]
+            Ok(()) => {
+                let t = self.taille().map(|t| format!("{:.0} x {:.0}", t.largeur, t.hauteur)).unwrap_or_default();
+                (self.journal)(&format!("Essai : échelle {echelle} pour {t}"));
+            }
+            #[cfg(not(feature = "essai"))]
+            Ok(()) => {}
         }
     }
 }

@@ -122,6 +122,11 @@ pub trait Fenetre {
     fn niveaux(&self) -> Vec<Niveau>;
     /// La page est-elle visible pour WebView2 (`SetIsVisible` : cachée, elle se met en veille).
     fn page_visible(&mut self, visible: bool);
+    /// La place de la page, en pixels logiques (`ActualWidth`, `ActualHeight` : une fois accrochée, Mindset a retiré la
+    /// barre de titre et la bordure, c'est la taille du panneau). `None` si elle ne se lit pas.
+    fn taille(&self) -> Option<Taille>;
+    /// Tout le contenu à cette échelle (`LayoutTransform`, systeme.ps1:47) : 1, la taille normale.
+    fn poser_echelle(&mut self, echelle: f64);
 }
 
 /// Les trois ensemble, pour un tour de surveillance.

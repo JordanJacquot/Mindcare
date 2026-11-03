@@ -177,6 +177,10 @@ pub struct FausseFenetre {
     pub activee: u32,
     /// Chaque visibilité donnée à la page
     pub page: Vec<bool>,
+    /// La place de la page (pixels logiques) ; `None` : illisible
+    pub taille: Option<Taille>,
+    /// Chaque échelle donnée à la fenêtre
+    pub echelles: Vec<f64>,
 }
 
 impl Fenetre for FausseFenetre {
@@ -208,6 +212,12 @@ impl Fenetre for FausseFenetre {
     }
     fn page_visible(&mut self, visible: bool) {
         self.page.push(visible);
+    }
+    fn taille(&self) -> Option<Taille> {
+        self.taille
+    }
+    fn poser_echelle(&mut self, echelle: f64) {
+        self.echelles.push(echelle);
     }
 }
 

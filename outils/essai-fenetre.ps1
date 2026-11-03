@@ -87,7 +87,14 @@ function Write-Suite([string]$Theme) {
 }
 Write-Suite 'crepuscule'
 $journal = Join-Path $donnees 'journal.txt'
-function Get-Journal { if (Test-Path -LiteralPath $journal) { @([IO.File]::ReadAllLines($journal, [Text.Encoding]::UTF8)) } else { @() } }
+# Le journal lu sans gêner l'appli qui y écrit (FileShare.ReadWrite : ReadAllLines le bloquerait en écriture le temps
+# de la lecture, et la ligne écrite à ce moment-là serait perdue)
+function Get-Journal {
+    if (-not (Test-Path -LiteralPath $journal)) { return @() }
+    $f = New-Object IO.FileStream($journal, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+    try { $l = (New-Object IO.StreamReader($f, [Text.Encoding]::UTF8)).ReadToEnd() } finally { $f.Dispose() }
+    @($l -split "`r`n" | Where-Object { $_ })
+}
 function Compter([string]$Motif) { @(Get-Journal | Where-Object { $_ -like "*$Motif*" }).Count }
 
 # Ce qui existe déjà hors de l'essai (comparé à la fin : rien ne doit y apparaître)

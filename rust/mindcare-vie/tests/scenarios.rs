@@ -653,12 +653,90 @@ fn partie7_veille_page_visible_seulement_si_tout_est_visible() {
 
 #[test]
 fn partie7_echelle_dans_mindset() {
-    // systeme.ps1:42-48
-    assert_eq!(echelle(true, 450.0, 640.0, MIN), 0.5);
-    assert_eq!(echelle(true, 900.0, 320.0, MIN), 0.5);
+    // systeme.ps1:42-48 : min(1, largeur / MinWidth, hauteur / MinHeight) dans Mindset, 1 sinon
+    // panneau plus grand (et tout juste assez grand) : 1
     assert_eq!(echelle(true, 1800.0, 1280.0, MIN), 1.0);
+    assert_eq!(echelle(true, 900.0, 640.0, MIN), 1.0);
+    // plus petit en largeur seulement, puis en hauteur seulement : le côté le plus serré décide
+    assert_eq!(echelle(true, 450.0, 640.0, MIN), 0.5);
+    assert_eq!(echelle(true, 450.0, 2000.0, MIN), 0.5);
+    assert_eq!(echelle(true, 900.0, 320.0, MIN), 0.5);
+    assert_eq!(echelle(true, 3000.0, 480.0, MIN), 0.75);
+    // plus petit des deux côtés : le plus petit rapport
+    assert_eq!(echelle(true, 720.0, 320.0, MIN), 0.5);
+    assert_eq!(echelle(true, 450.0, 512.0, MIN), 0.5);
+    // très petit (150 x 120, ce que Mindset donne en essai) : réduit d'autant, sans borne basse comme le PowerShell
+    assert_eq!(echelle(true, 150.0, 120.0, MIN), 150.0 / 900.0);
+    assert_eq!(echelle(true, 90.0, 64.0, MIN), 0.1);
+    // libérée (hors de Mindset) : 1, quelle que soit la taille
     assert_eq!(echelle(false, 450.0, 320.0, MIN), 1.0);
+    assert_eq!(echelle(false, 150.0, 120.0, MIN), 1.0);
+    // une taille nulle (pas encore mise en page) : 1
     assert_eq!(echelle(true, 0.0, 320.0, MIN), 1.0);
+    assert_eq!(echelle(true, 450.0, 0.0, MIN), 1.0);
+    assert_eq!(echelle(true, 450.0, 320.0, Taille { largeur: 0.0, hauteur: 640.0 }), 1.0);
+}
+
+#[test]
+fn partie7_echelle_suit_le_panneau_et_revient_a_1_une_fois_liberee() {
+    let mut b = banc_gere();
+    let mut v = vie_geree(&mut b);
+    b.fenetre.taille = Some(Taille { largeur: 1100.0, hauteur: 760.0 });
+    v.avancer(s(1.0), &mut b.monde());
+    v.ajuster_echelle(&mut b.monde());
+    assert!(b.fenetre.echelles.is_empty(), "hors de Mindset, à sa taille : rien à changer");
+    // Mindset l'accroche dans un panneau de 700 x 500 : réduite dès le tour de l'accrochage (systeme.ps1:38)
+    b.fenetre.taille = Some(Taille { largeur: 700.0, hauteur: 500.0 });
+    b.fenetre.accrochee = true;
+    v.avancer(s(1.5), &mut b.monde());
+    assert_eq!(b.fenetre.echelles, [0.777], "700 / 900 = 0,7777... arrondi vers le bas");
+    assert_eq!(v.echelle(), 0.777);
+    // la même taille : rien de redonné
+    v.ajuster_echelle(&mut b.monde());
+    v.avancer(s(3.0), &mut b.monde());
+    assert_eq!(b.fenetre.echelles.len(), 1);
+    // le panneau change (SizeChanged, systeme.ps1:125) : plus bas que large
+    b.fenetre.taille = Some(Taille { largeur: 1300.0, hauteur: 320.0 });
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles, [0.777, 0.5]);
+    // très petit
+    b.fenetre.taille = Some(Taille { largeur: 150.0, hauteur: 120.0 });
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles.last(), Some(&0.166));
+    // de nouveau assez grand : 1
+    b.fenetre.taille = Some(Taille { largeur: 1300.0, hauteur: 900.0 });
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles.last(), Some(&1.0));
+    // petit de nouveau, puis libérée par Mindset (encore à la taille du panneau) : 1 au tour du décrochage
+    b.fenetre.taille = Some(Taille { largeur: 600.0, hauteur: 400.0 });
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles.last(), Some(&0.625));
+    b.fenetre.accrochee = false;
+    v.avancer(s(3.5), &mut b.monde());
+    assert!(!v.dans_mindset());
+    assert_eq!(b.fenetre.echelles, [0.777, 0.5, 0.166, 1.0, 0.625, 1.0]);
+    // hors de Mindset, même petite (la taille minimale revient) : toujours 1, rien de redonné
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles.len(), 6);
+}
+
+#[test]
+fn partie7_echelle_taille_illisible_ou_sans_handle() {
+    let mut b = banc_gere();
+    let mut v = vie_geree(&mut b);
+    b.fenetre.taille = Some(Taille { largeur: 450.0, hauteur: 320.0 });
+    b.fenetre.accrochee = true;
+    v.avancer(s(0.5), &mut b.monde());
+    assert_eq!(b.fenetre.echelles, [0.5]);
+    // la taille ne se lit plus : retour à 1 (comme ActualWidth à 0)
+    b.fenetre.taille = None;
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles, [0.5, 1.0]);
+    // la fenêtre n'a plus de handle : rien n'est touché
+    b.fenetre.taille = Some(Taille { largeur: 450.0, hauteur: 320.0 });
+    b.fenetre.sans_handle = true;
+    v.ajuster_echelle(&mut b.monde());
+    assert_eq!(b.fenetre.echelles, [0.5, 1.0]);
 }
 
 #[test]
