@@ -12,7 +12,7 @@ if (-not (Test-Path -LiteralPath $Exe -PathType Leaf)) { Write-Host "Introuvable
 $octets = [IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $Exe).Path)
 # (chaque octet tel quel : les noms cherchés sont en ASCII)
 $simple = [Text.Encoding]::GetEncoding(28591).GetString($octets)
-$noms = 'MINDCARE_DONNEES', 'MINDCARE_ESSAI_LOCAL', 'MINDCARE_ESSAI_NOM', 'capture.demande', 'presse-papiers.txt'
+$noms = 'MINDCARE_DONNEES', 'MINDCARE_ESSAI_LOCAL', 'MINDCARE_ESSAI_NOM', 'capture.demande', 'actions.demande', 'presse-papiers.txt'
 $trouves = @()
 foreach ($n in $noms) {
     $large = ($n.ToCharArray() | ForEach-Object { "$_`0" }) -join ''

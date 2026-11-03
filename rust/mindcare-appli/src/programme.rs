@@ -417,6 +417,10 @@ fn tour(app: &AppHandle) {
             etat.tour_pages();
         }
         #[cfg(feature = "essai")]
+        if fin.is_none() {
+            actions_demandees(etat);
+        }
+        #[cfg(feature = "essai")]
         capture_demandee(etat);
         etat.fin = fin;
         fin
@@ -516,6 +520,33 @@ fn croix(app: &AppHandle) {
             Err(()) => croix(&a),
         }
     });
+}
+
+/// Construction d'essai : les messages demandés (`actions.demande`, un JSON par ligne), traités comme s'ils venaient
+/// de la page (`{ "type": "action", ... }`, lus par le pont comme ceux du kit), ou envoyés au kit tels quels
+/// (`{ "kit": "aller", ... }`). Le fichier est effacé une fois lu (le script d'essai l'écrit d'un coup, par un
+/// renommage).
+#[cfg(feature = "essai")]
+fn actions_demandees(etat: &mut Etat) {
+    let demande = etat.dossier.join(crate::essai::ACTIONS_DEMANDE);
+    let Ok(texte) = std::fs::read_to_string(&demande) else { return };
+    let _ = std::fs::remove_file(&demande);
+    for ligne in texte.trim_start_matches('\u{feff}').lines().map(str::trim).filter(|l| !l.is_empty()) {
+        let Ok(v) = serde_json::from_str::<Value>(ligne) else {
+            etat.journal.ecrire("Essai : demande illisible");
+            continue;
+        };
+        if v.get("kit").is_some() {
+            if let Some(app) = etat.app.clone() {
+                app.state::<Page>().ordre(v);
+            }
+            continue;
+        }
+        match crate::pont::lire_message(&v) {
+            Ok(m) => etat.recevoir(&m),
+            Err(r) => etat.journal.ecrire(&format!("Essai : demande refusée ({})", r.raison())),
+        }
+    }
 }
 
 /// Construction d'essai : une capture demandée (`capture.demande`) écrit l'image de la fenêtre dans `capture.png`.

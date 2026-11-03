@@ -11,7 +11,8 @@
 //!
 //! En plus, dans cette construction : HKLM n'est jamais lu et seul ce programme peut être lancé
 //! (windows\systeme.rs) ; un fichier `capture.demande` dans le dossier de données fait écrire l'image de la
-//! fenêtre dans `capture.png`, à côté.
+//! fenêtre dans `capture.png`, à côté ; un fichier `actions.demande` y fait jouer des messages de la page (chaque
+//! écran atteint sans clavier, pour les captures).
 
 use std::path::{Path, PathBuf};
 
@@ -20,6 +21,9 @@ use mindcare_vie::Noms;
 /// La demande de capture et l'image, dans le dossier de données d'essai.
 pub const CAPTURE_DEMANDE: &str = "capture.demande";
 pub const CAPTURE: &str = "capture.png";
+/// Les messages demandés par le script d'essai (outils\essai-captures.ps1), un JSON par ligne : comme s'ils venaient
+/// de la page, ou un ordre au kit (`{ "kit": "aller", "ecran": ... }`).
+pub const ACTIONS_DEMANDE: &str = "actions.demande";
 
 /// Ce que l'essai donne.
 #[derive(Debug, Clone, PartialEq, Eq)]

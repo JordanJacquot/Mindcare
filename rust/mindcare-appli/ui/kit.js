@@ -762,7 +762,18 @@
       };
       if (nouveau.ecran) { const id = nouveau.ecran; delete E.ecran; aller(id); choisir(); return; }
       if (nav.ecran !== 'accueil' && !E.pages?.[nav.ecran]) { aller('accueil'); choisir(); return; }
-      if (document.activeElement?.tagName === 'INPUT') { enAttente = true; enTete(); return; }
+      // (Mindcare, étape 5.5 : une recherche « en direct » montre ses résultats pendant qu'on tape ; le champ garde ce
+      // qui a été tapé depuis l'envoi, avec le curseur au même endroit. Les autres champs attendent toujours.)
+      const saisie = document.activeElement;
+      if (saisie?.tagName === 'INPUT' && saisie.dataset?.direct) {
+        const k = saisie.dataset.k, tape = saisie.value !== saisie.defaultValue ? saisie.value : null;
+        const debut = saisie.selectionStart, fin = saisie.selectionEnd;
+        dessiner(false);
+        const n = ecran.querySelector(`[data-k="${CSS.escape(k)}"]`);
+        if (n) { if (tape !== null) n.value = tape; n.focus({ preventScroll: true }); try { if (tape !== null) n.setSelectionRange(debut, fin); else n.setSelectionRange(n.value.length, n.value.length); } catch (_) { /* (rien) */ } }
+        return;
+      }
+      if (saisie?.tagName === 'INPUT') { enAttente = true; enTete(); return; }
       dessiner(false);
       choisir();
     },

@@ -153,6 +153,9 @@ impl Banc {
         while let Some(e) = file.pop_front() {
             match e {
                 Effet::Afficher { ecran } => {
+                    if self.etat.rapport_a_refaire(cat()) {
+                        self.etat.rapport = self.rapport();
+                    }
                     self.json = self.etat.etat_kit(cat(), ecran.as_deref());
                     self.erreurs_kit.extend(verifier_kit(&self.json));
                     if ecran.is_some() {
@@ -173,6 +176,7 @@ impl Banc {
                     }
                 }
                 Effet::RapportBureau => {
+                    self.etat.rapport = self.rapport();
                     let r = self.rapport().ok_or_else(|| "aucun rapport".to_string()).and_then(|t| {
                         enregistrer_rapport(&self.dossier, &t, self.donnees.journal())
                             .map(|f| f.file_name().unwrap_or_default().to_string_lossy().into_owned())
@@ -181,6 +185,7 @@ impl Banc {
                     file.extend(self.etat.rapport_enregistre(r));
                 }
                 Effet::CopierRapport => {
+                    self.etat.rapport = self.rapport();
                     let r = self.rapport().map(|_| ()).ok_or_else(|| "aucun rapport".to_string());
                     file.extend(self.etat.rapport_copie(r));
                 }
@@ -1138,10 +1143,7 @@ fn reprendre_une_enquete_et_revoir_la_derniere() {
     assert_eq!(tuile["id"], super::accueil::REPRENDRE);
     assert_eq!(tuile["alerte"], true);
     assert_eq!(tuile["nom"], "Reprendre l'enquête");
-    assert_eq!(
-        tuile["sous"],
-        format!("{} · commencée le 3 novembre à 10h15", t(cat().panne(&panne).unwrap(), "Titre"))
-    );
+    assert_eq!(tuile["sous"], t(cat().panne(&panne).unwrap(), "Titre"));
     b.action(super::accueil::REPRENDRE, Value::Null, ecrans::ACCUEIL);
     assert_eq!(b.ecran.as_deref(), Some(ecrans::ENQUETE));
     assert_eq!(b.etat.en_cours.choix, choix[..2]);
@@ -1200,19 +1202,31 @@ fn rapport_pour_le_reparateur() {
     let boutons = page["module"]["boutons"].as_array().unwrap();
     assert_eq!(boutons[0], json!({ "id": ids::BUREAU, "texte": textes_rapport::BOUTON_ENREGISTRER }));
     assert_eq!(boutons[1]["texte"], textes_rapport::BOUTON_COPIER);
-    // Sur le Bureau (ici, le dossier d'essai)
+    // Le rapport est montré dans la page, ligne par ligne, avant même d'être enregistré
+    let texte_rapport = b.rapport().unwrap();
+    assert_eq!(b.etat.rapport.as_deref(), Some(texte_rapport.as_str()));
+    assert_eq!(page["blocs"][0], json!({ "type": "titre", "texte": "Mindcare : rapport de l'enquête" }));
+    assert_rapport_montre(&page, &texte_rapport);
+    // Sur le Bureau (ici, le dossier d'essai) : dit dans la page seulement, pas en bulle (elle recouvrait le titre)
+    let messages = b.messages.len();
     b.action(ids::BUREAU, Value::Null, ecrans::REPARATEUR);
     let nom = "Mindcare, diagnostic du 3-11-2026 10h15.txt";
     assert!(b.dossier.join(nom).is_file(), "le rapport n'est pas écrit");
     let attendu = textes_rapport::enregistre(nom);
-    assert_eq!(b.messages.last(), Some(&(attendu.clone(), true)));
+    assert_eq!(b.messages.len(), messages, "une bulle en plus du texte de la page");
     assert!(a_texte(b.page(ecrans::REPARATEUR).unwrap(), &attendu));
+    assert_eq!(b.page(ecrans::REPARATEUR).unwrap()["blocs"][0]["texte"], attendu.as_str(), "le résultat en haut");
     let rapport = std::fs::read_to_string(b.dossier.join(nom)).unwrap();
+    let rapport = rapport.trim_start_matches('\u{feff}');
     assert!(rapport.contains(&format!("Panne : {}", t(cat().panne(&panne).unwrap(), "Titre"))));
+    // (la page montre le texte du fichier, tel quel)
+    assert_eq!(b.etat.rapport.as_deref(), Some(rapport));
+    assert_rapport_montre(b.page(ecrans::REPARATEUR).unwrap(), rapport);
     // Copié
     b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
     assert_eq!(b.page(ecrans::REPARATEUR).unwrap()["module"]["boutons"][1]["texte"], "Copié");
-    assert_eq!(b.messages.last(), Some(&(textes_rapport::COPIE.to_string(), true)));
+    assert!(a_texte(b.page(ecrans::REPARATEUR).unwrap(), textes_rapport::COPIE));
+    assert_eq!(b.messages.len(), messages, "une bulle en plus du texte de la page");
     // Raté
     let effets = b.etat.rapport_enregistre(Err("accès refusé".into()));
     assert!(effets.contains(&Effet::Journal("Rapport non enregistré : accès refusé".into())));
@@ -1225,7 +1239,58 @@ fn rapport_pour_le_reparateur() {
     b.propre();
     // Une nouvelle enquête oublie le rapport copié
     b.commencer(&panne);
-    assert!(!b.etat.copie && b.etat.info_rapport.is_none());
+    assert!(!b.etat.copie && b.etat.info_rapport.is_none() && b.etat.rapport.is_none());
+}
+
+/// Chaque ligne non vide du rapport se retrouve dans la page, dans l'ordre (les titres de parties sans leur « : »,
+/// les « - » des listes et le retrait des réponses en moins).
+fn assert_rapport_montre(page: &Value, rapport: &str) {
+    let mut montres: Vec<String> = Vec::new();
+    for b in page["blocs"].as_array().unwrap() {
+        match b["type"].as_str() {
+            Some("titre") => montres.push(texte(b.get("texte"))),
+            Some("reglages") => {
+                for r in b["rangs"].as_array().unwrap() {
+                    montres.push(texte(r.get("texte")));
+                    if r.get("note").is_some() {
+                        montres.push(texte(r.get("note")));
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    let attendus: Vec<String> = rapport
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| {
+            let l = l.strip_prefix("- ").unwrap_or(l).trim();
+            if l.ends_with(" :") { l.trim_end_matches(" :").to_string() } else { l.to_string() }
+        })
+        .collect();
+    assert_eq!(montres, attendus, "le rapport montré n'est pas celui du fichier");
+}
+
+/// Contre-épreuve : un rapport pas encore prêt montre ce qu'il contiendra, sans planter ; un texte vide aussi.
+#[test]
+fn reparateur_sans_le_texte() {
+    let (panne, choix) = chercher_parcours(|_, e| genre(e) == Some(TypeVerdict::Reparateur)).unwrap();
+    let mut b = Banc::nouveau(Some(IndicesGardes::default()));
+    b.commencer(&panne);
+    b.repondre(&choix);
+    for r in [None, Some(String::new())] {
+        b.etat.rapport = r;
+        let p = super::reparateur::page(&b.etat);
+        assert!(a_texte(&p, "Ce qu'il contient"), "{p}");
+    }
+    // Et l'inverse : une ligne perdue en route se voit
+    let t = b.rapport().unwrap();
+    b.etat.rapport = Some(t.clone());
+    let p = super::reparateur::page(&b.etat);
+    let faux = t.replace("Les réponses :", "Les réponses :\r\n- en trop");
+    let r = std::panic::catch_unwind(|| assert_rapport_montre(&p, &faux));
+    assert!(r.is_err(), "une ligne du fichier absente de la page doit se voir");
+    b.propre();
 }
 
 /// Sur le PC en panne, l'enquête attend ce que Windows a noté (Wait-Journaux), puis reprend.

@@ -385,12 +385,17 @@ fn enquete_de_bout_en_bout() {
     assert!(rapport.contains("Fait avec Mindcare 0.1.0."));
     // (une enquête faite sur un autre appareil : rien du PC)
     assert!(!rapport.contains("Ordinateur :"));
-    assert_eq!(b.messages().last(), Some(&(reparateur::enregistre(&nom), true)));
+    // (dit dans la page seulement, pas en bulle ; la page montre le texte du fichier, tel quel)
+    assert!(!b.messages().iter().any(|(m, _)| *m == reparateur::enregistre(&nom)), "{:?}", b.messages());
+    assert!(b.dernier_etat()["pages"][ecrans::REPARATEUR].to_string().contains(&reparateur::enregistre(&nom)));
+    assert_eq!(b.b.pages.rapport.as_deref(), Some(rapport.as_str()));
+    assert!(b.dernier_etat()["pages"][ecrans::REPARATEUR].to_string().contains(&format!("Panne : {titre}")));
     assert!(b.journal().contains("Rapport enregistré : "));
     // Copier : le même texte
     b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
     assert_eq!(b.copies.borrow().as_slice(), std::slice::from_ref(&rapport));
-    assert_eq!(b.messages().last(), Some(&(reparateur::COPIE.to_string(), true)));
+    assert!(!b.messages().iter().any(|(m, _)| m == reparateur::COPIE), "{:?}", b.messages());
+    assert!(b.dernier_etat()["pages"][ecrans::REPARATEUR].to_string().contains(reparateur::COPIE));
     assert!(b.b.pages.copie);
     // Un second rapport dans la même minute : le premier est gardé
     b.action(ids::BUREAU, Value::Null, ecrans::REPARATEUR);
@@ -558,10 +563,11 @@ fn rapport_et_copie_impossibles() {
     b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
     b.jusqu_a_la_reponse("1");
     b.action(ids::BUREAU, Value::Null, ecrans::REPARATEUR);
-    assert_eq!(b.messages().last(), Some(&(reparateur::ECHEC_ENREGISTRER.to_string(), false)));
+    assert!(b.dernier_etat()["pages"][ecrans::REPARATEUR].to_string().contains(reparateur::ECHEC_ENREGISTRER));
     assert!(b.journal().contains("Rapport non enregistré : Bureau introuvable"));
     b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
-    assert_eq!(b.messages().last(), Some(&(reparateur::ECHEC_COPIE.to_string(), false)));
+    assert!(b.dernier_etat()["pages"][ecrans::REPARATEUR].to_string().contains(reparateur::ECHEC_COPIE));
+    assert!(b.messages().is_empty(), "{:?}", b.messages());
     assert!(b.journal().contains("Rapport non copié : presse-papiers pris"));
     assert!(!b.b.pages.copie);
     // Une commande à copier : « Copie impossible », et le journal

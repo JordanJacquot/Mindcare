@@ -99,8 +99,9 @@ pub struct LectureWindows {
     /// L'enquête attend la lecture depuis cet instant (effet `LireWindows`), et la lecture était-elle déjà finie
     attente: Option<(Instant, bool)>,
     pc: Arc<Mutex<Option<LuPc>>>,
-    /// La raison d'une lecture du PC ratée est déjà au journal
+    /// La raison d'une lecture du PC ratée est déjà au journal (barrettes, modèle du PC)
     pc_note: bool,
+    infos_note: bool,
 }
 
 impl LectureWindows {
@@ -115,6 +116,7 @@ impl LectureWindows {
             attente: None,
             pc: Arc::new(Mutex::new(None)),
             pc_note: false,
+            infos_note: false,
         }
     }
 
@@ -214,12 +216,16 @@ impl LectureWindows {
         }
     }
 
-    /// `Get-InfosPC` : « Fabricant Modèle, Windows » (vide s'il n'est pas encore lu, ou illisible : au journal).
-    pub fn infos(&self, journal: &mindcare_donnees::Journal) -> String {
+    /// `Get-InfosPC` : « Fabricant Modèle, Windows » (vide s'il n'est pas encore lu, ou illisible : au journal, une
+    /// fois : le rapport est refait à chaque affichage d'une réponse finale).
+    pub fn infos(&mut self, journal: &mindcare_donnees::Journal) -> String {
         match self.pc().map(|p| p.infos) {
             Some(Ok(l)) => infos_pc(Ok(&l), journal),
-            Some(Err(e)) => infos_pc(Err(&e), journal),
-            None => String::new(),
+            Some(Err(e)) if !self.infos_note => {
+                self.infos_note = true;
+                infos_pc(Err(&e), journal)
+            }
+            Some(Err(_)) | None => String::new(),
         }
     }
 }
@@ -395,6 +401,12 @@ impl Branchement {
         let cat = self.cat.clone();
         match e {
             Effet::Afficher { ecran } => {
+                // (le rapport montré dans « Pour le réparateur » : refait tant qu'il n'est ni enregistré ni copié)
+                if let Some(cat) = cat.as_deref()
+                    && self.pages.rapport_a_refaire(cat)
+                {
+                    self.pages.rapport = self.rapport(cat, monde.donnees);
+                }
                 monde.page.etat(self.etat_kit(), ecran.as_deref());
                 Vec::new()
             }
@@ -423,22 +435,22 @@ impl Branchement {
             }
             Effet::RapportBureau => {
                 let Some(cat) = cat.as_deref() else { return Vec::new() };
-                let r = self.rapport(cat, monde.donnees).ok_or_else(|| "aucune réponse montrée".to_string()).and_then(
-                    |t| {
-                        let bureau = self.exterieur.bureau()?;
-                        enregistrer_rapport(&bureau, &t, &journal)
-                            .map(|f| f.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default())
-                            .map_err(|e| e.to_string())
-                    },
-                );
+                let texte = self.rapport(cat, monde.donnees);
+                self.pages.rapport.clone_from(&texte);
+                let r = texte.ok_or_else(|| "aucune réponse montrée".to_string()).and_then(|t| {
+                    let bureau = self.exterieur.bureau()?;
+                    enregistrer_rapport(&bureau, &t, &journal)
+                        .map(|f| f.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default())
+                        .map_err(|e| e.to_string())
+                });
                 self.pages.rapport_enregistre(r)
             }
             Effet::CopierRapport => {
                 let Some(cat) = cat.as_deref() else { return Vec::new() };
-                let r = self
-                    .rapport(cat, monde.donnees)
-                    .ok_or_else(|| "aucune réponse montrée".to_string())
-                    .and_then(|t| self.exterieur.copier(&t));
+                let texte = self.rapport(cat, monde.donnees);
+                self.pages.rapport.clone_from(&texte);
+                let r =
+                    texte.ok_or_else(|| "aucune réponse montrée".to_string()).and_then(|t| self.exterieur.copier(&t));
                 self.pages.rapport_copie(r)
             }
             Effet::CopierCommande { numero, texte } => {

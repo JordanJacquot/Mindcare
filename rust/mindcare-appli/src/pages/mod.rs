@@ -24,6 +24,8 @@ mod accueil;
 mod actions;
 mod enquete;
 mod familles;
+#[cfg(test)]
+mod juges;
 mod outils;
 mod raconte;
 mod reparateur;
@@ -75,10 +77,11 @@ pub enum Effet {
     /// Lire ce que Windows a noté sur ce PC (en arrière-plan, sans figer la fenêtre), et les barrettes de mémoire ;
     /// une fois lu, ou au bout de 30 secondes : [`Etat::windows_lu`]. Rendu une seule fois par lecture attendue.
     LireWindows,
-    /// Enregistrer le rapport sur le Bureau (`etat.en_cours.rapport(...)`, `rapport::enregistrer_rapport`) ; puis
-    /// [`Etat::rapport_enregistre`] avec le nom du fichier ou l'erreur.
+    /// Enregistrer le rapport sur le Bureau (`etat.en_cours.rapport(...)`, rangé aussi dans [`Etat::rapport`] : la
+    /// page montre le texte enregistré, `rapport::enregistrer_rapport`) ; puis [`Etat::rapport_enregistre`] avec le
+    /// nom du fichier ou l'erreur. Le fichier ne s'ouvre jamais dans un autre programme.
     RapportBureau,
-    /// Copier le rapport dans le presse-papiers ; puis [`Etat::rapport_copie`].
+    /// Copier le rapport dans le presse-papiers (rangé aussi dans [`Etat::rapport`]) ; puis [`Etat::rapport_copie`].
     CopierRapport,
     /// Copier une commande à taper dans le Terminal (Mindcare ne la lance jamais) ; puis [`Etat::commande_copiee`].
     CopierCommande { numero: usize, texte: String },
@@ -138,6 +141,10 @@ pub struct Etat {
     pub copie: bool,
     /// Le dernier essai d'enregistrer ou de copier le rapport
     pub info_rapport: Option<InfoRapport>,
+    /// Le texte du rapport montré dans « Pour le réparateur » (`Get-ResumeEnCours`), préparé par programme.rs avant
+    /// chaque affichage d'une réponse finale ([`Etat::rapport_a_refaire`]) ; une fois enregistré ou copié, c'est le
+    /// texte enregistré ou copié, gardé tel quel. `None` : pas encore prêt.
+    pub rapport: Option<String>,
     /// Le dernier écran dit par le kit (`{ type: 'ecran', id }`)
     pub ecran: String,
 }
@@ -235,14 +242,29 @@ impl Etat {
     fn nouvelle_page_enquete(&mut self) {
         self.gestes.clear();
         self.commande = None;
+        self.nouveau_rapport();
+    }
+
+    /// Le rapport d'une autre réponse : à refaire, pas encore enregistré ni copié.
+    fn nouveau_rapport(&mut self) {
         self.copie = false;
         self.info_rapport = None;
+        self.rapport = None;
+    }
+
+    /// Le rapport est à (re)faire avant d'envoyer l'état au kit : une réponse finale est montrée, et son rapport n'a
+    /// pas encore été enregistré ni copié (ensuite, la page garde le texte enregistré ou copié). programme.rs le
+    /// construit alors (`en_cours.rapport(...)`, avec la date et ce que Windows dit du PC) et le range dans
+    /// [`Etat::rapport`].
+    pub fn rapport_a_refaire(&self, cat: &Catalogue) -> bool {
+        (self.rapport.is_none() || self.info_rapport.is_none()) && matches!(self.vue(cat), Some(Vue::Reponse(_)))
     }
 
     /// `Show-Etape` : l'enquête avance (réponses déjà connues données toutes seules), puis elle est enregistrée et
     /// montrée, ou elle attend ce que Windows a noté.
     fn avancer(&mut self, cat: &Catalogue) -> Vec<Effet> {
         self.commande = None;
+        self.nouveau_rapport();
         match self.en_cours.avancer(cat, self.indices_du_jour.as_ref()) {
             None => {
                 self.retour_accueil();
@@ -281,42 +303,35 @@ impl Etat {
         vec![Effet::rafraichir()]
     }
 
-    /// Le rapport a été enregistré sur le Bureau (le nom de son fichier), ou pas (l'erreur).
+    /// Le rapport a été enregistré sur le Bureau (le nom de son fichier), ou pas (l'erreur). Comme Add-Reparateur,
+    /// le résultat est dit dans la page seulement (pas de bulle en plus, qui recouvrait le titre).
     pub fn rapport_enregistre(&mut self, resultat: Result<String, String>) -> Vec<Effet> {
         use mindcare_donnees::rapport::reparateur as r;
         match resultat {
             Ok(nom) => {
                 let texte = r::enregistre(&nom);
-                self.info_rapport = Some(InfoRapport { texte: texte.clone(), reussi: true });
-                vec![Effet::Message { texte, bravo: true }, Effet::rafraichir()]
+                self.info_rapport = Some(InfoRapport { texte, reussi: true });
+                vec![Effet::rafraichir()]
             }
             Err(erreur) => {
                 self.info_rapport = Some(InfoRapport { texte: r::ECHEC_ENREGISTRER.into(), reussi: false });
-                vec![
-                    Effet::Journal(r::journal_echec_enregistrer(&erreur)),
-                    Effet::message(r::ECHEC_ENREGISTRER, false),
-                    Effet::rafraichir(),
-                ]
+                vec![Effet::Journal(r::journal_echec_enregistrer(&erreur)), Effet::rafraichir()]
             }
         }
     }
 
-    /// Le rapport a été copié, ou pas (l'erreur).
+    /// Le rapport a été copié, ou pas (l'erreur) : dit dans la page seulement, comme l'enregistrement.
     pub fn rapport_copie(&mut self, resultat: Result<(), String>) -> Vec<Effet> {
         use mindcare_donnees::rapport::reparateur as r;
         match resultat {
             Ok(()) => {
                 self.copie = true;
                 self.info_rapport = Some(InfoRapport { texte: r::COPIE.into(), reussi: true });
-                vec![Effet::message(r::COPIE, true), Effet::rafraichir()]
+                vec![Effet::rafraichir()]
             }
             Err(erreur) => {
                 self.info_rapport = Some(InfoRapport { texte: r::ECHEC_COPIE.into(), reussi: false });
-                vec![
-                    Effet::Journal(r::journal_echec_copie(&erreur)),
-                    Effet::message(r::ECHEC_COPIE, false),
-                    Effet::rafraichir(),
-                ]
+                vec![Effet::Journal(r::journal_echec_copie(&erreur)), Effet::rafraichir()]
             }
         }
     }

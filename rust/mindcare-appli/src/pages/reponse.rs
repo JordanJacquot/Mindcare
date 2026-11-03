@@ -119,7 +119,8 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
     json!({
         "titre": panne,
         "sous": "La réponse de Mindcare",
-        "icone": "ok",
+        // (l'icône du badge : jamais une coche sur « Urgent »)
+        "icone": b.icone,
         "couleur": b.couleur,
         "retour": "appli",
         "actions": [

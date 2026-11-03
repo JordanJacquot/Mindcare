@@ -2,10 +2,9 @@
 
 use serde_json::{Value, json};
 
-use mindcare_donnees::format_date;
 use mindcare_donnees::historique::info_diagnostic;
 use mindcare_moteur::Catalogue;
-use mindcare_moteur::ps::{champ, texte, vrai};
+use mindcare_moteur::ps::{champ, vrai};
 
 use super::outils::{nombre, t};
 use super::{Etat, ecrans};
@@ -34,9 +33,9 @@ pub fn accueil(etat: &Etat, cat: &Catalogue) -> Value {
                 tuiles.push(json!({ "id": DERNIERE, "nom": "Dernière enquête", "icone": "rapport", "sous": titre,
                                     "couleur": "vert" }));
             } else {
-                let debut = format_date(&texte(champ(d, "Debut")), false);
-                let sous = if debut.is_empty() { titre } else { format!("{titre} · commencée le {debut}") };
-                tuiles.push(json!({ "id": REPRENDRE, "nom": "Reprendre l'enquête", "icone": "actu", "sous": sous,
+                // (la panne seulement, comme « Dernière enquête » : avec la date en plus, la ligne de la tuile devenait
+                // trop petite pour être lue, capture du 03/11)
+                tuiles.push(json!({ "id": REPRENDRE, "nom": "Reprendre l'enquête", "icone": "actu", "sous": titre,
                                     "couleur": "T", "alerte": true }));
             }
         }
