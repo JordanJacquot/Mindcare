@@ -1,6 +1,6 @@
 {
   "identifier": "principale",
-  "description": "La fenêtre de Mindcare dans Mindset : seulement les deux commandes dont sa page se sert.",
+  "description": "La fenêtre de Mindcare dans Mindset : seulement les trois commandes dont sa page se sert (l'état, la visibilité, les messages du kit).",
   "windows": ["principale"],
-  "permissions": ["allow-suivre-page", "allow-noter-visibilite"]
+  "permissions": ["allow-suivre-page", "allow-noter-visibilite", "allow-action"]
 }

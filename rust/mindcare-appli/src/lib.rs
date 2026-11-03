@@ -21,8 +21,10 @@ pub mod commandes;
 pub mod essai;
 pub mod fenetre;
 pub mod pack;
+pub mod pages;
 #[cfg(any(feature = "essai", test))]
 pub mod png;
+pub mod pont;
 #[cfg(windows)]
 pub mod programme;
 #[cfg(windows)]
@@ -38,9 +40,11 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Ajoute à Tauri la page partagée et les commandes de l'appli (les seules que la page peut appeler, chacune avec
 /// sa permission dans capabilities\principale.json).
 pub fn preparer<R: tauri::Runtime>(constructeur: tauri::Builder<R>, page: Page) -> tauri::Builder<R> {
-    constructeur
-        .manage(page)
-        .invoke_handler(tauri::generate_handler![commandes::suivre_page, commandes::noter_visibilite])
+    constructeur.manage(page).invoke_handler(tauri::generate_handler![
+        commandes::suivre_page,
+        commandes::noter_visibilite,
+        commandes::action
+    ])
 }
 
 /// La configuration de Tauri lue à la construction (tauri.conf.json, capabilities\, les pages de ui\ rangées dans

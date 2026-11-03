@@ -190,7 +190,26 @@ pub fn lancer() -> ! {
     *donnees.borrow_mut() = Some(d);
 
     let pour_page = journal.clone();
-    let page = Page::new(etat_page(VERSION, l.gere, &theme.variables_css()), move |t| pour_page.ecrire(t));
+    let page = Page::new(etat_page(VERSION, l.gere, &[]), move |t| pour_page.ecrire(t));
+    // (les couleurs du thème et d'un pack viennent de l'habillage, comme Get-PackVue de vue.ps1)
+    page.habiller(crate::pont::Habillage::depuis(&theme, crate::pont::soir(heure::maintenant().heure)));
+    let dossier_mindset = l.dossier_mindset.clone();
+    let pour_receveur = journal.clone();
+    page.recevoir(move |m| match m {
+        crate::pont::MessagePage::Menu => ETAT.with(|e| {
+            let Ok(mut e) = e.try_borrow_mut() else { return };
+            let Some(etat) = e.as_mut() else { return };
+            let ligne = if etat.vie.dans_mindset() {
+                crate::pont::demander_menu(&dossier_mindset, &mut etat.systeme, &mut etat.disque)
+            } else {
+                // (hors de Mindset : rien à ramener, la demande est seulement notée)
+                crate::pont::ligne_journal(&crate::pont::MessagePage::Menu)
+            };
+            etat.journal.ecrire(&ligne);
+        }),
+        // (étape 5.3 : vers les pages)
+        autre => pour_receveur.ecrire(&crate::pont::ligne_journal(&autre)),
+    });
     let dossier_pack = theme.pack.as_ref().map(|p| p.dossier.clone());
     let taille_min = Taille { largeur: TAILLE_MIN.0, hauteur: TAILLE_MIN.1 };
     ETAT.with(|e| {

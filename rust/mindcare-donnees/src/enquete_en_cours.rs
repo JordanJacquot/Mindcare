@@ -80,6 +80,39 @@ pub enum Affichage {
     Reponse(Box<Enquete>, String),
 }
 
+/// Où en est l'enquête après [`EnqueteEnCours::avancer`].
+#[derive(Debug, Clone)]
+pub enum Avance {
+    /// Une étape à montrer, ou la réponse finale (l'enquête finie)
+    Prete(Box<Enquete>),
+    /// Sur le PC en panne : elle attend ce que Windows a noté (`Wait-Journaux`)
+    Windows,
+}
+
+/// La phrase de la réponse finale montrée et gardée (`Show-Verdict`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TitreReponse {
+    pub titre: String,
+    /// Le suspect trouvé est une pièce à acheter
+    pub piece: bool,
+    /// Cette pièce n'est restée que par élimination : pas testée, jamais présentée comme sûre
+    pub supposee: bool,
+}
+
+/// La phrase de la réponse finale (`Get-VerdictTitre`), sauf pour une pièce seulement restée par élimination : elle
+/// n'a pas été testée, « À vérifier : ... » (on ne fait pas acheter sur une supposition).
+pub fn titre_reponse(cat: &Catalogue, e: &Enquete) -> TitreReponse {
+    let v = e.verdict.as_ref();
+    let mut titre = titre_verdict(cat, v);
+    let suspect = v.and_then(|v| v.suspect.as_deref()).and_then(|s| cat.suspect(s));
+    let piece = suspect.is_some_and(|s| vrai(champ(s, "Piece")));
+    let supposee = piece && v.is_some_and(|v| v.genre == TypeVerdict::Elimination);
+    if supposee {
+        titre = format!("À vérifier : {}", minuscule(&texte(suspect.and_then(|s| champ(s, "Titre")))));
+    }
+    TitreReponse { titre, piece, supposee }
+}
+
 /// L'enquête en cours.
 #[derive(Debug, Clone, Default)]
 pub struct EnqueteEnCours {
@@ -107,21 +140,19 @@ impl EnqueteEnCours {
         self.reprise.as_ref().is_some_and(|r| egal(&r.id, &self.diag_id))
     }
 
-    /// `Start-Diagnostic` : une nouvelle enquête (`pre_rempli` : les réponses déjà données par la phrase ; la question
-    /// de sécurité « danger » est toujours posée).
-    pub fn commencer(
+    /// La partie sans disque de `Start-Diagnostic` : la panne choisie, aucune réponse encore (`pre_rempli` : les
+    /// réponses déjà données par la phrase ; la question de sécurité « danger » est toujours posée). Rend la ligne du
+    /// journal à écrire, ou rien pour une panne inconnue (plus de panne en cours, comme PowerShell : l'accueil).
+    pub fn preparer(
         &mut self,
         cat: &Catalogue,
-        donnees: &mut Donnees,
         id: &str,
         pre_rempli: Option<&PreRempli>,
         diag_id: String,
-        indices_du_jour: &IndicesGardes,
-    ) -> Affichage {
-        // (une panne inconnue : plus de panne en cours, comme PowerShell, et l'accueil)
+    ) -> Option<String> {
         let Some(p) = cat.panne(id) else {
             self.panne = None;
-            return Affichage::Accueil;
+            return None;
         };
         self.panne = Some(p.clone());
         self.choix.clear();
@@ -139,36 +170,45 @@ impl EnqueteEnCours {
             }
             _ => String::new(),
         };
-        donnees.journal().ecrire(&format!("Enquête : {id}{deja}"));
-        self.montrer(cat, donnees, indices_du_jour)
+        Some(format!("Enquête : {id}{deja}"))
     }
 
-    /// `Open-Diagnostic` : une enquête gardée, là où on en était (son étape, ou sa réponse).
-    pub fn ouvrir(
+    /// `Start-Diagnostic` : une nouvelle enquête (`pre_rempli` : les réponses déjà données par la phrase ; la question
+    /// de sécurité « danger » est toujours posée).
+    pub fn commencer(
         &mut self,
         cat: &Catalogue,
         donnees: &mut Donnees,
         id: &str,
+        pre_rempli: Option<&PreRempli>,
+        diag_id: String,
         indices_du_jour: &IndicesGardes,
     ) -> Affichage {
-        let d = donnees.historique.trouver(id).cloned();
-        let p = d.as_ref().and_then(|d| cat.panne(&texte(champ(d, "Panne"))));
+        // (une panne inconnue : plus de panne en cours, comme PowerShell, et l'accueil)
+        let Some(ligne) = self.preparer(cat, id, pre_rempli, diag_id) else { return Affichage::Accueil };
+        donnees.journal().ecrire(&ligne);
+        self.montrer(cat, donnees, indices_du_jour)
+    }
+
+    /// La partie sans disque de `Open-Diagnostic` : l'enquête gardée `d` (trouvée dans l'historique par son Id `id`),
+    /// là où on en était. Rend la ligne du journal à écrire : « Reprise de l'enquête... », ou en erreur « Enquête ...
+    /// introuvable » (aucune enquête gardée, ou sa panne n'est plus dans le catalogue : rien n'est changé).
+    pub fn preparer_reprise(&mut self, cat: &Catalogue, id: &str, d: Option<&Objet>) -> Result<String, String> {
+        let p = d.and_then(|d| cat.panne(&texte(champ(d, "Panne"))));
         let (Some(d), Some(p)) = (d, p) else {
-            donnees.journal().ecrire(&format!("Enquête {id} introuvable"));
-            return Affichage::Accueil;
+            return Err(format!("Enquête {id} introuvable"));
         };
         self.panne = Some(p.clone());
         self.diag_id = id.to_string();
         // (finie : revue avec ce que Windows avait noté ce jour-là, pas celui d'aujourd'hui : sa réponse ne change pas
         // toute seule)
-        self.indices_gardes = if vrai(champ(&d, "Fini")) && champ(&d, "Indices").is_some() && vrai(champ(&d, "Indices"))
-        {
-            Some(convertir_indices(champ(&d, "Indices")))
+        self.indices_gardes = if vrai(champ(d, "Fini")) && champ(d, "Indices").is_some() && vrai(champ(d, "Indices")) {
+            Some(convertir_indices(champ(d, "Indices")))
         } else {
             None
         };
         self.reprise = None;
-        let reponses = champ(&d, "Reponses");
+        let reponses = champ(d, "Reponses");
         if reponses.is_some() && !tableau(reponses).is_empty() {
             // Chaque réponse ne va qu'à la question qui porte son Id
             self.choix.clear();
@@ -184,30 +224,67 @@ impl EnqueteEnCours {
                 Some(Reprise { id: id.to_string(), reponses: tableau(reponses).into_iter().cloned().collect() });
         } else {
             // (ancien format : les numéros seulement)
-            self.choix = parcours(champ(&d, "Choix")).into_iter().filter_map(|n| entier(Some(n))).collect();
+            self.choix = parcours(champ(d, "Choix")).into_iter().filter_map(|n| entier(Some(n))).collect();
             self.pre_rempli = None;
         }
-        donnees.journal().ecrire(&format!("Reprise de l'enquête {id} ({})", texte(champ(p, "Id"))));
-        self.montrer(cat, donnees, indices_du_jour)
+        Ok(format!("Reprise de l'enquête {id} ({})", texte(champ(p, "Id"))))
+    }
+
+    /// `Open-Diagnostic` : une enquête gardée, là où on en était (son étape, ou sa réponse).
+    pub fn ouvrir(
+        &mut self,
+        cat: &Catalogue,
+        donnees: &mut Donnees,
+        id: &str,
+        indices_du_jour: &IndicesGardes,
+    ) -> Affichage {
+        let d = donnees.historique.trouver(id).cloned();
+        match self.preparer_reprise(cat, id, d.as_ref()) {
+            Ok(ligne) => {
+                donnees.journal().ecrire(&ligne);
+                self.montrer(cat, donnees, indices_du_jour)
+            }
+            Err(ligne) => {
+                donnees.journal().ecrire(&ligne);
+                Affichage::Accueil
+            }
+        }
     }
 
     /// `Get-EnqueteEnCours` : l'enquête rejouée ; ouverte sur le PC en panne (« cepc »), avec ce que Windows a noté
     /// (ce jour-là pour une enquête finie revue, sinon aujourd'hui).
     pub fn enquete(&self, cat: &Catalogue, indices_du_jour: &IndicesGardes) -> Option<Enquete> {
+        self.enquete_avec(cat, Some(indices_du_jour))
+    }
+
+    /// Comme [`EnqueteEnCours::enquete`], quand ce que Windows a noté aujourd'hui n'est peut-être pas encore lu
+    /// (`None`) : sur le PC en panne, sans indices gardés, l'enquête est alors rejouée sans Windows (elle attend :
+    /// voir [`EnqueteEnCours::attend_windows`]).
+    pub fn enquete_avec(&self, cat: &Catalogue, indices_du_jour: Option<&IndicesGardes>) -> Option<Enquete> {
         let p = self.panne.as_ref()?;
         let e = enquete(cat, p, &self.choix, None);
-        if e.notes.iter().any(|n| egal(n, "cepc")) {
-            let i = self.indices_gardes.as_ref().unwrap_or(indices_du_jour).moteur();
-            return Some(enquete(cat, p, &self.choix, Some(&i)));
+        if e.notes.iter().any(|n| egal(n, "cepc"))
+            && let Some(i) = self.indices_gardes.as_ref().or(indices_du_jour)
+        {
+            return Some(enquete(cat, p, &self.choix, Some(&i.moteur())));
         }
         Some(e)
     }
 
-    /// `Show-Etape` sans l'écran : les questions auxquelles on a déjà répondu reçoivent leur réponse toutes seules (une
-    /// seule fois), puis l'étape est enregistrée (une enquête déjà finie le reste tant qu'une nouvelle réponse ne la
-    /// remplace pas), ou c'est la réponse finale.
-    pub fn montrer(&mut self, cat: &Catalogue, donnees: &mut Donnees, indices_du_jour: &IndicesGardes) -> Affichage {
-        let Some(mut e) = self.enquete(cat, indices_du_jour) else { return Affichage::Accueil };
+    /// `Wait-Journaux` sans l'écran : sur le PC en panne (« cepc »), l'enquête attend ce que Windows a noté avant
+    /// d'avancer (sauf une enquête finie revue, qui a ses indices gardés).
+    pub fn attend_windows(&self, e: &Enquete, indices_du_jour: Option<&IndicesGardes>) -> bool {
+        e.notes.iter().any(|n| egal(n, "cepc")) && self.indices_gardes.is_none() && indices_du_jour.is_none()
+    }
+
+    /// La partie sans disque de `Show-Etape` : les questions auxquelles on a déjà répondu reçoivent leur réponse toutes
+    /// seules (une seule fois). Rend l'enquête où on en est (une étape, ou finie), [`Avance::Windows`] si elle attend
+    /// ce que Windows a noté (pas encore lu : `indices_du_jour` à `None`), ou rien sans panne en cours.
+    pub fn avancer(&mut self, cat: &Catalogue, indices_du_jour: Option<&IndicesGardes>) -> Option<Avance> {
+        let mut e = self.enquete_avec(cat, indices_du_jour)?;
+        if self.attend_windows(&e, indices_du_jour) {
+            return Some(Avance::Windows);
+        }
         while let Some(etape) = &e.etape {
             let id = texte(champ(etape, "Id"));
             let Some(n) = self.pre_rempli.as_ref().and_then(|r| r.get(&id)) else { break };
@@ -220,12 +297,39 @@ impl EnqueteEnCours {
             }
             self.choix = e.choix.clone();
             self.choix.push(n);
-            match self.enquete(cat, indices_du_jour) {
+            match self.enquete_avec(cat, indices_du_jour) {
                 Some(x) => e = x,
                 None => break,
             }
+            if self.attend_windows(&e, indices_du_jour) {
+                return Some(Avance::Windows);
+            }
         }
         self.choix = e.choix.clone();
+        Some(Avance::Prete(Box::new(e)))
+    }
+
+    /// `Show-Etape` sans l'écran : les questions auxquelles on a déjà répondu reçoivent leur réponse toutes seules (une
+    /// seule fois), puis l'étape est enregistrée (une enquête déjà finie le reste tant qu'une nouvelle réponse ne la
+    /// remplace pas), ou c'est la réponse finale.
+    pub fn montrer(&mut self, cat: &Catalogue, donnees: &mut Donnees, indices_du_jour: &IndicesGardes) -> Affichage {
+        match self.avancer(cat, Some(indices_du_jour)) {
+            Some(Avance::Prete(e)) => self.enregistrer(cat, donnees, *e, indices_du_jour),
+            // (« Windows » n'arrive jamais ici : les indices du jour sont donnés)
+            Some(Avance::Windows) | None => Affichage::Accueil,
+        }
+    }
+
+    /// La partie enregistrée de `Show-Etape`, une fois l'enquête avancée ([`EnqueteEnCours::avancer`]) : l'étape
+    /// gardée dans l'historique (une enquête déjà finie le reste tant qu'une nouvelle réponse ne la remplace pas), ou
+    /// la réponse finale (`Show-Verdict`).
+    pub fn enregistrer(
+        &mut self,
+        cat: &Catalogue,
+        donnees: &mut Donnees,
+        e: Enquete,
+        indices_du_jour: &IndicesGardes,
+    ) -> Affichage {
         if e.etape.is_some() {
             let fini = donnees.historique.trouver(&self.diag_id).is_some_and(|a| vrai(champ(a, "Fini")));
             if !fini {
@@ -253,8 +357,8 @@ impl EnqueteEnCours {
         self.reponse(cat, donnees, e, indices_du_jour)
     }
 
-    /// La partie enregistrée de `Show-Verdict` : la phrase de la réponse (une pièce seulement restée par élimination
-    /// n'a pas été testée : « À vérifier : ... »), l'enquête finie gardée avec ce que Windows avait noté.
+    /// La partie enregistrée de `Show-Verdict` : la phrase de la réponse ([`titre_reponse`]), l'enquête finie gardée
+    /// avec ce que Windows avait noté.
     fn reponse(
         &mut self,
         cat: &Catalogue,
@@ -263,13 +367,7 @@ impl EnqueteEnCours {
         indices_du_jour: &IndicesGardes,
     ) -> Affichage {
         let v = e.verdict.clone();
-        let mut titre = titre_verdict(cat, v.as_ref());
-        let suspect = v.as_ref().and_then(|v| v.suspect.as_deref()).and_then(|s| cat.suspect(s));
-        let piece = suspect.is_some_and(|s| vrai(champ(s, "Piece")));
-        let supposee = piece && v.as_ref().is_some_and(|v| v.genre == TypeVerdict::Elimination);
-        if supposee {
-            titre = format!("À vérifier : {}", minuscule(&texte(suspect.and_then(|s| champ(s, "Titre")))));
-        }
+        let TitreReponse { titre, piece, supposee } = titre_reponse(cat, &e);
         let panne = self.panne_id();
         let genre = v.as_ref().map(|v| v.genre.nom()).unwrap_or_default();
         let suspect_id = v.as_ref().and_then(|v| v.suspect.clone()).filter(|s| !s.is_empty());

@@ -1709,6 +1709,7 @@ name = "mindcare-appli"
 version = "0.1.0"
 dependencies = [
  "mindcare-donnees",
+ "mindcare-moteur",
  "mindcare-vie",
  "serde_json",
  "suite-commun",

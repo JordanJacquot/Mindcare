@@ -14,7 +14,7 @@ fn main() {
     // Les commandes de src\commandes.rs, toutes ici (verifier-tauri.ps1 compare les deux listes)
     let attributs = tauri_build::Attributes::new()
         .windows_attributes(windows)
-        .app_manifest(tauri_build::AppManifest::new().commands(&["suivre_page", "noter_visibilite"]));
+        .app_manifest(tauri_build::AppManifest::new().commands(&["suivre_page", "noter_visibilite", "action"]));
     tauri_build::try_build(attributs).expect("construction de Mindcare (tauri-build)");
     // Les exe des tests (tests\) : tauri-build ne donne son manifeste qu'au programme. Sans les contrôles modernes de
     // Windows (comctl32 version 6, option « common-controls-v6 »), ils ne démarrent pas (STATUS_ENTRYPOINT_NOT_FOUND).

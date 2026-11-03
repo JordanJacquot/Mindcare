@@ -40,6 +40,8 @@ suite-commun.workspace = true
 # La vie de l'appli avec Mindset (démarrage, verrou, surveillances), ses données (dossier, journal, etat.json, réglages)
 mindcare-vie = { path = "../mindcare-vie" }
 mindcare-donnees = { path = "../mindcare-donnees" }
+# Le moteur des enquêtes et son catalogue : les pages (src\pages) montrent ses étapes et sa réponse finale
+mindcare-moteur = { path = "../mindcare-moteur" }
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
 # webview2-com, et que le Rust de Mindset.

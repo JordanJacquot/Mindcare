@@ -1,0 +1,59 @@
+//! « Raconte ton problème » : la recherche par mots du moteur (Find-Pannes), les plus proches d'abord. L'assistant et
+//! la dictée viendront à l'étape 6.
+
+use serde_json::{Value, json};
+
+use mindcare_moteur::{Catalogue, chercher};
+
+use super::Etat;
+use super::outils::t;
+
+/// L'id du champ de recherche.
+pub const RECHERCHE: &str = "recherche";
+/// Le début de l'id d'une panne à commencer (« panne:redemarre »).
+pub const PANNE: &str = "panne:";
+/// Les pannes trouvées montrées au plus (Update-Accueil : les 8 premières).
+pub const MONTREES: usize = 8;
+
+pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
+    let mut blocs = vec![json!({
+        "type": "champ", "id": RECHERCHE, "recherche": true, "valeur": etat.recherche,
+        "indice": "Par exemple : « bip », « le son grésille », « écran bleu »...",
+    })];
+    let texte = etat.recherche.trim();
+    if texte.is_empty() {
+        blocs.push(json!({ "type": "note",
+            "texte": "Écris ce qui se passe avec tes mots : les pannes qui ressemblent s'affichent juste en dessous." }));
+    } else {
+        let trouvees = chercher(cat, texte);
+        if trouvees.is_empty() {
+            blocs.push(json!({ "type": "titre", "texte": format!("Rien ne correspond à « {texte} »") }));
+            blocs.push(json!({ "type": "note",
+                "texte": "Essaie d'autres mots, ou choisis ce qui est concerné dans « Ça concerne quoi ? »." }));
+        } else {
+            let n = trouvees.len();
+            let titre = if n == 1 { "Une panne correspond".to_string() } else { format!("{n} pannes correspondent") };
+            let droite = if n > MONTREES {
+                format!("Les {MONTREES} plus proches")
+            } else if n > 1 {
+                "La plus proche en premier".to_string()
+            } else {
+                String::new()
+            };
+            blocs.push(json!({ "type": "titre", "texte": titre, "droite": droite }));
+            for p in trouvees.into_iter().take(MONTREES) {
+                let famille = cat.famille(&t(p, "Famille")).map(|f| t(f, "Titre")).unwrap_or_default();
+                blocs.push(json!({
+                    "type": "ligne", "id": format!("{PANNE}{}", t(p, "Id")), "texte": t(p, "Titre"),
+                    "note": t(p, "Phrase"), "etiquette": famille, "valeur": "Commencer",
+                }));
+            }
+        }
+    }
+    json!({
+        "titre": "Raconte ton problème",
+        "sous": "Avec tes mots : Mindcare trouve la bonne enquête.",
+        "icone": "loupe", "couleur": "P",
+        "blocs": blocs,
+    })
+}

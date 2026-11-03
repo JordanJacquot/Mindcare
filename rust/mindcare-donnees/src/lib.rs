@@ -40,7 +40,9 @@ pub mod valeurs;
 
 pub use carte::{Carte, EtatMindset, court, etat_carte, phrase_carte};
 pub use donnees::Donnees;
-pub use enquete_en_cours::{Affichage, EnqueteEnCours, PreRempli, Reprise, nouvel_id};
+pub use enquete_en_cours::{
+    Affichage, Avance, EnqueteEnCours, PreRempli, Reprise, TitreReponse, nouvel_id, titre_reponse,
+};
 pub use fichiers::{FichierRelu, Fichiers};
 pub use historique::{Enregistrement, Historique, IndiceGarde, IndicesGardes, Paire, info_diagnostic, paires};
 pub use journal::{Horloge, Journal, horloge_figee};
