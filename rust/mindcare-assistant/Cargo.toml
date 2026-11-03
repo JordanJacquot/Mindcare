@@ -1,0 +1,46 @@
+[package]
+name = "mindcare-assistant"
+version = "0.1.0"
+description = "Le moteur de l'assistant de Mindcare (portage de modules\\ia.ps1 et de sa partie dans contenu.ps1) : llama-server lancé sans fenêtre et arrêté avec Mindcare, la question, la décision (enquête, « Pour être sûr » ou recherche par mots), sans écran"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Versions figées (« = ») : une nouvelle version n'entre que par un changement relu. Aucune bibliothèque nouvelle :
+# toutes sont déjà dans Cargo.lock et dans la liste blanche de deny.toml.
+# Le catalogue, le garde-fou (Select-PreRempli) et la recherche par mots (Find-Pannes)
+mindcare-moteur = { path = "../mindcare-moteur" }
+# Où est l'assistant installé (llama-server.exe, ses .dll, le modèle à lancer) : le même Paquet que l'installation
+mindcare-telechargement = { path = "../mindcare-telechargement" }
+# La question et la réponse de llama-server (JSON), dans l'ordre du texte reçu (comme ConvertFrom-Json)
+serde_json = { version = "=1.0.154", features = ["preserve_order"] }
+# L'empreinte de llama-server.exe et de sa copie Mindset.exe (Get-IaServeurLance)
+sha2 = "=0.10.9"
+
+# Le seul module qui parle à Windows (src\windows.rs) : le Job Object (llama-server arrêté avec Mindcare, même tuée)
+# et la clé aléatoire (BCryptGenRandom). La même version que le reste de la suite : rien de nouveau dans Cargo.lock.
+[target.'cfg(windows)'.dependencies.windows]
+version = "=0.62.2"
+features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Cryptography",
+    "Win32_System_JobObjects",
+    "Win32_System_Threading",
+]
+
+# Les essais avec de vrais programmes (le programme de test lui-même joue le faux llama-server et la fausse
+# Mindcare) : il a sa propre fonction main, pour lire les arguments de llama-server avant le lanceur de tests.
+[[test]]
+name = "vrais_programmes"
+harness = false
+
+# Pas `workspace = true` : le module Windows (src\windows.rs) a besoin d'autoriser le code « unsafe », que le reste
+# du dépôt interdit tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src\windows.rs.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

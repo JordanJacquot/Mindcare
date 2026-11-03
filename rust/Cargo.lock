@@ -1721,6 +1721,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "mindcare-assistant"
+version = "0.1.0"
+dependencies = [
+ "mindcare-moteur",
+ "mindcare-telechargement",
+ "serde_json",
+ "sha2",
+ "windows",
+]
+
+[[package]]
+name = "mindcare-dictee"
+version = "0.1.0"
+dependencies = [
+ "mindcare-telechargement",
+ "regex",
+ "suite-commun",
+ "windows",
+]
+
+[[package]]
 name = "mindcare-donnees"
 version = "0.1.0"
 dependencies = [

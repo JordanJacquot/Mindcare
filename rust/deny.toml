@@ -88,6 +88,12 @@ allow = [
     # les téléchargements de l'assistant et de la dictée (étape 6.1) : seulement sha2, flate2 (version Rust :
     # miniz_oxide, crc32fast) et windows (WinHTTP), tous déjà dans la liste
     "mindcare-telechargement",
+    # la dictée (étape 6.3) : seulement suite-commun, mindcare-telechargement, regex (déjà tiré par Tauri) et
+    # windows (waveIn, Job Object), tous déjà dans la liste
+    "mindcare-dictee",
+    # le moteur de l'assistant (étape 6.2) : seulement mindcare-moteur, mindcare-telechargement, serde_json, sha2 et
+    # windows (Job Object, BCryptGenRandom), tous déjà dans la liste
+    "mindcare-assistant",
     # Tauri 2.12.5, figé dans mindcare-appli\Cargo.toml (tauri-build est tiré par tauri lui-même pour sa construction)
     "tauri", "tauri-build", "tauri-codegen", "tauri-macros", "tauri-runtime", "tauri-runtime-wry", "tauri-utils",
     "tauri-winres",
