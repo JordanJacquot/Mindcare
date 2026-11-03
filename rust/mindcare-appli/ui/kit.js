@@ -37,7 +37,8 @@
 //               { type: 'score', valeur, sur, titre, texte }
 //               { type: 'ligne', id?, texte, note, valeur, ton, fait, icone, couleur, image, etiquette, quand: [haut, bas],
 //                 barre (0 à 100), bascule: { id, oui }, bascules: [{ id, oui, texte }], bouton: { id, texte, style },
-//                 case: { id, oui, valeur } }   image : une petite image à la place de l'icône (icône d'un programme)
+//                 case: { id, oui, valeur }, brut }   image : une petite image à la place de l'icône (icône d'un programme)
+//                 brut : true pour un texte à recopier tel quel (une commande à taper) : pas de typographie dessus
 //                 ton : 'ok' | 'attention' | 'urgent' (couleur de la valeur et de l'étiquette)
 //               { type: 'bascule', id, texte, note, oui } | { type: 'case', id, texte, note, valeur, oui }
 //               { type: 'bouton', id, texte, style: 'second' | 'danger', icone }   (les boutons qui se suivent : une ligne)
@@ -75,6 +76,8 @@
 // texte vide : fini), { kit: 'question', id, titre, texte, boutons: [{ id, texte, style }], details: { titre, lignes } }
 // (une question par-dessus l'écran ; la réponse revient en { type: 'reponse', id, valeur: id du bouton } ; Échap : le
 // dernier bouton ; details : un bloc qui s'ouvre sous le texte, fermé au départ).
+// Typographie : le kit pose lui-même les espaces insécables du français dans le texte affiché (voir typo()) ; les
+// applis envoient leurs textes avec des espaces ordinaires.
 (() => {
   'use strict';
   // ---------------------------------------------------------------- petits sons de console (après le premier geste)
@@ -163,6 +166,11 @@
   const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const couleur = (c) => (c && /^[a-z-]+$/i.test(c) ? `var(--${c})` : esc(c || 'var(--P)'));   // 'P', 'vert'... ou une couleur CSS
   const tons = { ok: 'vert', attention: 'orange', urgent: 'rouge' };
+  // La typographie française, à l'affichage : l'espace tapée avant « : » devient insécable (U+00A0), celle avant
+  // « ; ! ? » une fine insécable (U+202F), et celles à l'intérieur des guillemets « » insécables. Ces signes ne se
+  // retrouvent ainsi jamais seuls en début de ligne, ni un « seul en fin de ligne. Seule une espace déjà là est
+  // remplacée, rien n'est ajouté : « C:\ », « 10:30 », une adresse (https://...) restent tels quels.
+  const typo = (t) => (typeof t === 'string' ? t.replace(/[ \t]+([:»])/g, '\u00A0$1').replace(/[ \t]+([;!?])/g, '\u202F$1').replace(/«[ \t]+/g, '«\u00A0') : t);
   const heure = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   const CONNEXIONS = { cable: 'Câble', wifi: 'Wi-Fi', aucune: 'Pas de connexion' };
   const borne = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -178,6 +186,25 @@
     }
     return o;
   }
+
+  // Elle se fait sur le texte affiché (les nœuds de texte, et l'indice d'un champ), jamais sur le HTML, les valeurs des
+  // champs ni les ids, ni dans un texte à recopier (data-brut : une commande) : partout où le kit pose du texte, dès
+  // qu'il apparaît à l'écran (une page, la bulle, une question, la pastille « en cours », une mesure en direct...)
+  const BRUT = '[data-brut], code, kbd, pre, script, style, textarea';
+  const filtreTypo = { acceptNode: (n) => (n.nodeType === 1 && n.matches(BRUT) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) };
+  function typoTexte(n) { const t = typo(n.data); if (t !== n.data) n.data = t; }
+  function typoDans(n) {
+    if (n.nodeType === 3) { if (n.parentElement && !n.parentElement.closest(BRUT)) typoTexte(n); return; }
+    if (n.nodeType !== 1 || n.closest(BRUT)) return;
+    const w = document.createTreeWalker(n, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, filtreTypo);
+    for (let x = n; x; x = w.nextNode()) {
+      if (x.nodeType === 3) typoTexte(x);
+      else if (x.placeholder) { const t = typo(x.placeholder); if (t !== x.placeholder) x.placeholder = t; }
+    }
+  }
+  new MutationObserver((ms) => { for (const m of ms) { if (m.type === 'characterData') typoDans(m.target); else m.addedNodes.forEach(typoDans); } })
+    .observe(document.body, { childList: true, subtree: true, characterData: true });
+  typoDans(document.body);
 
   // ---------------------------------------------------------------- liaison avec l'appli
   // (une appli Tauri pose son propre pont, window.kitPont, avant ce fichier : ipc.js ; sinon, WebView2 de PowerShell)
@@ -339,7 +366,7 @@
     const p = plasma();
     if (p) {
       // La 3D : plasma.js dessine les tuiles dans la toile ; le kit garde le nom, le clavier et les sons
-      const donnees = t.map((x) => ({ id: x.id, nom: x.nom, sous: x.sous, icone: x.icone, gros: x.gros, petit: x.petit, couleur: x.couleur, image: urlSure(x.image), fond: urlSure(x.fond), alerte: x.alerte, pack: imagePack(x.id) }));
+      const donnees = t.map((x) => ({ id: x.id, nom: typo(x.nom), sous: typo(x.sous), icone: x.icone, gros: x.gros, petit: x.petit, couleur: x.couleur, image: urlSure(x.image), fond: urlSure(x.fond), alerte: x.alerte, pack: imagePack(x.id) }));
       if (!document.getElementById('accueil3d')) {
         ecran.innerHTML = `<div class="accueil3d${anime ? ' entree' : ''}" id="accueil3d"><div class="nom-sel" id="nomSel"></div><div class="aide-accueil">Fais glisser la rangée ou utilise les flèches ; clic (ou A) pour ouvrir</div></div>`;
       }
@@ -427,7 +454,7 @@
         const interne = b.bascule || b.bascules?.length || b.bouton || b.case || b.boutons?.length;
         const img = urlSure(b.image) ? `<span class="ic img"><img src="${urlSure(b.image)}" alt="" onerror="this.remove()"></span>` : icone(b.icone, b.couleur);
         const debut = `${b.case ? caseC(b.case.id, b.case.oui, b.case.valeur) : ''}${b.quand ? `<span class="quand"><b>${esc(b.quand[0])}</b>${esc(b.quand[1] || '')}</span>` : ''}${img}`;
-        const milieu = `<span class="txt"><b>${esc(b.texte)}</b>${note}</span>`;
+        const milieu = `<span class="txt"><b${b.brut ? ' data-brut="1"' : ''}>${esc(b.texte)}</b>${note}</span>`;
         const fin = `${b.barre != null ? barre(b.barre, b.ton) : ''}${etiq(b.etiquette, b.ton)}${b.valeur != null && b.valeur !== '' ? `<span class="v${b.ton ? ` ${esc(b.ton)}` : ''}">${esc(b.valeur)}</span>` : ''}${b.bascule ? bascule(b.bascule.id, b.bascule.oui) : ''}${(b.bascules || []).map((x) => `<span class="bascule-l">${esc(x.texte)}${bascule(x.id, x.oui)}</span>`).join('')}${b.bouton ? btn(b.bouton, ' petit') : ''}`;
         const cls = `ligne plaque${b.fait ? ' fait' : ''}${b.boutons?.length ? ' avec-btns' : ''}`;
         if (b.id && !interne) return `<button type="button" class="${cls} f" data-k="l:${esc(b.id)}" data-action="${esc(b.id)}">${debut}${milieu}<span class="fin">${fin}${fleche()}</span></button>`;
@@ -762,7 +789,7 @@
       };
       if (nouveau.ecran) { const id = nouveau.ecran; delete E.ecran; aller(id); choisir(); return; }
       if (nav.ecran !== 'accueil' && !E.pages?.[nav.ecran]) { aller('accueil'); choisir(); return; }
-      // (Mindcare, étape 5.5 : une recherche « en direct » montre ses résultats pendant qu'on tape ; le champ garde ce
+      // (une recherche « en direct » montre ses résultats pendant qu'on tape ; le champ garde ce
       // qui a été tapé depuis l'envoi, avec le curseur au même endroit. Les autres champs attendent toujours.)
       const saisie = document.activeElement;
       if (saisie?.tagName === 'INPUT' && saisie.dataset?.direct) {

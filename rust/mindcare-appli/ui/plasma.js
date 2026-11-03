@@ -20,24 +20,28 @@ function demarrer() {
   const I = () => window.kitIcones || {};
   const lire = (n, d) => getComputedStyle(document.body).getPropertyValue(n).trim() || d;
   const police = () => lire('--police-app', '"Segoe UI Variable Display", "Segoe UI", sans-serif');
-  const coul = { P: new THREE.Color(), S: new THREE.Color(), T: new THREE.Color(), O: new THREE.Color(), fond: new THREE.Color() };
+  const coul = { P: new THREE.Color(), S: new THREE.Color(), T: new THREE.Color(), O: new THREE.Color(), fond: new THREE.Color(), vide: new THREE.Color() };
+  // Une couleur du thème (#RRGGBB) telle quelle, sans conversion : le shader de l'anneau l'écrit directement à l'écran
+  const brute = (n, d) => { const m = /^#([0-9a-f]{6})/i.exec(lire(n, d)) || /^#([0-9a-f]{6})/i.exec(d), x = parseInt(m[1], 16); return [(x >> 16 & 255) / 255, (x >> 8 & 255) / 255, (x & 255) / 255]; };
   function couleurs() {
     coul.P.set(lire('--P', '#00E5FF')); coul.S.set(lire('--S', '#B04BFF')); coul.T.set(lire('--T', '#FF2EB5'));
     coul.O.set(lire('--orange', '#FFB020')); coul.fond.set(lire('--fond', '#06050F'));
+    // La partie vide de l'anneau : le même mélange que --vide dans kit.css (moitié --ligne, moitié --fond2)
+    const l = brute('--ligne', '#2A2450'), f = brute('--fond2', '#0C0920'); coul.vide.setRGB((l[0] + f[0]) / 2, (l[1] + f[1]) / 2, (l[2] + f[2]) / 2);
     if (acc) acc.couleurs(); if (sol) sol.couleurs();
   }
-  const unis = () => ({ c1: { value: coul.P }, c2: { value: coul.S }, c3: { value: coul.T }, co: { value: coul.O } });
+  const unis = () => ({ c1: { value: coul.P }, c2: { value: coul.S }, c3: { value: coul.T }, co: { value: coul.O }, cv: { value: coul.vide } });
 
   // ---------------------------------------------------------------- les shaders : l'anneau et le bord de plasma
   const vsUv = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
   // L'anneau : le plasma coule du cyan au violet puis au magenta le long de la partie remplie ; orange en alerte
-  const fsAnneau = `uniform float t; uniform float v; uniform float force; uniform float alerte; uniform vec3 c1; uniform vec3 c2; uniform vec3 c3; uniform vec3 co; varying vec2 vUv;
+  const fsAnneau = `uniform float t; uniform float v; uniform float force; uniform float alerte; uniform vec3 c1; uniform vec3 c2; uniform vec3 c3; uniform vec3 co; uniform vec3 cv; varying vec2 vUv;
     void main() { float u = vUv.x; float dedans = step(u, v); float k = clamp(u / max(v, 0.001), 0.0, 1.0);
       vec3 c = k < 0.5 ? mix(c1, c2, k * 2.0) : mix(c2, c3, k * 2.0 - 1.0); c = mix(c, co, alerte);
       float n = sin(u * 70.0 - t * (6.0 + v * 5.0)) * sin(vUv.y * 6.283 + t * 2.0) * 0.5 + 0.5; float n2 = sin(u * 23.0 + t * 1.3) * sin(vUv.y * 12.566 - t * 3.0) * 0.5 + 0.5;
       vec3 vif = c * (0.55 + 0.6 * n * n2) * force + vec3(1.0) * pow(n * n2, 4.0) * 0.5;
       float bout = smoothstep(0.035, 0.0, abs(u - v)) * 1.2 * step(v, 0.999) * step(0.004, v);
-      gl_FragColor = vec4(mix(vec3(0.10, 0.09, 0.22), vif, dedans) + c * bout, 1.0); }`;
+      gl_FragColor = vec4(mix(cv, vif, dedans) + c * bout, 1.0); }`;
   // Le bord d'une tuile : un rectangle arrondi de plasma qui tourne
   const fsBord = `uniform float t; uniform float force; uniform vec2 taille; uniform vec3 c1; uniform vec3 c2; uniform vec3 c3; uniform vec3 co; uniform float alerte; varying vec2 vUv;
     float sd(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }

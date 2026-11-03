@@ -58,7 +58,7 @@ fn commandes(etat: &Etat, commande: &Objet) -> Vec<Value> {
                 Some((n, false)) if n == k => "Copie impossible",
                 _ => "Copier",
             };
-            json!({ "type": "ligne", "icone": "windows", "couleur": "S", "texte": ligne, "note": ou,
+            json!({ "type": "ligne", "icone": "windows", "couleur": "S", "texte": ligne, "note": ou, "brut": true,
                     "bouton": { "id": ids::COMMANDE, "texte": bouton, "valeur": k.to_string() } })
         })
         .collect()

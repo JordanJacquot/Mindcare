@@ -8,6 +8,9 @@ body {
   --fond: #06050F; --fond2: #0C0920; --carte: rgba(16, 13, 38, 0.82); --carte2: rgba(28, 23, 62, 0.9); --ligne: #2A2450;
   --texte: #ECEAF7; --doux: #A9A3C9; --pale: #6F6894; --P: #00E5FF; --S: #B04BFF; --T: #FF2EB5; --vert: #3DDC84; --orange: #FFB020; --rouge: #FF5C7A;
   --police-app: var(--police); --r: 20px;
+  /* La partie vide d'une jauge, d'un anneau (plasma.js fait le même mélange) ou d'un interrupteur : mélangée aux
+     couleurs du thème, pour ne jamais rester bleu-violet en Crépuscule ou en Terminal */
+  --vide: color-mix(in srgb, var(--ligne) 50%, var(--fond2));
   margin: 0; height: 100vh; overflow: hidden; background: var(--fond); color: var(--texte); font-family: var(--police-app); user-select: none;
 }
 body[data-theme="crepuscule"] { --fond: #0B0508; --fond2: #1A0B12; --carte: rgba(44, 16, 28, 0.82); --carte2: rgba(70, 26, 44, 0.9); --ligne: #4A2030; --texte: #F7ECEF; --doux: #CDAAB6; --pale: #8E6474; --P: #FF8A3D; --S: #FF3D7F; --T: #FFC83D; }
@@ -214,12 +217,12 @@ body.avec-3d .anneau { background: none; }
 .etiquette.attention { background: color-mix(in srgb, var(--orange) 15%, transparent); color: var(--orange); }
 .etiquette.ok { background: color-mix(in srgb, var(--vert) 13%, transparent); color: var(--vert); }
 /* L'interrupteur et la case de plasma */
-.bascule { width: 52px; height: 30px; flex: none; border-radius: 99px; background: #1A1738; border: 1px solid var(--ligne); position: relative; transition: background 250ms ease; box-sizing: border-box; }
+.bascule { width: 52px; height: 30px; flex: none; border-radius: 99px; background: var(--vide); border: 1px solid var(--ligne); position: relative; transition: background 250ms ease; box-sizing: border-box; }
 .bascule::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #CFCDE0; transition: transform 260ms cubic-bezier(.3, 1.4, .5, 1); }
 .bascule.oui { border-color: transparent; background: linear-gradient(90deg, var(--P), var(--S), var(--T), var(--P)) 0 0 / 300% 100%; animation: coule 3s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--S) 55%, transparent); }
 .bascule.oui::after { transform: translateX(22px); background: #fff; }
 @keyframes coule { to { background-position: 300% 0; } }
-.case { width: 26px; height: 26px; flex: none; border-radius: 8px; border: 1.5px solid #4A4380; display: grid; place-items: center; transition: all 200ms ease; box-sizing: border-box; }
+.case { width: 26px; height: 26px; flex: none; border-radius: 8px; border: 1.5px solid color-mix(in srgb, var(--ligne) 75%, var(--doux)); display: grid; place-items: center; transition: all 200ms ease; box-sizing: border-box; }
 .case svg { width: 16px; height: 16px; color: #0B0820; opacity: 0; transform: scale(0.4); transition: all 220ms cubic-bezier(.3, 1.4, .5, 1); }
 .case.oui { border-color: transparent; background: linear-gradient(135deg, var(--P), var(--S), var(--T)); box-shadow: 0 0 10px color-mix(in srgb, var(--S) 55%, transparent); }
 .case.oui svg { opacity: 1; transform: none; }
@@ -241,7 +244,7 @@ body.avec-3d .anneau { background: none; }
 .champ-grand:focus-within::before { opacity: 1; }
 .champ::placeholder { color: var(--pale); }
 /* Un choix parmi plusieurs, en pastilles ; ou en cartes */
-.choix-p { display: inline-flex; gap: 6px; padding: 5px; border-radius: 99px; background: #100D26; border: 1px solid var(--ligne); flex-wrap: wrap; margin-bottom: 18px; }
+.choix-p { display: inline-flex; gap: 6px; padding: 5px; border-radius: 99px; background: color-mix(in srgb, var(--ligne) 20%, var(--fond2)); border: 1px solid var(--ligne); flex-wrap: wrap; margin-bottom: 18px; }
 .choix-p button { font-size: 14px; font-weight: 700; color: var(--doux); padding: 9px 16px; border-radius: 99px; }
 .choix-p button:hover, .choix-p button:focus { color: var(--texte); }
 .choix-p button.oui { color: #0B0820; background: linear-gradient(90deg, var(--P), var(--S) 60%, var(--T)); }
@@ -283,7 +286,7 @@ body.avec-3d .anneau { background: none; }
 .question-r.ouvert p { display: block; } .question-r.ouvert .chev { transform: rotate(90deg); }
 .question-r:has(.q:focus)::before { opacity: 1; }
 /* La barre de plasma (une jauge, ou dans une ligne) */
-.flux { display: block; width: 120px; height: 8px; flex: none; border-radius: 99px; background: #1A1738; overflow: hidden; }
+.flux { display: block; width: 120px; height: 8px; flex: none; border-radius: 99px; background: var(--vide); overflow: hidden; }
 .flux i { display: block; height: 100%; border-radius: inherit; transition: width 600ms ease;
   background: linear-gradient(90deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 60% 100%) 0 0 / 220% 100%, linear-gradient(90deg, var(--P), var(--S) 50%, var(--T));
   animation: fluxA 2.2s linear infinite; }
