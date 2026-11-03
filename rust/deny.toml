@@ -85,6 +85,9 @@ allow = [
     "mindcare-appli", "mindcare-vie",
     # le relais Mindcare.exe (étape 4.5) : seulement windows, déjà dans la liste
     "mindcare-relais",
+    # les téléchargements de l'assistant et de la dictée (étape 6.1) : seulement sha2, flate2 (version Rust :
+    # miniz_oxide, crc32fast) et windows (WinHTTP), tous déjà dans la liste
+    "mindcare-telechargement",
     # Tauri 2.12.5, figé dans mindcare-appli\Cargo.toml (tauri-build est tiré par tauri lui-même pour sa construction)
     "tauri", "tauri-build", "tauri-codegen", "tauri-macros", "tauri-runtime", "tauri-runtime-wry", "tauri-utils",
     "tauri-winres",

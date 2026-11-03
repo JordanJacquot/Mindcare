@@ -1,0 +1,31 @@
+[package]
+name = "mindcare-telechargement"
+version = "0.1.0"
+description = "Les téléchargements de l'assistant et de la dictée de Mindcare (portage de Start-Telechargement, modules\\ia.ps1 et dictee.ps1) : sans fenêtre, sur un fil à part, avec reprise, empreinte, place libre et extraction des seuls fichiers voulus"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Versions figées (« = ») : une nouvelle version n'entre que par un changement relu. Aucune bibliothèque nouvelle :
+# les deux sont déjà dans Cargo.lock (Tauri s'en sert) et dans la liste blanche de deny.toml.
+# L'empreinte SHA-256 des fichiers téléchargés (Get-FileHash)
+sha2 = "=0.10.9"
+# Les zips du moteur de l'assistant et de la dictée (deflate, comme System.IO.Compression), et leur CRC-32. Sans ses
+# options par défaut : seulement la version en Rust (miniz_oxide), jamais une zlib en C.
+flate2 = { version = "=1.1.10", default-features = false, features = ["rust_backend"] }
+
+# Le seul module qui parle à Windows (src\windows) : WinHTTP (le téléchargement, https compris, par Windows lui-même)
+# et la place libre. La même version que le reste de la suite : rien de nouveau dans Cargo.lock.
+[target.'cfg(windows)'.dependencies.windows]
+version = "=0.62.2"
+features = ["Win32_Foundation", "Win32_Networking_WinHttp", "Win32_Storage_FileSystem"]
+
+# Pas `workspace = true` : le module Windows (src\windows) a besoin d'autoriser le code « unsafe », que le reste du
+# dépôt interdit tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src\windows, comme mindcare-windows.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

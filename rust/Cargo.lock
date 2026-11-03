@@ -1745,6 +1745,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mindcare-telechargement"
+version = "0.1.0"
+dependencies = [
+ "flate2",
+ "sha2",
+ "windows",
+]
+
+[[package]]
 name = "mindcare-vie"
 version = "0.1.0"
 dependencies = [
