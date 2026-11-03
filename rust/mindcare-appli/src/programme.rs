@@ -17,7 +17,8 @@
 //!    de la page dans un panneau de Mindset plus petit que la fenêtre (`Update-EchelleMindset`) suit chaque nouvelle
 //!    taille (`Resized`), et chaque pas. La croix et `WM_CLOSE` (le bouton « Fermer » de Mindset) quittent.
 //! 5. La fin : la relance si le thème a changé (comme aujourd'hui), puis `std::process::exit` (aucun fil ne garde
-//!    le processus en vie sans fenêtre, contrat-appli partie 3).
+//!    le processus en vie sans fenêtre, contrat-appli partie 3), sans rien lâcher de l'état du fil de la fenêtre
+//!    ([`quitter_sans_rien_lacher`]).
 //!
 //! Tout l'état vit sur le fil de la fenêtre (celui de Tauri) : la vie, les données, le verrou (qui appartient au fil
 //! qui l'a pris) et la fenêtre. La minuterie, sur un autre fil, ne fait que demander un tour à ce fil-là.
@@ -26,6 +27,7 @@ use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::Arc;
+use std::thread::LocalKey;
 use std::time::{Duration, Instant};
 
 use mindcare_donnees::{Donnees, Journal};
@@ -610,5 +612,19 @@ fn finir() -> ! {
             etat.vie.terminer(fin, &mut etat.systeme, &mut etat.disque);
         }
     });
-    std::process::exit(0)
+    quitter_sans_rien_lacher(&ETAT, 0)
+}
+
+/// Quitte le processus (`std::process::exit`) sans lâcher ce que garde `etat`, le `thread_local` du fil qui quitte.
+///
+/// `std::process::exit`, c'est `ExitProcess` : Windows arrête d'abord tous les autres fils, puis Rust lâche les
+/// `thread_local` du fil qui quitte. Lâcher là les outils de l'étape 6.4 bloquait la fin pour toujours : la dictée
+/// attend son fil, déjà arrêté par Windows (la jointure panique), puis `WinHttpCloseHandle` attend un fil réseau de
+/// WinHTTP lui aussi arrêté (vu sur la pile d'une copie restée accrochée après un changement de thème : la nouvelle
+/// copie était lancée, l'ancienne ne quittait jamais). Ici, rien n'est lâché : tout a été arrêté avant
+/// (`Branchement::arreter`, `Vie::terminer`) et Windows ferme lui-même les poignées du processus qui se termine.
+pub fn quitter_sans_rien_lacher<T: 'static>(etat: &'static LocalKey<RefCell<Option<T>>>, code: i32) -> ! {
+    let reste = etat.with(|e| e.try_borrow_mut().ok().and_then(|mut e| e.take()));
+    std::mem::forget(reste);
+    std::process::exit(code)
 }
