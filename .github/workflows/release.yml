@@ -71,6 +71,11 @@ jobs:
       present: ${{ steps.rust.outputs.present }}
       version: ${{ steps.rust.outputs.version }}
     steps:
+      # Les fichiers tels qu'ils sont dans git : sans ça, git pour Windows change les fins de ligne en CRLF, et
+      # l'enquetes.json du zip n'est plus celui du commit (verifier-zip-rust.ps1 le refuse, publication du 04/11)
+      - name: "Garder les fins de ligne de git"
+        run: git config --global core.autocrlf false
+
       - name: "Récupérer le dépôt"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
