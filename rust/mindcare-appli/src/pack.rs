@@ -35,6 +35,13 @@ pub fn adresse(fichier: &str) -> String {
     a
 }
 
+/// Une lueur que la page accepte : « #RRGGBB » ou « #AARRGGBB » (`Get-CouleurGlow` de themes.ps1). suite-commun
+/// l'a déjà vérifiée à la lecture ; comme pour les couleurs (`pont::couleurs_json`), rien d'autre n'entre dans
+/// l'état de la page, quoi que dise le pack.
+pub fn lueur_valable(c: &str) -> bool {
+    (c.len() == 7 || c.len() == 9) && c.starts_with('#') && c[1..].bytes().all(|b| b.is_ascii_hexdigit())
+}
+
 fn planche(p: &Planche) -> Map<String, Value> {
     let mut m = Map::new();
     m.insert("url".into(), json!(adresse(&p.image.fichier)));
@@ -50,7 +57,8 @@ pub fn pack_ecran(p: &Pack, soir: bool) -> Value {
     let mut m = Map::new();
     if let Some(l) = &p.logo {
         let mut logo = planche(l);
-        logo.insert("lueur".into(), p.logo_lueur.as_ref().map_or(Value::Null, |c| json!(c)));
+        let lueur = p.logo_lueur.as_deref().filter(|c| lueur_valable(c));
+        logo.insert("lueur".into(), lueur.map_or(Value::Null, |c| json!(c)));
         m.insert("logo".into(), Value::Object(logo));
     }
     if let Some(f) = &p.fond {
@@ -223,5 +231,151 @@ mod tests {
         let (r, refus) = repondre(None, "/fond.png");
         assert_eq!(r.status(), StatusCode::NOT_FOUND);
         assert_eq!(refus, Some(Refus::Dossier));
+    }
+
+    /// Les 13 packs inventés de outils\tester.ps1 (« thème perso : couleurs, police et lueur contrôlées », Mindcare
+    /// 0.15.2, `Test-CouleursPack` et `Get-CouleurGlow` de themes.ps1), lus comme le programme les lit
+    /// (`themes::charger`), puis posés dans l'état de la page (`Habillage`, comme `Send-Vue`) : les bonnes couleurs
+    /// passent ; une couleur mal écrite laisse le thème de base, avec une ligne au journal ; une police ou une lueur
+    /// piégées sont écartées ; et rien du piège n'arrive jamais à la page.
+    ///
+    /// Un seul changement : T vaut ici « #A0C4FF » au lieu de « #0A2A66 ». suite-commun vérifie EN PLUS du PowerShell
+    /// que le texte reste lisible (`verifier_lisibilite`), et le bleu nuit de tester.ps1 se lit mal sur le fond
+    /// (contraste 1,4 pour 2 demandé) : avec lui, toutes les couleurs seraient refusées pour cette raison, et le test
+    /// ne prouverait plus rien sur l'écriture des couleurs. Cet écart voulu est vérifié à part, à la fin.
+    #[test]
+    fn packs_inventes_de_tester_ps1() {
+        let piege = r#""/><Button xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Content="piege"/><Border Tag=""#;
+        let bonnes = json!({ "P": "#1E5BFF", "S": "#7FB2FF", "T": "#A0C4FF", "NH": 220, "NS": 0.6,
+            "Map": { "0C0920": "0A1230", "#06050F": "#050A1A" } });
+        let avec = |changes: Value| {
+            let mut c = bonnes.clone();
+            for (k, v) in changes.as_object().expect("objet") {
+                c[k] = v.clone();
+            }
+            c
+        };
+        // (id, pack.json, thème attendu : « pack » pour ses propres couleurs, police et lueur à écarter)
+        let cas = [
+            ("essai-bleu", json!({ "Name": "Essai bleu", "Colors": bonnes, "LogoGlow": "#FFD6E4FF" }), "pack", false),
+            (
+                "essai-rouge-mot",
+                json!({ "Base": "crepuscule", "Colors": avec(json!({ "P": "red" })) }),
+                "crepuscule",
+                false,
+            ),
+            ("essai-court", json!({ "Colors": avec(json!({ "S": "#0F0" })) }), "neon", false),
+            (
+                "essai-guillemets",
+                json!({ "Base": "terminal", "Colors": avec(json!({ "T": "#FF0000\" Foreground=\"Red" })) }),
+                "terminal",
+                false,
+            ),
+            ("essai-balise", json!({ "Colors": avec(json!({ "P": format!("#00FF00{piege}") })) }), "neon", false),
+            ("essai-retour-ligne", json!({ "Colors": avec(json!({ "P": "#00FF00\n" })) }), "neon", false),
+            (
+                "essai-map-cle",
+                json!({ "Base": "arcade", "Colors": avec(json!({ "Map": { format!("0C0920{piege}"): "112233" } })) }),
+                "arcade",
+                false,
+            ),
+            (
+                "essai-map-valeur",
+                json!({ "Colors": avec(json!({ "Map": { "0C0920": format!("112233{piege}") } })) }),
+                "neon",
+                false,
+            ),
+            ("essai-map-texte", json!({ "Colors": avec(json!({ "Map": "rouge" })) }), "neon", false),
+            ("essai-nombre", json!({ "Colors": avec(json!({ "NS": -2 })) }), "neon", false),
+            ("essai-teinte", json!({ "Colors": avec(json!({ "NH": "NaN" })) }), "neon", false),
+            (
+                "essai-police",
+                json!({ "Colors": bonnes, "Font": format!("police{piege}.ttf"), "FontScope": "tout",
+                    "LogoGlow": format!("#FFFFFF{piege}") }),
+                "pack",
+                true,
+            ),
+            ("essai-police-dossier", json!({ "Colors": bonnes, "Font": "..\\police.ttf" }), "pack", true),
+        ];
+        let e = Essai::new("couleurs");
+        // (une vraie police hors du dossier du pack : jamais reprise)
+        std::fs::write(e.0.join("packs").join("police.ttf"), b"pas une police").unwrap();
+        let mut rates = Vec::new();
+        for (id, json_pack, attendu, police) in &cas {
+            let dossier = e.0.join("packs").join(id);
+            std::fs::create_dir_all(&dossier).unwrap();
+            // (un logo, pour que la lueur passe vraiment par ce que reçoit la page)
+            let mut json_pack = json_pack.clone();
+            json_pack["Logo"] = json!("logo.png");
+            std::fs::write(dossier.join("logo.png"), PNG).unwrap();
+            std::fs::write(dossier.join("pack.json"), serde_json::to_string_pretty(&json_pack).unwrap()).unwrap();
+            let t = suite_commun::themes::charger(Some(&format!("pack:{id}")), &[e.0.join("packs")]);
+            let Some(p) = t.pack.as_ref() else {
+                rates.push(format!("{id} : pas lu ({:?})", t.raisons));
+                continue;
+            };
+            let propres = *attendu == "pack";
+            let attendu_id = if propres { format!("pack-{id}") } else { (*attendu).to_string() };
+            if t.id != attendu_id {
+                rates.push(format!("{id} : thème {} au lieu de {attendu_id} ({:?})", t.id, t.raisons));
+            }
+            // (refusées pour leur écriture, jamais pour la lisibilité : c'est bien ce contrôle-là qui joue)
+            let note = t
+                .raisons
+                .iter()
+                .filter(|r| r.starts_with(&format!("thème {id} : couleurs refusées")) && !r.contains("se lit mal"))
+                .count();
+            if propres == (note > 0) || t.raisons.len() != note {
+                rates.push(format!("{id} : journal {:?}", t.raisons));
+            }
+            if *police && (p.police.is_some() || p.logo_lueur.is_some()) {
+                rates.push(format!("{id} : police {:?}, lueur {:?} gardées", p.police, p.logo_lueur));
+            }
+            // L'état de la page : le thème du kit, et les couleurs du pack seulement si elles sont à lui
+            let h = crate::pont::Habillage::depuis(&t, false);
+            let mut etat = json!({ "app": { "nom": "Mindcare" } });
+            h.poser(&mut etat);
+            let lueur = &etat["pack"]["logo"]["lueur"];
+            if !(lueur.is_null() || lueur.as_str().is_some_and(lueur_valable)) || (*police && !lueur.is_null()) {
+                rates.push(format!("{id} : lueur dans la page {lueur}"));
+            }
+            let theme_kit = if propres { "neon" } else { *attendu };
+            if etat["theme"] != theme_kit || h.couleurs.is_some() != propres {
+                rates.push(format!("{id} : état de la page {etat}"));
+            }
+            if let Some(c) = &h.couleurs {
+                let ok = c.len() == 5 && c.values().all(|v| v.as_str().is_some_and(crate::pont::couleur_valable));
+                if !ok {
+                    rates.push(format!("{id} : couleurs de la page {c:?}"));
+                }
+            }
+            let texte = etat.to_string();
+            if texte.contains("piege") || texte.contains("Foreground") || texte.contains("red") {
+                rates.push(format!("{id} : le piège est dans l'état de la page : {texte}"));
+            }
+            if *id == "essai-bleu" {
+                let (a, b, c) = (t.traduire("#00E5FF"), t.traduire("#0C0920"), t.traduire("#06050F"));
+                if (a.as_str(), b.as_str(), c.as_str()) != ("#1E5BFF", "#0A1230", "#050A1A")
+                    || p.logo_lueur.as_deref() != Some("#FFD6E4FF")
+                    || etat["couleurs"]["P"] != "#1E5BFF"
+                    || etat["pack"]["logo"]["lueur"] != "#FFD6E4FF"
+                {
+                    rates.push(format!("essai-bleu : couleurs du pack non reprises ({a} {b} {c}, {:?})", p.logo_lueur));
+                }
+            }
+        }
+        // Le pack « essai-bleu » de tester.ps1 tel quel (T « #0A2A66 ») : PowerShell garde ses couleurs, suite-commun
+        // les refuse parce que le texte se lirait mal (écart voulu), et l'écran reste sur le thème de base.
+        let dossier = e.0.join("packs").join("essai-bleu-nuit");
+        std::fs::create_dir_all(&dossier).unwrap();
+        let nuit = avec(json!({ "T": "#0A2A66" }));
+        std::fs::write(dossier.join("pack.json"), json!({ "Colors": nuit, "LogoGlow": "#FFD6E4FF" }).to_string())
+            .unwrap();
+        let t = suite_commun::themes::charger(Some("pack:essai-bleu-nuit"), &[e.0.join("packs")]);
+        if t.id != "neon" || !t.raisons.iter().any(|r| r.contains("couleurs refusées") && r.contains("se lit mal")) {
+            rates.push(format!("essai-bleu-nuit : thème {} ({:?})", t.id, t.raisons));
+        }
+        assert_eq!(t.pack.as_ref().and_then(|p| p.logo_lueur.as_deref()), Some("#FFD6E4FF"));
+        assert!(rates.is_empty(), "{}", rates.join("\n"));
     }
 }
