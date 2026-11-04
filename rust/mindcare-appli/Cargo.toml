@@ -1,6 +1,6 @@
 [package]
 name = "mindcare-appli"
-version = "0.90.0"
+version = "0.91.0"
 description = "Mindcare en Rust : le programme (Mindset.exe dans le dossier de Mindcare), sa fenêtre Tauri dans Mindset"
 edition.workspace = true
 license.workspace = true
