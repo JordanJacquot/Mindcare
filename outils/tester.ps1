@@ -125,7 +125,12 @@ $cas = @(
     @{ Nom = 'multiprise : branché au mur, il tient'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 0, 0; Type = 'trouve'; Suspect = 'prise' }
     @{ Nom = 'PC fixe au mur, frais : alimentation par élimination'; Panne = 'seteint'; Choix = 1, 1, 1, 1, 1, 1; Type = 'elimination'; Suspect = 'alimentation' }
     @{ Nom = 'écran bleu depuis une nouvelle manette'; Panne = 'ecranbleu'; Choix = 0, 1, 6, 0, 0; Type = 'trouve'; Suspect = 'appareil' }
-    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 1, 3, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
+    @{ Nom = 'écran bleu à chaque démarrage : au réparateur'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 1, 1, 1; Type = 'reparateur'; Restants = @('windowsabime', 'disque') }
+    # Windows ne démarre plus : seulement des gestes faisables depuis l'écran de secours (cas de Jordan, octobre 2026)
+    @{ Nom = 'écran bleu à chaque démarrage : réparé par l''outil de redémarrage'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
+    @{ Nom = 'écran bleu à chaque démarrage : fichiers réparés depuis l''écran de secours'; Panne = 'ecranbleu'; Choix = 1, 3, 1, 1, 0; Type = 'trouve'; Suspect = 'windowsabime' }
+    @{ Nom = 'vérification du disque, Windows ne s''ouvre plus : fichiers réparés depuis l''écran de secours'; Panne = 'chkdsk'; Choix = 1, 1, 0; Type = 'trouve'; Suspect = 'fichierssysteme' }
+    @{ Nom = 'écran bleu VIDEO_TDR_FAILURE à chaque démarrage : réparé par l''outil de redémarrage'; Panne = 'ecranbleu'; Choix = 1, 2, 0; Type = 'trouve'; Suspect = 'windowsabime' }
     @{ Nom = 'écran bleu, Windows dit que le disque est malade'; Panne = 'ecranbleu'; Choix = 0, 0; Indices = @{ disque = (New-Indice $true 'Windows dit qu''un disque n''est pas en bonne santé') }; Type = 'trouve'; Suspect = 'disque' }
     @{ Nom = 'jeu : écran noir qui revient, réglé par le pilote'; Panne = 'jeu'; Choix = 1, 1, 1, 2, 1, 0; Type = 'trouve'; Suspect = 'pilote' }
     @{ Nom = 'jeu : des traits bizarres, frais : la carte graphique'; Panne = 'jeu'; Choix = 1, 1, 1, 3, 1; Type = 'elimination'; Suspect = 'gpu' }
@@ -169,15 +174,27 @@ $av = @(foreach ($c in @(@(), @(1), @(1, 1, 1, 1, 1))) { $e = Get-Enquete $donne
 Write-Resultat 'avancement « étape N sur M » (son qui grésille)' (($av -join ' ') -eq '1/8 2/7 6/7') "($($av -join ' '))"
 # Des centaines d'enquêtes au hasard (toujours les mêmes) : chacune finit, avec une réponse
 $mauvais = @(); $types = @{}
+# (et, une fois dit que Windows ne démarre plus, plus aucun geste qui demande Windows ouvert)
+$demandeWindows = 'touche Windows|bouton Démarrer|menu Démarrer|/Online|Ctrl \+ Maj \+ Échap|Windows Update|Panneau de configuration|Mindcare est-il ouvert'
+$horsWindows = @()
 $hasard = New-Object Random 42
 foreach ($p in $donnees.Pannes) {
     for ($t = 0; $t -lt 300; $t++) {
         $choix = @(); $e = Get-Enquete $donnees $p @()
         while ($e.Etape -and $choix.Count -lt 40) { $choix += $hasard.Next(-1, @($e.Etape.Reponses).Count); $e = Get-Enquete $donnees $p $choix }
         if ($e.Etape -or -not $e.Verdict) { $mauvais += "$($p.Id):$($choix -join ',')" } else { $types[$e.Verdict.Type] = 1 + [int]$types[$e.Verdict.Type] }
+        $hors = $false
+        foreach ($f in $e.Faits) {
+            if ($hors -and "$($f.Etape.Texte) $($f.Etape.Aide) $(@($f.Etape.Gestes) -join ' ')" -match $demandeWindows) { $horsWindows += "$($p.Id):$($f.Etape.Id)" }
+            if (@($f.Etape.Reponses | Where-Object { $_.Texte -eq $f.Reponse -and $_.Note -eq 'horswindows' })) { $hors = $true }
+        }
     }
 }
 Write-Resultat "enquêtes au hasard (300 par panne : $(($types.GetEnumerator() | Sort-Object Name | ForEach-Object { "$($_.Name) $($_.Value)" }) -join ', '))" (-not $mauvais) "($($mauvais | Select-Object -First 3))"
+Write-Resultat 'Windows ne démarre plus : aucun geste qui demande Windows' (-not $horsWindows) "($(@($horsWindows | Select-Object -Unique -First 5) -join ', '))"
+# Clavier sans effet sur l'écran de connexion : un test qui se fait dans Windows commence par s'y connecter
+$sansConnexion = @(Get-Etapes $donnees (Get-Panne $donnees 'clavierconnexion') | Where-Object { "$(@($_.Gestes) -join ' ')" -match $demandeWindows -and "$(@($_.Gestes)[0])" -notmatch 'connecte-toi' } | ForEach-Object { $_.Id })
+Write-Resultat 'clavier à la connexion : se connecter avant les gestes dans Windows' (-not $sansConnexion) "($($sansConnexion -join ', '))"
 # La recherche par mots (plusieurs bonnes réponses possibles : séparées par |)
 foreach ($r in @(@('il redémarre tout seul', 'redemarre'), @('écran bleu', 'ecranbleu'), @('mon pc se fige', 'fige'), @('mon jeu plante', 'programme|jeu'), @('il chauffe et plante en jeu', 'jeu'),
                  @('bip', 'bipsdemarrage'), @('wifi', 'wifiabsent|wificoupe'), @('mon imprimante n''imprime plus', 'imprimante'), @('la batterie gonfle', 'gonfle'), @('des pubs partout', 'pubs'),
@@ -224,6 +241,62 @@ foreach ($f in Get-ChildItem -LiteralPath $ImagesDir -Filter '*.svg') {
     }
 }
 Write-Resultat "images ($($citees.Count) citées ; en attente d'une famille : $($enAttente.Count))" (-not $pbImages) "($($pbImages -join ' ; '))"
+# Les couleurs d'un thème perso (constat 7 de l'audit du 25/10) : seulement « #RRGGBB » pour P, S, T et « RRGGBB » pour
+# Map ; sinon le thème de base du pack (ou Néon), noté au journal, et la fenêtre se lit quand même (jamais montrée).
+# Packs inventés, dans un dossier temporaire ; le vrai code de themes.ps1, dans un bloc à part (rien ne reste ensuite).
+& {
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) "mindcare-test-themes-$([guid]::NewGuid().ToString('N'))"
+    $DataDir = Join-Path $tmp 'Mindcare'
+    $GereParMindset = $false; $EnTest = $false; $ModulesDir = Join-Path $AppDir 'modules'
+    $journal = New-Object Collections.Generic.List[string]
+    function Write-Log([string]$Texte) { $journal.Add($Texte) }
+    function Get-Setting($Nom, $Defaut) { $Defaut }
+    . (Join-Path $ModulesDir 'themes.ps1')
+    $xamlBrut = [IO.File]::ReadAllText((Join-Path $ModulesDir 'interface.xaml'), [Text.Encoding]::UTF8)
+    $piege = '"/><Button xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Content="piege"/><Border Tag="'
+    $bonnes = @{ P = '#1E5BFF'; S = '#7FB2FF'; T = '#0A2A66'; NH = 220; NS = 0.6; Map = @{ '0C0920' = '0A1230'; '#06050F' = '#050A1A' } }
+    function Copie($H, $Changes) { $c = @{}; foreach ($k in $H.Keys) { $c[$k] = $H[$k] }; foreach ($k in $Changes.Keys) { $c[$k] = $Changes[$k] }; $c }
+    # Chaque cas : le pack.json, puis le thème attendu (« pack » : ses propres couleurs)
+    $casThemes = @(
+        @{ Id = 'essai-bleu'; Pack = @{ Name = 'Essai bleu'; Colors = $bonnes; LogoGlow = '#FFD6E4FF' }; Attendu = 'pack' }
+        @{ Id = 'essai-rouge-mot'; Pack = @{ Base = 'crepuscule'; Colors = (Copie $bonnes @{ P = 'red' }) }; Attendu = 'crepuscule' }
+        @{ Id = 'essai-court'; Pack = @{ Colors = (Copie $bonnes @{ S = '#0F0' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-guillemets'; Pack = @{ Base = 'terminal'; Colors = (Copie $bonnes @{ T = '#FF0000" Foreground="Red' }) }; Attendu = 'terminal' }
+        @{ Id = 'essai-balise'; Pack = @{ Colors = (Copie $bonnes @{ P = "#00FF00$piege" }) }; Attendu = 'neon' }
+        @{ Id = 'essai-retour-ligne'; Pack = @{ Colors = (Copie $bonnes @{ P = "#00FF00`n" }) }; Attendu = 'neon' }
+        @{ Id = 'essai-map-cle'; Pack = @{ Base = 'arcade'; Colors = (Copie $bonnes @{ Map = @{ "0C0920$piege" = '112233' } }) }; Attendu = 'arcade' }
+        @{ Id = 'essai-map-valeur'; Pack = @{ Colors = (Copie $bonnes @{ Map = @{ '0C0920' = "112233$piege" } }) }; Attendu = 'neon' }
+        @{ Id = 'essai-map-texte'; Pack = @{ Colors = (Copie $bonnes @{ Map = 'rouge' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-nombre'; Pack = @{ Colors = (Copie $bonnes @{ NS = -2 }) }; Attendu = 'neon' }
+        @{ Id = 'essai-teinte'; Pack = @{ Colors = (Copie $bonnes @{ NH = 'NaN' }) }; Attendu = 'neon' }
+        @{ Id = 'essai-police'; Pack = @{ Colors = $bonnes; Font = "police$piege.ttf"; FontScope = 'tout'; LogoGlow = "#FFFFFF$piege" }; Attendu = 'pack'; Police = $true }
+        @{ Id = 'essai-police-dossier'; Pack = @{ Colors = $bonnes; Font = '..\police.ttf' }; Attendu = 'pack'; Police = $true }
+    )
+    $ratesThemes = @()
+    try {
+        foreach ($k in $casThemes) { try {
+            $dir = Join-Path $DataDir "packs\$($k.Id)"
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            [IO.File]::WriteAllText((Join-Path $dir 'pack.json'), (ConvertTo-Json $k.Pack -Depth 5), (New-Object Text.UTF8Encoding($false)))
+            [IO.File]::WriteAllText((Join-Path $DataDir 'packs\police.ttf'), 'pas une police')   # (hors du dossier du pack)
+            $journal.Clear()
+            $pk = Get-ThemePack $k.Id
+            $attendu = if ($k.Attendu -eq 'pack') { "pack-$($k.Id)" } else { $k.Attendu }
+            $note = @($journal | Where-Object { $_ -like "Thème $($k.Id) : couleurs mal écrites*" }).Count
+            if (-not $pk) { $ratesThemes += "$($k.Id) : pas lu"; continue }
+            if ($pk.Base -ne $attendu) { $ratesThemes += "$($k.Id) : thème $($pk.Base) au lieu de $attendu" }
+            if (($k.Attendu -eq 'pack') -eq ($note -gt 0)) { $ratesThemes += "$($k.Id) : journal « $($journal -join ' | ') »" }
+            if ($k.Police -and ($pk.Font -or $pk.LogoGlow)) { $ratesThemes += "$($k.Id) : police « $($pk.Font) », lueur « $($pk.LogoGlow) » gardées" }
+            # La fenêtre, traduite dans ce thème : sans le piège, et lisible
+            $ThemePack = $pk; $ThemeId = $pk.Base; $Theme = $AppThemes[$ThemeId]; $PackFont = $null; $script:ThemeCache = @{}
+            $x = Convert-ThemeXaml $xamlBrut
+            if ($x -match 'piege|Foreground="Red') { $ratesThemes += "$($k.Id) : le piège est dans la fenêtre" }
+            try { $w = [Windows.Markup.XamlReader]::Parse($x); $w.Close() } catch { $ratesThemes += "$($k.Id) : fenêtre illisible ($($_.Exception.Message))" }
+            if ($k.Id -eq 'essai-bleu' -and ((ConvertTo-ThemeHex '#00E5FF') -ne '#1E5BFF' -or (ConvertTo-ThemeHex '#0C0920') -ne '#0A1230' -or (ConvertTo-ThemeHex '#06050F') -ne '#050A1A' -or $pk.LogoGlow -ne '#FFD6E4FF')) { $ratesThemes += "essai-bleu : couleurs du pack non reprises" }
+        } catch { $ratesThemes += "$($k.Id) : erreur ($($_.Exception.Message))" } }
+    } finally { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+    Write-Resultat "thème perso : couleurs, police et lueur contrôlées ($($casThemes.Count) packs inventés : bonnes couleurs, « red », « #0F0 », guillemets, balise, Map, nombres, police piégée)" (-not $ratesThemes) "($($ratesThemes -join ' ; '))"
+}
 # La vraie lecture des journaux, sur ce PC, en lecture seule (rien n'est modifié) : tous les indices, dans un temps raisonnable
 if (-not $SansFenetre) {
     . (Join-Path $AppDir 'modules\journaux.ps1')
