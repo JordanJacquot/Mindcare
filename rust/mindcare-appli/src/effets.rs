@@ -27,10 +27,10 @@ use std::time::{Duration, Instant};
 use mindcare_assistant::{Assistant, Question, Tache, decider};
 use mindcare_dictee::{Appui, DicteeEnFond, Etat as EtatDictee};
 use mindcare_donnees::rapport::enregistrer_rapport;
-use mindcare_donnees::{Donnees, IndiceGarde, IndicesGardes, LecturePc, SurLePc, infos_pc};
+use mindcare_donnees::{Donnees, IndiceGarde, IndicesGardes, LecturePc, PcDuRapport, SurLePc, infos_pc};
 use mindcare_moteur::Catalogue;
 use mindcare_telechargement::{Disque, Etat as EtatInstallation, Fin, Installation, Transport};
-use mindcare_windows::{Horloge, IndicesWindows, LectureJournaux, SourceWindows, a_relire, barrettes};
+use mindcare_windows::{Horloge, IndicesWindows, LectureJournaux, PcDetecte, SourceWindows, a_relire, barrettes};
 use serde_json::{Value, json};
 
 use crate::pages::{self, Effet};
@@ -190,6 +190,9 @@ pub struct Lu {
     pub journal: Vec<String>,
 }
 
+/// Le PC reconnu, et la raison d'une détection ratée (`mindcare_windows::detecter`).
+pub type Detection = (PcDetecte, Option<String>);
+
 /// La lecture de ce que Windows a noté (journaux.ps1), sans jamais bloquer le fil de la fenêtre.
 pub struct LectureWindows {
     source: Arc<dyn SourceWindows>,
@@ -203,6 +206,8 @@ pub struct LectureWindows {
     /// La raison d'une lecture du PC ratée est déjà au journal (barrettes, modèle du PC)
     pc_note: bool,
     infos_note: bool,
+    /// Le PC reconnu (`mindcare_windows::detecter`, sur son fil), et la raison d'une détection ratée
+    detection: Arc<Mutex<Option<Detection>>>,
 }
 
 impl LectureWindows {
@@ -218,11 +223,12 @@ impl LectureWindows {
             pc: Arc::new(Mutex::new(None)),
             pc_note: false,
             infos_note: false,
+            detection: Arc::new(Mutex::new(None)),
         }
     }
 
     /// `Start-LectureJournaux` (au démarrage) : ce que Windows a noté, puis les barrettes et le modèle du PC, chacun
-    /// sur son fil.
+    /// sur son fil ; et la détection du PC (portable ou fixe, marque...) sur un fil de plus, pour trier les pannes.
     pub fn lancer(&mut self) {
         if self.lancee {
             return;
@@ -241,6 +247,16 @@ impl LectureWindows {
             };
             *pc.lock().unwrap_or_else(|e| e.into_inner()) = Some(lu);
         });
+        let (source, detection) = (Arc::clone(&self.source), Arc::clone(&self.detection));
+        let _ = std::thread::Builder::new().name("mindcare-detection".to_string()).spawn(move || {
+            let lu = mindcare_windows::detecter(source.as_ref());
+            *detection.lock().unwrap_or_else(|e| e.into_inner()) = Some(lu);
+        });
+    }
+
+    /// Le PC reconnu, une fois la détection finie (réussie ou pas, avec sa raison).
+    pub fn pc_detecte(&self) -> Option<Detection> {
+        self.detection.lock().unwrap_or_else(|e| e.into_inner()).clone()
     }
 
     /// L'enquête a besoin de ce que Windows a noté (effet `LireWindows`) : la lecture est lancée si elle ne l'est pas,
@@ -349,6 +365,8 @@ pub struct Branchement {
     /// l'étape 5
     pub outils: Option<Outils>,
     hasard: u64,
+    /// Le PC reconnu est déjà donné aux pages (une seule fois)
+    pc_donne: bool,
 }
 
 /// Le catalogue des enquêtes, lu dans ce fichier (`Read-Enquetes`) : enquetes.json à côté du programme.
@@ -397,14 +415,10 @@ impl Branchement {
         if let Err(e) = &cat {
             donnees.journal().ecrire(&format!("Enquêtes illisibles : {e}"));
         }
-        Branchement {
-            pages: pages::Etat::nouveau(version, theme, donnees.historique.liste.clone()),
-            cat: cat.ok(),
-            windows,
-            exterieur,
-            outils: None,
-            hasard: graine | 1,
-        }
+        let mut pages = pages::Etat::nouveau(version, theme, donnees.historique.liste.clone());
+        // (le PC choisi, gardé dans les réglages : « mon PC » ou un autre)
+        pages.choix_pc = donnees.choix_pc();
+        Branchement { pages, cat: cat.ok(), windows, exterieur, outils: None, hasard: graine | 1, pc_donne: false }
     }
 
     /// L'assistant et la dictée rejoignent les pages (avec un catalogue lisible seulement : sans lui, la page du
@@ -469,6 +483,10 @@ impl Branchement {
     /// Le pas de la minuterie : une lecture de Windows attendue et finie (ou trop longue) fait avancer l'enquête ;
     /// des barrettes lues entre-temps rejoignent l'état.
     pub fn tour(&mut self, maintenant: Instant, monde: &mut Monde) {
+        let effets = self.pc_fini(monde.donnees);
+        if !effets.is_empty() {
+            self.executer(effets, monde);
+        }
         let effets = self.windows_fini(maintenant, monde.donnees);
         if !effets.is_empty() {
             self.executer(effets, monde);
@@ -550,6 +568,22 @@ impl Branchement {
         effets
     }
 
+    /// La détection du PC est finie (une seule fois) : les pages trient les pannes pour lui. Rien sinon.
+    fn pc_fini(&mut self, donnees: &Donnees) -> Vec<Effet> {
+        if self.pc_donne || self.cat.is_none() {
+            return Vec::new();
+        }
+        let Some((pc, erreur)) = self.windows.pc_detecte() else { return Vec::new() };
+        self.pc_donne = true;
+        let profil = pc.profil();
+        donnees.journal().ecrire(&match &erreur {
+            Some(e) => format!("PC non reconnu : {e}"),
+            None if profil.est_inconnu() => "PC non reconnu : rien de sûr".to_string(),
+            None => format!("PC reconnu : {}", profil.libelle_court()),
+        });
+        self.pages.pc_reconnu(profil, pc.fiche())
+    }
+
     /// La lecture de Windows attendue est finie (ou abandonnée) : l'enquête qui l'attendait avance. Rien sinon.
     fn windows_fini(&mut self, maintenant: Instant, donnees: &Donnees) -> Vec<Effet> {
         let Some(cat) = self.cat.clone() else { return Vec::new() };
@@ -575,7 +609,13 @@ impl Branchement {
             barrettes: &self.pages.barrettes,
             indices_du_jour: self.pages.indices_du_jour.as_ref(),
         };
-        self.pages.en_cours.rapport(cat, &journal.maintenant(), &pc, &self.pages.version)
+        // (la fiche du PC reconnu, écrite pour une enquête faite sur lui ; l'autre PC choisi, pour une autre)
+        let choisi = match &self.pages.choix_pc {
+            mindcare_donnees::ChoixPc::Autre(p) => Some(p),
+            mindcare_donnees::ChoixPc::MonPc => None,
+        };
+        let detail = PcDuRapport { fiche: self.pages.pc.as_ref().map(|p| &p.fiche), choisi };
+        self.pages.en_cours.rapport_pc(cat, &journal.maintenant(), &pc, &detail, &self.pages.version)
     }
 
     /// Exécute les effets, dans l'ordre ; ceux que rend un résultat (rapport enregistré...) passent avant la suite.
@@ -732,6 +772,10 @@ impl Branchement {
                 if let Some(o) = &self.outils {
                     o.dictee.effacer_message();
                 }
+                Vec::new()
+            }
+            Effet::ChoisirPc(choix) => {
+                monde.donnees.choisir_pc(&choix);
                 Vec::new()
             }
         }

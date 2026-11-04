@@ -6,16 +6,12 @@ use serde_json::{Value, json};
 use mindcare_moteur::ps::{champ, champ_v, egal, parcours, texte};
 use mindcare_moteur::{Catalogue, Objet};
 
-use super::actions::ids;
 use super::outils::t;
 use super::raconte::PANNE;
 use super::{Etat, ecrans};
 
 /// Le début de l'id d'une famille à ouvrir (« famille:plantages »).
 pub const FAMILLE: &str = "famille:";
-
-/// Le bouton de la bande « Adapté à ton PC ».
-pub const TOUT_AFFICHER: &str = "Tout afficher";
 
 /// Les pannes d'une famille, dans l'ordre du catalogue.
 pub fn pannes_de<'a>(cat: &'a Catalogue, famille: &str) -> Vec<&'a Objet> {
@@ -71,22 +67,28 @@ pub fn icone_image(image: &str) -> Option<&'static str> {
 }
 
 pub fn page_familles(etat: &Etat, cat: &Catalogue) -> Value {
+    let (_, cachees) = etat.trier(cat.pannes().iter().collect());
     let elements: Vec<Value> = cat
         .familles()
         .iter()
         .map(|f| {
             let id = t(f, "Id");
-            let texte = if pannes_de(cat, &id).is_empty() { "Arrive bientôt".to_string() } else { t(f, "Phrase") };
+            let toutes = pannes_de(cat, &id);
+            let texte = if toutes.is_empty() {
+                "Arrive bientôt".to_string()
+            } else if etat.trier(toutes).0.is_empty() {
+                // (toutes ses pannes sont cachées : elles ne concernent pas ce PC)
+                textes::RIEN_POUR_CE_PC.to_string()
+            } else {
+                t(f, "Phrase")
+            };
             json!({ "id": format!("{FAMILLE}{id}"), "titre": t(f, "Titre"), "texte": texte,
                     "icone": icone_famille(&id), "couleur": "P" })
         })
         .collect();
     let mut blocs = Vec::new();
-    // (seulement quand la détection du PC a caché des pannes qui ne le concernent pas)
-    if let Some(texte) = etat.adapte_au_pc.as_deref().filter(|x| !x.trim().is_empty()) {
-        blocs.push(json!({ "type": "bande", "texte": texte,
-                           "bouton": { "id": ids::TOUT_AFFICHER, "texte": TOUT_AFFICHER } }));
-    }
+    // (seulement quand le PC choisi cache des pannes qui ne le concernent pas)
+    blocs.extend(etat.bande(&cachees));
     // (la première famille choisie à l'ouverture, pas le bouton de la bande)
     let focus = elements.first().map(|e| format!("l:{}", e["id"].as_str().unwrap_or_default()));
     blocs.push(json!({ "type": "groupe", "colonnes": 2, "elements": elements }));
@@ -106,6 +108,9 @@ pub mod textes {
     pub const AUTRES_EXEMPLE: &str = "Ce qui ne rentre dans aucune carte";
     pub const RACONTE: &str = "Pas trouvé ? Raconte ton problème avec tes mots";
     pub const BIENTOT: &str = "Arrive bientôt : cette famille n'a pas encore de panne connue.";
+    pub const RIEN_POUR_CE_PC: &str = "Rien qui concerne ce PC";
+    pub const TOUTES_CACHEES: &str =
+        "Aucune panne de cette famille ne concerne ce PC. « Tout afficher » les montre quand même.";
 }
 
 /// Un groupe de pannes d'une famille (« Groupes » du catalogue : Id, Titre ou Nom, Exemple, Icone).
@@ -130,11 +135,12 @@ fn groupes(f: &Objet) -> Vec<Groupe> {
 }
 
 /// Une famille et ses pannes, en cartes dépliables (une par groupe de pannes, la première ouverte ; une famille sans
-/// groupes : une seule carte « Toutes les pannes ») ; rien pour une famille inconnue.
-pub fn page_famille(cat: &Catalogue, id: &str) -> Option<Value> {
+/// groupes : une seule carte « Toutes les pannes ») ; rien pour une famille inconnue. Seulement les pannes qui
+/// concernent le PC choisi (la bande dit combien sont cachées).
+pub fn page_famille(etat: &Etat, cat: &Catalogue, id: &str) -> Option<Value> {
     let f = cat.famille(id)?;
     let fid = t(f, "Id");
-    let pannes = pannes_de(cat, &fid);
+    let (pannes, cachees) = etat.trier(pannes_de(cat, &fid));
     let secours = icone_famille(&fid);
     let ligne = |p: &Objet| json!({ "id": format!("{PANNE}{}", t(p, "Id")), "texte": t(p, "Titre") });
     let gs = groupes(f);
@@ -164,10 +170,13 @@ pub fn page_famille(cat: &Catalogue, id: &str) -> Option<Value> {
         "titre": t(f, "Titre"), "parent": ecrans::FAMILLES, "icone": secours, "sous": textes::SOUS,
     });
     let mut blocs = Vec::new();
+    blocs.extend(etat.bande(&cachees));
     if let Some(premiere) = cartes.first_mut() {
         premiere["ouvert"] = json!(true);
         page["focus"] = json!(format!("l:{}", premiere["pannes"][0]["id"].as_str().unwrap_or_default()));
         blocs.push(json!({ "type": "depliables", "id": "groupes", "elements": cartes }));
+    } else if !cachees.is_empty() {
+        blocs.push(json!({ "type": "note", "texte": textes::TOUTES_CACHEES }));
     } else {
         blocs.push(json!({ "type": "note", "texte": textes::BIENTOT }));
     }

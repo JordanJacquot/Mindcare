@@ -436,12 +436,17 @@ body[data-theme="terminal"] { --serre: 0; --serre2: 0; }
 /* La pastille « Ton PC » du haut */
 .onglet.pc { display: inline-flex; align-items: center; gap: 8px; color: var(--texte); }
 .onglet.pc svg { width: 16px; height: 16px; color: var(--P); flex: none; }
-.onglet.pc span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.onglet.pc span { max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
 .ronds-haut { align-items: center; }
 
 /* La page : une colonne au milieu, le fil d'Ariane, le titre */
 .page .defile { padding: 0; }
 .colonne { max-width: 1040px; margin: 0 auto; padding: 24px 48px 30px; box-sizing: border-box; }
+/* Le pied : les boutons d'une page toujours visibles, entre la zone qui défile (et son fondu) et Retour / OK */
+.page.avec-pied .defile { bottom: 118px; }
+.pied { position: absolute; left: 0; right: 0; bottom: 50px; height: 68px; display: flex; align-items: center; }
+.colonne-pied { flex: 1; max-width: 1040px; margin: 0 auto; padding: 0 48px; box-sizing: border-box; }
+.pied .boutons { display: flex; flex-wrap: wrap; }
 .page .tete { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; }
 .fil { display: flex; align-items: center; gap: 10px; min-height: 34px; font-size: 14px; color: var(--doux); }
 .fil > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

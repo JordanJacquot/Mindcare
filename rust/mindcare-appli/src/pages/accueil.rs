@@ -17,7 +17,8 @@ pub const DERNIERE: &str = "derniere";
 /// n'est pas finie (le bandeau « Ton enquête ... n'est pas finie » du PowerShell), ou à revoir si elle l'est.
 pub fn accueil(etat: &Etat, cat: &Catalogue) -> Value {
     let familles = cat.familles().len();
-    let pannes = cat.pannes().len();
+    // (les pannes qui concernent le PC choisi)
+    let pannes = etat.trier(cat.pannes().iter().collect()).0.len();
     // (avec la dictée : « ou ta voix », la maquette validée)
     let sous = if etat.aides.branchees() { "Avec tes mots ou ta voix" } else { "Avec tes mots" };
     let mut tuiles = vec![

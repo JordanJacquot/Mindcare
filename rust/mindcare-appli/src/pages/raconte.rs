@@ -45,7 +45,9 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
         blocs.push(json!({ "type": "note",
             "texte": "Écris ce qui se passe avec tes mots : les pannes qui ressemblent s'affichent juste en dessous." }));
     } else {
-        let trouvees = chercher(cat, texte);
+        // (seulement les pannes qui concernent le PC choisi ; la bande dit combien sont cachées)
+        let (trouvees, cachees) = etat.trier(chercher(cat, texte));
+        blocs.extend(etat.bande(&cachees));
         if trouvees.is_empty() {
             blocs.push(json!({ "type": "titre", "texte": format!("Rien ne correspond à « {texte} »") }));
             blocs.push(json!({ "type": "note",

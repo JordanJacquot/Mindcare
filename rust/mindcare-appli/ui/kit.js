@@ -395,7 +395,7 @@
       haut.dataset.cle = cle;
       document.getElementById('onglets').innerHTML = t.map((x, i) => `<button type="button" class="onglet f${x.id === r ? ' actif' : ''}" data-k="h:${esc(x.id)}" data-tuile="${i}">${esc(x.nom)}${x.alerte ? '<i class="point"></i>' : ''}</button>`).join('');
       // (« Ton PC » : une pastille avant les ronds, qui envoie son action)
-      const pastillePc = pc ? `<button type="button" class="onglet pc f" data-k="pc" data-action="${esc(pc.id)}" title="Ton PC">${ico(I[pc.icone] ? pc.icone : 'pc', 2)}<span>${esc(pc.texte)}</span></button>` : '';
+      const pastillePc = pc ? `<button type="button" class="onglet pc f" data-k="pc" data-action="${esc(pc.id)}" title="${esc(pc.texte)}">${ico(I[pc.icone] ? pc.icone : 'pc', 2)}<span>${esc(pc.texte)}</span></button>` : '';
       document.getElementById('rondsHaut').innerHTML = pastillePc + ronds.map((x, i) => `<button type="button" class="rond f${x.id === r ? ' actif' : ''}" data-k="r:${esc(x.id)}" data-rond="${i}" title="${esc(x.nom)}" aria-label="${esc(x.nom)}" style="--a:${couleur(x.couleur)}">${ico(x.icone, 1.8)}</button>`).join('');
     }
     const cnx = E.connexion && CONNEXIONS[E.connexion] ? `<span class="cnx" title="${CONNEXIONS[E.connexion]}">${ico(E.connexion)}</span>` : '';
@@ -714,11 +714,13 @@
     const actions = (p.actions || []).map((b) => btn({ ...b, style: b.style || 'second' })).join('');
     // (l'avancée en segments, quand la page commence par elle : entre le fil et le titre)
     const avancee = p.blocs?.[0]?.type === 'segments' && !ongletsDe(p) ? bloc(p.blocs[0]) : '';
-    ecran.innerHTML = `<div class="page${premiere ? ' entree' : ''}${forme ? ` forme-${forme}` : ''}" data-id="${esc(nav.ecran)}"><div class="defile"><div class="colonne">
+    // (le pied : des boutons toujours visibles sous la zone qui défile, jamais effacés par son fondu)
+    const pied = p.pied?.length ? `<div class="pied"><div class="colonne-pied">${blocs(p.pied)}</div></div>` : '';
+    ecran.innerHTML = `<div class="page${premiere ? ' entree' : ''}${forme ? ` forme-${forme}` : ''}${pied ? ' avec-pied' : ''}" data-id="${esc(nav.ecran)}"><div class="defile"><div class="colonne">
       <div class="tete">${fil}${avancee}
         <div class="titre-l">${p.icone && forme !== 'question' ? `<span class="ic-titre">${ico(I[p.icone] ? p.icone : 'liste', 2)}</span>` : ''}<div class="titres"><h1>${esc(p.titre)}</h1>${p.sous ? `<p>${esc(p.sous)}</p>` : ''}</div>
         ${actions ? `<div class="actions">${actions}</div>` : ''}</div></div>
-      <div id="corps"></div></div></div></div>`;
+      <div id="corps"></div></div></div>${pied}</div>`;
     corps();
     if (largeurs) ecran.querySelectorAll('.flux i').forEach((x, k) => {
       const fin = x.style.width; if (largeurs[k] == null || largeurs[k] === fin) return;

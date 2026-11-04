@@ -44,11 +44,13 @@ fn cat() -> Arc<Catalogue> {
 struct FauxWindows {
     lent: (Mutex<bool>, Condvar),
     lectures: AtomicUsize,
+    /// Le matériel du PC (rien : pas lu, comme les faux Windows des autres tests)
+    materiel: Option<mindcare_windows::PcBrut>,
 }
 
 impl FauxWindows {
-    fn nouveau(lent: bool) -> Arc<FauxWindows> {
-        Arc::new(FauxWindows { lent: (Mutex::new(lent), Condvar::new()), lectures: AtomicUsize::new(0) })
+    fn avec(lent: bool, materiel: Option<mindcare_windows::PcBrut>) -> Arc<FauxWindows> {
+        Arc::new(FauxWindows { lent: (Mutex::new(lent), Condvar::new()), lectures: AtomicUsize::new(0), materiel })
     }
 
     fn liberer(&self) {
@@ -104,6 +106,9 @@ impl SourceWindows for FauxWindows {
     }
     fn infos_pc(&self) -> Mesure<InfosPc> {
         Ok(InfosPc { fabricant: "Dell".into(), modele: "XPS 13".into(), systeme: "Windows 11 Famille".into() })
+    }
+    fn materiel(&self) -> Mesure<mindcare_windows::PcBrut> {
+        self.materiel.clone().ok_or_else(|| "matériel non lu".to_string())
     }
 }
 
@@ -192,11 +197,22 @@ impl Banc {
 
     /// Les pages sur ce dossier d'essai (une relance de l'appli : le même dossier).
     fn dans(racine: PathBuf, cat: Result<Arc<Catalogue>, String>, lent: bool, copie_possible: bool) -> Banc {
+        Banc::avec_pc(racine, cat, lent, copie_possible, None)
+    }
+
+    /// Les pages sur ce dossier d'essai, avec ce matériel du PC (rien : pas lu).
+    fn avec_pc(
+        racine: PathBuf,
+        cat: Result<Arc<Catalogue>, String>,
+        lent: bool,
+        copie_possible: bool,
+        materiel: Option<mindcare_windows::PcBrut>,
+    ) -> Banc {
         let bureau = racine.join("Bureau");
         std::fs::create_dir_all(&bureau).unwrap();
         let mut donnees = Donnees::ouvrir(&racine.join("Donnees"), horloge_figee(moment()), true);
         donnees.lire_historique();
-        let windows = FauxWindows::nouveau(lent);
+        let windows = FauxWindows::avec(lent, materiel);
         let mut lecture = LectureWindows::nouvelle(
             Arc::clone(&windows) as Arc<dyn SourceWindows>,
             Arc::new(FausseHorloge),
@@ -623,4 +639,182 @@ fn indices_windows_gardes() {
     assert!(!j.vu && !j.affiche && j.partiel && j.texte_ok == "le journal commence le 2 octobre");
     // Le moteur reçoit les mêmes indices que par vers_moteur
     assert_eq!(g.moteur(), mindcare_windows::vers_moteur(&i));
+}
+
+// ------------------------------------------------------------------------------------------------ le PC reconnu
+
+/// Un portable HP, tel que WMI le dirait.
+fn portable_hp() -> mindcare_windows::PcBrut {
+    mindcare_windows::PcBrut {
+        boitiers: vec![10],
+        genre_systeme: Some(2),
+        batterie: Some(true),
+        fabricant: "HP".into(),
+        modele: "HP Pavilion Laptop 15-eh1xxx".into(),
+        carte_fabricant: "HP".into(),
+        carte_modele: "87B2".into(),
+        processeur: "AMD Ryzen 5 5500U with Radeon Graphics".into(),
+        barrettes: vec![Some(8 << 30)],
+        systeme: "Microsoft Windows 11 Famille".into(),
+        build: "22631".into(),
+        ..Default::default()
+    }
+}
+
+/// Attend (au plus 5 s) que la détection du PC arrive aux pages, pas de minuterie après pas de minuterie.
+fn attendre_pc(b: &mut Banc) {
+    let debut = Instant::now();
+    while b.b.pages.pc.is_none() && debut.elapsed() < Duration::from_secs(5) {
+        std::thread::sleep(Duration::from_millis(10));
+        b.tour(Instant::now());
+    }
+    assert!(b.b.pages.pc.is_some(), "la détection du PC n'arrive pas");
+}
+
+/// Les clés des lignes de la carte « Le PC » de « Pour le réparateur » (vide : la carte dit « rien de lu »).
+fn cles_le_pc(e: &Value) -> Vec<String> {
+    fn chercher(v: &Value, l: &mut Vec<String>) {
+        match v {
+            Value::Object(o) => {
+                if o.get("type").and_then(Value::as_str) == Some("rangs")
+                    && o.get("titre").and_then(Value::as_str) == Some("Le PC")
+                {
+                    for r in o["rangs"].as_array().into_iter().flatten() {
+                        l.push(r["cle"].as_str().unwrap_or_default().to_string());
+                    }
+                }
+                o.values().for_each(|x| chercher(x, l));
+            }
+            Value::Array(a) => a.iter().for_each(|x| chercher(x, l)),
+            _ => {}
+        }
+    }
+    let mut l = Vec::new();
+    chercher(&e["pages"][ecrans::REPARATEUR], &mut l);
+    l
+}
+
+/// Le texte de la bande des familles (rien sans bande).
+fn bande_familles(e: &Value) -> String {
+    let b = &e["pages"][ecrans::FAMILLES]["blocs"][0];
+    if b["type"] == "bande" { b["texte"].as_str().unwrap_or_default().to_string() } else { String::new() }
+}
+
+/// La détection lancée au démarrage sur son fil : la fenêtre ne l'attend pas, les pages la reçoivent au pas de la
+/// minuterie qui suit, une seule fois ; la pastille et le tri la suivent.
+#[test]
+fn detection_du_pc_au_demarrage() {
+    let mut b = Banc::avec_pc(dossier_neuf(), Ok(cat()), false, true, Some(portable_hp()));
+    b.envoyer(MessagePage::Pret);
+    attendre_pc(&mut b);
+    let pc = b.b.pages.pc.clone().unwrap();
+    assert_eq!(pc.profil.libelle_court(), "Portable HP");
+    assert_eq!(pc.fiche.genre.as_deref(), Some("Portable"));
+    assert!(b.journal().contains("PC reconnu : Portable HP"), "{}", b.journal());
+    // (la page redessinée avec la pastille et la bande)
+    let e = b.dernier_etat();
+    assert_eq!(e["pc"]["texte"], "Portable HP");
+    assert!(bande_familles(&e).starts_with("Adapté à ton portable HP : "), "{}", bande_familles(&e));
+    // (une seule fois : les pas suivants ne redessinent rien pour elle)
+    let envois = b.page.envois.borrow().len();
+    b.tour(Instant::now());
+    b.tour(Instant::now());
+    assert_eq!(b.page.envois.borrow().len(), envois);
+    assert_eq!(b.journal().matches("PC reconnu").count(), 1);
+}
+
+/// Contre-épreuve : un faux Windows qui ne donne pas le matériel (comme tous les autres tests, et jamais le vrai PC) :
+/// le PC n'est pas reconnu, rien n'est caché.
+#[test]
+fn detection_ratee_rien_de_cache() {
+    let mut b = Banc::nouveau(Ok(cat()), false);
+    b.envoyer(MessagePage::Pret);
+    attendre_pc(&mut b);
+    assert!(b.b.pages.pc.as_ref().unwrap().profil.est_inconnu());
+    assert!(b.journal().contains("PC non reconnu : matériel non lu"), "{}", b.journal());
+    let e = b.dernier_etat();
+    assert_eq!(e["pc"]["texte"], "PC pas reconnu");
+    assert_eq!(bande_familles(&e), "");
+}
+
+/// Un autre PC choisi est gardé après une relance de l'appli ; « Tout afficher » ne l'est pas.
+#[test]
+fn choix_garde_apres_relance() {
+    let racine = dossier_neuf();
+    let mut b = Banc::avec_pc(racine.clone(), Ok(cat()), false, true, Some(portable_hp()));
+    b.envoyer(MessagePage::Pret);
+    attendre_pc(&mut b);
+    b.action(ids::TON_PC, Value::Null, ecrans::ACCUEIL);
+    b.action("pc-genre:fixe", Value::Null, ecrans::TON_PC);
+    b.action("pc-marque:Dell", Value::Null, ecrans::TON_PC_MARQUE);
+    b.action(ids::TOUT_AFFICHER, Value::Null, ecrans::FAMILLES);
+    assert!(b.journal().contains("PC choisi : un autre PC (PC fixe Dell)"), "{}", b.journal());
+    assert!(b.b.pages.tout_afficher);
+    b.effacer = false;
+    drop(b);
+    let mut b = Banc::avec_pc(racine, Ok(cat()), false, true, Some(portable_hp()));
+    b.envoyer(MessagePage::Pret);
+    // (avant même la détection : l'autre PC choisi trie déjà)
+    let e = b.dernier_etat();
+    assert_eq!(e["pc"]["texte"], "Autre : PC fixe Dell");
+    assert!(!b.b.pages.tout_afficher, "« Tout afficher » est pour une fois seulement");
+    assert!(bande_familles(&e).starts_with("Adapté au PC choisi (PC fixe Dell) : "), "{}", bande_familles(&e));
+    attendre_pc(&mut b);
+    assert_eq!(b.dernier_etat()["pc"]["texte"], "Autre : PC fixe Dell");
+}
+
+/// Le rapport pour le réparateur : sur ce PC, la fiche du PC reconnu (et la partie « Le PC » de la page remplie) ;
+/// pas sur ce PC, rien du PC, ou le PC choisi pour un autre.
+#[test]
+fn rapport_avec_la_fiche_du_pc() {
+    let mut b = Banc::avec_pc(dossier_neuf(), Ok(cat()), false, true, Some(portable_hp()));
+    b.envoyer(MessagePage::Pret);
+    attendre_pc(&mut b);
+    b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
+    b.jusqu_a_cepc();
+    b.action(ids::REP, json!("0"), ecrans::ENQUETE);
+    attendre_windows(&mut b);
+    b.jusqu_a_la_reponse("0");
+    b.action(ids::REPARATEUR, Value::Null, ecrans::ENQUETE);
+    b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
+    let rapport = b.copies.borrow().last().cloned().expect("rapport copié");
+    for l in [
+        "Ordinateur : Dell XPS 13, Windows 11 Famille",
+        "Type : Portable",
+        "Processeur : AMD Ryzen 5 5500U with Radeon Graphics",
+        "Mémoire installée : 8 Go",
+        "Windows : Windows 11, version 23H2",
+    ] {
+        assert!(rapport.contains(l), "« {l} » manque : {rapport}");
+    }
+    // (le modèle est déjà dans « Ordinateur : »)
+    assert!(!rapport.contains("Modèle : "), "{rapport}");
+    assert!(!rapport.contains("PC choisi"), "{rapport}");
+    // (la carte « Le PC » de la page : ses lignes, pas la phrase « rien de lu cette fois »)
+    let cles = cles_le_pc(&b.dernier_etat());
+    for c in ["Ordinateur", "Type", "Processeur", "Mémoire installée", "Windows"] {
+        assert!(cles.iter().any(|x| x == c), "« {c} » manque dans « Le PC » : {cles:?}");
+    }
+
+    // Pas sur ce PC, avec un autre PC choisi : seulement le PC choisi
+    b.action(ids::ACCUEIL, Value::Null, ecrans::REPARATEUR);
+    b.action(ids::TON_PC, Value::Null, ecrans::ACCUEIL);
+    b.action("pc-genre:fixe", Value::Null, ecrans::TON_PC);
+    b.action("pc-marque:ASUS", Value::Null, ecrans::TON_PC_MARQUE);
+    b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
+    b.jusqu_a_la_reponse("1");
+    b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
+    let rapport = b.copies.borrow().last().cloned().unwrap();
+    assert!(rapport.contains("PC choisi : PC fixe ASUS"), "{rapport}");
+    assert!(!rapport.contains("Processeur"), "la fiche de ce PC pour une panne d'un autre : {rapport}");
+    assert!(!rapport.contains("Ordinateur :"), "{rapport}");
+    assert_eq!(cles_le_pc(&b.dernier_etat()), ["PC choisi"]);
+    // (contre-épreuve : revenu à mon PC, pas sur ce PC : rien du PC)
+    b.action(ids::MON_PC, Value::Null, ecrans::TON_PC);
+    b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
+    b.jusqu_a_la_reponse("1");
+    b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
+    let rapport = b.copies.borrow().last().cloned().unwrap();
+    assert!(!rapport.contains("PC choisi") && !rapport.contains("Processeur"), "{rapport}");
+    assert!(cles_le_pc(&b.dernier_etat()).is_empty(), "« Le PC » : rien de lu cette fois");
 }

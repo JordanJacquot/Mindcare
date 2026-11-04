@@ -2,7 +2,8 @@
 //! Le design A2 (Jordan trouvait l'ancienne trop chargée) : en haut la carte « verdict » (la pastille et la couleur du
 //! cas, le sur-titre, la conclusion en une phrase, une ligne d'explication) ; puis « Ce qu'il faut faire » en liste
 //! numérotée, avec en dernier le conseil pour le réparateur (et la garantie avant d'acheter une pièce) ; « Comment
-//! Mindcare le sait » replié (une ligne avec son résumé) ; les boutons ; la sécurité en une petite ligne en bas.
+//! Mindcare le sait » replié (une ligne avec son résumé) ; la sécurité en une petite ligne en bas ; les boutons dans
+//! le pied de la page, toujours visibles.
 
 use serde_json::{Value, json};
 
@@ -157,12 +158,13 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
     let resume = if resume.is_empty() { "Rien d'écarté".to_string() } else { resume.join(", ") };
     blocs.push(json!({ "type": "repli", "titre": x::COMMENT, "resume": resume, "blocs": preuves }));
 
-    // Les boutons : l'accueil d'abord (choisi à l'ouverture), le rapport, changer la dernière réponse
-    blocs.push(json!({ "type": "bouton", "id": ids::ACCUEIL, "texte": x::ACCUEIL }));
-    blocs.push(
-        json!({ "type": "bouton", "id": ids::REPARATEUR, "texte": x::REPARATEUR, "icone": "rapport", "style": "second" }),
-    );
-    blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": x::CHANGER, "style": "discret" }));
+    // Les boutons, dans le pied de la page (toujours visibles, même quand la réponse est longue) : l'accueil d'abord
+    // (choisi à l'ouverture), le rapport, changer la dernière réponse
+    let pied = json!([
+        { "type": "bouton", "id": ids::ACCUEIL, "texte": x::ACCUEIL },
+        { "type": "bouton", "id": ids::REPARATEUR, "texte": x::REPARATEUR, "icone": "rapport", "style": "second" },
+        { "type": "bouton", "id": ids::PRECEDENT, "texte": x::CHANGER, "style": "discret" },
+    ]);
 
     let securite: Vec<String> =
         parcours(cat.json().get("Securite")).into_iter().map(|x| texte(Some(x))).filter(|x| !x.is_empty()).collect();
@@ -179,5 +181,6 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
         "retour": "appli",
         "focus": format!("o:{}", ids::ACCUEIL),
         "blocs": blocs,
+        "pied": pied,
     })
 }

@@ -19,6 +19,11 @@
 //! n'est pas sur ce PC : une adresse morte, jamais Internet) ; le micro est un FAUX micro (le vrai n'est jamais
 //! ouvert) ; le son vit dans le `Temp` du dossier d'essai. llama-server et whisper sont ceux que le faux serveur a
 //! donnés (les faux des tests des crates), lancés comme les vrais (sans fenêtre, arrêtés avec Mindcare).
+//!
+//! Le PC de l'essai (étape 8, [`SourceEssai`]) : ce que Windows a noté est lu pour de vrai (en lecture seule, comme
+//! avant), mais le matériel et les barrettes sont ceux d'un PC inventé (le modèle n'est pas lu : la fiche le dit) ([`pc_essai`] : un PC fixe monté
+//! avec une carte mère ASUS). Le vrai matériel de ce PC n'est jamais lu par la construction d'essai, et les captures
+//! sont les mêmes sur tous les PC.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -27,6 +32,10 @@ use std::time::{Duration, Instant};
 use mindcare_dictee::{Materiel, Mesures, Micro};
 use mindcare_telechargement::Paquet;
 use mindcare_vie::Noms;
+use mindcare_windows::{
+    Barrette, Batterie, Disque, DisqueBrut, DisquePhysique, Evenement, Filtre, InfosPc, Mesure, Moment, Partition,
+    PcBrut, Place, SourceWindows,
+};
 use serde_json::Value;
 
 /// Le fichier qui décrit le faux serveur de l'essai : `{ "assistant": [{ url, sha256, taille }, ...], "dictee": [...] }`,
@@ -145,6 +154,79 @@ pub fn outils(
     )
 }
 
+/// Le PC inventé de l'essai : un PC fixe monté (une tour sans marque, une carte mère ASUS), 16 Go en deux barrettes,
+/// un SSD NVMe de 1 To, Windows 11 24H2.
+pub fn pc_essai() -> PcBrut {
+    PcBrut {
+        boitiers: vec![3],
+        genre_systeme: Some(1),
+        batterie: Some(false),
+        fabricant: "System manufacturer".into(),
+        modele: "System Product Name".into(),
+        version_produit: "System Version".into(),
+        carte_fabricant: "ASUSTeK COMPUTER INC.".into(),
+        carte_modele: "PRIME B550-PLUS".into(),
+        processeur: "AMD Ryzen 5 5600X 6-Core Processor".into(),
+        barrettes: vec![Some(8 << 30), Some(8 << 30)],
+        disque: Some(DisqueBrut { media: Some(4), bus: Some(17), taille: Some(1_000_204_886_016) }),
+        place: Some(Place { libre: 412 << 30, taille: 931 << 30 }),
+        systeme: "Microsoft Windows 11 Famille".into(),
+        build: "26100".into(),
+    }
+}
+
+/// Ce que l'essai demande à Windows : les journaux, les disques et la batterie pour de vrai (en lecture seule), le
+/// matériel, le modèle et les barrettes du PC inventé ([`pc_essai`]).
+pub struct SourceEssai<S: SourceWindows> {
+    pub reel: S,
+}
+
+impl<S: SourceWindows> SourceWindows for SourceEssai<S> {
+    fn plus_ancien(&self) -> Mesure<Option<Moment>> {
+        self.reel.plus_ancien()
+    }
+    fn evenements(&self, filtre: &Filtre) -> Mesure<Vec<Evenement>> {
+        self.reel.evenements(filtre)
+    }
+    fn disques(&self) -> Mesure<Vec<Disque>> {
+        self.reel.disques()
+    }
+    fn partitions(&self) -> Mesure<Vec<Partition>> {
+        self.reel.partitions()
+    }
+    fn disques_physiques(&self) -> Mesure<Vec<DisquePhysique>> {
+        self.reel.disques_physiques()
+    }
+    fn lecteur_systeme(&self) -> String {
+        self.reel.lecteur_systeme()
+    }
+    fn place(&self, lecteur: &str) -> Mesure<Place> {
+        self.reel.place(lecteur)
+    }
+    fn batterie(&self) -> Mesure<Option<Batterie>> {
+        self.reel.batterie()
+    }
+    fn demarrage(&self) -> Mesure<Moment> {
+        self.reel.demarrage()
+    }
+    fn barrettes(&self) -> Mesure<Vec<Barrette>> {
+        let b = |emplacement: &str| Barrette {
+            capacite: Some(8 << 30),
+            fabricant: "Kingston".into(),
+            reference: "KF3200C16D4".into(),
+            emplacement: emplacement.into(),
+        };
+        Ok(vec![b("DIMM_A2"), b("DIMM_B2")])
+    }
+    fn infos_pc(&self) -> Mesure<InfosPc> {
+        // (le PC inventé est décrit par sa fiche : « Ordinateur : System manufacturer... » n'apprendrait rien)
+        Err("construction d'essai : le modèle vient de la fiche du PC inventé".into())
+    }
+    fn materiel(&self) -> Mesure<PcBrut> {
+        Ok(pc_essai())
+    }
+}
+
 /// La demande de capture et l'image, dans le dossier de données d'essai.
 pub const CAPTURE_DEMANDE: &str = "capture.demande";
 pub const CAPTURE: &str = "capture.png";
@@ -229,6 +311,58 @@ mod tests {
         for f in paquet_essai(Paquet::dictee(d), "dictee", None).fichiers {
             assert!(f.url.starts_with("http://127.0.0.1:9/"), "{}", f.url);
         }
+    }
+
+    /// Le PC de l'essai : reconnu comme un PC fixe monté ASUS, sans jamais lire le vrai matériel.
+    #[test]
+    fn pc_de_l_essai() {
+        struct RienDuVraiPc;
+        impl SourceWindows for RienDuVraiPc {
+            fn plus_ancien(&self) -> Mesure<Option<Moment>> {
+                Ok(None)
+            }
+            fn evenements(&self, _: &Filtre) -> Mesure<Vec<Evenement>> {
+                Ok(Vec::new())
+            }
+            fn disques(&self) -> Mesure<Vec<Disque>> {
+                Ok(Vec::new())
+            }
+            fn partitions(&self) -> Mesure<Vec<Partition>> {
+                Ok(Vec::new())
+            }
+            fn disques_physiques(&self) -> Mesure<Vec<DisquePhysique>> {
+                Ok(Vec::new())
+            }
+            fn lecteur_systeme(&self) -> String {
+                "C:".into()
+            }
+            fn place(&self, _: &str) -> Mesure<Place> {
+                Err("non".into())
+            }
+            fn batterie(&self) -> Mesure<Option<Batterie>> {
+                Ok(None)
+            }
+            fn demarrage(&self) -> Mesure<Moment> {
+                Err("non".into())
+            }
+            fn barrettes(&self) -> Mesure<Vec<Barrette>> {
+                panic!("les barrettes du vrai PC lues")
+            }
+            fn infos_pc(&self) -> Mesure<InfosPc> {
+                panic!("le modèle du vrai PC lu")
+            }
+            fn materiel(&self) -> Mesure<PcBrut> {
+                panic!("le matériel du vrai PC lu")
+            }
+        }
+        let s = SourceEssai { reel: RienDuVraiPc };
+        let (pc, erreur) = mindcare_windows::detecter(&s);
+        assert!(erreur.is_none());
+        assert_eq!(pc.libelle_court(), "PC fixe ASUS");
+        assert!(pc.monte);
+        assert_eq!(pc.fiche().memoire.as_deref(), Some("16 Go (2 barrettes)"));
+        assert_eq!(s.barrettes().unwrap().len(), 2);
+        assert!(s.infos_pc().is_err());
     }
 
     #[test]

@@ -21,6 +21,8 @@ use super::actions::{PLUS_TARD_MESSAGE, ids};
 
 /// Les pages de l'assistant et de la dictée (étape 6.4).
 mod aides;
+/// Le PC dans les pages (étape 8) : le tri, la bande, « Ton PC ».
+mod pc;
 use super::outils::{gestes_materiel, suspects_montres, t, textes};
 use super::{Effet, Etat, Vue, ecrans, etat_sans_catalogue};
 
@@ -206,6 +208,7 @@ impl Banc {
                 | Effet::Parler
                 | Effet::AnnulerDictee
                 | Effet::EffacerMessageDictee => self.aides.push(e),
+                Effet::ChoisirPc(c) => self.donnees.choisir_pc(&c),
             }
         }
     }
@@ -535,7 +538,12 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
         {
             ep(format!("focus sans élément : {fo}"));
         }
-        for b in a_plat(&p["blocs"]) {
+        if let Some(pied) = p.get("pied")
+            && pied.as_array().is_none_or(|l| l.is_empty() || l.iter().any(|b| b["type"] != "bouton"))
+        {
+            ep(format!("pied sans boutons : {pied}"));
+        }
+        for b in tous_les_blocs(p) {
             let ty = b["type"].as_str().unwrap_or_default();
             if !BLOCS.contains(&ty) {
                 ep(format!("type de bloc inconnu : {b}"));
@@ -704,7 +712,7 @@ fn actions_de_page(p: &Value) -> Vec<(String, Value)> {
         for b in p["module"]["boutons"].as_array().into_iter().flatten() {
             ajoute(b["id"].as_str().unwrap_or_default(), b.get("valeur").cloned().unwrap_or(Value::Null));
         }
-        for b in a_plat(&p["blocs"]) {
+        for b in tous_les_blocs(p) {
             let bid = b["id"].as_str().unwrap_or_default();
             match b["type"].as_str().unwrap_or_default() {
                 "ligne" => {
@@ -805,9 +813,16 @@ fn suspect_trouve<'a>(e: &Enquete) -> Option<&'a Objet> {
     e.verdict.as_ref().and_then(|v| v.suspect.as_deref()).and_then(|s| cat().suspect(s))
 }
 
-/// Les blocs d'une page, par type (ceux des parties repliées et des colonnes compris).
+/// Les blocs d'une page, par type (ceux des parties repliées, des colonnes et du pied compris).
 fn blocs<'a>(page: &'a Value, ty: &str) -> Vec<&'a Value> {
-    a_plat(&page["blocs"]).into_iter().filter(|b| b["type"] == ty).collect()
+    tous_les_blocs(page).into_iter().filter(|b| b["type"] == ty).collect()
+}
+
+/// Tous les blocs d'une page, ceux du pied (les boutons toujours visibles) à la fin.
+fn tous_les_blocs(page: &Value) -> Vec<&Value> {
+    let mut l = a_plat(&page["blocs"]);
+    l.extend(a_plat(&page["pied"]));
+    l
 }
 
 /// Ce texte est dans la page : un bloc, ou une ligne d'une liste numérotée ou d'une carte de lignes.
@@ -1730,43 +1745,6 @@ fn le_verificateur_du_kit_voit_les_erreurs() {
     assert!(!verifier_kit(&Value::Object(j)).is_empty());
 }
 
-/// La pastille « Ton PC » et la bande « Adapté à ton PC » : absentes sans détection ; données, elles se montrent et
-/// leurs actions sont acceptées (une ligne au journal pour l'instant).
-#[test]
-fn ton_pc_et_la_bande_adaptee() {
-    let mut b = Banc::nouveau(None);
-    assert!(b.json.get("pc").is_none());
-    assert!(blocs(b.page(ecrans::FAMILLES).unwrap(), "bande").is_empty());
-    b.etat.ton_pc = Some("Portable HP".into());
-    let phrase = "Adapté à ton PC portable HP : 6 pannes de tour de bureau sont cachées.";
-    b.etat.adapte_au_pc = Some(phrase.into());
-    b.message(json!({ "type": "pret" }));
-    b.propre();
-    assert_eq!(b.json["pc"], json!({ "id": ids::TON_PC, "texte": "Portable HP", "icone": "portable" }));
-    let familles = b.page(ecrans::FAMILLES).unwrap().clone();
-    // (au-dessus des familles)
-    assert_eq!(familles["blocs"][0]["type"], "bande");
-    assert_eq!(familles["blocs"][0]["texte"], phrase);
-    assert_eq!(familles["blocs"][0]["bouton"], json!({ "id": ids::TOUT_AFFICHER, "texte": "Tout afficher" }));
-    assert!(toutes_acceptees(&b.etat, &b.json).is_empty());
-    assert_eq!(
-        b.action(ids::TON_PC, Value::Null, ecrans::FAMILLES),
-        vec![Effet::Journal(super::actions::JOURNAL_TON_PC.into())]
-    );
-    assert_eq!(
-        b.action(ids::TOUT_AFFICHER, Value::Null, ecrans::FAMILLES),
-        vec![Effet::Journal(super::actions::JOURNAL_TOUT_AFFICHER.into())]
-    );
-    // Un PC de bureau : l'icône d'un PC ; un libellé vide : pas de pastille
-    b.etat.ton_pc = Some("Tour de bureau".into());
-    assert_eq!(b.etat.etat_kit(cat(), None)["pc"]["icone"], "pc");
-    b.etat.ton_pc = Some("  ".into());
-    b.etat.adapte_au_pc = Some(String::new());
-    let j = b.etat.etat_kit(cat(), None);
-    assert!(j.get("pc").is_none());
-    assert!(blocs(&j["pages"][ecrans::FAMILLES], "bande").is_empty());
-}
-
 /// Une famille avec des groupes au catalogue (« Groupes » : Id, Titre, Exemple, Icone ; « Groupe » sur chaque
 /// panne) : une carte par groupe, dans son ordre, la première ouverte ; les pannes sans groupe dans « Autres pannes ».
 #[test]
@@ -1790,7 +1768,7 @@ fn famille_en_cartes_par_groupe() {
         }
     }
     let c = Catalogue::lire(&Value::Object(j).to_string()).expect("catalogue modifié");
-    let page = super::familles::page_famille(&c, "allumage").unwrap();
+    let page = super::familles::page_famille(&Etat::default(), &c, "allumage").unwrap();
     let cartes = blocs(&page, "depliables")[0]["elements"].as_array().unwrap().clone();
     let ids: Vec<&str> = cartes.iter().map(|x| x["id"].as_str().unwrap()).collect();
     assert_eq!(ids, ["eteint", "rien", "autres"], "le groupe vide n'a pas de carte");

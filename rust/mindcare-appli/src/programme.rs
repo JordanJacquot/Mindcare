@@ -278,7 +278,9 @@ pub fn lancer() -> ! {
         let local = PathBuf::from(&essai.local);
         let temp = local.join("Temp");
         let _ = std::fs::create_dir_all(&temp);
-        (mindcare_windows::windows::WindowsReel { dossier_temp: temp }, Box::new(ExterieurEssai { local }))
+        // (le PC inventé de l'essai : le vrai matériel n'est jamais lu)
+        let reel = mindcare_windows::windows::WindowsReel { dossier_temp: temp };
+        (crate::essai::SourceEssai { reel }, Box::new(ExterieurEssai { local }))
     };
     let mut lecture = LectureWindows::nouvelle(
         Arc::new(source),

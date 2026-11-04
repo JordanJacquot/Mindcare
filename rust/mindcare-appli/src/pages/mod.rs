@@ -33,6 +33,7 @@ mod reparateur;
 mod reponse;
 #[cfg(test)]
 mod tests;
+mod ton_pc;
 
 /// Les ids des actions des pages, et ceux de l'accueil (reprendre l'enquête en cours, revoir la dernière).
 pub use accueil::{DERNIERE, REPRENDRE};
@@ -41,11 +42,13 @@ pub use actions::{PLUS_TARD_MESSAGE, ids};
 pub use aides::{Aides, POUR_ETRE_SUR, PourEtreSur, ids as ids_aides, textes as textes_aides};
 /// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
 pub use raconte::PANNE;
+/// Le PC reconnu, et les textes de l'écran « Ton PC ».
+pub use ton_pc::{PcReconnu, textes as textes_pc};
 
 use serde_json::{Map, Value, json};
 
-use mindcare_donnees::{Avance, EnqueteEnCours, IndicesGardes};
-use mindcare_moteur::{Catalogue, Enquete, Objet};
+use mindcare_donnees::{Avance, ChoixPc, EnqueteEnCours, IndicesGardes};
+use mindcare_moteur::{Catalogue, Enquete, Objet, TypePc};
 
 /// L'id de chaque page (et de l'écran où aller).
 pub mod ecrans {
@@ -56,6 +59,9 @@ pub mod ecrans {
     pub const ENQUETE: &str = "enquete";
     pub const REPARATEUR: &str = "reparateur";
     pub const AIDE: &str = "aide";
+    /// « Ton PC » (la pastille de la barre du haut), et le choix de la marque d'un autre PC
+    pub const TON_PC: &str = "tonpc";
+    pub const TON_PC_MARQUE: &str = "tonpc-marque";
     /// Seulement quand le catalogue est illisible ([`super::etat_sans_catalogue`])
     pub const PROBLEME: &str = "probleme";
 }
@@ -111,6 +117,8 @@ pub enum Effet {
     AnnulerDictee,
     /// Le message de la dictée est lu (`$script:DicteeMessage = $null`).
     EffacerMessageDictee,
+    /// Garder le PC choisi dans les réglages (`Donnees::choisir_pc` : un autre PC, ou « Revenir à mon PC »).
+    ChoisirPc(ChoixPc),
 }
 
 impl Effet {
@@ -171,13 +179,17 @@ pub struct Etat {
     pub ecran: String,
     /// L'assistant et la dictée (étape 6.4) : leur photo, prise par effets.rs
     pub aides: Aides,
-    /// La pastille « Ton PC » de la barre du haut : le libellé court du PC (« Portable HP ») ; `None` : pas de
-    /// pastille. Un clic envoie l'action [`ids::TON_PC`] (pour l'instant : une ligne au journal).
-    pub ton_pc: Option<String>,
-    /// La bande « Adapté à ton PC » en haut de « Ça concerne quoi ? » : sa phrase entière (« Adapté à ton PC portable
-    /// HP : 6 pannes de tour de bureau sont cachées. ») ; `None` : pas de bande. Son bouton « Tout afficher » envoie
-    /// l'action [`ids::TOUT_AFFICHER`] (pour l'instant : une ligne au journal).
-    pub adapte_au_pc: Option<String>,
+    /// Le PC reconnu par Mindcare (la détection, lue sur un fil à part au démarrage) ; `None` : pas encore reconnu
+    /// (rien n'est caché, pas de pastille).
+    pub pc: Option<PcReconnu>,
+    /// Le PC dont on regarde les pannes (gardé dans les réglages, recopié ici par effets.rs)
+    pub choix_pc: ChoixPc,
+    /// « Tout afficher » choisi dans la bande : rien n'est caché, pour cette fois seulement (jamais gardé)
+    pub tout_afficher: bool,
+    /// Le genre de l'autre PC choisi, en attendant sa marque (`Some(None)` : je ne sais pas)
+    pub genre_choisi: Option<Option<TypePc>>,
+    /// L'écran d'où « Ton PC » a été ouvert (Retour y ramène)
+    pub avant_pc: Option<String>,
 }
 
 /// Où en est l'enquête montrée.
@@ -207,7 +219,7 @@ impl Etat {
         let mut pages = Map::new();
         pages.insert(ecrans::RACONTE.into(), raconte::page(self, cat));
         pages.insert(ecrans::FAMILLES.into(), familles::page_familles(self, cat));
-        if let Some(p) = self.famille.as_deref().and_then(|f| familles::page_famille(cat, f)) {
+        if let Some(p) = self.famille.as_deref().and_then(|f| familles::page_famille(self, cat, f)) {
             pages.insert(ecrans::FAMILLE.into(), p);
         }
         match self.vue(cat) {
@@ -227,6 +239,15 @@ impl Etat {
             pages.insert(POUR_ETRE_SUR.into(), aides::page_pour_etre_sur(p));
         }
         pages.insert(ecrans::AIDE.into(), accueil::page_aide());
+        let pastille = self.libelle_pastille();
+        if pastille.is_some() {
+            // (Retour ramène à l'écran d'où « Ton PC » a été ouvert, s'il est toujours là)
+            let parent = self.avant_pc.as_deref().filter(|e| pages.contains_key(*e)).map(str::to_string);
+            pages.insert(ecrans::TON_PC.into(), ton_pc::page(self, parent.as_deref()));
+            if let Some(g) = self.genre_choisi {
+                pages.insert(ecrans::TON_PC_MARQUE.into(), ton_pc::page_marque(g));
+            }
+        }
         let mut etat = json!({
             "app": { "nom": crate::NOM_APPLI, "version": self.version, "logo": LOGO },
             "theme": self.theme,
@@ -239,7 +260,7 @@ impl Etat {
                     o.insert(k.clone(), v.clone());
                 }
             }
-            if let Some(pc) = self.ton_pc.as_deref().map(str::trim).filter(|p| !p.is_empty()) {
+            if let Some(pc) = pastille.as_deref() {
                 o.insert("pc".into(), pastille_pc(pc));
             }
             if let Some(e) = ecran {

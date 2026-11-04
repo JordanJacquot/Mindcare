@@ -8,13 +8,20 @@
 # parcours exportés du vrai Mindcare PowerShell (juges du moteur) : une réponse finale de chaque genre. Les captures
 # vont dans <Resultats>\<thème>\NN-nom.png, avec <Resultats>\index.txt (fichier, écran, ce qu'on doit y voir).
 #
+# Les thèmes : Néon, Crépuscule, Terminal, Arcade, Rubis et un thème perso d'ESSAI (« pack:essai-ciel » : un pack
+# inventé ici, dans le dossier d'essai, avec une image de fond dessinée par le script et ses couleurs P/S/T ; aucun
+# vrai pack). Ses captures vont dans <Resultats>\perso-essai-ciel.
+#
+# Le PC : celui, inventé, de la construction d'essai (un PC fixe monté ASUS, src\essai.rs) ; le vrai matériel n'est
+# jamais lu. Les captures de « Ton PC » montrent ce PC, puis un autre PC choisi (un portable HP), puis le retour.
+#
 # Rien du vrai PC : un dossier d'essai dans %TEMP% (données, faux %LOCALAPPDATA%, faux Bureau, faux presse-papiers),
 # les verrou et signal d'ESSAI (Local\MindcareEssai-...), jamais ceux de la vraie Mindcare ni de Mindset. Windows est
 # seulement lu (le journal Système, sans droits administrateur), comme dans essai-ecrans.ps1.
 param(
     [Parameter(Mandatory = $true)][string]$Exe,
     [Parameter(Mandatory = $true)][string]$Resultats,
-    [string[]]$Themes = @('neon', 'crepuscule', 'terminal'),
+    [string[]]$Themes = @('neon', 'crepuscule', 'terminal', 'arcade', 'rubis', 'pack:essai-ciel'),
     # Seulement ces captures (leur nom, par exemple « reparateur-avant ») ; rien : toutes
     [string[]]$Seulement = @()
 )
@@ -94,8 +101,29 @@ function Preparer([string]$Theme, [bool]$AvecCatalogue) {
     $script:exeEssai = Join-Path $script:programmes 'Mindset.exe'
     Copy-Item -LiteralPath $Exe -Destination $script:exeEssai
     if ($AvecCatalogue) { Copy-Item -LiteralPath (Join-Path $depot 'Mindcare\fichiers\enquetes.json') -Destination (Join-Path $script:programmes 'enquetes.json') }
+    if ($Theme -like 'pack:*') { Nouveau-Pack ($Theme.Substring(5)) }
     $j = [ordered]@{ theme = $Theme; micro = ''; casque = ''; applis = [ordered]@{ mindcare = $script:programmes }; modifie = (Get-Date -Format s) }
     [IO.File]::WriteAllText((Join-Path $script:local 'Mindset\suite.json'), ($j | ConvertTo-Json -Depth 4), $utf8)
+}
+
+# Un thème perso d'ESSAI, inventé ici (jamais un vrai pack) : une image de fond dessinée (un ciel du soir en dégradé,
+# avec des collines), et ses couleurs P/S/T, dans les packs du dossier de données d'essai
+function Nouveau-Pack([string]$Id) {
+    Add-Type -AssemblyName System.Drawing
+    $d = Join-Path $script:donnees "packs\$Id"
+    New-Item -ItemType Directory -Force -Path $d | Out-Null
+    $fond = New-Object Drawing.Bitmap 1280, 720
+    $g = [Drawing.Graphics]::FromImage($fond)
+    $ciel = New-Object Drawing.Drawing2D.LinearGradientBrush ([Drawing.Point]::new(0, 0)), ([Drawing.Point]::new(0, 720)), ([Drawing.Color]::FromArgb(255, 18, 40, 92)), ([Drawing.Color]::FromArgb(255, 232, 128, 72))
+    $g.FillRectangle($ciel, 0, 0, 1280, 720)
+    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(255, 255, 214, 140))), 900, 300, 160, 160)
+    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(255, 34, 70, 60))), -200, 520, 900, 400)
+    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(255, 24, 52, 48))), 500, 560, 1000, 380)
+    $g.Dispose()
+    $fond.Save((Join-Path $d 'fond.jpg'), [Drawing.Imaging.ImageFormat]::Jpeg); $fond.Dispose()
+    $pack = [ordered]@{ Name = 'Ciel d''essai'; Colors = [ordered]@{ P = '#FF9F5A'; S = '#7FC8FF'; T = '#FFD36E'; NH = 210; NS = 0.5 }
+        Background = 'fond.jpg'; BackgroundOpacity = 0.45; BackgroundAlign = 'bas' }
+    [IO.File]::WriteAllText((Join-Path $d 'pack.json'), ($pack | ConvertTo-Json -Depth 4), $utf8)
 }
 
 function Get-Journal {
@@ -196,9 +224,10 @@ $reponses = @(
 function Parcours-Theme {
     Preparer $script:theme $true
     $script:n = 0
-    # L'attente de Windows : l'enquête « sur ce PC » est demandée AVANT le départ (lue au premier pas de l'appli, quand
+    # L'attente de Windows : l'enquête « sur ce PC » (Windows démarre encore, puis « Oui, sur ce PC-là » ; la réponse
+    # « revient à chaque démarrage » sauterait la question « Sur ce PC ? ») est demandée AVANT le départ (lue au premier pas de l'appli, quand
     # Windows commence tout juste à être lu)
-    $m = @((Action 'panne:ecranbleu' $null 'raconte'), (Rep 1), (Rep 0))
+    $m = @((Action 'panne:ecranbleu' $null 'raconte'), (Rep 0), (Rep 0))
     [IO.File]::WriteAllText((Join-Path $script:donnees 'actions.demande'), (@($m | ForEach-Object { $_ | ConvertTo-Json -Compress -Depth 5 }) -join "`n"), $utf8)
     Lancer "Thème $($script:theme)"
     # (l'écran demandé avant que le kit soit prêt n'est pas suivi : on y va)
@@ -208,8 +237,8 @@ function Parcours-Theme {
     Write-Host "Attente de Windows capturée : $attente"
     [void](Attendre { (Compter 'Journaux de Windows') -gt $lus } 35000)
     Envoyer @(Action 'accueil' $null 'enquete')
-    # (la pastille « Ton PC » et la bande « Adapté à ton PC », comme la détection du PC les donnera)
-    Envoyer @(Action 'essai-pc' ([ordered]@{ pc = 'Portable HP'; adapte = 'Adapté à ton PC portable HP : 6 pannes de tour de bureau sont cachées.' }) 'accueil')
+    # (la pastille « Ton PC » et la bande « Adapté à ton PC » : le PC inventé de l'essai est reconnu au démarrage)
+    Verifier (Attendre { (Compter 'PC reconnu : PC fixe ASUS') -ge 1 } 10000) 'le PC de l''essai reconnu (PC fixe ASUS)'
 
     Capturer 'accueil' 'Accueil' 'Les tuiles Raconte ton problème, Ça concerne quoi ?, Reprendre l''enquête (l''enquête « écran bleu » en cours) ; le rond Comment ça marche en haut à droite'
     Envoyer @(Action 'raconte')
@@ -219,7 +248,22 @@ function Parcours-Theme {
     Envoyer @(Action 'recherche' 'xyzzy plouf' 'raconte')
     Capturer 'raconte-rien' 'Raconte ton problème : rien trouvé' '« Rien ne correspond à « xyzzy plouf » » et ce qu''on peut faire'
     Envoyer @(Action 'recherche' '' 'raconte'; Action 'familles' $null 'raconte')
-    Capturer 'familles' 'Ça concerne quoi ? (les familles)' 'La bande « Adapté à ton PC », les familles en deux colonnes de listes groupées (icône centrée dans sa pastille, titre, phrase, chevron)'
+    Capturer 'familles' 'Ça concerne quoi ? (les familles)' 'La bande « Adapté à ton PC fixe ASUS : N pannes de PC portable ou d''autres marques sont cachées. » et Tout afficher, les familles en deux colonnes de listes groupées (icône centrée dans sa pastille, titre, phrase, chevron)'
+    Envoyer @(Action 'famille:batterie' $null 'familles')
+    Capturer 'famille-batterie-triee' 'Une famille triée pour un PC fixe (Batterie et charge)' 'La bande « ... pannes de PC portable sont cachées. », la seule panne qui reste'
+    Envoyer @(Action 'tout-afficher' $null 'famille')
+    Capturer 'famille-batterie-tout' 'La même famille après « Tout afficher »' 'Toutes les pannes de la famille, la bande « Toutes les pannes sont affichées... » et « Adapter à mon PC »'
+    Envoyer @((Action 'adapter-pc' $null 'famille'), (Action 'familles' $null 'famille'))
+    # L'écran « Ton PC » : ce PC, puis un autre PC choisi (genre, marque), puis le retour à ce PC
+    Envoyer @(Action 'ton-pc' $null 'familles')
+    Capturer 'ton-pc' 'Ton PC (ce PC)' 'À gauche ce que Mindcare a reconnu (PC fixe monté, ASUS, carte mère, processeur, mémoire, disque, Windows), chaque mot expliqué ; à droite « Tu regardes une panne pour un autre PC ? » : Un portable, Un PC fixe, Je ne sais pas'
+    Envoyer @(Action 'pc-genre:portable' $null 'tonpc')
+    Capturer 'ton-pc-marque' 'Ton PC : la marque de l''autre PC' '« Quelle est la marque du portable ? », Je ne sais pas puis les 22 marques en deux colonnes'
+    Envoyer @(Action 'pc-marque:HP' $null 'tonpc-marque')
+    Capturer 'ton-pc-autre' 'Ton PC, un autre PC choisi (portable HP)' 'La bande « Tu regardes les pannes d''un autre PC : portable HP. » et Revenir à mon PC, la pastille « Autre : Portable HP », « Choisi » sur Un portable'
+    Envoyer @(Action 'familles' $null 'tonpc')
+    Capturer 'familles-autre-pc' 'Ça concerne quoi ? pour l''autre PC' 'La bande « Adapté au PC choisi (portable HP) : ... pannes de PC fixe ou d''autres marques sont cachées. »'
+    Envoyer @((Action 'ton-pc' $null 'familles'), (Action 'pc-mon-pc' $null 'tonpc'), (Action 'familles' $null 'tonpc'))
     Envoyer @(Action 'famille:allumage' $null 'familles')
     Capturer 'famille' 'Une famille (Allumage)' 'Les groupes de pannes en cartes dépliables sur deux colonnes, la première ouverte (bord de plasma) avec ses pannes'
     # (cinq fois vers le bas depuis la première panne : l'en-tête de la carte suivante de la colonne, puis Entrée)
@@ -230,16 +274,17 @@ function Parcours-Theme {
     Enquete 'redemarre' @(1, 1, 0)
     Envoyer @((Action 'geste' ([ordered]@{ valeur = '0'; oui = $true }) 'enquete'), (Action 'geste' ([ordered]@{ valeur = '1'; oui = $true }) 'enquete'))
     Capturer 'etape-manipulation-gestes' 'Une manipulation (test de la mémoire), deux gestes cochés' 'Les gestes à cocher (deux cochés), la sécurité, les réponses, la jauge'
-    Enquete 'ecranbleu' @(1, 1, 4, 1)
+    # (« Les Paramètres de Windows ne s'ouvrent pas », la 2e réponse : l'étape « Réparer les fichiers de Windows », DISM puis sfc)
+    Enquete 'parametres' @(1)
     Envoyer @(Action 'commande' '0' 'enquete')
-    Capturer 'etape-commande-copiee' 'Une manipulation avec une commande à copier (sfc)' 'La commande à taper dans le Terminal, son bouton « Copiée »'
+    Capturer 'etape-commande-copiee' 'Une manipulation avec une commande à copier (sfc)' 'Les deux commandes à taper dans le Terminal (DISM, sfc /scannow), le bouton de la première « Copiée »'
     foreach ($r in $reponses) {
         Enquete $r.panne $r.choix
         Capturer $r.nom "Réponse finale : $($r.badge) ($($r.panne))" "La carte « $($r.badge) » (pastille, couleur), la conclusion, Ce qu'il faut faire numéroté avec le conseil pour le réparateur, Comment Mindcare le sait replié, les boutons, la sécurité en bas"
     }
     # (la dernière réponse montrée : « À faire vérifier par un réparateur »)
     Envoyer @(Action 'reparateur' $null 'enquete')
-    Capturer 'reparateur-avant' 'Pour le réparateur, avant Enregistrer' 'La panne, la réponse et la date en haut ; à gauche ce qui est sûr, écarté, à vérifier, les questions ; à droite le PC et ce que Windows a noté ; Copier et Enregistrer sur le Bureau en haut à droite'
+    Capturer 'reparateur-avant' 'Pour le réparateur, avant Enregistrer' 'La panne, la réponse et la date en haut ; à gauche ce qui est sûr, écarté, à vérifier, les questions ; à droite le PC (une enquête pas faite sur ce PC : rien de lu) et ce que Windows a noté ; Copier et Enregistrer sur le Bureau en haut à droite'
     [EssaiCaptures]::Molette($script:cible, 760, 500, -10); Start-Sleep -Milliseconds 600
     Capturer 'reparateur-avant-bas' 'Pour le réparateur, défilé vers le bas' 'La suite du rapport : les réponses une par une (la question, la réponse dessous), Fait avec Mindcare, la note'
     [EssaiCaptures]::Molette($script:cible, 760, 500, 10); Start-Sleep -Milliseconds 400
@@ -261,6 +306,13 @@ function Parcours-Theme {
     Capturer 'accueil-reprendre-choisie' 'Accueil, la tuile Reprendre l''enquête choisie' 'La tuile au centre, son titre et sa ligne (la panne, commencée le...) lisibles'
     Envoyer @(Action 'reprendre' $null 'accueil')
     Capturer 'reprise' 'L''enquête reprise' 'La même question qu''avant « plus tard »'
+    # Une enquête sur ce PC jusqu'à sa réponse (« Je ne sais pas » à tout), puis son rapport : la partie « Le PC »
+    # remplie avec la fiche du PC de l'essai
+    $m = @((Action 'panne:ecranbleu' $null 'raconte'), (Rep 0), (Rep 0))
+    foreach ($k in 1..15) { $m += Rep -1 }
+    Envoyer $m 1500
+    Envoyer @(Action 'reparateur' $null 'enquete')
+    Capturer 'reparateur-ce-pc' 'Pour le réparateur, une enquête faite sur ce PC' 'À droite, « Le PC » rempli : Type (PC fixe monté), carte mère, processeur, mémoire installée, disque, Windows ; les barrettes'
     Quitter
 
     # Sans catalogue des enquêtes
@@ -275,7 +327,7 @@ function Parcours-Theme {
 try {
     foreach ($t in $Themes) {
         $script:theme = $t
-        $script:dossierTheme = Join-Path $Resultats $t
+        $script:dossierTheme = Join-Path $Resultats ($t -replace '^pack:', 'perso-')
         New-Item -ItemType Directory -Force -Path $script:dossierTheme | Out-Null
         if (-not $Seulement.Count) {
             Get-ChildItem -LiteralPath $script:dossierTheme -File | Remove-Item -Force
