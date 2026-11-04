@@ -80,13 +80,18 @@ if (-not $bonne) {
     }
     $depuis = Get-Date
     $limite = $depuis.AddMinutes(40)
+    $toutFini = $null
     while (-not $bonne) {
         if ((Get-Date) -gt $limite) { throw "Publication annulée : GitHub n'a pas fini de construire Mindcare en Rust pour le commit $commit en 40 minutes." }
         Start-Sleep -Seconds 15
         $bonne = Find-Bonne
         $toutes = @(Get-Executions 'release.yml')
-        # (une minute de grâce : la construction lancée à la main met quelques secondes à apparaître)
-        if (-not $bonne -and ((Get-Date) - $depuis).TotalSeconds -gt 60 -and -not @($toutes | Where-Object { $_.status -ne 'completed' }).Count) {
+        # (une minute de grâce : la construction lancée à la main met quelques secondes à apparaître ; puis deux minutes
+        # après la fin de toutes les constructions : GitHub montre leurs fichiers un peu après les avoir dites finies.
+        # Avant : 0.91.0 annulé alors que la construction avait réussi et déposé le zip.)
+        $finies = -not @($toutes | Where-Object { $_.status -ne 'completed' }).Count
+        if (-not $finies) { $toutFini = $null } elseif (-not $toutFini) { $toutFini = Get-Date }
+        if (-not $bonne -and ((Get-Date) - $depuis).TotalSeconds -gt 60 -and $finies -and ((Get-Date) - $toutFini).TotalSeconds -gt 120) {
             $derniere = if ($toutes.Count) { "$($toutes[0].conclusion) : $($toutes[0].url)" } else { 'aucune construction trouvée' }
             throw "Publication annulée : la construction GitHub de Mindcare en Rust n'a rien donné ($derniere)."
         }

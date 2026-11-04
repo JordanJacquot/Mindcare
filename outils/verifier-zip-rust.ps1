@@ -76,10 +76,19 @@ try {
         }
     }
 
-    # Le catalogue des enquêtes : le même que celui du dépôt
+    # Le catalogue des enquêtes : le même que celui du dépôt, octet pour octet. Le zip de GitHub a les fins de ligne de
+    # git, un zip fait sur ce PC celles du dossier (git pour Windows peut y écrire des CRLF) : l'un ou l'autre convient.
+    # Avant : seulement le dossier, et 0.91.0 refusé à tort parce que git y avait remis le fichier en CRLF.
     $cat = Join-Path $tmp 'enquetes.json'
-    if ((Test-Path -LiteralPath $cat) -and (Get-FileHash -LiteralPath $cat).Hash -ne (Get-FileHash -LiteralPath (Join-Path $racine 'Mindcare\fichiers\enquetes.json')).Hash) {
-        $problemes.Add('enquetes.json du zip différent de Mindcare\fichiers\enquetes.json')
+    if (Test-Path -LiteralPath $cat) {
+        $dossier = (Get-FileHash -LiteralPath (Join-Path $racine 'Mindcare\fichiers\enquetes.json')).Hash -eq (Get-FileHash -LiteralPath $cat).Hash
+        $avantGit = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+        try {
+            $dansGit = ((& git -C $racine rev-parse 'HEAD:Mindcare/fichiers/enquetes.json' 2>$null) -join '').Trim()
+            $duZip = ((& git -C $racine hash-object --no-filters -- $cat 2>$null) -join '').Trim()
+        } finally { $ErrorActionPreference = $avantGit }
+        $commeGit = $dansGit -match '^[0-9a-f]{40}$' -and $dansGit -eq $duZip
+        if (-not ($dossier -or $commeGit)) { $problemes.Add('enquetes.json du zip différent de Mindcare\fichiers\enquetes.json (ni celui du dossier, ni celui de git)') }
     }
 
     # Les fiches de version des deux programmes
