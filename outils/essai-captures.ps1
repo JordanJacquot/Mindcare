@@ -208,6 +208,8 @@ function Parcours-Theme {
     Write-Host "Attente de Windows capturée : $attente"
     [void](Attendre { (Compter 'Journaux de Windows') -gt $lus } 35000)
     Envoyer @(Action 'accueil' $null 'enquete')
+    # (la pastille « Ton PC » et la bande « Adapté à ton PC », comme la détection du PC les donnera)
+    Envoyer @(Action 'essai-pc' ([ordered]@{ pc = 'Portable HP'; adapte = 'Adapté à ton PC portable HP : 6 pannes de tour de bureau sont cachées.' }) 'accueil')
 
     Capturer 'accueil' 'Accueil' 'Les tuiles Raconte ton problème, Ça concerne quoi ?, Reprendre l''enquête (l''enquête « écran bleu » en cours) ; le rond Comment ça marche en haut à droite'
     Envoyer @(Action 'raconte')
@@ -217,11 +219,14 @@ function Parcours-Theme {
     Envoyer @(Action 'recherche' 'xyzzy plouf' 'raconte')
     Capturer 'raconte-rien' 'Raconte ton problème : rien trouvé' '« Rien ne correspond à « xyzzy plouf » » et ce qu''on peut faire'
     Envoyer @(Action 'recherche' '' 'raconte'; Action 'familles' $null 'raconte')
-    Capturer 'familles' 'Ça concerne quoi ? (les familles)' 'Les familles de pannes en cartes avec leur image'
+    Capturer 'familles' 'Ça concerne quoi ? (les familles)' 'La bande « Adapté à ton PC », les familles en deux colonnes de listes groupées (icône centrée dans sa pastille, titre, phrase, chevron)'
     Envoyer @(Action 'famille:allumage' $null 'familles')
-    Capturer 'famille' 'Une famille (Allumage)' 'Les pannes de la famille, avec leur phrase'
+    Capturer 'famille' 'Une famille (Allumage)' 'Les groupes de pannes en cartes dépliables sur deux colonnes, la première ouverte (bord de plasma) avec ses pannes'
+    # (cinq fois vers le bas depuis la première panne : l'en-tête de la carte suivante de la colonne, puis Entrée)
+    Touche 0x28; Touche 0x28; Touche 0x28; Touche 0x28; Touche 0x28; Touche 0x0D
+    Capturer 'famille-deux-ouvertes' 'Une famille, une deuxième carte ouverte au clavier' 'Deux cartes ouvertes, chacune n''allonge que sa colonne'
     Enquete 'redemarre' @()
-    Capturer 'etape-question' 'Une étape question (Il redémarre tout seul)' 'La question de sécurité, ses réponses, Je ne sais pas, l''anneau des suspects à gauche'
+    Capturer 'etape-question' 'Une étape question (Il redémarre tout seul)' 'Le fil (famille › panne) et « Étape 1 sur N », les segments, la question en grand, les réponses deux par ligne, Je ne sais pas et Étape précédente en liens, les suspects juste en dessous'
     Enquete 'redemarre' @(1, 1, 0)
     Envoyer @((Action 'geste' ([ordered]@{ valeur = '0'; oui = $true }) 'enquete'), (Action 'geste' ([ordered]@{ valeur = '1'; oui = $true }) 'enquete'))
     Capturer 'etape-manipulation-gestes' 'Une manipulation (test de la mémoire), deux gestes cochés' 'Les gestes à cocher (deux cochés), la sécurité, les réponses, la jauge'
@@ -230,11 +235,11 @@ function Parcours-Theme {
     Capturer 'etape-commande-copiee' 'Une manipulation avec une commande à copier (sfc)' 'La commande à taper dans le Terminal, son bouton « Copiée »'
     foreach ($r in $reponses) {
         Enquete $r.panne $r.choix
-        Capturer $r.nom "Réponse finale : $($r.badge) ($($r.panne))" "Le badge « $($r.badge) », le titre de la réponse, les preuves, les écartés, à faire, Pour le réparateur"
+        Capturer $r.nom "Réponse finale : $($r.badge) ($($r.panne))" "La carte « $($r.badge) » (pastille, couleur), la conclusion, Ce qu'il faut faire numéroté avec le conseil pour le réparateur, Comment Mindcare le sait replié, les boutons, la sécurité en bas"
     }
     # (la dernière réponse montrée : « À faire vérifier par un réparateur »)
     Envoyer @(Action 'reparateur' $null 'enquete')
-    Capturer 'reparateur-avant' 'Pour le réparateur, avant Enregistrer' 'Le rapport montré dans la page (titre, panne, réponse, comment on le sait, écartés, il reste), les deux boutons'
+    Capturer 'reparateur-avant' 'Pour le réparateur, avant Enregistrer' 'La panne, la réponse et la date en haut ; à gauche ce qui est sûr, écarté, à vérifier, les questions ; à droite le PC et ce que Windows a noté ; Copier et Enregistrer sur le Bureau en haut à droite'
     [EssaiCaptures]::Molette($script:cible, 760, 500, -10); Start-Sleep -Milliseconds 600
     Capturer 'reparateur-avant-bas' 'Pour le réparateur, défilé vers le bas' 'La suite du rapport : les réponses une par une (la question, la réponse dessous), Fait avec Mindcare, la note'
     [EssaiCaptures]::Molette($script:cible, 760, 500, 10); Start-Sleep -Milliseconds 400

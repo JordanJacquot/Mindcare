@@ -1,21 +1,40 @@
 //! Une étape de l'enquête (Show-EtapeEnquete et Add-PanneauEnquete), et l'attente de ce que Windows a noté
-//! (Wait-Journaux).
+//! (Wait-Journaux). Le design A2 : le fil d'Ariane (famille › panne) avec « Étape X sur N », l'avancée en segments, la
+//! question en grand sur toute la largeur, les réponses en grands boutons, « Je ne sais pas » et « Étape précédente »
+//! en liens, puis les suspects juste en dessous (ils suivent la hauteur de la question).
 
 use serde_json::{Value, json};
 
 use mindcare_moteur::ps::{champ, champ_v, egal, tableau, texte, vrai};
-use mindcare_moteur::verdict::minuscule;
 use mindcare_moteur::{Catalogue, Enquete, Objet};
 
 use super::Etat;
 use super::actions::ids;
-use super::outils::{gestes_materiel, image, suspects_montres, t, textes, titre_suspect, urgent};
+use super::outils::{gestes_materiel, image, suspects_montres, t, textes, titre_suspect};
 
-/// L'anneau des suspects (Add-AnneauSuspects) : combien sont déjà écartés, et la liste de ceux à montrer.
-pub fn module_suspects(cat: &Catalogue, panne: &Objet, e: &Enquete, label: &str) -> Value {
+/// Les textes des étapes.
+pub mod textes {
+    pub const SUSPECTS: &str = "Les suspects";
+    pub const A_VERIFIER: &str = "À vérifier";
+    pub const ECARTE: &str = "Écarté";
+    pub const NSP: &str = "Je ne sais pas";
+    pub const PRECEDENT: &str = "Étape précédente";
+    pub const PLUS_TARD: &str = "Je le ferai plus tard";
+    pub const ACCUEIL: &str = "Accueil";
+}
+
+/// Le fil d'Ariane d'une panne : sa famille, puis son titre.
+pub fn fil_panne(cat: &Catalogue, panne: &Objet) -> Vec<String> {
+    let famille = cat.famille(&t(panne, "Famille")).map(|f| t(f, "Titre")).unwrap_or_default();
+    [famille, t(panne, "Titre")].into_iter().filter(|x| !x.trim().is_empty()).collect()
+}
+
+/// Les suspects (Add-AnneauSuspects) : une petite carte par suspect à montrer, « À vérifier » ou « Écarté », avec le
+/// compte (« 1 écarté, encore 5 à vérifier ») ; rien quand la panne n'en montre aucun.
+pub fn bloc_suspects(cat: &Catalogue, panne: &Objet, e: &Enquete) -> Option<Value> {
     let tous = suspects_montres(cat, panne);
     if tous.is_empty() {
-        return json!({ "icone": "loupe", "couleur": "P", "titre": t(panne, "Titre"), "texte": label });
+        return None;
     }
     let reste = |id: &str| e.restants.iter().any(|r| egal(r, id));
     let ecartes = tous.iter().filter(|s| !reste(s)).count();
@@ -25,21 +44,17 @@ pub fn module_suspects(cat: &Catalogue, panne: &Objet, e: &Enquete, label: &str)
         1 => "encore 1 à vérifier".to_string(),
         n => format!("encore {n} à vérifier"),
     };
-    let ecartes_texte = if ecartes == 1 { "1 écarté".to_string() } else { format!("{ecartes} écartés") };
-    let resume: Vec<Value> = tous
+    let ecartes_texte = if ecartes <= 1 { format!("{ecartes} écarté") } else { format!("{ecartes} écartés") };
+    let elements: Vec<Value> = tous
         .iter()
         .map(|s| {
             let r = reste(s);
-            json!({ "nom": titre_suspect(cat, s), "valeur": if r { "À vérifier" } else { "Écarté" },
+            json!({ "nom": titre_suspect(cat, s), "etat": if r { textes::A_VERIFIER } else { textes::ECARTE },
                     "ton": if r { "" } else { "ok" } })
         })
         .collect();
-    json!({
-        "anneau": { "valeur": ecartes, "sur": tous.len(), "texte": format!("{ecartes}/{}", tous.len()), "petit": "" },
-        "titre": "Les suspects",
-        "texte": format!("{ecartes_texte}, {encore}"),
-        "resume": resume,
-    })
+    Some(json!({ "type": "suspects", "titre": textes::SUSPECTS, "droite": format!("{ecartes_texte}, {encore}"),
+                 "elements": elements }))
 }
 
 /// Les commandes à taper dans le Terminal (Add-Commandes) : chacune avec son bouton « Copier ».
@@ -67,29 +82,15 @@ fn commandes(etat: &Etat, commande: &Objet) -> Vec<Value> {
 /// La page d'une étape de l'enquête.
 pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
     let (Some(panne), Some(et)) = (etat.en_cours.panne.as_ref(), e.etape.as_ref()) else {
-        return page_attente(etat);
+        return page_attente(etat, cat);
     };
     let id_etape = t(et, "Id");
     let test = egal(&t(et, "Type"), "test");
-    let suspects = e.restants.iter().filter(|r| !urgent(cat, r)).count();
-    let label = if test {
-        let duree = t(et, "Duree");
-        if duree.is_empty() {
-            "Une manipulation à faire".to_string()
-        } else {
-            format!("Une manipulation à faire ({duree})")
-        }
-    } else if suspects > 1 {
-        format!("Il reste {suspects} suspects")
-    } else {
-        "Une dernière vérification".to_string()
-    };
     // « Étape 2 sur 5 » (le total peut baisser : des étapes deviennent inutiles en route)
     let n = e.faits.len() + 1;
     let total = (n + e.a_venir).max(n);
 
-    let mut blocs = vec![json!({ "type": "jauge", "texte": format!("Étape {n} sur {total}"),
-                                 "valeur": (100 * n) as f64 / total as f64 })];
+    let mut blocs = vec![json!({ "type": "segments", "valeur": n, "sur": total })];
     let aide = t(et, "Aide");
     if !aide.is_empty() {
         blocs.push(json!({ "type": "texte", "texte": aide }));
@@ -133,14 +134,18 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
     let options: Vec<Value> = tableau(champ(et, "Reponses"))
         .into_iter()
         .enumerate()
-        .map(|(k, r)| {
-            json!({ "id": k.to_string(), "titre": texte(champ_v(Some(r), "Texte")),
-                              "texte": "" })
-        })
+        .map(|(k, r)| json!({ "id": k.to_string(), "titre": texte(champ_v(Some(r), "Texte")), "texte": "" }))
         .collect();
     blocs.push(json!({ "type": "cartes", "id": ids::REP, "options": options }));
-    blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": "Étape précédente", "style": "second" }));
-    blocs.push(json!({ "type": "bouton", "id": ids::NSP, "texte": "Je ne sais pas", "style": "second" }));
+    // (les liens sous les réponses : « Je ne sais pas » en couleur, les autres en gris)
+    blocs.push(json!({ "type": "bouton", "id": ids::NSP, "texte": textes::NSP, "style": "lien" }));
+    blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": textes::PRECEDENT, "style": "discret" }));
+    blocs.push(if test {
+        json!({ "type": "bouton", "id": ids::PLUS_TARD, "texte": textes::PLUS_TARD, "style": "discret" })
+    } else {
+        json!({ "type": "bouton", "id": ids::ACCUEIL, "texte": textes::ACCUEIL, "style": "discret" })
+    });
+    blocs.extend(bloc_suspects(cat, panne, e));
     if !e.auto.is_empty() {
         blocs.push(json!({ "type": "titre", "texte": "Ce que Mindcare a vérifié" }));
         for a in &e.auto {
@@ -156,37 +161,38 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
                                "note": f.reponse, "valeur": "Changer" }));
         }
     }
-    let action = if test {
-        json!({ "id": ids::PLUS_TARD, "texte": "Je le ferai plus tard", "icone": "horloge" })
-    } else {
-        json!({ "id": ids::ACCUEIL, "texte": "Accueil", "icone": "maison" })
-    };
-    json!({
+    let mut page = json!({
         "titre": t(et, "Texte"),
-        "sous": format!("{} · {}", t(panne, "Titre"), minuscule(&label)),
-        "icone": if test { "test" } else { "aide" },
-        "couleur": if test { "T" } else { "P" },
+        "forme": "question",
+        "chemin": fil_panne(cat, panne),
+        "etape": format!("Étape {n} sur {total}"),
         "retour": "appli",
-        "actions": [action],
-        "module": module_suspects(cat, panne, e, &label),
         "blocs": blocs,
-    })
+    });
+    if test {
+        let duree = t(et, "Duree");
+        page["sous"] = json!(if duree.is_empty() {
+            "Une manipulation à faire".to_string()
+        } else {
+            format!("Une manipulation à faire ({duree})")
+        });
+    }
+    page
 }
 
 /// La page d'attente : sur le PC en panne, Mindcare lit ce que Windows a noté avant de continuer.
-pub fn page_attente(etat: &Etat) -> Value {
-    let panne = etat.en_cours.panne.as_ref().map(|p| t(p, "Titre")).unwrap_or_default();
+pub fn page_attente(etat: &Etat, cat: &Catalogue) -> Value {
+    let chemin = etat.en_cours.panne.as_ref().map(|p| fil_panne(cat, p)).unwrap_or_default();
     json!({
         "titre": "Mindcare regarde ce que Windows a noté...",
-        "sous": if panne.is_empty() { "Un instant".to_string() } else { panne },
-        "icone": "windows", "couleur": "S", "retour": "appli",
-        "module": { "icone": "windows", "couleur": "S", "titre": "Un instant",
-                    "texte": "Je regarde ce que Windows a noté, ça ne prend qu'un instant." },
+        "sous": "Je regarde ce que Windows a noté, ça ne prend qu'un instant.",
+        "chemin": chemin,
+        "retour": "appli",
         "blocs": [
             { "type": "texte",
               "texte": "Quelques secondes : ce que Windows a noté sur ce PC permet d'écarter des pistes sans rien te demander." },
-            { "type": "bouton", "id": ids::PRECEDENT, "texte": "Étape précédente", "style": "second" },
-            { "type": "bouton", "id": ids::ACCUEIL, "texte": "Accueil", "style": "second" },
+            { "type": "bouton", "id": ids::PRECEDENT, "texte": textes::PRECEDENT, "style": "second" },
+            { "type": "bouton", "id": ids::ACCUEIL, "texte": textes::ACCUEIL, "style": "second" },
         ],
     })
 }

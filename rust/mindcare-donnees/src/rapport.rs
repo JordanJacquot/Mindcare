@@ -7,8 +7,9 @@ use std::path::{Path, PathBuf};
 use crate::historique::IndicesGardes;
 use crate::journal::Journal;
 use crate::moment::{Moment, format_moment};
+use mindcare_moteur::pc::FichePc;
 use mindcare_moteur::ps::{champ, egal, texte, vrai};
-use mindcare_moteur::{Catalogue, Enquete, Objet, TypeVerdict};
+use mindcare_moteur::{Catalogue, Enquete, Objet, ProfilPc, TypeVerdict};
 
 /// Ce que Windows dit du PC (Win32_ComputerSystem et Win32_OperatingSystem), lu par l'autre crate.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -65,6 +66,49 @@ pub fn texte_rapport(
     pc: &SurLePc,
     version: &str,
 ) -> String {
+    texte_rapport_pc(cat, panne, e, titre, maintenant, pc, &PcDuRapport::default(), version)
+}
+
+/// Ce que le rapport dit en plus du PC (pas dans Mindcare PowerShell) : la fiche du PC reconnu (type, modèle, carte
+/// mère, processeur, mémoire, disque, Windows), et le PC choisi à la main pour un autre.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PcDuRapport<'a> {
+    /// La fiche du PC où Mindcare est ouvert : seulement écrite pour une enquête faite sur lui (« cepc »).
+    pub fiche: Option<&'a FichePc>,
+    /// Le PC choisi à la main (« pour un ami ») : « PC choisi : Portable HP », quand l'enquête n'est pas faite sur ce PC.
+    pub choisi: Option<&'a ProfilPc>,
+}
+
+/// Les lignes de la fiche du PC (« Type : Portable »...). `sans_modele` : le modèle est déjà écrit (« Ordinateur : »).
+pub fn lignes_fiche(f: &FichePc, sans_modele: bool) -> Vec<String> {
+    let modele = if sans_modele { None } else { f.modele.as_ref() };
+    [
+        ("Type", f.genre.as_ref()),
+        ("Modèle", modele),
+        ("Carte mère", f.carte_mere.as_ref()),
+        ("Processeur", f.processeur.as_ref()),
+        ("Mémoire installée", f.memoire.as_ref()),
+        ("Disque de Windows", f.disque.as_ref()),
+        ("Windows", f.windows.as_ref()),
+    ]
+    .into_iter()
+    .filter_map(|(nom, v)| v.map(|v| v.trim()).filter(|v| !v.is_empty()).map(|v| format!("{nom} : {v}")))
+    .collect()
+}
+
+/// Le rapport de l'enquête avec ce qu'on sait du PC en plus (voir [`PcDuRapport`]) : sans fiche ni choix, exactement
+/// `Get-ResumeTexte`.
+#[allow(clippy::too_many_arguments)]
+pub fn texte_rapport_pc(
+    cat: &Catalogue,
+    panne: &Objet,
+    e: &Enquete,
+    titre: &str,
+    maintenant: &Moment,
+    pc: &SurLePc,
+    detail: &PcDuRapport,
+    version: &str,
+) -> String {
     let mut l: Vec<String> = vec!["Mindcare : rapport de l'enquête".into(), String::new()];
     l.push(format!("Date : {}", format_moment(maintenant, true)));
     l.push(format!("Panne : {}", texte(champ(panne, "Titre"))));
@@ -76,6 +120,11 @@ pub fn texte_rapport(
         if liste_vraie(pc.barrettes) {
             l.push(format!("Mémoire : {}", pc.barrettes.join(" ; ")));
         }
+        if let Some(f) = detail.fiche {
+            l.extend(lignes_fiche(f, !pc.infos.is_empty()));
+        }
+    } else if let Some(p) = detail.choisi {
+        l.push(format!("PC choisi : {}", p.libelle_court()));
     }
     l.push(String::new());
     l.push(format!("Réponse : {titre}"));

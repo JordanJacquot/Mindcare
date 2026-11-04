@@ -5,6 +5,7 @@ use unicode_normalization::UnicodeNormalization;
 use unicode_normalization::char::is_combining_mark;
 
 use crate::catalogue::Catalogue;
+use crate::pc::{ProfilPc, Tri, trier};
 use crate::ps::{Objet, champ, tableau, texte};
 
 /// Les petits mots qui ne disent rien de la panne (« mon pc ne démarre plus » : seulement « demarre »).
@@ -83,4 +84,10 @@ pub fn chercher<'a>(cat: &'a Catalogue, requete: &str) -> Vec<&'a Objet> {
     }
     res.sort_by(|a, b| b.1.cmp(&a.1).then(a.2.cmp(&b.2)));
     res.into_iter().map(|(p, _, _)| p).collect()
+}
+
+/// La recherche par mots pour ce PC : les pannes trouvées qui le concernent (même ordre que [`chercher`]), et combien
+/// de pannes trouvées sont cachées parce qu'elles ne le concernent pas (« PourPc », voir [`crate::pc`]).
+pub fn chercher_pour<'a>(cat: &'a Catalogue, requete: &str, profil: &ProfilPc) -> Tri<'a> {
+    trier(chercher(cat, requete), profil)
 }

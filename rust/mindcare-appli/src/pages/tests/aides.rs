@@ -61,6 +61,7 @@ fn sans_aides_la_page_de_l_etape_5() {
     let b = Banc::nouveau(None);
     let p = raconte(&b);
     assert!(p.get("actions").is_none());
+    assert!(p["blocs"][0].get("bouton").is_none(), "le bouton Parler sans la dictée");
     assert_eq!(ligne(&p, x::LIGNE_DICTEE), Value::Null);
     assert_eq!(ligne(&p, x::LIGNE_ASSISTANT), Value::Null);
     assert_eq!(p["sous"], "Avec tes mots : Mindcare trouve la bonne enquête.");
@@ -213,7 +214,13 @@ fn chaque_etat_de_la_ligne_de_la_dictee() {
         assert_eq!(l["note"], note.as_str(), "{inst:?} {dictee:?}");
         assert_eq!(l["bouton"]["texte"].as_str(), bouton, "{inst:?}");
         assert_eq!(l["bouton"]["id"].as_str(), bouton.map(|_| ia::INSTALLER_DICTEE), "{inst:?}");
-        assert_eq!(p["actions"], json!([{ "id": ia::PARLER, "texte": parler, "icone": "son" }]), "{dictee:?}");
+        // (le bouton Parler dans le champ, à droite)
+        assert_eq!(
+            p["blocs"][0]["bouton"],
+            json!({ "id": ia::PARLER, "texte": parler, "icone": "micro" }),
+            "{dictee:?}"
+        );
+        assert!(p.get("actions").is_none());
         assert_eq!(p["sous"], "Avec tes mots ou avec ta voix : Mindcare trouve la bonne enquête.");
         // (la maquette : la dictée, puis l'assistant, juste sous le champ)
         assert_eq!(p["blocs"][1]["texte"], x::LIGNE_DICTEE);
@@ -316,14 +323,14 @@ fn pour_etre_sur() {
     assert_eq!(p["titre"], "Pour être sûr");
     assert_eq!(p["parent"], ecrans::RACONTE);
     assert_eq!(
-        p["module"],
-        json!({ "icone": "aide", "couleur": "T", "titre": "Ce que tu as écrit", "texte": "« mon pc s'éteint d'un coup »" })
+        p["blocs"][0],
+        json!({ "type": "citation", "titre": "Ce que tu as écrit", "texte": "« mon pc s'éteint d'un coup »" })
     );
     assert_eq!(
-        p["blocs"][0],
+        p["blocs"][1],
         json!({ "type": "titre", "texte": "Laquelle de ces phrases ressemble le plus à ce qui se passe ?" })
     );
-    let options = p["blocs"][1]["options"].as_array().cloned().unwrap_or_default();
+    let options = p["blocs"][2]["options"].as_array().cloned().unwrap_or_default();
     assert_eq!(options.len(), 3);
     for (o, c) in options.iter().zip(["seteint", "redemarre", "ecranbleu"]) {
         let ch = choix(c);
@@ -331,7 +338,7 @@ fn pour_etre_sur() {
         assert_eq!(o["texte"], ch.phrase.as_str());
     }
     assert_eq!(
-        p["blocs"][2],
+        p["blocs"][3],
         json!({ "type": "bouton", "id": "aucune", "texte": "Aucune de ces phrases", "style": "second" })
     );
     b.propre();
@@ -416,7 +423,7 @@ fn le_verificateur_voit_une_barre_impossible() {
     let l = blocs.iter_mut().find(|v| v["texte"] == x::LIGNE_ASSISTANT).unwrap();
     l["barre"] = json!(150);
     assert!(!verifier_kit(&json).is_empty(), "une barre à 150 % passe");
-    json["pages"][ecrans::RACONTE]["actions"][0]["icone"] = json!("micro-inconnu");
+    json["pages"][ecrans::RACONTE]["blocs"][0]["bouton"]["icone"] = json!("micro-inconnu");
     assert!(verifier_kit(&json).iter().any(|e| e.contains("micro-inconnu")));
     b.propre();
 }

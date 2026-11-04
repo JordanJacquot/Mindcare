@@ -1,6 +1,7 @@
 //! « Raconte ton problème » : la recherche par mots du moteur (Find-Pannes), les plus proches d'abord ; avec
-//! l'assistant et la dictée (étape 6.4, src\pages\aides.rs) : le bouton Parler, les lignes « La dictée » et
-//! « L'assistant », et « Demander à l'assistant » juste sous le champ dès qu'une phrase est écrite.
+//! l'assistant et la dictée (étape 6.4, src\pages\aides.rs) : le bouton Parler dans le champ, les lignes « La dictée »
+//! et « L'assistant », et « Demander à l'assistant » juste sous le champ dès qu'une phrase est écrite. Le design A2 :
+//! les pannes trouvées en une liste groupée (titre, phrase, étiquette de famille, chevron).
 
 use serde_json::{Value, json};
 
@@ -24,9 +25,15 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
     } else {
         "Par exemple : « bip », « le son grésille », « écran bleu »..."
     };
-    let mut blocs = vec![json!({
+    let mut champ = json!({
         "type": "champ", "id": RECHERCHE, "recherche": true, "valeur": etat.recherche, "indice": indice,
-    })];
+        "texte": "Ton problème",
+    });
+    // (le bouton Parler, dans le champ à droite : seulement avec la dictée)
+    if let Some(b) = aides::bouton_parler(a) {
+        champ["bouton"] = b;
+    }
+    let mut blocs = vec![champ];
     let texte = etat.recherche.trim();
     // (juste sous le champ, pas sous les 8 pannes : un bouton qu'il faut faire défiler pour voir est souvent manqué)
     if !texte.is_empty() {
@@ -49,7 +56,7 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
             let droite = if n > MONTREES {
                 format!("Les {MONTREES} plus proches")
             } else if n > 1 {
-                "La plus proche en premier".to_string()
+                "Les plus proches d'abord".to_string()
             } else {
                 String::new()
             };
@@ -58,7 +65,7 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
                 let famille = cat.famille(&t(p, "Famille")).map(|f| t(f, "Titre")).unwrap_or_default();
                 blocs.push(json!({
                     "type": "ligne", "id": format!("{PANNE}{}", t(p, "Id")), "texte": t(p, "Titre"),
-                    "note": t(p, "Phrase"), "etiquette": famille, "valeur": "Commencer",
+                    "note": t(p, "Phrase"), "etiquette": famille,
                 }));
             }
         }
@@ -68,14 +75,9 @@ pub fn page(etat: &Etat, cat: &Catalogue) -> Value {
     } else {
         "Avec tes mots : Mindcare trouve la bonne enquête."
     };
-    let mut page = json!({
+    json!({
         "titre": "Raconte ton problème",
         "sous": sous,
-        "icone": "loupe", "couleur": "P",
         "blocs": blocs,
-    });
-    if let Some(actions) = aides::actions(a) {
-        page["actions"] = actions;
-    }
-    page
+    })
 }

@@ -11,6 +11,7 @@
 //! - [`recherche`] : la recherche par mots (Find-Pannes) ;
 //! - [`garde_fou`] : le garde-fou de l'assistant (Select-PreRempli) ;
 //! - [`validation`] : ce qui ne va pas dans le catalogue (Test-Enquetes) ;
+//! - [`pc`] : les pannes qui concernent ce PC (le champ « PourPc », le profil du PC) ;
 //! - [`identifiables`] : chaque suspect peut-il être la réponse ?
 //! - [`ps`] : les règles de PowerShell que tout cela reproduit (majuscules, vrai ou faux, listes).
 
@@ -18,15 +19,17 @@ pub mod catalogue;
 pub mod enquete;
 pub mod garde_fou;
 pub mod identifiables;
+pub mod pc;
 pub mod ps;
 pub mod recherche;
 pub mod validation;
 pub mod verdict;
 
-pub use catalogue::Catalogue;
+pub use catalogue::{Catalogue, Groupe, GroupesFamille};
 pub use enquete::{Auto, Ecarte, Enquete, Fait, INDICES_CONNUS, Indice, Indices, TypeVerdict, Verdict, enquete};
 pub use garde_fou::pre_rempli;
+pub use pc::{MARQUES, ProfilPc, Tri, TypePc, concerne};
 pub use ps::Objet;
-pub use recherche::{chercher, simple};
-pub use validation::verifier;
+pub use recherche::{chercher, chercher_pour, simple};
+pub use validation::{verifier, verifier_groupes};
 pub use verdict::titre_verdict;

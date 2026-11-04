@@ -1,5 +1,6 @@
 //! Ce qui ne va pas dans le catalogue (Test-Enquetes) : une liste vide, tout est bon. Les messages sont exactement ceux
-//! de PowerShell, dans le même ordre.
+//! de PowerShell, dans le même ordre. En plus (PowerShell ne les lit pas) : un « PourPc » mal écrit ([`crate::pc`]), et
+//! les groupes des familles ([`verifier_groupes`]).
 
 use std::collections::HashSet;
 
@@ -7,6 +8,7 @@ use serde_json::Value;
 
 use crate::catalogue::Catalogue;
 use crate::enquete::INDICES_CONNUS;
+use crate::pc::{CHAMP, problemes};
 use crate::ps::{
     champ, champ_v, cle, contient, contient_valeur, egal, egal_valeurs, parcours, tableau, texte, vrai, vrai_liste,
 };
@@ -43,6 +45,10 @@ pub fn verifier(cat: &Catalogue, texte_fichier: &str) -> Vec<String> {
         if !familles.iter().any(|f| egal(f, &famille)) {
             pb.push(format!("{nom} : famille inconnue \u{ab} {famille} \u{bb}"));
         }
+        // (« PourPc » : seulement en Rust, PowerShell ne le lit pas ; un champ bien écrit ne donne aucun message)
+        if let Some(pour) = champ(p, CHAMP) {
+            pb.extend(problemes(pour).into_iter().map(|x| format!("{nom} : {x}")));
+        }
         for s in parcours(champ(p, "Suspects")) {
             if !contient(&suspects, s) {
                 pb.push(format!("{nom} : suspect inconnu \u{ab} {} \u{bb}", texte(Some(s))));
@@ -66,6 +72,9 @@ pub fn verifier(cat: &Catalogue, texte_fichier: &str) -> Vec<String> {
                 pb.push(format!("{ou} : en double"));
             }
             vus.insert(cle(&id));
+            if champ(&e, CHAMP).is_some() {
+                pb.push(format!("{ou} : PourPc n'est lu que sur une panne (sur une étape, il changerait le parcours des enquêtes gardées)"));
+            }
             let genre = champ(&e, "Type").cloned().unwrap_or(Value::Null);
             if !["question", "test", "auto"].iter().any(|t| egal_valeurs(&Value::String((*t).to_string()), &genre)) {
                 pb.push(format!("{ou} : type inconnu \u{ab} {} \u{bb}", texte(Some(&genre))));
@@ -138,6 +147,61 @@ pub fn verifier(cat: &Catalogue, texte_fichier: &str) -> Vec<String> {
     }
     if !vrai_liste(&ids.iter().collect::<Vec<_>>()) {
         pb.push("Aucune panne".to_string());
+    }
+    pb
+}
+
+/// Les groupes des familles (seulement en Rust : PowerShell ne les lit pas) : chaque famille a ses groupes (Id, Nom,
+/// Exemple, Icone), un Id de groupe n'est pris qu'une fois dans tout le catalogue, chaque panne a un Groupe de sa
+/// famille, et aucun groupe n'est vide. Une liste vide : tout est bon.
+///
+/// À part de [`verifier`] : les petits catalogues abîmés des juges gardent toutes les familles (et leurs groupes) avec
+/// quelques pannes seulement ; leurs groupes vides ne sont pas une erreur pour PowerShell.
+pub fn verifier_groupes(cat: &Catalogue) -> Vec<String> {
+    let mut pb = Vec::new();
+    let mut tous: Vec<String> = Vec::new();
+    let rempli = |v: Option<&Value>| matches!(v, Some(Value::String(s)) if !s.trim().is_empty());
+    for f in cat.familles() {
+        let fid = texte(champ(f, "Id"));
+        if !matches!(champ(f, "Groupes"), Some(Value::Array(l)) if !l.is_empty()) {
+            pb.push(format!("Famille {fid} : Groupes manquant"));
+            continue;
+        }
+        for g in parcours(champ(f, "Groupes")) {
+            let gid = texte(champ_v(Some(g), "Id"));
+            if ["Id", "Nom", "Exemple", "Icone"].iter().any(|c| !rempli(champ_v(Some(g), c))) {
+                pb.push(format!("Famille {fid}, groupe {gid} : Id, Nom, Exemple ou Icone manquant"));
+            }
+            if gid.is_empty() {
+                continue;
+            }
+            if tous.iter().any(|x| egal(x, &gid)) {
+                pb.push(format!("Famille {fid}, groupe {gid} : en double"));
+            }
+            tous.push(gid.clone());
+            let n = cat
+                .pannes()
+                .iter()
+                .filter(|p| egal(&texte(champ(p, "Famille")), &fid) && egal(&texte(champ(p, "Groupe")), &gid))
+                .count();
+            if n == 0 {
+                pb.push(format!("Famille {fid}, groupe {gid} : aucune panne"));
+            }
+        }
+    }
+    for p in cat.pannes() {
+        let nom = format!("Panne {}", texte(champ(p, "Id")));
+        if !rempli(champ(p, "Groupe")) {
+            pb.push(format!("{nom} : Groupe manquant"));
+            continue;
+        }
+        let gid = texte(champ(p, "Groupe"));
+        let dans_sa_famille = cat
+            .famille(&texte(champ(p, "Famille")))
+            .is_some_and(|f| parcours(champ(f, "Groupes")).iter().any(|g| egal(&texte(champ_v(Some(g), "Id")), &gid)));
+        if !dans_sa_famille {
+            pb.push(format!("{nom} : groupe \u{ab} {gid} \u{bb} absent de sa famille"));
+        }
     }
     pb
 }

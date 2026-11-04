@@ -292,6 +292,17 @@ const BLOCS: &[&str] = &[
     "reseau",
     "apercu",
     "etapes",
+    "groupe",
+    "bande",
+    "segments",
+    "suspects",
+    "verdict",
+    "repli",
+    "rangs",
+    "colonnes",
+    "citation",
+    "petit",
+    "depliables",
 ];
 /// Les icônes dessinées par le kit.
 const ICONES: &[&str] = &[
@@ -352,12 +363,40 @@ const ICONES: &[&str] = &[
     "retour",
     "croix",
     "coche",
+    "voyants",
+    "demarrage",
+    "moniteur",
+    "thermo",
+    "batterie",
+    "souris",
+    "cle",
+    "etincelle",
+    "micro",
+    "question",
+    "bas",
 ];
+/// Les styles de bouton du kit.
+const STYLES: &[&str] = &["second", "danger", "lien", "discret", "doux", "principal"];
 const COULEURS: &[&str] = &["P", "S", "T", "vert", "orange", "rouge", "fond", "fond2"];
 const TONS: &[&str] = &["", "ok", "attention", "urgent"];
 
 fn texte_plein(v: &Value) -> bool {
     v.as_str().is_some_and(|s| !s.trim().is_empty())
+}
+
+/// Tous les blocs d'une liste, ceux des parties repliées et des colonnes compris, dans l'ordre.
+fn a_plat(liste: &Value) -> Vec<&Value> {
+    let mut l = Vec::new();
+    for b in liste.as_array().into_iter().flatten() {
+        l.push(b);
+        l.extend(a_plat(&b["blocs"]));
+        if b["type"] == "colonnes" {
+            for c in b["elements"].as_array().into_iter().flatten() {
+                l.extend(a_plat(&c["blocs"]));
+            }
+        }
+    }
+    l
 }
 
 /// Ce qui ne va pas dans un état envoyé au kit (une liste vide : tout va bien).
@@ -395,6 +434,13 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
             e(format!("accueil : couleur inconnue {c}"));
         }
     }
+    if let Some(pc) = etat.get("pc")
+        && (!texte_plein(&pc["id"])
+            || !texte_plein(&pc["texte"])
+            || pc.get("icone").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i)))
+    {
+        e(format!("pastille Ton PC mal remplie : {pc}"));
+    }
     if let Some(ecran) = etat.get("ecran").and_then(Value::as_str)
         && ecran != ecrans::ACCUEIL
         && !pages.contains_key(ecran)
@@ -415,6 +461,17 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
             && r != "appli"
         {
             ep(format!("retour inconnu : {r}"));
+        }
+        if let Some(c) = p.get("chemin")
+            && c.as_array().is_none_or(|l| l.iter().any(|x| !texte_plein(x)))
+        {
+            ep(format!("chemin mal rempli : {c}"));
+        }
+        if let Some(fo) = p.get("forme")
+            && fo != "question"
+            && fo != "carte"
+        {
+            ep(format!("forme inconnue : {fo}"));
         }
         if let Some(i) = p.get("icone").and_then(Value::as_str)
             && !ICONES.contains(&i)
@@ -466,11 +523,19 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
                 }
             }
         }
-        let blocs = p["blocs"].as_array().cloned().unwrap_or_default();
-        if blocs.is_empty() {
+        if p["blocs"].as_array().is_none_or(Vec::is_empty) {
             ep("page vide (aucun bloc)".into());
         }
-        for b in &blocs {
+        // (le choix de départ : un élément de la page)
+        if let Some(fo) = p.get("focus").and_then(Value::as_str)
+            && !actions_de_page(p).iter().any(|(id, v)| {
+                let k = |pre: &str| format!("{pre}{id}");
+                fo == k("o:") && v.is_null() || fo == k("l:") || fo == k("o:") && !v.is_null()
+            })
+        {
+            ep(format!("focus sans élément : {fo}"));
+        }
+        for b in a_plat(&p["blocs"]) {
             let ty = b["type"].as_str().unwrap_or_default();
             if !BLOCS.contains(&ty) {
                 ep(format!("type de bloc inconnu : {b}"));
@@ -490,9 +555,68 @@ fn verifier_kit(etat: &Value) -> Vec<String> {
                 "case" => manque(&["id", "texte"]) || !b["oui"].is_boolean(),
                 "bouton" => {
                     manque(&["id", "texte"])
-                        || b.get("style").and_then(Value::as_str).is_some_and(|s| s != "second" && s != "danger")
+                        || b.get("style").and_then(Value::as_str).is_some_and(|s| !STYLES.contains(&s))
+                        || b.get("icone").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i))
                 }
-                "champ" => manque(&["id"]) || !b["valeur"].is_string(),
+                "champ" => {
+                    manque(&["id"])
+                        || !b["valeur"].is_string()
+                        || b.get("bouton").is_some_and(|x| {
+                            !texte_plein(&x["id"])
+                                || !texte_plein(&x["texte"])
+                                || x.get("icone").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i))
+                        })
+                }
+                "groupe" => b["elements"].as_array().is_none_or(|l| {
+                    l.is_empty()
+                        || l.iter().any(|x| {
+                            !texte_plein(&x["id"])
+                                || !texte_plein(&x["titre"])
+                                || x.get("icone").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i))
+                        })
+                }),
+                "depliables" => b["elements"].as_array().is_none_or(|l| {
+                    l.is_empty()
+                        || l.iter().any(|x| {
+                            !texte_plein(&x["id"])
+                                || !texte_plein(&x["titre"])
+                                || x.get("secours").and_then(Value::as_str).is_some_and(|i| !ICONES.contains(&i))
+                                || !x["icone"].as_str().is_some_and(|i| ICONES.contains(&i))
+                                || x["pannes"].as_array().is_none_or(|p| {
+                                    p.is_empty()
+                                        || p.iter().any(|y| !texte_plein(&y["id"]) || !texte_plein(&y["texte"]))
+                                })
+                        })
+                }),
+                "bande" => {
+                    manque(&["texte"]) || !texte_plein(&b["bouton"]["id"]) || !texte_plein(&b["bouton"]["texte"])
+                }
+                "segments" => {
+                    !matches!((b["valeur"].as_u64(), b["sur"].as_u64()), (Some(v), Some(s)) if s > 0 && v <= s)
+                }
+                "suspects" => {
+                    manque(&["titre"])
+                        || b["elements"].as_array().is_none_or(|l| {
+                            l.is_empty() || l.iter().any(|x| !texte_plein(&x["nom"]) || !texte_plein(&x["etat"]))
+                        })
+                }
+                "verdict" => {
+                    manque(&["titre"])
+                        || !b["icone"].as_str().is_some_and(|i| ICONES.contains(&i))
+                        || !b["couleur"].as_str().is_some_and(|c| COULEURS.contains(&c))
+                }
+                "repli" => manque(&["titre"]) || b["blocs"].as_array().is_none_or(Vec::is_empty),
+                "rangs" => {
+                    !matches!(b["forme"].as_str(), Some("liste" | "qr" | "kv"))
+                        || b["rangs"].as_array().is_none_or(|l| l.is_empty() && !texte_plein(&b["note"]))
+                        || b["rangs"].as_array().into_iter().flatten().any(|x| match b["forme"].as_str() {
+                            Some("qr") => !texte_plein(&x["texte"]),
+                            Some("kv") => !texte_plein(&x["cle"]) || !texte_plein(&x["valeur"]),
+                            _ => !texte_plein(&x["texte"]) && !texte_plein(&x["gras"]),
+                        })
+                }
+                "colonnes" => b["elements"].as_array().is_none_or(|l| l.len() != 2),
+                "citation" | "petit" => manque(&["texte"]),
                 "cartes" => {
                     manque(&["id"])
                         || b["options"].as_array().is_none_or(|o| {
@@ -555,8 +679,22 @@ fn actions_montrees(etat: &Value) -> Vec<(String, Value, String)> {
     for x in etat["accueil"]["ronds"].as_array().into_iter().flatten() {
         l.push((s(&x["id"]), Value::Null, ecrans::ACCUEIL.to_string()));
     }
+    if let Some(pc) = etat.get("pc") {
+        l.push((s(&pc["id"]), Value::Null, ecrans::ACCUEIL.to_string()));
+    }
     for (id, p) in etat["pages"].as_object().into_iter().flatten() {
-        let mut ajoute = |a: &str, v: Value| l.push((a.to_string(), v, id.clone()));
+        for (a, v) in actions_de_page(p) {
+            l.push((a, v, id.clone()));
+        }
+    }
+    l
+}
+
+/// Chaque geste qu'on peut faire sur une page : (id, valeur).
+fn actions_de_page(p: &Value) -> Vec<(String, Value)> {
+    let mut l = Vec::new();
+    {
+        let mut ajoute = |a: &str, v: Value| l.push((a.to_string(), v));
         if p.get("retour").is_some() {
             ajoute(ids::RETOUR, Value::Null);
         }
@@ -566,7 +704,7 @@ fn actions_montrees(etat: &Value) -> Vec<(String, Value, String)> {
         for b in p["module"]["boutons"].as_array().into_iter().flatten() {
             ajoute(b["id"].as_str().unwrap_or_default(), b.get("valeur").cloned().unwrap_or(Value::Null));
         }
-        for b in p["blocs"].as_array().into_iter().flatten() {
+        for b in a_plat(&p["blocs"]) {
             let bid = b["id"].as_str().unwrap_or_default();
             match b["type"].as_str().unwrap_or_default() {
                 "ligne" => {
@@ -579,7 +717,25 @@ fn actions_montrees(etat: &Value) -> Vec<(String, Value, String)> {
                 }
                 "bouton" => ajoute(bid, b.get("valeur").cloned().unwrap_or(Value::Null)),
                 "case" => ajoute(bid, json!({ "valeur": b["valeur"], "oui": !b["oui"].as_bool().unwrap_or(false) })),
-                "champ" => ajoute(bid, json!("écran bleu")),
+                "champ" => {
+                    ajoute(bid, json!("écran bleu"));
+                    if let Some(x) = b.get("bouton") {
+                        ajoute(x["id"].as_str().unwrap_or_default(), Value::Null);
+                    }
+                }
+                "bande" => ajoute(b["bouton"]["id"].as_str().unwrap_or_default(), Value::Null),
+                "groupe" => {
+                    for x in b["elements"].as_array().into_iter().flatten() {
+                        ajoute(x["id"].as_str().unwrap_or_default(), Value::Null);
+                    }
+                }
+                "depliables" => {
+                    for x in b["elements"].as_array().into_iter().flatten() {
+                        for p in x["pannes"].as_array().into_iter().flatten() {
+                            ajoute(p["id"].as_str().unwrap_or_default(), Value::Null);
+                        }
+                    }
+                }
                 "cartes" => {
                     for o in b["options"].as_array().into_iter().flatten() {
                         ajoute(bid, o["id"].clone());
@@ -649,13 +805,27 @@ fn suspect_trouve<'a>(e: &Enquete) -> Option<&'a Objet> {
     e.verdict.as_ref().and_then(|v| v.suspect.as_deref()).and_then(|s| cat().suspect(s))
 }
 
-/// Les blocs d'une page, par type.
+/// Les blocs d'une page, par type (ceux des parties repliées et des colonnes compris).
 fn blocs<'a>(page: &'a Value, ty: &str) -> Vec<&'a Value> {
-    page["blocs"].as_array().into_iter().flatten().filter(|b| b["type"] == ty).collect()
+    a_plat(&page["blocs"]).into_iter().filter(|b| b["type"] == ty).collect()
 }
 
+/// Ce texte est dans la page : un bloc, ou une ligne d'une liste numérotée ou d'une carte de lignes.
 fn a_texte(page: &Value, texte: &str) -> bool {
-    page["blocs"].as_array().into_iter().flatten().any(|b| b["texte"] == texte)
+    a_plat(&page["blocs"]).into_iter().any(|b| {
+        b["texte"] == texte
+            || ["elements", "rangs"].iter().any(|c| b[*c].as_array().into_iter().flatten().any(|x| x["texte"] == texte))
+    })
+}
+
+/// Les pannes des cartes dépliables d'une page (leurs ids), dans l'ordre.
+fn pannes_depliees(page: &Value) -> Vec<String> {
+    blocs(page, "depliables")
+        .into_iter()
+        .flat_map(|b| b["elements"].as_array().cloned().unwrap_or_default())
+        .flat_map(|x| x["pannes"].as_array().cloned().unwrap_or_default())
+        .map(|p| texte(p.get("id")))
+        .collect()
 }
 
 /// Le badge attendu d'une réponse (Show-Verdict), écrit ici sans passer par reponse.rs.
@@ -683,9 +853,13 @@ fn verifier_reponse(banc: &Banc, panne: &str, choix: &[i64], jour: Option<&Indic
     assert_eq!(banc.etat.en_cours.choix, choix, "{panne} : pas les mêmes réponses");
     let page = banc.enquete();
     let (badge, couleur) = badge_attendu(&attendue);
-    assert_eq!(page["module"]["titre"], badge, "{panne} {choix:?}");
-    assert_eq!(page["module"]["couleur"], couleur, "{panne} {choix:?}");
-    assert_eq!(page["module"]["texte"], titre_reponse(cat(), &attendue).titre, "{panne} {choix:?}");
+    // (la carte de la réponse en premier)
+    let v = &page["blocs"][0];
+    assert_eq!(v["type"], "verdict", "{panne} {choix:?}");
+    assert_eq!(v["surtitre"], badge, "{panne} {choix:?}");
+    assert_eq!(v["couleur"], couleur, "{panne} {choix:?}");
+    assert_eq!(v["titre"], titre_reponse(cat(), &attendue).titre, "{panne} {choix:?}");
+    assert!(v["icone"] != "coche" || couleur == "vert", "{panne} : une coche sur « {badge} »");
     assert!(banc.page(ecrans::REPARATEUR).is_some(), "{panne} : pas de page pour le réparateur");
 }
 
@@ -761,8 +935,22 @@ fn raconte_trouve_comme_le_moteur() {
 #[test]
 fn familles_et_leurs_pannes() {
     let mut b = Banc::nouveau(None);
-    let grille = &blocs(b.page(ecrans::FAMILLES).unwrap(), "grille")[0]["elements"];
-    assert_eq!(grille.as_array().unwrap().len(), cat().familles().len());
+    let grille = &blocs(b.page(ecrans::FAMILLES).unwrap(), "groupe")[0];
+    assert_eq!(grille["colonnes"], 2);
+    assert_eq!(grille["elements"].as_array().unwrap().len(), cat().familles().len());
+    // (chaque famille du catalogue a son icône, centrée dans sa pastille : pas celle d'une liste par défaut ; chaque
+    // image des groupes a son dessin au trait)
+    for x in grille["elements"].as_array().unwrap() {
+        assert_ne!(x["icone"], "liste", "{} sans icône à elle", x["id"]);
+    }
+    for f in cat().familles() {
+        for g in parcours(champ(f, "Groupes")) {
+            let image = texte(champ_v(Some(g), "Icone"));
+            let icone = super::familles::icone_image(&image);
+            assert!(icone.is_some_and(|i| ICONES.contains(&i)), "image de groupe sans icône : {image}");
+        }
+    }
+    assert!(blocs(b.page(ecrans::FAMILLES).unwrap(), "bande").is_empty(), "la bande sans détection du PC");
     for f in cat().familles() {
         let id = t(f, "Id");
         b.action(&format!("famille:{id}"), Value::Null, ecrans::FAMILLES);
@@ -777,9 +965,31 @@ fn familles_et_leurs_pannes() {
             .filter(|p| egal(&t(p, "Famille"), &id))
             .map(|p| format!("panne:{}", t(p, "Id")))
             .collect();
-        let lignes: Vec<String> = blocs(page, "ligne").iter().map(|l| l["id"].as_str().unwrap().to_string()).collect();
-        assert_eq!(lignes, attendues, "famille {id}");
-        assert_eq!(page["module"]["resume"][0]["valeur"], attendues.len().to_string());
+        // (chaque panne de la famille une fois, rangée dans la carte de son groupe)
+        let mut montrees = pannes_depliees(page);
+        let premiere = montrees[0].clone();
+        montrees.sort();
+        let mut attendues = attendues;
+        attendues.sort();
+        assert_eq!(montrees, attendues, "famille {id}");
+        // (la première carte ouverte, sa première panne choisie ; les cartes des groupes dans l'ordre du catalogue)
+        let cartes = blocs(page, "depliables")[0]["elements"].as_array().unwrap().clone();
+        let groupes: Vec<String> =
+            parcours(champ(f, "Groupes")).into_iter().map(|g| texte(champ_v(Some(g), "Id"))).collect();
+        let cartes_ids: Vec<String> =
+            cartes.iter().map(|c| texte(c.get("id"))).filter(|c| c.as_str() != "autres").collect();
+        assert!(cartes_ids.iter().all(|c| groupes.contains(c)), "famille {id} : {cartes_ids:?}");
+        assert!(
+            cartes_ids
+                .windows(2)
+                .all(|w| { groupes.iter().position(|g| *g == w[0]) < groupes.iter().position(|g| *g == w[1]) })
+        );
+        assert_eq!(cartes[0]["ouvert"], true, "famille {id}");
+        assert_eq!(cartes.iter().filter(|c| c["ouvert"] == true).count(), 1, "famille {id}");
+        let total: u64 = cartes.iter().map(|c| c["nombre"].as_u64().unwrap()).sum();
+        assert_eq!(total as usize, attendues.len(), "famille {id}");
+        assert_eq!(page["focus"], format!("l:{premiere}"), "famille {id}");
+        assert!(blocs(page, "bouton").iter().any(|x| x["id"] == ecrans::RACONTE), "famille {id}");
         assert!(toutes_acceptees(&b.etat, &b.json).is_empty());
     }
     // Une famille inconnue : retour à la liste
@@ -802,18 +1012,32 @@ fn premiere_etape_de_chaque_panne() {
         let page = b.enquete().clone();
         assert_eq!(page["titre"], t(et, "Texte"), "{id}");
         assert_eq!(page["retour"], "appli");
-        let jauge = blocs(&page, "jauge")[0];
-        assert_eq!(jauge["texte"], format!("Étape 1 sur {}", 1 + attendue.a_venir), "{id}");
+        assert_eq!(page["etape"], format!("Étape 1 sur {}", 1 + attendue.a_venir), "{id}");
+        assert_eq!(page["forme"], "question", "{id}");
+        let segments = blocs(&page, "segments")[0];
+        assert_eq!(
+            (segments["valeur"].as_u64(), segments["sur"].as_u64()),
+            (Some(1), Some(1 + attendue.a_venir as u64))
+        );
         let cartes = blocs(&page, "cartes")[0];
         assert_eq!(cartes["id"], ids::REP);
         assert_eq!(cartes["options"].as_array().unwrap().len(), tableau(champ(et, "Reponses")).len(), "{id}");
         let test = egal(&t(et, "Type"), "test");
-        assert_eq!(page["actions"][0]["id"], if test { ids::PLUS_TARD } else { ids::ACCUEIL }, "{id}");
+        let sortie = if test { ids::PLUS_TARD } else { ids::ACCUEIL };
+        assert!(blocs(&page, "bouton").iter().any(|x| x["id"] == sortie), "{id}");
         let montres = suspects_montres(cat(), p);
-        if !montres.is_empty() {
-            assert_eq!(page["module"]["anneau"]["sur"], montres.len(), "{id}");
-            assert_eq!(page["module"]["anneau"]["valeur"], 0, "{id}");
-            assert_eq!(page["module"]["resume"].as_array().unwrap().len(), montres.len(), "{id}");
+        let suspects = blocs(&page, "suspects");
+        if montres.is_empty() {
+            assert!(suspects.is_empty(), "{id}");
+        } else {
+            let l = suspects[0]["elements"].as_array().unwrap();
+            assert_eq!(l.len(), montres.len(), "{id}");
+            assert!(l.iter().all(|x| x["etat"] == "À vérifier"), "{id} : un suspect écarté à la première étape");
+            assert!(suspects[0]["droite"].as_str().unwrap().starts_with("0 écarté"), "{id}");
+            // (juste sous les réponses et leurs liens : ils suivent la hauteur de la question)
+            let liste = page["blocs"].as_array().unwrap();
+            let ou = liste.iter().position(|x| x["type"] == "suspects").unwrap();
+            assert_eq!(liste[ou - 1]["type"], "bouton", "{id}");
         }
         assert!(blocs(&page, "bouton").iter().any(|x| x["id"] == ids::PRECEDENT));
         assert!(blocs(&page, "bouton").iter().any(|x| x["id"] == ids::NSP));
@@ -994,12 +1218,9 @@ fn etape_a_faire_gestes_et_securite() {
     assert!(cases.iter().all(|c| c["oui"] == false));
     let securite = texte(cat().json().get("Securite").and_then(|s| s.get(0)));
     assert!(a_texte(&page, &securite), "{panne} : la consigne de sécurité manque");
-    assert_eq!(page["icone"], "test");
-    assert_eq!(
-        page["actions"][0],
-        json!({ "id": ids::PLUS_TARD, "texte": "Je le ferai plus tard", "icone": "horloge" })
-    );
-    assert!(page["sous"].as_str().unwrap().contains("une manipulation à faire"));
+    assert_eq!(page["forme"], "question");
+    assert!(blocs(&page, "bouton").iter().any(|x| x["id"] == ids::PLUS_TARD && x["texte"] == "Je le ferai plus tard"));
+    assert!(page["sous"].as_str().unwrap().starts_with("Une manipulation à faire"));
     assert!(a_texte(&page, "Coche chaque geste une fois fait"));
     assert!(a_texte(&page, "Ensuite, dis à Mindcare ce que ça a donné"));
     // Cocher, décocher
@@ -1025,7 +1246,8 @@ fn etape_a_faire_gestes_et_securite() {
     let page = b.enquete();
     assert!(blocs(page, "case").is_empty());
     assert!(!a_texte(page, &securite));
-    assert_eq!(page["actions"][0]["id"], ids::ACCUEIL);
+    assert!(blocs(page, "bouton").iter().any(|x| x["id"] == ids::ACCUEIL));
+    assert!(page.get("sous").is_none());
 }
 
 #[test]
@@ -1093,13 +1315,22 @@ fn reponses_finales_de_chaque_genre() {
         let page = b.enquete().clone();
         assert_eq!(page["titre"], t(cat().panne(&panne).unwrap(), "Titre"));
         assert_eq!(page["sous"], "La réponse de Mindcare");
-        let actions: Vec<&str> =
-            page["actions"].as_array().unwrap().iter().map(|a| a["id"].as_str().unwrap()).collect();
-        assert_eq!(actions, [ids::PRECEDENT, ids::REPARATEUR], "{nom}");
-        assert_eq!(page["module"]["boutons"][0]["id"], ids::ACCUEIL);
-        assert!(a_texte(&page, "Comment on le sait"), "{nom}");
+        let boutons: Vec<&str> = blocs(&page, "bouton").iter().map(|a| a["id"].as_str().unwrap()).collect();
+        assert_eq!(boutons, [ids::ACCUEIL, ids::REPARATEUR, ids::PRECEDENT], "{nom}");
+        assert_eq!(page["focus"], format!("o:{}", ids::ACCUEIL), "{nom} : Retour à l'accueil choisi à l'ouverture");
+        assert!(page.get("actions").is_none(), "{nom}");
+        // (comment on le sait : replié, avec son résumé)
+        let repli = blocs(&page, "repli");
+        assert_eq!(repli.len(), 1, "{nom}");
+        assert_eq!(repli[0]["titre"], "Comment Mindcare le sait", "{nom}");
+        assert!(texte_plein(&repli[0]["resume"]), "{nom}");
+        assert!(
+            !page["blocs"].as_array().unwrap().iter().any(|x| x["type"] == "liste"),
+            "{nom} : les preuves dépliées"
+        );
         assert!(a_texte(&page, "Ce qu'il faut faire"), "{nom}");
         assert!(a_texte(&page, &securite.join(" ")), "{nom} : la sécurité");
+        assert_eq!(page["blocs"].as_array().unwrap().last().unwrap()["type"], "petit", "{nom} : la sécurité en bas");
         if !e.preuves.is_empty() {
             assert_eq!(blocs(&page, "liste")[0]["elements"], json!(e.preuves), "{nom}");
         }
@@ -1113,19 +1344,23 @@ fn reponses_finales_de_chaque_genre() {
             }
             "pièce supposée" => {
                 assert!(supposee && !garantie, "{nom}");
-                assert!(page["module"]["texte"].as_str().unwrap().starts_with("À vérifier : "));
+                assert!(page["blocs"][0]["titre"].as_str().unwrap().starts_with("À vérifier : "));
             }
             _ => assert!(!garantie && !supposee, "{nom}"),
         }
         let s = suspect_trouve(&e);
         if let Some(s) = s {
             let a_faire = textes(s, "AFaire");
-            if !a_faire.is_empty() {
-                assert_eq!(blocs(&page, "etapes")[0]["elements"].as_array().unwrap().len(), a_faire.len(), "{nom}");
+            let elements = blocs(&page, "etapes")[0]["elements"].as_array().unwrap().clone();
+            let numerotes: Vec<&Value> = elements.iter().filter(|x| x.get("icone").is_none()).collect();
+            assert_eq!(numerotes.len(), a_faire.len(), "{nom}");
+            for (x, a) in numerotes.iter().zip(&a_faire) {
+                assert_eq!(x["texte"], a.as_str(), "{nom}");
             }
             if !t(s, "Pro").is_empty() {
-                assert!(a_texte(&page, "Quand aller chez un réparateur"), "{nom}");
-                assert!(a_texte(&page, &t(s, "Pro")), "{nom}");
+                let conseil = elements.iter().find(|x| x["texte"] == t(s, "Pro").as_str()).expect("le conseil");
+                assert_eq!(conseil["titre"], "Ensuite, chez un réparateur :", "{nom}");
+                assert_eq!(conseil["icone"], "cle", "{nom}");
             }
         } else {
             let v = e.verdict.as_ref().unwrap();
@@ -1171,7 +1406,7 @@ fn reprendre_une_enquete_et_revoir_la_derniere() {
     assert_eq!(blocs(b.enquete(), "ligne").iter().filter(|l| l["valeur"] == "Changer").count(), 2);
     b.repondre(&choix[2..]);
     verifier_reponse(&b, &panne, &choix, None);
-    let titre = b.enquete()["module"]["texte"].clone();
+    let titre = b.enquete()["blocs"][0]["titre"].clone();
     // Finie : « Dernière enquête », la même réponse
     b.action(ids::ACCUEIL, Value::Null, ecrans::ENQUETE);
     let tuile = b.json["accueil"]["tuiles"][2].clone();
@@ -1179,7 +1414,7 @@ fn reprendre_une_enquete_et_revoir_la_derniere() {
     assert_eq!(tuile["sous"], t(cat().panne(&panne).unwrap(), "Titre"));
     b.action(super::accueil::DERNIERE, Value::Null, ecrans::ACCUEIL);
     verifier_reponse(&b, &panne, &choix, None);
-    assert_eq!(b.enquete()["module"]["texte"], titre);
+    assert_eq!(b.enquete()["blocs"][0]["titre"], titre);
     // (revoir ne déplace ni ne change l'enquête gardée)
     assert_eq!(b.etat.historique.len(), 1);
     b.propre();
@@ -1217,15 +1452,17 @@ fn rapport_pour_le_reparateur() {
     assert_eq!(b.ecran.as_deref(), Some(ecrans::REPARATEUR));
     let page = b.page(ecrans::REPARATEUR).unwrap().clone();
     assert_eq!(page["titre"], textes_rapport::TITRE);
-    assert_eq!(page["sous"], textes_rapport::EXPLICATION);
+    assert_eq!(page["sous"], super::reparateur::titres::SOUS);
     assert_eq!(page["parent"], ecrans::ENQUETE);
-    let boutons = page["module"]["boutons"].as_array().unwrap();
-    assert_eq!(boutons[0], json!({ "id": ids::BUREAU, "texte": textes_rapport::BOUTON_ENREGISTRER }));
-    assert_eq!(boutons[1]["texte"], textes_rapport::BOUTON_COPIER);
+    let boutons = page["actions"].as_array().unwrap();
+    assert_eq!(boutons[0], json!({ "id": ids::COPIER, "texte": "Copier", "style": "second" }));
+    assert_eq!(boutons[1], json!({ "id": ids::BUREAU, "texte": "Enregistrer sur le Bureau", "style": "principal" }));
+    assert_eq!(page["focus"], format!("o:{}", ids::BUREAU));
     // Le rapport est montré dans la page, ligne par ligne, avant même d'être enregistré
     let texte_rapport = b.rapport().unwrap();
     assert_eq!(b.etat.rapport.as_deref(), Some(texte_rapport.as_str()));
-    assert_eq!(page["blocs"][0], json!({ "type": "titre", "texte": "Mindcare : rapport de l'enquête" }));
+    assert_eq!(page["blocs"][0]["type"], "verdict");
+    assert_eq!(page["blocs"][0]["petit"], format!("Panne : {}", t(cat().panne(&panne).unwrap(), "Titre")));
     assert_rapport_montre(&page, &texte_rapport);
     // Sur le Bureau (ici, le dossier d'essai) : dit dans la page seulement, pas en bulle (elle recouvrait le titre)
     let messages = b.messages.len();
@@ -1244,7 +1481,7 @@ fn rapport_pour_le_reparateur() {
     assert_rapport_montre(b.page(ecrans::REPARATEUR).unwrap(), rapport);
     // Copié
     b.action(ids::COPIER, Value::Null, ecrans::REPARATEUR);
-    assert_eq!(b.page(ecrans::REPARATEUR).unwrap()["module"]["boutons"][1]["texte"], "Copié");
+    assert_eq!(b.page(ecrans::REPARATEUR).unwrap()["actions"][0]["texte"], "Copié");
     assert!(a_texte(b.page(ecrans::REPARATEUR).unwrap(), textes_rapport::COPIE));
     assert_eq!(b.messages.len(), messages, "une bulle en plus du texte de la page");
     // Raté
@@ -1262,32 +1499,74 @@ fn rapport_pour_le_reparateur() {
     assert!(!b.etat.copie && b.etat.info_rapport.is_none() && b.etat.rapport.is_none());
 }
 
-/// Chaque ligne non vide du rapport se retrouve dans la page, dans l'ordre (les titres de parties sans leur « : »,
-/// les « - » des listes et le retrait des réponses en moins).
+/// Chaque ligne du rapport se retrouve dans la page, et seulement elles (sans le titre du texte ni les titres de ses
+/// parties, que la page nomme à sa façon ; sans les « - » des listes ni le retrait des réponses) : la page est relue
+/// ligne à ligne comme le texte les écrit (la panne, la réponse, la date ; « Nom (raison) » d'un écarté ; « Il reste :
+/// a, b » ; « Clé : valeur » du PC ; une question puis sa réponse), puis comparée au texte. Les questions et leurs
+/// réponses gardent leur ordre.
 fn assert_rapport_montre(page: &Value, rapport: &str) {
     let mut montres: Vec<String> = Vec::new();
-    for b in page["blocs"].as_array().unwrap() {
+    let mut reponses: Vec<String> = Vec::new();
+    for b in a_plat(&page["blocs"]) {
         match b["type"].as_str() {
-            Some("titre") => montres.push(texte(b.get("texte"))),
-            Some("reglages") => {
-                for r in b["rangs"].as_array().unwrap() {
-                    montres.push(texte(r.get("texte")));
-                    if r.get("note").is_some() {
-                        montres.push(texte(r.get("note")));
+            Some("verdict") => {
+                montres.push(texte(b.get("petit")));
+                montres.push(format!("Réponse : {}", texte(b.get("titre"))));
+                montres.push(format!("Date : {}", texte(b.get("droite")).trim_start_matches("Enquête du ")));
+            }
+            Some("rangs") => {
+                let rangs = b["rangs"].as_array().unwrap();
+                match (b["forme"].as_str(), b["titre"].as_str()) {
+                    (Some("qr"), _) => {
+                        for r in rangs {
+                            reponses.push(texte(r.get("texte")));
+                            reponses.push(texte(r.get("valeur")));
+                        }
+                    }
+                    (Some("kv"), _) => montres
+                        .extend(rangs.iter().map(|r| format!("{} : {}", texte(r.get("cle")), texte(r.get("valeur"))))),
+                    (_, Some(super::reparateur::titres::RESTE)) => {
+                        let noms: Vec<String> = rangs
+                            .iter()
+                            .map(|r| texte(r.get(if r.get("gras").is_some() { "gras" } else { "texte" })))
+                            .collect();
+                        montres.push(format!("Il reste : {}", noms.join(", ")));
+                    }
+                    _ => {
+                        for r in rangs {
+                            montres.push(match (r.get("gras"), texte(r.get("texte"))) {
+                                (Some(g), t) if t.is_empty() => texte(Some(g)),
+                                (Some(g), t) => format!("{} ({t})", texte(Some(g))),
+                                (None, t) => t,
+                            });
+                        }
                     }
                 }
             }
+            // (« Fait avec Mindcare ... »)
+            Some("petit") if texte(b.get("texte")).starts_with("Fait avec") => montres.push(texte(b.get("texte"))),
             _ => {}
         }
     }
-    let attendus: Vec<String> = rapport
-        .lines()
-        .filter(|l| !l.trim().is_empty())
-        .map(|l| {
-            let l = l.strip_prefix("- ").unwrap_or(l).trim();
-            if l.ends_with(" :") { l.trim_end_matches(" :").to_string() } else { l.to_string() }
-        })
-        .collect();
+    let mut attendus: Vec<String> = Vec::new();
+    let mut reponses_attendues: Vec<String> = Vec::new();
+    let mut dans_reponses = false;
+    for l in rapport.lines().skip(1) {
+        if l.trim().is_empty() {
+            dans_reponses = false;
+            continue;
+        }
+        if l.trim_end().ends_with(" :") {
+            dans_reponses = l.starts_with("Les réponses");
+            continue;
+        }
+        let x = l.strip_prefix("- ").unwrap_or(l).trim().to_string();
+        if dans_reponses { reponses_attendues.push(x) } else { attendus.push(x) }
+    }
+    assert_eq!(reponses, reponses_attendues, "les questions et les réponses montrées ne sont pas celles du fichier");
+    montres.retain(|m| !m.is_empty() && m != "Date : " && m != "Réponse : ");
+    montres.sort();
+    attendus.sort();
     assert_eq!(montres, attendus, "le rapport montré n'est pas celui du fichier");
 }
 
@@ -1300,13 +1579,13 @@ fn reparateur_sans_le_texte() {
     b.repondre(&choix);
     for r in [None, Some(String::new())] {
         b.etat.rapport = r;
-        let p = super::reparateur::page(&b.etat);
+        let p = super::reparateur::page(&b.etat, cat());
         assert!(a_texte(&p, "Ce qu'il contient"), "{p}");
     }
     // Et l'inverse : une ligne perdue en route se voit
     let t = b.rapport().unwrap();
     b.etat.rapport = Some(t.clone());
-    let p = super::reparateur::page(&b.etat);
+    let p = super::reparateur::page(&b.etat, cat());
     let faux = t.replace("Les réponses :", "Les réponses :\r\n- en trop");
     let r = std::panic::catch_unwind(|| assert_rapport_montre(&p, &faux));
     assert!(r.is_err(), "une ligne du fichier absente de la page doit se voir");
@@ -1432,9 +1711,15 @@ fn le_verificateur_du_kit_voit_les_erreurs() {
     casse(&|j| j["pages"]["enquete"]["blocs"][0]["type"] = json!("inconnu"));
     casse(&|j| j["pages"]["enquete"]["blocs"] = json!([]));
     casse(&|j| j["pages"]["enquete"]["titre"] = json!(""));
-    casse(&|j| j["pages"]["familles"]["blocs"][0]["elements"][0]["image"] = json!("images/absente.svg"));
+    casse(&|j| j["pages"]["familles"]["blocs"][0]["elements"][0]["icone"] = json!("inconnue"));
+    casse(&|j| {
+        j["pages"]["enquete"]["blocs"] = json!([{ "type": "repli", "titre": "x", "blocs": [{ "type": "inconnu" }] }])
+    });
+    casse(&|j| j["pages"]["enquete"]["chemin"] = json!(["", "b"]));
+    casse(&|j| j["pages"]["enquete"]["focus"] = json!("o:absent"));
+    casse(&|j| j["pc"] = json!({ "id": "", "texte": "Portable" }));
     casse(&|j| j["pages"]["raconte"]["sous"] = json!("un tiret \u{2014} long"));
-    casse(&|j| j["pages"]["enquete"]["module"]["anneau"]["sur"] = json!(0));
+    casse(&|j| j["pages"]["enquete"]["blocs"][0]["sur"] = json!(0));
     casse(&|j| j["ecran"] = json!("pourEtreSur"));
     casse(&|j| j["accueil"]["tuiles"] = json!([]));
     let mut j: Map<String, Value> = bon.as_object().unwrap().clone();
@@ -1443,6 +1728,85 @@ fn le_verificateur_du_kit_voit_les_erreurs() {
         json!({ "x": { "titre": "X", "parent": "absente", "blocs": [{ "type": "texte", "texte": "a" }] } }),
     );
     assert!(!verifier_kit(&Value::Object(j)).is_empty());
+}
+
+/// La pastille « Ton PC » et la bande « Adapté à ton PC » : absentes sans détection ; données, elles se montrent et
+/// leurs actions sont acceptées (une ligne au journal pour l'instant).
+#[test]
+fn ton_pc_et_la_bande_adaptee() {
+    let mut b = Banc::nouveau(None);
+    assert!(b.json.get("pc").is_none());
+    assert!(blocs(b.page(ecrans::FAMILLES).unwrap(), "bande").is_empty());
+    b.etat.ton_pc = Some("Portable HP".into());
+    let phrase = "Adapté à ton PC portable HP : 6 pannes de tour de bureau sont cachées.";
+    b.etat.adapte_au_pc = Some(phrase.into());
+    b.message(json!({ "type": "pret" }));
+    b.propre();
+    assert_eq!(b.json["pc"], json!({ "id": ids::TON_PC, "texte": "Portable HP", "icone": "portable" }));
+    let familles = b.page(ecrans::FAMILLES).unwrap().clone();
+    // (au-dessus des familles)
+    assert_eq!(familles["blocs"][0]["type"], "bande");
+    assert_eq!(familles["blocs"][0]["texte"], phrase);
+    assert_eq!(familles["blocs"][0]["bouton"], json!({ "id": ids::TOUT_AFFICHER, "texte": "Tout afficher" }));
+    assert!(toutes_acceptees(&b.etat, &b.json).is_empty());
+    assert_eq!(
+        b.action(ids::TON_PC, Value::Null, ecrans::FAMILLES),
+        vec![Effet::Journal(super::actions::JOURNAL_TON_PC.into())]
+    );
+    assert_eq!(
+        b.action(ids::TOUT_AFFICHER, Value::Null, ecrans::FAMILLES),
+        vec![Effet::Journal(super::actions::JOURNAL_TOUT_AFFICHER.into())]
+    );
+    // Un PC de bureau : l'icône d'un PC ; un libellé vide : pas de pastille
+    b.etat.ton_pc = Some("Tour de bureau".into());
+    assert_eq!(b.etat.etat_kit(cat(), None)["pc"]["icone"], "pc");
+    b.etat.ton_pc = Some("  ".into());
+    b.etat.adapte_au_pc = Some(String::new());
+    let j = b.etat.etat_kit(cat(), None);
+    assert!(j.get("pc").is_none());
+    assert!(blocs(&j["pages"][ecrans::FAMILLES], "bande").is_empty());
+}
+
+/// Une famille avec des groupes au catalogue (« Groupes » : Id, Titre, Exemple, Icone ; « Groupe » sur chaque
+/// panne) : une carte par groupe, dans son ordre, la première ouverte ; les pannes sans groupe dans « Autres pannes ».
+#[test]
+fn famille_en_cartes_par_groupe() {
+    let mut j = cat().json().clone();
+    let familles = j.get_mut("Familles").and_then(Value::as_array_mut).unwrap();
+    let f = familles.iter_mut().find(|f| f["Id"] == "allumage").unwrap();
+    f["Groupes"] = json!([
+        { "Id": "vide", "Titre": "Un groupe sans panne", "Exemple": "x", "Icone": "marche" },
+        { "Id": "eteint", "Titre": "Il s'éteint ou redémarre", "Exemple": "Il démarre, puis s'arrête", "Icone": "actu" },
+        { "Id": "rien", "Titre": "Il ne s'allume pas", "Exemple": "Rien ne se passe", "Icone": "icone-inconnue" },
+    ]);
+    let pannes: Vec<String> = super::familles::pannes_de(cat(), "allumage").iter().map(|p| t(p, "Id")).collect();
+    assert!(pannes.len() >= 4);
+    for p in j.get_mut("Pannes").and_then(Value::as_array_mut).unwrap() {
+        let id = texte(p.get("Id"));
+        if id == pannes[0] || id == pannes[2] {
+            p["Groupe"] = json!("rien");
+        } else if id == pannes[1] {
+            p["Groupe"] = json!("eteint");
+        }
+    }
+    let c = Catalogue::lire(&Value::Object(j).to_string()).expect("catalogue modifié");
+    let page = super::familles::page_famille(&c, "allumage").unwrap();
+    let cartes = blocs(&page, "depliables")[0]["elements"].as_array().unwrap().clone();
+    let ids: Vec<&str> = cartes.iter().map(|x| x["id"].as_str().unwrap()).collect();
+    assert_eq!(ids, ["eteint", "rien", "autres"], "le groupe vide n'a pas de carte");
+    assert_eq!(cartes[0]["ouvert"], true);
+    assert!(cartes[1].get("ouvert").is_none());
+    assert_eq!(cartes[1]["nombre"], 2);
+    assert_eq!(cartes[1]["pannes"][1]["id"], format!("panne:{}", pannes[2]));
+    assert_eq!(cartes[1]["secours"], "marche", "l'icône de la famille si celle du groupe est inconnue du kit");
+    assert_eq!(cartes[2]["titre"], "Autres pannes");
+    assert_eq!(cartes[2]["nombre"].as_u64().unwrap() as usize, pannes.len() - 3);
+    assert_eq!(page["focus"], format!("l:panne:{}", pannes[1]));
+    let mut toutes = pannes_depliees(&page);
+    toutes.sort();
+    let mut attendues: Vec<String> = pannes.iter().map(|p| format!("panne:{p}")).collect();
+    attendues.sort();
+    assert_eq!(toutes, attendues, "chaque panne une fois");
 }
 
 /// Aucun tiret long ni thème perso dans le code des pages (ni dans ses textes).

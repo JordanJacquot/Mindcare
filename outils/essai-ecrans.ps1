@@ -215,8 +215,8 @@ function Lire-Texte([string]$f) { [IO.File]::ReadAllText($f, [Text.Encoding]::UT
 
 # Pour le réparateur : le rapport sur le FAUX Bureau, puis dans le FAUX presse-papiers (le même texte)
 function Parcours-Rapport {
-    # (« Pour le réparateur », en haut à droite de la réponse : un clic)
-    [EssaiEcrans]::Clic($script:cible, 964, 115)
+    # (« Pour le réparateur » : à droite de « Retour à l'accueil », choisi à l'ouverture de la réponse)
+    Touche 'D'; Touche 'E'
     Verifier (Attendre { (Compter 'Écran : montre reparateur') -ge 1 } 4000) '« Pour le réparateur » ouvre sa page (journal)'
     Capturer 'reparateur'
     $a = Agir @('E'); Verifier ($a -like '*action bureau (écran reparateur*') "« Pour le réparateur » ouvert, puis « Enregistrer le rapport sur le Bureau » ($a)"
@@ -231,8 +231,8 @@ function Parcours-Rapport {
         Verifier ($fichiers[0].Name -like 'Mindcare, diagnostic du *.txt') "nom du rapport ($($fichiers[0].Name))"
         Verifier ((Compter "Rapport enregistré : $($fichiers[0].FullName)") -eq 1) 'rapport enregistré (journal)'
     }
-    $a = Agir @('B', 'E')
-    if (-not ($a -like '*action copier *')) { [EssaiEcrans]::Clic($script:cible, 213, 621); $a = Derniere-Action }
+    # (« Copier », à gauche de « Enregistrer sur le Bureau », en haut à droite de la page)
+    $a = Agir @('G', 'E')
     Verifier ($a -like '*action copier *') "« Copier le rapport » ($a)"
     Verifier (Attendre { Test-Path -LiteralPath $pressePapiers } 3000) 'le rapport dans le faux presse-papiers'
     if ((Test-Path -LiteralPath $pressePapiers) -and $fichiers.Count -eq 1) {
@@ -254,7 +254,8 @@ function Vers-Panne([int]$Famille, [string]$Nom) {
     [EssaiEcrans]::Clic($script:cible, 443, 31)
     Verifier (Attendre { (Compter 'Écran : montre familles') -gt $familles } 3000) 'les familles (barre du haut)'
     Start-Sleep -Milliseconds 800
-    $cles = @(for ($i = 0; $i -lt $Famille; $i++) { 'D' }) + 'E'
+    # (les familles en deux colonnes, la première moitié à gauche : la famille n°$Famille, en descendant)
+    $cles = @(for ($i = 0; $i -lt $Famille; $i++) { 'B' }) + 'E'
     $a = Agir $cles; Verifier ($a -like '*action famille:*') "une famille ($a)"
     $a = Agir @('E'); Verifier ($a -like '*action panne:*') "une panne ($a)"
     Capturer "$Nom-debut"

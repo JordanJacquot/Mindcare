@@ -538,7 +538,7 @@ impl Banc {
     }
 
     fn texte_parler(&self) -> String {
-        self.page_kit(ecrans::RACONTE)["actions"][0]["texte"].as_str().unwrap_or_default().to_string()
+        self.page_kit(ecrans::RACONTE)["blocs"][0]["bouton"]["texte"].as_str().unwrap_or_default().to_string()
     }
 
     fn messages(&self) -> Vec<String> {
@@ -723,7 +723,7 @@ fn juge_phrase_hesitante(b: &mut Banc, choix: Option<usize>) -> Juge {
     b.entree();
     b.attendre("« Pour être sûr »", |b| b.dernier_ecran().as_deref() == Some(POUR_ETRE_SUR))?;
     let p = b.page_kit(POUR_ETRE_SUR);
-    exiger!(p["module"]["texte"] == format!("« {PHRASE_HESITANTE} »"), "module : {}", p["module"]);
+    exiger!(p["blocs"][0]["texte"] == format!("« {PHRASE_HESITANTE} »"), "ce que tu as écrit : {}", p["blocs"][0]);
     let cartes = p["blocs"].as_array().and_then(|l| l.iter().find(|x| x["type"] == "cartes").cloned());
     let options = cartes.as_ref().and_then(|c| c["options"].as_array().cloned()).unwrap_or_default();
     exiger!((2..=3).contains(&options.len()), "{} réponse(s)", options.len());

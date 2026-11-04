@@ -28,11 +28,25 @@ use windows::Win32::System::Time::{
 use windows::core::HSTRING;
 
 use crate::moment::{Moment, TICKS_PAR_SECONDE};
+use crate::pc::{DisqueBrut, PcBrut};
 use crate::source::{
     Barrette, Batterie, Disque, DisquePhysique, Evenement, Filtre, Horloge, InfosPc, Mesure, Partition, Place,
     SourceWindows,
 };
 use wmi::Valeur;
+
+/// Les requêtes WMI qui reconnaissent le PC (`materiel`), toutes dans ROOT\CIMV2. Jamais de numéro de série, de nom
+/// d'utilisateur ni de nom du PC (vérifié par un test).
+pub const REQUETES_PC: [(&str, &[&str]); 8] = [
+    ("SELECT ChassisTypes FROM Win32_SystemEnclosure", &["ChassisTypes"]),
+    ("SELECT Manufacturer, Model, PCSystemType FROM Win32_ComputerSystem", &["Manufacturer", "Model", "PCSystemType"]),
+    ("SELECT Version FROM Win32_ComputerSystemProduct", &["Version"]),
+    ("SELECT Manufacturer, Product FROM Win32_BaseBoard", &["Manufacturer", "Product"]),
+    ("SELECT Name FROM Win32_Processor", &["Name"]),
+    ("SELECT Capacity FROM Win32_PhysicalMemory", &["Capacity"]),
+    ("SELECT Caption, BuildNumber FROM Win32_OperatingSystem", &["Caption", "BuildNumber"]),
+    ("SELECT Availability FROM Win32_Battery", &["Availability"]),
+];
 
 /// Un programme lancé sans fenêtre (CREATE_NO_WINDOW).
 const SANS_FENETRE: u32 = 0x0800_0000;
@@ -300,6 +314,67 @@ impl SourceWindows for WindowsReel {
             fabricant: texte(cs.first()),
             modele: texte(cs.get(1)),
             systeme: texte(os.first().and_then(|o| o.first())),
+        })
+    }
+
+    fn materiel(&self) -> Mesure<PcBrut> {
+        let r = wmi::requetes(wmi::CIMV2, &REQUETES_PC);
+        // (la connexion à WMI ratée : tout raté)
+        if r.iter().all(Result::is_err) {
+            return Err(r.into_iter().find_map(Result::err).unwrap_or_default());
+        }
+        let ligne =
+            |i: usize| r.get(i).and_then(|x| x.as_ref().ok()).and_then(|l| l.first().cloned()).unwrap_or_default();
+        let boitiers = match ligne(0).first() {
+            Some(Valeur::Liste(l)) => l.iter().filter_map(|n| u16::try_from(*n).ok()).collect(),
+            _ => Vec::new(),
+        };
+        let (cs, csp, cm, cpu, os) = (ligne(1), ligne(2), ligne(3), ligne(4), ligne(6));
+        let barrettes = match r.get(5) {
+            Some(Ok(l)) => l.iter().map(|b| entier(b.first()).and_then(|n| u64::try_from(n).ok())).collect(),
+            _ => Vec::new(),
+        };
+        let batterie = match r.get(7) {
+            Some(Ok(l)) => Some(!l.is_empty()),
+            _ => None,
+        };
+        let lecteur = self.lecteur_systeme();
+        Ok(PcBrut {
+            boitiers,
+            genre_systeme: entier(cs.get(2)).and_then(|n| u16::try_from(n).ok()),
+            batterie,
+            fabricant: texte(cs.first()),
+            modele: texte(cs.get(1)),
+            version_produit: texte(csp.first()),
+            carte_fabricant: texte(cm.first()),
+            carte_modele: texte(cm.get(1)),
+            processeur: texte(cpu.first()),
+            barrettes,
+            disque: self.disque_de_windows(&lecteur),
+            place: self.place(lecteur.trim_end_matches(':')).ok(),
+            systeme: texte(os.first()),
+            build: texte(os.get(1)),
+        })
+    }
+}
+
+impl WindowsReel {
+    /// Le disque physique où est Windows (sa partition qui porte la lettre du lecteur de Windows).
+    fn disque_de_windows(&self, lecteur: &str) -> Option<DisqueBrut> {
+        let lettre = u16::from(*lecteur.trim().as_bytes().first()?);
+        let numero =
+            self.partitions().ok()?.into_iter().find(|p| p.lettre == lettre || p.lettre == lettre ^ 0x20)?.disque;
+        let l = wmi::requete(
+            wmi::STOCKAGE,
+            "SELECT DeviceId, MediaType, BusType, Size FROM MSFT_PhysicalDisk",
+            &["DeviceId", "MediaType", "BusType", "Size"],
+        )
+        .ok()?;
+        let d = l.iter().find(|d| texte(d.first()).trim() == numero.to_string())?;
+        Some(DisqueBrut {
+            media: entier(d.get(1)).and_then(|n| u16::try_from(n).ok()),
+            bus: entier(d.get(2)).and_then(|n| u16::try_from(n).ok()),
+            taille: entier(d.get(3)).and_then(|n| u64::try_from(n).ok()),
         })
     }
 }

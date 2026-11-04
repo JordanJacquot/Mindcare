@@ -10,91 +10,188 @@
       "Id": "allumage",
       "Titre": "Allumage",
       "Phrase": "Rien ne s'allume, des bips, il s'éteint aussitôt",
-      "Icone": "famille-allumage"
+      "Icone": "famille-allumage",
+      "Groupes": [
+        { "Id": "allumage-rien", "Nom": "Il ne s'allume pas", "Exemple": "Rien ne se passe, ou juste une lumière", "Icone": "interrupteur" },
+        { "Id": "allumage-eteint", "Nom": "Il s'éteint ou redémarre", "Exemple": "Il démarre, puis s'arrête ou recommence", "Icone": "redemarrer" },
+        { "Id": "allumage-veille", "Nom": "La veille et l'arrêt", "Exemple": "Il ne se réveille pas, ou ne s'éteint pas", "Icone": "famille-allumage" },
+        { "Id": "allumage-message", "Nom": "Un message au démarrage", "Exemple": "Un texte en anglais sur fond noir", "Icone": "famille-demarrage" },
+        { "Id": "allumage-accident", "Nom": "Après un accident", "Exemple": "Un orage, un liquide, une chute", "Icone": "prise-lampe" }
+      ]
     },
     {
       "Id": "voyants",
       "Titre": "Voyants, lumières et bips",
       "Phrase": "Une lumière sur la carte mère, un voyant qui clignote, des bips",
-      "Icone": "famille-voyants"
+      "Icone": "famille-voyants",
+      "Groupes": [
+        { "Id": "voyants-bips", "Nom": "Des bips ou un voyant qui clignote", "Exemple": "Le PC bipe, ou une petite lumière clignote", "Icone": "famille-voyants" },
+        { "Id": "voyants-marque", "Nom": "Un code de voyant HP ou Dell", "Exemple": "Une lumière clignote selon un rythme", "Icone": "lampe" },
+        { "Id": "voyants-tour", "Nom": "Une lumière dans la tour", "Exemple": "Sur la carte mère ou la carte graphique", "Icone": "tour-voyant" }
+      ]
     },
     {
       "Id": "demarrage",
       "Titre": "Démarrage de Windows",
       "Phrase": "Reste sur le BIOS, réparation en boucle, disque introuvable",
-      "Icone": "famille-demarrage"
+      "Icone": "famille-demarrage",
+      "Groupes": [
+        { "Id": "demarrage-bloque", "Nom": "Il reste bloqué", "Exemple": "Sur le logo, ou les points qui tournent", "Icone": "famille-demarrage" },
+        { "Id": "demarrage-reparation", "Nom": "Windows ne trouve pas comment démarrer", "Exemple": "Réparation en boucle, disque introuvable", "Icone": "stockage" },
+        { "Id": "demarrage-bios", "Nom": "Le BIOS et la sécurité", "Exemple": "Un écran de réglages, ou une clé demandée", "Icone": "famille-demarrage" },
+        { "Id": "demarrage-menu", "Nom": "Un menu inconnu", "Exemple": "Choisir un système, GRUB, mode sans échec", "Icone": "famille-demarrage" },
+        { "Id": "demarrage-connexion", "Nom": "Après la connexion", "Exemple": "Écran noir, Bureau vide, clavier muet", "Icone": "famille-windows" }
+      ]
     },
     {
       "Id": "ecran",
       "Titre": "Écran et image",
       "Phrase": "Noir, pas de signal, clignote, des traits",
-      "Icone": "famille-ecran"
+      "Icone": "famille-ecran",
+      "Groupes": [
+        { "Id": "ecran-noir", "Nom": "Écran noir ou pas d'image", "Exemple": "Rien ne s'affiche, ou « Pas de signal »", "Icone": "ecran-signal" },
+        { "Id": "ecran-abime", "Nom": "L'image est abîmée", "Exemple": "Des traits, des taches, ça clignote", "Icone": "famille-ecran" },
+        { "Id": "ecran-reglages", "Nom": "Taille, netteté et réglages", "Exemple": "Trop grand, flou, penché, trop sombre", "Icone": "famille-ecran" },
+        { "Id": "ecran-plusieurs", "Nom": "Deux écrans ou la télé", "Exemple": "Un écran en plus, ou l'image sur la télé", "Icone": "famille-ecran" },
+        { "Id": "ecran-tactile", "Nom": "Le tactile et la flèche", "Exemple": "L'écran tactile, le curseur de la souris", "Icone": "famille-ecran" }
+      ]
     },
     {
       "Id": "plantages",
       "Titre": "Plantages",
       "Phrase": "Écran bleu, redémarre, se fige",
-      "Icone": "famille-plantages"
+      "Icone": "famille-plantages",
+      "Groupes": [
+        { "Id": "plantages-tout", "Nom": "Tout le PC plante", "Exemple": "Écran bleu, il redémarre ou s'éteint", "Icone": "ecran-bleu" },
+        { "Id": "plantages-fige", "Nom": "Il se fige", "Exemple": "Plus rien ne bouge, ou de petits gels", "Icone": "famille-plantages" },
+        { "Id": "plantages-programme", "Nom": "Un programme plante", "Exemple": "Il se ferme tout seul ou ne répond plus", "Icone": "famille-plantages" },
+        { "Id": "plantages-ouvrepas", "Nom": "Un programme ne s'ouvre pas", "Exemple": "Rien ne se passe, ou un message", "Icone": "famille-plantages" },
+        { "Id": "plantages-manque", "Nom": "Il manque un fichier ou un outil", "Exemple": "Un .dll, Java ou .NET demandé", "Icone": "famille-plantages" }
+      ]
     },
     {
       "Id": "jeux",
       "Titre": "Jeux vidéo",
       "Phrase": "Le jeu ne se lance pas, saccade, lague en ligne",
-      "Icone": "famille-jeux"
+      "Icone": "famille-jeux",
+      "Groupes": [
+        { "Id": "jeux-lancement", "Nom": "Le jeu ne se lance pas", "Exemple": "Rien, un message, ou un écran noir", "Icone": "famille-jeux" },
+        { "Id": "jeux-partie", "Nom": "Pendant la partie", "Exemple": "Ça saccade, ça plante, la souris réagit mal", "Icone": "famille-jeux" },
+        { "Id": "jeux-enligne", "Nom": "Jouer en ligne", "Exemple": "Ça lague, impossible de rejoindre des amis", "Icone": "famille-internet" },
+        { "Id": "jeux-steam", "Nom": "Steam et les téléchargements", "Exemple": "Un jeu qui télécharge lentement ou s'arrête", "Icone": "famille-jeux" }
+      ]
     },
     {
       "Id": "lenteur",
       "Titre": "Lenteur",
       "Phrase": "Tout rame, démarrage long, jeux qui saccadent",
-      "Icone": "famille-lenteur"
+      "Icone": "famille-lenteur",
+      "Groupes": [
+        { "Id": "lenteur-tout", "Nom": "Tout est lent", "Exemple": "Il rame partout, depuis peu ou au bout d'un moment", "Icone": "famille-lenteur" },
+        { "Id": "lenteur-afond", "Nom": "Quelque chose est à fond", "Exemple": "Le disque, le processeur ou la mémoire", "Icone": "famille-lenteur" },
+        { "Id": "lenteur-precis", "Nom": "Une chose précise est lente", "Exemple": "Copier, ouvrir un dossier, le navigateur", "Icone": "famille-lenteur" }
+      ]
     },
     {
       "Id": "bruits",
       "Titre": "Bruits et chaleur",
       "Phrase": "Ventilateur fort, clics, chauffe, odeur",
-      "Icone": "famille-bruits"
+      "Icone": "famille-bruits",
+      "Groupes": [
+        { "Id": "bruits-bruit", "Nom": "Un bruit bizarre", "Exemple": "Souffle, clics, sifflement, bourdonnement", "Icone": "famille-bruits" },
+        { "Id": "bruits-chaleur", "Nom": "Il chauffe", "Exemple": "Brûlant, ou un ventilateur arrêté", "Icone": "grille-poussiere" },
+        { "Id": "bruits-alerte", "Nom": "Une alerte", "Exemple": "Une odeur de brûlé, un bip sans arrêt", "Icone": "famille-bruits" }
+      ]
     },
     {
       "Id": "son",
       "Titre": "Son",
       "Phrase": "Plus de son, grésille, micro",
-      "Icone": "famille-son"
+      "Icone": "famille-son",
+      "Groupes": [
+        { "Id": "son-pasdeson", "Nom": "Pas de son", "Exemple": "Plus rien, ou pas là où il faut", "Icone": "famille-son" },
+        { "Id": "son-qualite", "Nom": "Le son est mauvais", "Exemple": "Il grésille, bourdonne, ou arrive en retard", "Icone": "famille-son" },
+        { "Id": "son-volume", "Nom": "Le volume", "Exemple": "Trop fort, trop faible, ou il change tout seul", "Icone": "famille-son" },
+        { "Id": "son-micro", "Nom": "Le micro et les appels", "Exemple": "On ne m'entend pas, ou mal", "Icone": "famille-son" },
+        { "Id": "son-casque", "Nom": "Le casque et le Bluetooth", "Exemple": "Le casque n'est pas reconnu", "Icone": "famille-son" }
+      ]
     },
     {
       "Id": "internet",
       "Titre": "Internet et Wi-Fi",
       "Phrase": "Plus d'internet, Wi-Fi absent ou qui coupe",
-      "Icone": "famille-internet"
+      "Icone": "famille-internet",
+      "Groupes": [
+        { "Id": "internet-plus", "Nom": "Plus d'internet", "Exemple": "Aucun site ne s'ouvre", "Icone": "famille-internet" },
+        { "Id": "internet-wifi", "Nom": "Le Wi-Fi", "Exemple": "Absent, qui coupe, mot de passe refusé", "Icone": "famille-internet" },
+        { "Id": "internet-lent", "Nom": "Internet est lent", "Exemple": "Les pages et les vidéos chargent mal", "Icone": "famille-internet" },
+        { "Id": "internet-cable", "Nom": "Le câble et la maison", "Exemple": "Le câble réseau, les autres appareils", "Icone": "branchement" },
+        { "Id": "internet-site", "Nom": "Un site ou une appli", "Exemple": "Un seul site, Discord, Outlook, le navigateur", "Icone": "famille-internet" }
+      ]
     },
     {
       "Id": "peripheriques",
       "Titre": "Clavier, souris et USB",
       "Phrase": "Ne répond plus, clé non reconnue",
-      "Icone": "famille-peripheriques"
+      "Icone": "famille-peripheriques",
+      "Groupes": [
+        { "Id": "peripheriques-clavier", "Nom": "Le clavier", "Exemple": "Il ne répond plus, ou des touches font autre chose", "Icone": "famille-peripheriques" },
+        { "Id": "peripheriques-souris", "Nom": "La souris, le pavé tactile et le stylet", "Exemple": "Le curseur ne bouge plus, saute ou clique seul", "Icone": "famille-peripheriques" },
+        { "Id": "peripheriques-sansfil", "Nom": "Sans fil et lumières", "Exemple": "Le Bluetooth, la souris sans fil, l'éclairage", "Icone": "famille-peripheriques" },
+        { "Id": "peripheriques-usb", "Nom": "Ce qu'on branche", "Exemple": "Clé USB, carte SD, téléphone, manette", "Icone": "branchement" },
+        { "Id": "peripheriques-webcam", "Nom": "La webcam", "Exemple": "Image noire ou floue, partage d'écran", "Icone": "famille-peripheriques" },
+        { "Id": "peripheriques-imprimante", "Nom": "L'imprimante et le scanner", "Exemple": "Rien ne sort, ou ça imprime mal", "Icone": "famille-peripheriques" }
+      ]
     },
     {
       "Id": "batterie",
       "Titre": "Batterie et charge",
       "Phrase": "Ne charge plus, tient peu",
-      "Icone": "famille-batterie"
+      "Icone": "famille-batterie",
+      "Groupes": [
+        { "Id": "batterie-charge", "Nom": "La charge", "Exemple": "Il ne charge plus, ou très lentement", "Icone": "portable-chargeur" },
+        { "Id": "batterie-vide", "Nom": "La batterie se vide", "Exemple": "Elle tient peu, ou il s'éteint trop tôt", "Icone": "famille-batterie" },
+        { "Id": "batterie-danger", "Nom": "Un danger", "Exemple": "Le chargeur chauffe ou crépite, la batterie gonfle", "Icone": "famille-batterie" }
+      ]
     },
     {
       "Id": "virus",
       "Titre": "Virus et pubs",
       "Phrase": "Fenêtres bizarres, navigateur détourné",
-      "Icone": "famille-virus"
+      "Icone": "famille-virus",
+      "Groupes": [
+        { "Id": "virus-pubs", "Nom": "Des pubs et des changements", "Exemple": "Des fenêtres, un navigateur détourné", "Icone": "famille-virus" },
+        { "Id": "virus-arnaque", "Nom": "Une arnaque", "Exemple": "Un appel, un lien, un message qui demande de l'argent", "Icone": "famille-virus" },
+        { "Id": "virus-protection", "Nom": "L'antivirus et les comptes", "Exemple": "La protection coupée, un compte piraté", "Icone": "famille-virus" }
+      ]
     },
     {
       "Id": "fichiers",
       "Titre": "Fichiers et disques",
       "Phrase": "Disque plein, fichier perdu, disque externe",
-      "Icone": "famille-fichiers"
+      "Icone": "famille-fichiers",
+      "Groupes": [
+        { "Id": "fichiers-disques", "Nom": "Les disques du PC", "Exemple": "Plein, des erreurs, un disque disparu", "Icone": "stockage" },
+        { "Id": "fichiers-perdu", "Nom": "Un fichier perdu", "Exemple": "Supprimé, introuvable, ou dans un PC en panne", "Icone": "famille-fichiers" },
+        { "Id": "fichiers-bloque", "Nom": "Impossible de copier ou supprimer", "Exemple": "Accès refusé, nom trop long, fichier bloqué", "Icone": "famille-fichiers" },
+        { "Id": "fichiers-cle", "Nom": "La clé USB et le disque externe", "Exemple": "Pas reconnu, protégé, fichiers disparus", "Icone": "branchement" },
+        { "Id": "fichiers-word", "Nom": "Word et Excel", "Exemple": "Pas de licence, document perdu ou abîmé", "Icone": "famille-fichiers" },
+        { "Id": "fichiers-ouvre", "Nom": "Un fichier ne s'ouvre pas", "Exemple": "PDF, photos, vidéos, archives", "Icone": "famille-fichiers" }
+      ]
     },
     {
       "Id": "windows",
       "Titre": "Windows et compte",
       "Phrase": "Mot de passe oublié, mises à jour, menu Démarrer, heure",
-      "Icone": "famille-windows"
+      "Icone": "famille-windows",
+      "Groupes": [
+        { "Id": "windows-compte", "Nom": "Le compte et la sécurité", "Exemple": "Mot de passe oublié, code PIN, PC volé", "Icone": "famille-windows" },
+        { "Id": "windows-maj", "Nom": "Mises à jour et activation", "Exemple": "Elles échouent, Windows 11, « Activer Windows »", "Icone": "mise-a-jour" },
+        { "Id": "windows-bureau", "Nom": "Le Bureau et la barre des tâches", "Exemple": "Icônes disparues, menu qui ne répond plus", "Icone": "famille-windows" },
+        { "Id": "windows-reglage", "Nom": "Un réglage qui gêne", "Exemple": "La langue, une voix, des bips, l'heure", "Icone": "famille-windows" },
+        { "Id": "windows-programmes", "Nom": "Installer et ouvrir des programmes", "Exemple": "Le Store, une installation, accès refusé", "Icone": "famille-windows" },
+        { "Id": "windows-outils", "Nom": "Les petits outils", "Exemple": "Copier-coller, capture, recherche, clic droit", "Icone": "famille-windows" }
+      ]
     }
   ],
   "Suspects": {
@@ -14190,6 +14287,7 @@
     {
       "Id": "redemarre",
       "Famille": "plantages",
+      "Groupe": "plantages-tout",
       "Titre": "Il redémarre tout seul",
       "Phrase": "L'écran devient noir, puis le logo revient",
       "Mots": [
@@ -14354,6 +14452,7 @@
     {
       "Id": "seteint",
       "Famille": "plantages",
+      "Groupe": "plantages-tout",
       "Titre": "Il s'éteint d'un coup",
       "Phrase": "Comme une coupure de courant, il faut le rallumer",
       "Mots": [
@@ -14504,6 +14603,7 @@
     {
       "Id": "ecranbleu",
       "Famille": "plantages",
+      "Groupe": "plantages-tout",
       "Titre": "Un écran bleu apparaît",
       "Phrase": "Un message sur fond bleu, puis il redémarre",
       "Mots": [
@@ -14901,6 +15001,7 @@
     {
       "Id": "fige",
       "Famille": "plantages",
+      "Groupe": "plantages-fige",
       "Titre": "Il se fige",
       "Phrase": "Plus rien ne bouge, même la souris",
       "Mots": [
@@ -15002,6 +15103,7 @@
     {
       "Id": "programme",
       "Famille": "plantages",
+      "Groupe": "plantages-programme",
       "Titre": "Un programme ou un jeu plante",
       "Phrase": "Il se ferme tout seul ou ne répond plus",
       "Mots": [
@@ -15066,6 +15168,7 @@
     {
       "Id": "navplante",
       "Famille": "plantages",
+      "Groupe": "plantages-programme",
       "Titre": "Le navigateur plante ou affiche « Oh non ! »",
       "Phrase": "Chrome, Edge ou Firefox se ferme, ou affiche « Oh non ! » / « Aw, Snap » / « Ce site est inaccessible »",
       "Mots": [
@@ -15124,6 +15227,7 @@
     {
       "Id": "dll",
       "Famille": "plantages",
+      "Groupe": "plantages-manque",
       "Titre": "Message « fichier .dll introuvable »",
       "Phrase": "VCRUNTIME140.dll, MSVCP140.dll, d3dx9_43.dll... manque au lancement d'un programme ou d'un jeu",
       "Mots": [
@@ -15165,6 +15269,7 @@
     {
       "Id": "java",
       "Famille": "plantages",
+      "Groupe": "plantages-manque",
       "Titre": "« Java introuvable » ou un fichier .jar ne s'ouvre pas",
       "Phrase": "Un programme demande Java, ou un .jar s'ouvre comme une archive",
       "Mots": [
@@ -15193,6 +15298,7 @@
     {
       "Id": "dotnet",
       "Famille": "plantages",
+      "Groupe": "plantages-manque",
       "Titre": "Un programme demande « .NET Framework » ou « .NET Runtime »",
       "Phrase": "« Pour exécuter cette application, vous devez installer .NET »",
       "Mots": [
@@ -15220,6 +15326,7 @@
     {
       "Id": "piloteaffichage",
       "Famille": "plantages",
+      "Groupe": "plantages-tout",
       "Titre": "« Le pilote d'affichage a cessé de répondre » ou écran noir quelques secondes",
       "Phrase": "L'écran devient noir un instant puis revient, parfois avec un message",
       "Mots": [
@@ -15256,6 +15363,7 @@
     {
       "Id": "ouvrepas",
       "Famille": "plantages",
+      "Groupe": "plantages-ouvrepas",
       "Titre": "Un programme ne s'ouvre plus (rien ne se passe)",
       "Phrase": "Un double-clic ne fait rien, ou une fenêtre s'ouvre et se ferme",
       "Mots": [
@@ -15304,6 +15412,7 @@
     {
       "Id": "appliwindows",
       "Famille": "plantages",
+      "Groupe": "plantages-ouvrepas",
       "Titre": "Une appli de Windows ne s'ouvre plus (Photos, Calculatrice...)",
       "Phrase": "Elle s'ouvre et se ferme aussitôt, ou rien ne se passe",
       "Mots": [
@@ -15353,6 +15462,7 @@
     {
       "Id": "accespath",
       "Famille": "plantages",
+      "Groupe": "plantages-ouvrepas",
       "Titre": "« Windows ne peut pas accéder au périphérique, au chemin ou au fichier »",
       "Phrase": "Un raccourci ou un programme refuse de s'ouvrir avec ce message",
       "Mots": [
@@ -15382,6 +15492,7 @@
     {
       "Id": "microgels",
       "Famille": "plantages",
+      "Groupe": "plantages-fige",
       "Titre": "Le PC se fige une ou deux secondes, régulièrement",
       "Phrase": "De petits gels : la souris s'arrête un instant, puis tout repart",
       "Mots": [
@@ -15415,6 +15526,7 @@
     {
       "Id": "explorateurplante",
       "Famille": "plantages",
+      "Groupe": "plantages-programme",
       "Titre": "L'Explorateur de fichiers plante ou se ferme tout seul",
       "Phrase": "Les dossiers se ferment, « L'Explorateur Windows ne répond pas »",
       "Mots": [
@@ -15459,6 +15571,7 @@
     {
       "Id": "memoireinsuffisante",
       "Famille": "plantages",
+      "Groupe": "plantages-fige",
       "Titre": "Message « mémoire insuffisante »",
       "Phrase": "Un programme ou Windows dit qu'il manque de mémoire",
       "Mots": [
@@ -15494,6 +15607,7 @@
     {
       "Id": "memoiremoitie",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "Windows ne voit qu'une partie de la mémoire (RAM)",
       "Phrase": "Le PC a 16 Go, Windows en affiche 8 (ou « utilisable » bien moins)",
       "Mots": [
@@ -15526,6 +15640,7 @@
     {
       "Id": "processeurbride",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "Le processeur reste bloqué à basse vitesse",
       "Phrase": "Le PC est très lent, et la vitesse du processeur ne monte jamais",
       "Mots": [
@@ -15564,6 +15679,7 @@
     {
       "Id": "rien",
       "Famille": "allumage",
+      "Groupe": "allumage-rien",
       "Titre": "Rien ne s'allume",
       "Phrase": "On appuie sur le bouton : aucune lumière, aucun bruit",
       "Mots": [
@@ -15753,6 +15869,7 @@
     {
       "Id": "lumiere",
       "Famille": "allumage",
+      "Groupe": "allumage-rien",
       "Titre": "Une lumière, mais rien d'autre",
       "Phrase": "Un voyant ou un ventilateur, mais l'écran reste noir et rien ne démarre",
       "Mots": [
@@ -16003,6 +16120,7 @@
     {
       "Id": "eteintaussitot",
       "Famille": "allumage",
+      "Groupe": "allumage-eteint",
       "Titre": "Il s'allume puis s'éteint aussitôt",
       "Phrase": "Les ventilateurs démarrent une seconde, puis tout s'arrête",
       "Mots": [
@@ -16078,6 +16196,7 @@
     {
       "Id": "bipsdemarrage",
       "Famille": "voyants",
+      "Groupe": "voyants-bips",
       "Titre": "Des bips au démarrage",
       "Phrase": "Il bipe (ou une lumière clignote) et rien ne s'affiche",
       "Mots": [
@@ -16146,6 +16265,7 @@
     {
       "Id": "boucledemarrage",
       "Famille": "allumage",
+      "Groupe": "allumage-eteint",
       "Titre": "Il redémarre en boucle avant Windows",
       "Phrase": "Le logo de la marque, puis il recommence, sans arriver à Windows",
       "Mots": [
@@ -16238,6 +16358,8 @@
     {
       "Id": "portablecharge",
       "Famille": "allumage",
+      "Groupe": "allumage-rien",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le portable charge mais ne s'allume pas",
       "Phrase": "Le voyant de charge s'allume, mais rien ne se passe au bouton",
       "Mots": [
@@ -16293,6 +16415,7 @@
     {
       "Id": "sortveille",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Il ne sort pas de la veille",
       "Phrase": "Écran noir après la veille, il faut forcer l'arrêt",
       "Mots": [
@@ -16325,6 +16448,8 @@
     {
       "Id": "capot",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
+      "PourPc": { "Type": "portable" },
       "Titre": "Rien ne se passe quand je ferme le capot",
       "Phrase": "Le portable reste allumé capot fermé, ou s'éteint au lieu de se mettre en veille",
       "Mots": [
@@ -16356,6 +16481,7 @@
     {
       "Id": "nesteintpas",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Il ne s'éteint pas",
       "Phrase": "Après « Arrêter », il reste allumé, ou l'écran s'éteint mais les ventilateurs tournent",
       "Mots": [
@@ -16388,6 +16514,7 @@
     {
       "Id": "lumieresarret",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Le clavier ou la souris restent allumés quand le PC est éteint",
       "Phrase": "Les lumières du clavier, de la souris ou des ventilateurs restent allumées après l'arrêt",
       "Mots": [
@@ -16414,6 +16541,7 @@
     {
       "Id": "arretredemarre",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Quand je fais « Arrêter », il redémarre",
       "Phrase": "Il s'éteint, puis se rallume tout seul aussitôt",
       "Mots": [
@@ -16447,6 +16575,7 @@
     {
       "Id": "allumeseul",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Il s'allume tout seul",
       "Phrase": "Il sort de veille ou s'allume la nuit, sans qu'on y touche",
       "Mots": [
@@ -16482,6 +16611,7 @@
     {
       "Id": "memoiretraining",
       "Famille": "allumage",
+      "Groupe": "allumage-rien",
       "Titre": "Écran noir très long au premier démarrage",
       "Phrase": "PC neuf ou nouvelle mémoire : les ventilateurs tournent, mais l'image tarde",
       "Mots": [
@@ -16515,6 +16645,7 @@
     {
       "Id": "cpufan",
       "Famille": "allumage",
+      "Groupe": "allumage-message",
       "Titre": "Message « CPU Fan Error » au démarrage",
       "Phrase": "Le PC signale un problème de ventilateur avant Windows",
       "Mots": [
@@ -16538,6 +16669,7 @@
     {
       "Id": "cmoserror",
       "Famille": "allumage",
+      "Groupe": "allumage-message",
       "Titre": "Message « CMOS » ou « Press F1 to continue » au démarrage",
       "Phrase": "Le PC demande d'appuyer sur F1, ou parle de « CMOS checksum »",
       "Mots": [
@@ -16579,6 +16711,7 @@
     {
       "Id": "orage",
       "Famille": "allumage",
+      "Groupe": "allumage-accident",
       "Titre": "Plus rien après un orage ou une coupure de courant",
       "Phrase": "Il ne s'allume plus depuis une coupure ou un orage",
       "Mots": [
@@ -16619,6 +16752,7 @@
     {
       "Id": "liquide",
       "Famille": "allumage",
+      "Groupe": "allumage-accident",
       "Titre": "Un liquide a coulé sur l'ordinateur",
       "Phrase": "De l'eau, du café ou du soda renversé sur le portable ou dans la tour",
       "Mots": [
@@ -16663,6 +16797,7 @@
     {
       "Id": "chute",
       "Famille": "allumage",
+      "Groupe": "allumage-accident",
       "Titre": "L'ordinateur est tombé",
       "Phrase": "Une chute, et depuis quelque chose ne va plus",
       "Mots": [
@@ -16690,6 +16825,7 @@
     {
       "Id": "apresnettoyage",
       "Famille": "allumage",
+      "Groupe": "allumage-accident",
       "Titre": "Il ne s'allume plus après avoir été nettoyé, déplacé ou ouvert",
       "Phrase": "Il marchait, il a été bougé ou ouvert, et plus rien",
       "Mots": [
@@ -16729,6 +16865,7 @@
     {
       "Id": "eteintbouge",
       "Famille": "allumage",
+      "Groupe": "allumage-eteint",
       "Titre": "Il s'éteint quand on le bouge ou qu'on le touche",
       "Phrase": "Un petit choc, déplacer le portable ou toucher la tour, et tout s'éteint",
       "Mots": [
@@ -16763,6 +16900,7 @@
     {
       "Id": "usbcoupe",
       "Famille": "allumage",
+      "Groupe": "allumage-eteint",
       "Titre": "Il s'éteint dès que je branche un appareil USB",
       "Phrase": "Brancher une clé, un câble ou une manette fait s'éteindre le PC d'un coup",
       "Mots": [
@@ -16792,6 +16930,7 @@
     {
       "Id": "allumesecteur",
       "Famille": "allumage",
+      "Groupe": "allumage-veille",
       "Titre": "Il s'allume dès qu'on branche la prise",
       "Phrase": "Allumer la multiprise ou brancher le câble démarre le PC",
       "Mots": [
@@ -16817,6 +16956,7 @@
     {
       "Id": "plusieursappuis",
       "Famille": "allumage",
+      "Groupe": "allumage-rien",
       "Titre": "Il faut appuyer plusieurs fois pour qu'il s'allume",
       "Phrase": "Le bouton ne marche qu'au deuxième, troisième essai, ou après un moment",
       "Mots": [
@@ -16852,6 +16992,8 @@
     {
       "Id": "voyantclignote",
       "Famille": "voyants",
+      "Groupe": "voyants-bips",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le voyant clignote mais rien ne démarre (portable)",
       "Phrase": "Une petite lumière clignote, l'écran reste noir",
       "Mots": [
@@ -16890,6 +17032,8 @@
     {
       "Id": "capslockhp",
       "Famille": "voyants",
+      "Groupe": "voyants-marque",
+      "PourPc": { "Marque": ["HP"] },
       "Titre": "Verr. Maj (ou le voyant) clignote et le portable HP ne démarre pas",
       "Phrase": "Écran noir, et une lumière clignote selon un rythme : des longs puis des courts",
       "Mots": [
@@ -16934,6 +17078,8 @@
     {
       "Id": "voyantdell",
       "Famille": "voyants",
+      "Groupe": "voyants-marque",
+      "PourPc": { "Marque": ["Dell"] },
       "Titre": "Le voyant clignote orange et blanc (PC Dell)",
       "Phrase": "Le voyant d'alimentation ou de batterie clignote selon un code, et le PC ne démarre pas",
       "Mots": [
@@ -16994,6 +17140,8 @@
     {
       "Id": "ledcartemere",
       "Famille": "voyants",
+      "Groupe": "voyants-tour",
+      "PourPc": { "Type": "fixe" },
       "Titre": "Un voyant reste allumé sur la carte mère (CPU, DRAM, VGA ou BOOT)",
       "Phrase": "Une petite lumière rouge, orange ou blanche reste allumée, et rien ne s'affiche",
       "Mots": [
@@ -17073,6 +17221,8 @@
     {
       "Id": "qcode",
       "Famille": "voyants",
+      "Groupe": "voyants-tour",
+      "PourPc": { "Type": "fixe" },
       "Titre": "Deux chiffres ou lettres s'affichent sur la carte mère (Q-Code, Debug)",
       "Phrase": "Un petit afficheur montre un code (00, 55, D6, A2...) et le PC ne démarre pas",
       "Mots": [
@@ -17152,6 +17302,8 @@
     {
       "Id": "ledgpu",
       "Famille": "voyants",
+      "Groupe": "voyants-tour",
+      "PourPc": { "Type": "fixe" },
       "Titre": "Une lumière rouge sur la carte graphique",
       "Phrase": "Un petit voyant rouge près des prises de courant de la carte graphique",
       "Mots": [
@@ -17185,6 +17337,7 @@
     {
       "Id": "reparationboucle",
       "Famille": "demarrage",
+      "Groupe": "demarrage-reparation",
       "Titre": "Réparation automatique en boucle",
       "Phrase": "« Préparation de la réparation automatique », puis il recommence",
       "Mots": [
@@ -17345,6 +17498,7 @@
     {
       "Id": "nodisque",
       "Famille": "demarrage",
+      "Groupe": "demarrage-reparation",
       "Titre": "« Aucun disque » au démarrage",
       "Phrase": "« No bootable device », « Boot device not found », « Insert boot disk »",
       "Mots": [
@@ -17448,6 +17602,7 @@
     {
       "Id": "biosboucle",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bios",
       "Titre": "Il démarre sur le BIOS et n'en sort pas",
       "Phrase": "Un écran de réglages (BIOS, UEFI, Setup) s'affiche à la place de Windows",
       "Mots": [
@@ -17493,6 +17648,7 @@
     {
       "Id": "secureboot",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bios",
       "Titre": "« Secure Boot Violation » au démarrage",
       "Phrase": "Un message parle de démarrage sécurisé, de signature invalide, et Windows ne démarre pas",
       "Mots": [
@@ -17534,6 +17690,7 @@
     {
       "Id": "apresbios",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bios",
       "Titre": "Il ne démarre plus depuis une mise à jour du BIOS",
       "Phrase": "Après la mise à jour du BIOS : écran noir, BIOS en boucle, ou Windows introuvable",
       "Mots": [
@@ -17578,6 +17735,7 @@
     {
       "Id": "noirlogo",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bloque",
       "Titre": "Écran noir après le logo",
       "Phrase": "Le logo apparaît, puis l'écran reste noir (parfois avec la flèche de la souris)",
       "Mots": [
@@ -17648,6 +17806,7 @@
     {
       "Id": "logobloque",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bloque",
       "Titre": "Il reste bloqué sur le logo du fabricant",
       "Phrase": "Le logo (ASUS, HP, Dell, MSI...) s'affiche, puis plus rien ne bouge",
       "Mots": [
@@ -17713,6 +17872,7 @@
     {
       "Id": "ecrannoircurseur",
       "Famille": "demarrage",
+      "Groupe": "demarrage-connexion",
       "Titre": "Écran noir avec la souris après la connexion",
       "Phrase": "On voit le curseur, mais pas le Bureau ni la barre des tâches",
       "Mots": [
@@ -17768,6 +17928,7 @@
     {
       "Id": "bitlocker",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bios",
       "Titre": "Il demande une clé de récupération BitLocker",
       "Phrase": "Un écran bleu demande une longue clé de chiffres",
       "Mots": [
@@ -17792,6 +17953,7 @@
     {
       "Id": "pointstournent",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bloque",
       "Titre": "Bloqué sur les points qui tournent",
       "Phrase": "Le cercle de points tourne sans fin, ou « Préparation de Windows »",
       "Mots": [
@@ -17917,6 +18079,7 @@
     {
       "Id": "demarragelong",
       "Famille": "demarrage",
+      "Groupe": "demarrage-bloque",
       "Titre": "Le démarrage est très long",
       "Phrase": "Plusieurs minutes avant de pouvoir s'en servir",
       "Mots": [
@@ -17983,6 +18146,7 @@
     {
       "Id": "menuos",
       "Famille": "demarrage",
+      "Groupe": "demarrage-menu",
       "Titre": "Un menu « Choisir un système d'exploitation » au démarrage",
       "Phrase": "Le PC demande quel Windows démarrer",
       "Mots": [
@@ -18007,6 +18171,7 @@
     {
       "Id": "grub",
       "Famille": "demarrage",
+      "Groupe": "demarrage-menu",
       "Titre": "Un écran « GRUB » ou « grub rescue » au démarrage",
       "Phrase": "Un écran noir avec « grub> », « grub rescue » ou un menu Linux",
       "Mots": [
@@ -18031,6 +18196,7 @@
     {
       "Id": "chkdsk",
       "Famille": "demarrage",
+      "Groupe": "demarrage-reparation",
       "Titre": "Il vérifie ou répare le disque à chaque démarrage",
       "Phrase": "« Analyse et réparation du lecteur » ou « Vérification du disque » au démarrage",
       "Mots": [
@@ -18097,6 +18263,7 @@
     {
       "Id": "profiltemp",
       "Famille": "demarrage",
+      "Groupe": "demarrage-connexion",
       "Titre": "« Profil temporaire » ou Bureau vide après la connexion",
       "Phrase": "Windows dit que tu es connecté avec un profil temporaire, tes fichiers semblent disparus",
       "Mots": [
@@ -18138,6 +18305,7 @@
     {
       "Id": "modesansechec",
       "Famille": "demarrage",
+      "Groupe": "demarrage-menu",
       "Titre": "Windows démarre toujours en mode sans échec",
       "Phrase": "Écrit « Mode sans échec » dans les coins, tout est en grand et en basse qualité",
       "Mots": [
@@ -18159,6 +18327,7 @@
     {
       "Id": "clavierconnexion",
       "Famille": "demarrage",
+      "Groupe": "demarrage-connexion",
       "Titre": "Le clavier ou la souris ne marchent pas sur l'écran de connexion",
       "Phrase": "Impossible de taper le mot de passe au démarrage",
       "Mots": [
@@ -18203,6 +18372,7 @@
     {
       "Id": "ecrannoir",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
       "Titre": "Écran noir, PC allumé",
       "Phrase": "On entend le PC ou on voit ses lumières, mais rien ne s'affiche",
       "Mots": [
@@ -18423,6 +18593,7 @@
     {
       "Id": "pasdesignal",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
       "Titre": "« Pas de signal »",
       "Phrase": "L'écran affiche « Pas de signal » ou « No signal »",
       "Mots": [
@@ -18577,6 +18748,7 @@
     {
       "Id": "horslimites",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
       "Titre": "« Hors limites », « Input not supported » ou « Out of range » sur l'écran",
       "Phrase": "L'écran affiche ce message au lieu de l'image",
       "Mots": [
@@ -18621,6 +18793,7 @@
     {
       "Id": "clignote",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
       "Titre": "L'écran clignote",
       "Phrase": "L'image saute, s'éteint une seconde ou scintille",
       "Mots": [
@@ -18728,6 +18901,7 @@
     {
       "Id": "signalcoupe",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
       "Titre": "L'écran perd le signal quelques secondes, puis revient",
       "Phrase": "Noir quelques secondes, parfois « Pas de signal », puis tout revient",
       "Mots": [
@@ -18790,6 +18964,7 @@
     {
       "Id": "navclignote",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
       "Titre": "Le navigateur clignote ou affiche des carrés noirs",
       "Phrase": "Seulement dans Chrome, Edge ou Firefox : clignotements, zones noires, vidéos vertes",
       "Mots": [
@@ -18818,6 +18993,7 @@
     {
       "Id": "artefacts",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
       "Titre": "Des traits, des carrés ou des couleurs bizarres",
       "Phrase": "L'image se déforme, se pixelise ou change de couleur",
       "Mots": [
@@ -18935,6 +19111,7 @@
     {
       "Id": "flou",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "Image floue ou trop grande",
       "Phrase": "Tout est trop gros, flou, ou ne remplit pas l'écran",
       "Mots": [
@@ -19001,6 +19178,7 @@
     {
       "Id": "ecranenvers",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "L'image est tournée ou à l'envers",
       "Phrase": "Tout est penché sur le côté ou la tête en bas",
       "Mots": [
@@ -19033,6 +19211,7 @@
     {
       "Id": "couleurs",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
       "Titre": "Les couleurs sont bizarres",
       "Phrase": "Tout est jaune, en noir et blanc, inversé ou délavé",
       "Mots": [
@@ -19090,6 +19269,7 @@
     {
       "Id": "taille",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "Tout est trop grand ou trop petit",
       "Phrase": "Le texte, les icônes ou les fenêtres n'ont pas la bonne taille",
       "Mots": [
@@ -19127,6 +19307,7 @@
     {
       "Id": "dpiprog",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "Un seul programme est flou ou minuscule",
       "Phrase": "Tout est net, sauf un programme flou ou écrit tout petit",
       "Mots": [
@@ -19154,6 +19335,7 @@
     {
       "Id": "luminosite",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "La luminosité ne se règle plus",
       "Phrase": "Trop sombre ou trop clair, ou elle change toute seule",
       "Mots": [
@@ -19185,6 +19367,7 @@
     {
       "Id": "pixels",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
       "Titre": "Des points ou des taches sur l'écran",
       "Phrase": "Un point de couleur fixe, une tache, une zone plus claire",
       "Mots": [
@@ -19216,6 +19399,7 @@
     {
       "Id": "tactile",
       "Famille": "ecran",
+      "Groupe": "ecran-tactile",
       "Titre": "L'écran tactile ne répond plus",
       "Phrase": "Toucher l'écran ne fait plus rien",
       "Mots": [
@@ -19261,6 +19445,7 @@
     {
       "Id": "styletmarchepas",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "Le stylet n'écrit plus",
       "Phrase": "Le stylet de l'écran tactile ne fait plus rien",
       "Mots": [
@@ -19288,6 +19473,7 @@
     {
       "Id": "cliquesfantomes",
       "Famille": "ecran",
+      "Groupe": "ecran-tactile",
       "Titre": "L'écran tactile (ou la souris) clique tout seul",
       "Phrase": "Des fenêtres s'ouvrent, ça clique et défile sans qu'on touche",
       "Mots": [
@@ -19329,6 +19515,7 @@
     {
       "Id": "ecranseteint",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
       "Titre": "L'écran s'éteint trop vite",
       "Phrase": "Il devient noir au bout de quelques minutes, même pendant une vidéo",
       "Mots": [
@@ -19361,6 +19548,8 @@
     {
       "Id": "portablecasse",
       "Famille": "ecran",
+      "Groupe": "ecran-abime",
+      "PourPc": { "Type": "portable" },
       "Titre": "Écran du portable cassé ou taché",
       "Phrase": "Une fissure, une tache noire, des lignes ou une partie qui ne s'affiche plus",
       "Mots": [
@@ -19420,6 +19609,7 @@
     {
       "Id": "deuxiemeecran",
       "Famille": "ecran",
+      "Groupe": "ecran-plusieurs",
       "Titre": "Le deuxième écran n'est pas détecté",
       "Phrase": "L'écran ajouté reste noir ou n'apparaît pas dans Windows",
       "Mots": [
@@ -19503,6 +19693,7 @@
     {
       "Id": "miracast",
       "Famille": "ecran",
+      "Groupe": "ecran-plusieurs",
       "Titre": "Afficher le PC sur la télé sans câble",
       "Phrase": "Je veux voir l'écran du PC sur la télé, sans câble HDMI",
       "Mots": [
@@ -19527,6 +19718,7 @@
     {
       "Id": "ordreecrans",
       "Famille": "ecran",
+      "Groupe": "ecran-plusieurs",
       "Titre": "Avec deux écrans, la souris passe du mauvais côté",
       "Phrase": "Pour aller sur l'écran de droite, il faut sortir à gauche (ou en haut)",
       "Mots": [
@@ -19551,6 +19743,7 @@
     {
       "Id": "ecrandupl",
       "Famille": "ecran",
+      "Groupe": "ecran-plusieurs",
       "Titre": "Le deuxième écran affiche la même chose que le premier",
       "Phrase": "Impossible de mettre une fenêtre sur l'autre écran : c'est la même image",
       "Mots": [
@@ -19578,6 +19771,7 @@
     {
       "Id": "fenetrehorsecran",
       "Famille": "ecran",
+      "Groupe": "ecran-plusieurs",
       "Titre": "Une fenêtre a disparu ou s'ouvre hors de l'écran",
       "Phrase": "Le programme est ouvert (dans la barre des tâches) mais on ne le voit pas",
       "Mots": [
@@ -19605,6 +19799,7 @@
     {
       "Id": "curseurdisparu",
       "Famille": "ecran",
+      "Groupe": "ecran-tactile",
       "Titre": "Le curseur de la souris a disparu",
       "Phrase": "Plus de flèche à l'écran, même en bougeant la souris",
       "Mots": [
@@ -19635,6 +19830,7 @@
     {
       "Id": "bandesnoires",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "Des bandes noires autour de l'image, ou des bords coupés",
       "Phrase": "L'image ne remplit pas l'écran, ou il en manque sur les côtés (souvent sur une télé)",
       "Mots": [
@@ -19664,6 +19860,8 @@
     {
       "Id": "portableecrannoir",
       "Famille": "ecran",
+      "Groupe": "ecran-noir",
+      "PourPc": { "Type": "portable" },
       "Titre": "L'écran du portable reste noir, mais un écran externe affiche l'image",
       "Phrase": "Branché à un écran ou une télé, l'image apparaît là-bas mais pas sur le portable",
       "Mots": [
@@ -19694,6 +19892,7 @@
     {
       "Id": "frequence",
       "Famille": "ecran",
+      "Groupe": "ecran-reglages",
       "Titre": "L'écran reste à 60 Hz au lieu de 144 Hz (ou plus)",
       "Phrase": "Un écran rapide n'est pas fluide, Windows n'affiche pas sa fréquence maximale",
       "Mots": [
@@ -19734,6 +19933,7 @@
     {
       "Id": "toutlent",
       "Famille": "lenteur",
+      "Groupe": "lenteur-tout",
       "Titre": "Tout est lent",
       "Phrase": "Tout met longtemps à s'ouvrir, il rame ou se fige souvent",
       "Mots": [
@@ -19828,6 +20028,7 @@
     {
       "Id": "disque100",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "Le disque est à 100 %",
       "Phrase": "Dans le Gestionnaire des tâches, le disque reste à 100 % et tout rame",
       "Mots": [
@@ -19868,6 +20069,7 @@
     {
       "Id": "cpu100",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "Le processeur est à 100 %",
       "Phrase": "Le Gestionnaire des tâches montre le processeur (ou « CPU ») à fond",
       "Mots": [
@@ -19906,6 +20108,7 @@
     {
       "Id": "antimalware",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "« Antimalware Service Executable » prend tout le processeur",
       "Phrase": "Ce programme est en haut du Gestionnaire des tâches et le PC rame",
       "Mots": [
@@ -19937,6 +20140,7 @@
     {
       "Id": "arretlong",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Il met très longtemps à s'éteindre",
       "Phrase": "Après « Arrêter », l'écran « Arrêt en cours » dure des minutes",
       "Mots": [
@@ -19966,6 +20170,8 @@
     {
       "Id": "lentbatterie",
       "Famille": "lenteur",
+      "Groupe": "lenteur-tout",
+      "PourPc": { "Type": "portable" },
       "Titre": "Il devient lent quand il est sur batterie",
       "Phrase": "Le portable rame dès qu'on débranche le chargeur",
       "Mots": [
@@ -19992,6 +20198,7 @@
     {
       "Id": "copielente",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Copier des fichiers est très lent",
       "Phrase": "Vers une clé, un disque externe ou entre deux dossiers, la copie n'avance pas",
       "Mots": [
@@ -20021,6 +20228,7 @@
     {
       "Id": "dossierslents",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Les dossiers mettent longtemps à s'afficher",
       "Phrase": "L'Explorateur affiche une barre verte qui avance lentement",
       "Mots": [
@@ -20048,6 +20256,7 @@
     {
       "Id": "rameheures",
       "Famille": "lenteur",
+      "Groupe": "lenteur-tout",
       "Titre": "Il rame au bout de quelques heures",
       "Phrase": "Au démarrage tout va bien, puis ça ralentit petit à petit",
       "Mots": [
@@ -20081,6 +20290,7 @@
     {
       "Id": "clicdroitlent",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Le clic droit met longtemps à s'ouvrir",
       "Phrase": "Le menu du clic droit (sur un fichier ou le Bureau) tarde ou bloque",
       "Mots": [
@@ -20120,6 +20330,7 @@
     {
       "Id": "ventilosfond",
       "Famille": "lenteur",
+      "Groupe": "lenteur-afond",
       "Titre": "Les ventilateurs à fond sans raison",
       "Phrase": "Il souffle fort même sans rien faire",
       "Mots": [
@@ -20154,6 +20365,7 @@
     {
       "Id": "apresmaj",
       "Famille": "lenteur",
+      "Groupe": "lenteur-tout",
       "Titre": "Il rame depuis une mise à jour",
       "Phrase": "Avant la mise à jour, tout allait bien",
       "Mots": [
@@ -20216,6 +20428,7 @@
     {
       "Id": "navigateurlent",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Le navigateur est lent",
       "Phrase": "Les pages mettent longtemps à s'ouvrir, ça rame dans Chrome, Edge ou Firefox",
       "Mots": [
@@ -20252,6 +20465,7 @@
     {
       "Id": "videosaccade",
       "Famille": "lenteur",
+      "Groupe": "lenteur-precis",
       "Titre": "Les vidéos saccadent (YouTube, Netflix...)",
       "Phrase": "L'image des vidéos saute ou se fige, alors que le reste va bien",
       "Mots": [
@@ -20306,6 +20520,7 @@
     {
       "Id": "lentantivirus",
       "Famille": "lenteur",
+      "Groupe": "lenteur-tout",
       "Titre": "Il est lent depuis l'installation d'un antivirus",
       "Phrase": "Depuis Avast, Norton, McAfee ou un autre, tout rame",
       "Mots": [
@@ -20349,6 +20564,7 @@
     {
       "Id": "ventilobruyant",
       "Famille": "bruits",
+      "Groupe": "bruits-bruit",
       "Titre": "Un ventilateur très bruyant",
       "Phrase": "Il souffle fort, grince ou claque",
       "Mots": [
@@ -20405,6 +20621,7 @@
     {
       "Id": "cliquetis",
       "Famille": "bruits",
+      "Groupe": "bruits-bruit",
       "Titre": "Des cliquetis ou des grattements",
       "Phrase": "Des petits clics réguliers, ou un bruit de grattement",
       "Mots": [
@@ -20452,6 +20669,7 @@
     {
       "Id": "sifflement",
       "Famille": "bruits",
+      "Groupe": "bruits-bruit",
       "Titre": "Un sifflement aigu",
       "Phrase": "Un petit sifflement ou grésillement électrique",
       "Mots": [
@@ -20523,6 +20741,7 @@
     {
       "Id": "chauffe",
       "Famille": "bruits",
+      "Groupe": "bruits-chaleur",
       "Titre": "Il chauffe beaucoup",
       "Phrase": "Il est brûlant au toucher, ou souffle de l'air très chaud",
       "Mots": [
@@ -20606,6 +20825,8 @@
     {
       "Id": "brulantsac",
       "Famille": "bruits",
+      "Groupe": "bruits-chaleur",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le portable est brûlant en le sortant du sac",
       "Phrase": "Capot fermé, rangé dans un sac, il en ressort très chaud et vidé",
       "Mots": [
@@ -20636,6 +20857,7 @@
     {
       "Id": "vibration",
       "Famille": "bruits",
+      "Groupe": "bruits-bruit",
       "Titre": "Le PC vibre ou bourdonne",
       "Phrase": "Un bourdonnement grave, le meuble vibre",
       "Mots": [
@@ -20678,6 +20900,7 @@
     {
       "Id": "odeurbrule",
       "Famille": "bruits",
+      "Groupe": "bruits-alerte",
       "Titre": "Une odeur de brûlé ou de la fumée",
       "Phrase": "Une odeur de brûlé, de la fumée, des étincelles ou un claquement",
       "Mots": [
@@ -20717,6 +20940,7 @@
     {
       "Id": "alarme",
       "Famille": "bruits",
+      "Groupe": "bruits-alerte",
       "Titre": "Un bip continu ou une alarme pendant que le PC marche",
       "Phrase": "Le PC sonne ou bipe sans arrêt, alors qu'il était allumé",
       "Mots": [
@@ -20754,6 +20978,7 @@
     {
       "Id": "ventiloarret",
       "Famille": "bruits",
+      "Groupe": "bruits-chaleur",
       "Titre": "Un ventilateur ne tourne plus",
       "Phrase": "Un ventilateur reste immobile alors que le PC est allumé",
       "Mots": [
@@ -20783,6 +21008,7 @@
     {
       "Id": "plusdeson",
       "Famille": "son",
+      "Groupe": "son-pasdeson",
       "Titre": "Plus de son du tout",
       "Phrase": "Aucun son, ni des vidéos ni de Windows",
       "Mots": [
@@ -20830,6 +21056,8 @@
     {
       "Id": "hautparleursportable",
       "Famille": "son",
+      "Groupe": "son-pasdeson",
+      "PourPc": { "Type": "portable" },
       "Titre": "Les haut-parleurs du portable ne marchent plus (le casque oui)",
       "Phrase": "Le son passe au casque, mais plus par les haut-parleurs",
       "Mots": [
@@ -20863,6 +21091,7 @@
     {
       "Id": "songresille",
       "Famille": "son",
+      "Groupe": "son-qualite",
       "Titre": "Le son grésille ou coupe",
       "Phrase": "Des craquements, du souffle ou des coupures",
       "Mots": [
@@ -20963,6 +21192,7 @@
     {
       "Id": "bourdonnementson",
       "Famille": "son",
+      "Groupe": "son-qualite",
       "Titre": "Un bourdonnement dans les haut-parleurs ou le casque",
       "Phrase": "Un « bzzz » qui change quand la souris bouge ou que le PC travaille",
       "Mots": [
@@ -20994,6 +21224,7 @@
     {
       "Id": "sonfort",
       "Famille": "son",
+      "Groupe": "son-volume",
       "Titre": "Le son est beaucoup trop fort ou déformé",
       "Phrase": "Le son sature, hurle, ou change tout seul",
       "Mots": [
@@ -21040,6 +21271,7 @@
     {
       "Id": "sonfaible",
       "Famille": "son",
+      "Groupe": "son-volume",
       "Titre": "Le son est trop faible, même à fond",
       "Phrase": "Tout est à 100 % et on entend à peine",
       "Mots": [
@@ -21075,6 +21307,7 @@
     {
       "Id": "sonunseul",
       "Famille": "son",
+      "Groupe": "son-pasdeson",
       "Titre": "Le son manque dans un seul programme ou jeu",
       "Phrase": "Le son marche partout, sauf là",
       "Mots": [
@@ -21126,6 +21359,7 @@
     {
       "Id": "volumebaisse",
       "Famille": "son",
+      "Groupe": "son-volume",
       "Titre": "Le son baisse tout seul pendant les appels",
       "Phrase": "Pendant Discord, Teams ou un appel, le jeu ou la musique deviennent très bas",
       "Mots": [
@@ -21153,6 +21387,7 @@
     {
       "Id": "volumeseul",
       "Famille": "son",
+      "Groupe": "son-volume",
       "Titre": "Le volume change tout seul",
       "Phrase": "Le volume monte ou descend sans qu'on y touche",
       "Mots": [
@@ -21182,6 +21417,7 @@
     {
       "Id": "uncote",
       "Famille": "son",
+      "Groupe": "son-pasdeson",
       "Titre": "Le son ne sort que d'un côté",
       "Phrase": "Seulement à gauche ou seulement à droite, au casque ou aux haut-parleurs",
       "Mots": [
@@ -21213,6 +21449,7 @@
     {
       "Id": "sondecale",
       "Famille": "son",
+      "Groupe": "son-qualite",
       "Titre": "Le son est en retard sur l'image",
       "Phrase": "Les lèvres ne collent pas aux paroles, les bruits arrivent après",
       "Mots": [
@@ -21241,6 +21478,7 @@
     {
       "Id": "micro",
       "Famille": "son",
+      "Groupe": "son-micro",
       "Titre": "Le micro ne marche pas",
       "Phrase": "Les autres ne m'entendent pas (Discord, Teams, appels...)",
       "Mots": [
@@ -21325,6 +21563,8 @@
     {
       "Id": "microjack",
       "Famille": "son",
+      "Groupe": "son-micro",
+      "PourPc": { "Type": "fixe" },
       "Titre": "Le micro du casque n'est pas reconnu sur la tour",
       "Phrase": "Le son marche dans le casque, mais personne ne t'entend",
       "Mots": [
@@ -21403,6 +21643,7 @@
     {
       "Id": "microfaible",
       "Famille": "son",
+      "Groupe": "son-micro",
       "Titre": "On m'entend mal (micro faible, grésillant ou lointain)",
       "Phrase": "Les autres disent que ta voix est trop basse, hachée ou de mauvaise qualité",
       "Mots": [
@@ -21439,6 +21680,7 @@
     {
       "Id": "echo",
       "Famille": "son",
+      "Groupe": "son-micro",
       "Titre": "Les autres m'entendent en écho",
       "Phrase": "En appel, ils entendent leur voix ou un écho",
       "Mots": [
@@ -21472,6 +21714,7 @@
     {
       "Id": "entendmusique",
       "Famille": "son",
+      "Groupe": "son-micro",
       "Titre": "Les autres entendent ma musique ou mon jeu",
       "Phrase": "En appel, les autres entendent le son de mon PC",
       "Mots": [
@@ -21503,6 +21746,7 @@
     {
       "Id": "casque",
       "Famille": "son",
+      "Groupe": "son-casque",
       "Titre": "Le casque n'est pas reconnu",
       "Phrase": "Le son reste sur les haut-parleurs quand je branche le casque",
       "Mots": [
@@ -21540,6 +21784,7 @@
     {
       "Id": "bluetoothaudio",
       "Famille": "son",
+      "Groupe": "son-casque",
       "Titre": "Le son Bluetooth ne marche pas",
       "Phrase": "Le casque ou l'enceinte sans fil ne se connecte pas, ou pas de son",
       "Mots": [
@@ -21598,6 +21843,7 @@
     {
       "Id": "bruitsusb",
       "Famille": "son",
+      "Groupe": "son-qualite",
       "Titre": "Des sons de branchement et débranchement sans arrêt",
       "Phrase": "Windows fait « ding-dong » tout seul, encore et encore",
       "Mots": [
@@ -21640,6 +21886,7 @@
     {
       "Id": "sonhdmi",
       "Famille": "son",
+      "Groupe": "son-pasdeson",
       "Titre": "Le son ne passe pas par la télé ou l'écran (HDMI)",
       "Phrase": "L'image passe sur la télé, mais pas le son (ou l'inverse)",
       "Mots": [
@@ -21670,6 +21917,7 @@
     {
       "Id": "plusinternet",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "Plus d'internet",
       "Phrase": "Les sites ne s'ouvrent plus, « Aucun accès internet »",
       "Mots": [
@@ -21745,6 +21993,7 @@
     {
       "Id": "voyantbox",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "Un voyant de la box est rouge ou clignote",
       "Phrase": "Le voyant internet, fibre ou @ est rouge, orange ou clignote",
       "Mots": [
@@ -21777,6 +22026,7 @@
     {
       "Id": "ledreseau",
       "Famille": "internet",
+      "Groupe": "internet-cable",
       "Titre": "Les petites lumières de la prise réseau du PC sont éteintes",
       "Phrase": "Câble branché, mais aucune lumière à côté de la prise réseau du PC ou de la box",
       "Mots": [
@@ -21804,6 +22054,7 @@
     {
       "Id": "conflitip",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "« Aucune configuration IP valide » ou « conflit d'adresse IP »",
       "Phrase": "Connecté, mais sans internet, avec un message sur l'adresse IP",
       "Mots": [
@@ -21836,6 +22087,7 @@
     {
       "Id": "wifiabsent",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "Le Wi-Fi n'apparaît plus",
       "Phrase": "L'icône du Wi-Fi a disparu, ou aucun réseau n'est proposé",
       "Mots": [
@@ -21896,6 +22148,7 @@
     {
       "Id": "wifi5ghz",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "Le Wi-Fi 5 GHz n'apparaît pas",
       "Phrase": "Le PC ne voit que le Wi-Fi 2,4 GHz de la box",
       "Mots": [
@@ -21938,6 +22191,7 @@
     {
       "Id": "wificoupe",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "Le Wi-Fi coupe souvent",
       "Phrase": "Internet se coupe puis revient, plusieurs fois par jour",
       "Mots": [
@@ -22017,6 +22271,7 @@
     {
       "Id": "mdpwifi",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "Le mot de passe du Wi-Fi est refusé",
       "Phrase": "« Clé de sécurité réseau incorrecte » ou impossible de se connecter",
       "Mots": [
@@ -22051,6 +22306,7 @@
     {
       "Id": "mdpwifioublie",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "J'ai oublié le mot de passe du Wi-Fi (pour connecter un autre appareil)",
       "Phrase": "Un téléphone ou une console veut le mot de passe du Wi-Fi",
       "Mots": [
@@ -22076,6 +22332,7 @@
     {
       "Id": "partage",
       "Famille": "internet",
+      "Groupe": "internet-wifi",
       "Titre": "Le partage de connexion du téléphone ne marche pas",
       "Phrase": "Le PC ne voit pas le téléphone, ou n'a pas internet par lui",
       "Mots": [
@@ -22108,6 +22365,7 @@
     {
       "Id": "internetlent",
       "Famille": "internet",
+      "Groupe": "internet-lent",
       "Titre": "Internet est très lent",
       "Phrase": "Les pages et les vidéos mettent longtemps à charger",
       "Mots": [
@@ -22193,6 +22451,7 @@
     {
       "Id": "wifilent",
       "Famille": "internet",
+      "Groupe": "internet-lent",
       "Titre": "Le Wi-Fi est lent, mais avec un câble c'est rapide",
       "Phrase": "En câble tout va bien, en Wi-Fi c'est bien plus lent",
       "Mots": [
@@ -22267,6 +22526,7 @@
     {
       "Id": "cablereseau",
       "Famille": "internet",
+      "Groupe": "internet-cable",
       "Titre": "Le câble réseau ne marche pas",
       "Phrase": "Branché à la box avec un câble, pas d'internet",
       "Mots": [
@@ -22332,6 +22592,7 @@
     {
       "Id": "ethernet100",
       "Famille": "internet",
+      "Groupe": "internet-lent",
       "Titre": "Le câble réseau est limité à 100 Mb/s",
       "Phrase": "Branché à la box par câble, la vitesse plafonne à 100 Mb/s",
       "Mots": [
@@ -22356,6 +22617,7 @@
     {
       "Id": "apresvpn",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "Plus d'internet depuis un VPN ou un nouvel antivirus",
       "Phrase": "Internet a disparu après avoir installé (ou désinstallé) un VPN ou un antivirus",
       "Mots": [
@@ -22385,6 +22647,7 @@
     {
       "Id": "unsite",
       "Famille": "internet",
+      "Groupe": "internet-site",
       "Titre": "Un seul site ou une seule appli ne marche pas",
       "Phrase": "Le reste d'internet marche, mais pas ce site ou cette appli",
       "Mots": [
@@ -22458,6 +22721,7 @@
     {
       "Id": "favoris",
       "Famille": "internet",
+      "Groupe": "internet-site",
       "Titre": "Mes favoris ou mes mots de passe du navigateur ont disparu",
       "Phrase": "Le navigateur n'a plus mes favoris ou ne remplit plus mes mots de passe",
       "Mots": [
@@ -22481,6 +22745,7 @@
     {
       "Id": "appareilsreseau",
       "Famille": "internet",
+      "Groupe": "internet-cable",
       "Titre": "Le PC ne voit pas les autres appareils de la maison",
       "Phrase": "Imprimante en Wi-Fi, autre PC, télé ou disque réseau introuvables",
       "Mots": [
@@ -22508,6 +22773,7 @@
     {
       "Id": "proxy",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "Le navigateur dit « pas de connexion », mais d'autres applis marchent",
       "Phrase": "Discord ou les jeux marchent, mais aucun site ne s'ouvre dans le navigateur",
       "Mots": [
@@ -22543,6 +22809,7 @@
     {
       "Id": "discordrtc",
       "Famille": "internet",
+      "Groupe": "internet-site",
       "Titre": "Discord reste bloqué sur « Connexion RTC » ou « Pas de route »",
       "Phrase": "Impossible de rejoindre un salon vocal Discord, alors qu'internet marche",
       "Mots": [
@@ -22606,6 +22873,7 @@
     {
       "Id": "outlookmdp",
       "Famille": "internet",
+      "Groupe": "internet-site",
       "Titre": "Outlook (ou Courrier) redemande sans arrêt le mot de passe",
       "Phrase": "Une fenêtre de mot de passe revient sans cesse, les mails n'arrivent plus",
       "Mots": [
@@ -22648,6 +22916,7 @@
     {
       "Id": "certificat",
       "Famille": "internet",
+      "Groupe": "internet-site",
       "Titre": "« Votre connexion n'est pas privée » sur beaucoup de sites",
       "Phrase": "Le navigateur parle de certificat, de connexion non sécurisée, d'horloge",
       "Mots": [
@@ -22696,6 +22965,7 @@
     {
       "Id": "erreurdns",
       "Famille": "internet",
+      "Groupe": "internet-plus",
       "Titre": "Erreur « DNS » : aucun site ne s'ouvre",
       "Phrase": "« DNS_PROBE_FINISHED », « Impossible de trouver l'adresse DNS du serveur »",
       "Mots": [
@@ -22745,6 +23015,7 @@
     {
       "Id": "clavier",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "Le clavier ne répond plus",
       "Phrase": "Aucune touche ne marche",
       "Mots": [
@@ -22810,6 +23081,7 @@
     {
       "Id": "touches",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "Des touches ne marchent plus (ou tapent autre chose)",
       "Phrase": "Les chiffres ne marchent pas, A et Q inversés, des touches mortes",
       "Mots": [
@@ -22922,6 +23194,7 @@
     {
       "Id": "touchearrachee",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "Une touche du clavier s'est détachée",
       "Phrase": "Une touche est tombée ou ne tient plus",
       "Mots": [
@@ -22970,6 +23243,7 @@
     {
       "Id": "touchesf",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "Les touches F1 à F12 font autre chose (volume, luminosité...)",
       "Phrase": "F5 baisse le son au lieu d'actualiser, Alt + F4 ne ferme plus...",
       "Mots": [
@@ -22996,6 +23270,7 @@
     {
       "Id": "touchewindows",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "La touche Windows ne marche plus",
       "Phrase": "Elle n'ouvre plus le menu Démarrer, les raccourcis Windows + quelque chose non plus",
       "Mots": [
@@ -23026,6 +23301,7 @@
     {
       "Id": "toucherepete",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-clavier",
       "Titre": "Des lettres se répètent ou le clavier tape tout seul",
       "Phrase": "Des lettres en double, des touches qui s'enfoncent seules, ou qui ne répondent qu'une fois sur deux",
       "Mots": [
@@ -23057,6 +23333,7 @@
     {
       "Id": "retroeclairage",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "Le rétroéclairage du clavier ne s'allume plus",
       "Phrase": "Les touches ne sont plus éclairées",
       "Mots": [
@@ -23088,6 +23365,7 @@
     {
       "Id": "rgb",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "Les lumières (RGB) du PC ne s'allument plus ou restent fixes",
       "Phrase": "Les ventilateurs, la mémoire ou le clavier lumineux ne changent plus de couleur",
       "Mots": [
@@ -23124,6 +23402,7 @@
     {
       "Id": "souris",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "La souris ou le pavé tactile ne marche plus",
       "Phrase": "Le curseur ne bouge plus, ou saute",
       "Mots": [
@@ -23223,6 +23502,8 @@
     {
       "Id": "pavegestes",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le pavé tactile ne défile plus (ou ne clique plus d'un appui)",
       "Phrase": "Le défilement à deux doigts ou le clic en tapotant ne marchent plus",
       "Mots": [
@@ -23253,6 +23534,8 @@
     {
       "Id": "paumepave",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le texte s'écrit ailleurs pendant que je tape (portable)",
       "Phrase": "En tapant, le curseur saute et le texte part au milieu d'une autre ligne",
       "Mots": [
@@ -23281,6 +23564,7 @@
     {
       "Id": "doubleclic",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "La souris fait des doubles clics toute seule",
       "Phrase": "Un clic ouvre deux fois, un glisser lâche tout seul",
       "Mots": [
@@ -23308,6 +23592,7 @@
     {
       "Id": "clicsinverses",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "Le clic gauche et le clic droit sont inversés",
       "Phrase": "Le clic gauche ouvre le menu, le droit sélectionne",
       "Mots": [
@@ -23331,6 +23616,7 @@
     {
       "Id": "sourissaute",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "Le curseur saute, tremble ou bouge tout seul",
       "Phrase": "La flèche part toute seule, saccade ou tremble",
       "Mots": [
@@ -23366,6 +23652,7 @@
     {
       "Id": "sansfilcoupe",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "La souris ou le clavier sans fil se coupent souvent",
       "Phrase": "Ça saccade, des touches sont perdues, il faut attendre qu'ils reviennent",
       "Mots": [
@@ -23401,6 +23688,7 @@
     {
       "Id": "btsature",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "La souris Bluetooth saccade quand le casque Bluetooth est connecté",
       "Phrase": "Dès que le casque (ou les écouteurs) Bluetooth est branché, la souris saute",
       "Mots": [
@@ -23430,6 +23718,7 @@
     {
       "Id": "vitessesouris",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-souris",
       "Titre": "La souris est trop lente ou trop rapide",
       "Phrase": "Le curseur est lent, trop rapide, ou accélère bizarrement",
       "Mots": [
@@ -23457,6 +23746,7 @@
     {
       "Id": "usbnonreconnu",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Une clé USB ou un disque non reconnu",
       "Phrase": "Rien n'apparaît quand je le branche, ou « Périphérique non reconnu »",
       "Mots": [
@@ -23509,6 +23799,7 @@
     {
       "Id": "cartesd",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Le PC ne lit pas la carte SD (ou micro SD)",
       "Phrase": "La carte d'un appareil photo ou d'un téléphone n'apparaît pas",
       "Mots": [
@@ -23536,6 +23827,7 @@
     {
       "Id": "portsusb",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Plusieurs prises USB ne marchent plus",
       "Phrase": "Aucun appareil ne marche sur certaines prises, ou sur toutes",
       "Mots": [
@@ -23567,6 +23859,7 @@
     {
       "Id": "dock",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Un dock ou un adaptateur USB-C ne marche pas",
       "Phrase": "L'écran, le réseau ou les prises USB branchés sur le dock restent muets",
       "Mots": [
@@ -23596,6 +23889,7 @@
     {
       "Id": "bluetoothperiph",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "Le Bluetooth ne trouve rien",
       "Phrase": "Aucun appareil n'apparaît, ou le Bluetooth a disparu",
       "Mots": [
@@ -23649,6 +23943,7 @@
     {
       "Id": "bluetoothdisparu",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-sansfil",
       "Titre": "Le Bluetooth a disparu (plus d'interrupteur Bluetooth)",
       "Phrase": "Le bouton Bluetooth n'est plus dans Windows",
       "Mots": [
@@ -23675,6 +23970,7 @@
     {
       "Id": "webcam",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-webcam",
       "Titre": "La webcam ne marche pas",
       "Phrase": "Image noire, « aucune caméra trouvée », ou elle n'est pas reconnue",
       "Mots": [
@@ -23717,6 +24013,7 @@
     {
       "Id": "webcamvoyant",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-webcam",
       "Titre": "Le voyant de la webcam s'allume tout seul",
       "Phrase": "La petite lumière de la caméra s'allume sans que j'utilise la webcam",
       "Mots": [
@@ -23743,6 +24040,7 @@
     {
       "Id": "webcamfloue",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-webcam",
       "Titre": "L'image de la webcam est floue ou sombre",
       "Phrase": "Image floue, granuleuse, ou trop sombre en visio",
       "Mots": [
@@ -23770,6 +24068,7 @@
     {
       "Id": "partageecran",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-webcam",
       "Titre": "L'écran partagé est noir (Teams, Discord, Zoom)",
       "Phrase": "En partage d'écran, les autres voient un écran noir",
       "Mots": [
@@ -23801,6 +24100,7 @@
     {
       "Id": "telephone",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Le téléphone branché n'apparaît pas",
       "Phrase": "Impossible de voir les photos du téléphone sur le PC",
       "Mots": [
@@ -23840,6 +24140,7 @@
     {
       "Id": "manette",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "La manette ne marche pas",
       "Phrase": "Elle n'est pas reconnue, ou ne marche pas dans un jeu",
       "Mots": [
@@ -23882,6 +24183,7 @@
     {
       "Id": "imprimante",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-imprimante",
       "Titre": "L'imprimante ne marche plus",
       "Phrase": "Rien ne sort, « hors ligne », ou erreur d'impression",
       "Mots": [
@@ -23985,6 +24287,7 @@
     {
       "Id": "impressionmauvaise",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-imprimante",
       "Titre": "L'imprimante imprime mal (pâle, traînées, couleurs fausses)",
       "Phrase": "Des traits blancs, des taches, une couleur qui manque",
       "Mots": [
@@ -24018,6 +24321,7 @@
     {
       "Id": "impressioncoupee",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-imprimante",
       "Titre": "Les documents s'impriment trop petits ou coupés",
       "Phrase": "Une partie de la page manque, ou tout est minuscule",
       "Mots": [
@@ -24045,6 +24349,7 @@
     {
       "Id": "scanner",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-imprimante",
       "Titre": "Le scanner (ou l'imprimante pour numériser) ne marche pas",
       "Phrase": "Impossible de numériser un document, alors que l'impression marche",
       "Mots": [
@@ -24072,6 +24377,7 @@
     {
       "Id": "dvd",
       "Famille": "peripheriques",
+      "Groupe": "peripheriques-usb",
       "Titre": "Le lecteur de CD ou DVD ne lit pas (ou n'apparaît pas)",
       "Phrase": "Le disque tourne sans être lu, ou le lecteur a disparu de « Ce PC »",
       "Mots": [
@@ -24100,6 +24406,8 @@
     {
       "Id": "necharge",
       "Famille": "batterie",
+      "Groupe": "batterie-charge",
+      "PourPc": { "Type": "portable" },
       "Titre": "Il ne charge plus",
       "Phrase": "Branché, la batterie ne remonte pas, ou « Branché, pas en charge »",
       "Mots": [
@@ -24146,6 +24454,8 @@
     {
       "Id": "batterie0",
       "Famille": "batterie",
+      "Groupe": "batterie-charge",
+      "PourPc": { "Type": "portable" },
       "Titre": "« Aucune batterie détectée » ou bloqué à 0 %",
       "Phrase": "Le portable marche sur secteur mais ne voit plus sa batterie",
       "Mots": [
@@ -24173,6 +24483,8 @@
     {
       "Id": "secteurseul",
       "Famille": "batterie",
+      "Groupe": "batterie-charge",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le portable ne marche que branché sur le chargeur",
       "Phrase": "Dès qu'on débranche, il s'éteint (ou ne démarre pas sans le chargeur)",
       "Mots": [
@@ -24203,6 +24515,8 @@
     {
       "Id": "chargelente",
       "Famille": "batterie",
+      "Groupe": "batterie-charge",
+      "PourPc": { "Type": "portable" },
       "Titre": "Il charge très lentement",
       "Phrase": "Des heures pour gagner quelques pour cent, ou « charge lente » s'affiche",
       "Mots": [
@@ -24232,6 +24546,8 @@
     {
       "Id": "tientpeu",
       "Famille": "batterie",
+      "Groupe": "batterie-vide",
+      "PourPc": { "Type": "portable" },
       "Titre": "La batterie tient peu",
       "Phrase": "Elle se vide bien plus vite qu'avant",
       "Mots": [
@@ -24291,6 +24607,8 @@
     {
       "Id": "pourcentagefaux",
       "Famille": "batterie",
+      "Groupe": "batterie-vide",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le pourcentage de la batterie est faux (il saute ou reste bloqué)",
       "Phrase": "Il passe de 40 % à 10 % d'un coup, ou reste bloqué sur un chiffre",
       "Mots": [
@@ -24319,6 +24637,8 @@
     {
       "Id": "videeteint",
       "Famille": "batterie",
+      "Groupe": "batterie-vide",
+      "PourPc": { "Type": "portable" },
       "Titre": "La batterie se vide alors qu'il est éteint ou fermé",
       "Phrase": "Le lendemain, la batterie a beaucoup baissé sans s'en servir",
       "Mots": [
@@ -24347,6 +24667,8 @@
     {
       "Id": "eteintbatterie",
       "Famille": "batterie",
+      "Groupe": "batterie-vide",
+      "PourPc": { "Type": "portable" },
       "Titre": "Il s'éteint alors qu'il reste de la batterie",
       "Phrase": "Il indique 20 ou 30 %, puis s'éteint d'un coup",
       "Mots": [
@@ -24404,6 +24726,8 @@
     {
       "Id": "chargeurchauffe",
       "Famille": "batterie",
+      "Groupe": "batterie-danger",
+      "PourPc": { "Type": "portable" },
       "Titre": "Le chargeur chauffe",
       "Phrase": "Le bloc du chargeur est très chaud, sent ou grésille",
       "Mots": [
@@ -24447,6 +24771,7 @@
     {
       "Id": "etincelles",
       "Famille": "batterie",
+      "Groupe": "batterie-danger",
       "Titre": "Le chargeur fait des étincelles ou crépite",
       "Phrase": "Une étincelle au branchement, un grésillement, une odeur",
       "Mots": [
@@ -24471,6 +24796,8 @@
     {
       "Id": "gonfle",
       "Famille": "batterie",
+      "Groupe": "batterie-danger",
+      "PourPc": { "Type": "portable" },
       "Titre": "La batterie gonfle",
       "Phrase": "Le portable ne tient plus à plat, le clavier ou le dessous se soulève",
       "Mots": [
@@ -24509,6 +24836,7 @@
     {
       "Id": "pubs",
       "Famille": "virus",
+      "Groupe": "virus-pubs",
       "Titre": "Des pubs et des fenêtres partout",
       "Phrase": "Des pubs, de fausses alertes en bas à droite, des fenêtres qui s'ouvrent",
       "Mots": [
@@ -24572,6 +24900,7 @@
     {
       "Id": "navigateurchange",
       "Famille": "virus",
+      "Groupe": "virus-pubs",
       "Titre": "Le navigateur a changé tout seul",
       "Phrase": "Page d'accueil ou moteur de recherche inconnus",
       "Mots": [
@@ -24604,6 +24933,7 @@
     {
       "Id": "organisation",
       "Famille": "virus",
+      "Groupe": "virus-pubs",
       "Titre": "Le navigateur dit « Géré par votre organisation »",
       "Phrase": "Sans être au travail, le navigateur dit être géré, et impose une page ou une extension",
       "Mots": [
@@ -24630,6 +24960,7 @@
     {
       "Id": "programmesinconnus",
       "Famille": "virus",
+      "Groupe": "virus-pubs",
       "Titre": "Des programmes inconnus",
       "Phrase": "Des programmes ou des icônes que je n'ai pas installés",
       "Mots": [
@@ -24676,6 +25007,7 @@
     {
       "Id": "rancon",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "Un message demande de payer",
       "Phrase": "Mes fichiers sont bloqués, ou un écran demande de l'argent",
       "Mots": [
@@ -24717,6 +25049,7 @@
     {
       "Id": "arnaquesupport",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "Un appel ou un message du « support Microsoft »",
       "Phrase": "Quelqu'un appelle ou une page dit que le PC est infecté, avec un numéro",
       "Mots": [
@@ -24759,6 +25092,7 @@
     {
       "Id": "phishing",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "J'ai cliqué sur un lien suspect (colis, amende, banque)",
       "Phrase": "Un SMS ou un e-mail bizarre, j'ai cliqué dessus",
       "Mots": [
@@ -24788,6 +25122,7 @@
     {
       "Id": "chantage",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "Un e-mail dit que j'ai été filmé et demande de l'argent",
       "Phrase": "Chantage, menace de diffuser une vidéo, paiement en bitcoins",
       "Mots": [
@@ -24833,6 +25168,7 @@
     {
       "Id": "accesdistance",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "Quelqu'un a pris la main sur mon PC (AnyDesk, TeamViewer)",
       "Phrase": "Après un appel ou un message, un inconnu a fait installer un programme et a bougé la souris",
       "Mots": [
@@ -24859,6 +25195,7 @@
     {
       "Id": "antivirusoff",
       "Famille": "virus",
+      "Groupe": "virus-protection",
       "Titre": "La protection contre les virus est coupée et ne se rallume pas",
       "Phrase": "Sécurité Windows affiche une croix rouge, ou ses réglages sont grisés",
       "Mots": [
@@ -24891,6 +25228,7 @@
     {
       "Id": "antivirusbloque",
       "Famille": "virus",
+      "Groupe": "virus-protection",
       "Titre": "L'antivirus supprime ou bloque un programme (ou un téléchargement)",
       "Phrase": "« Menace trouvée », « Virus détecté », le programme a disparu ou ne se télécharge pas",
       "Mots": [
@@ -24923,6 +25261,7 @@
     {
       "Id": "gestionnairebloque",
       "Famille": "virus",
+      "Groupe": "virus-pubs",
       "Titre": "« Le Gestionnaire des tâches a été désactivé par votre administrateur »",
       "Phrase": "Ctrl + Maj + Échap ne marche plus, ou les réglages sont bloqués",
       "Mots": [
@@ -24945,6 +25284,7 @@
     {
       "Id": "fauxnettoyage",
       "Famille": "virus",
+      "Groupe": "virus-arnaque",
       "Titre": "Un programme dit que le PC est infecté et demande de payer",
       "Phrase": "Des centaines de « problèmes » trouvés, à réparer contre de l'argent",
       "Mots": [
@@ -24974,6 +25314,7 @@
     {
       "Id": "comptepirate",
       "Famille": "virus",
+      "Groupe": "virus-protection",
       "Titre": "Un compte (e-mail, réseau social, jeu) a été piraté",
       "Phrase": "Des messages envoyés à ta place, un mot de passe qui ne marche plus",
       "Mots": [
@@ -25001,6 +25342,7 @@
     {
       "Id": "disqueplein",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Le disque est plein",
       "Phrase": "« Espace disque insuffisant », la barre du disque est rouge",
       "Mots": [
@@ -25036,6 +25378,7 @@
     {
       "Id": "cpleindvide",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Le disque C: est plein, mais D: est presque vide",
       "Phrase": "Plus de place sur C:, alors que le deuxième disque n'est presque pas utilisé",
       "Mots": [
@@ -25080,6 +25423,7 @@
     {
       "Id": "fichiersupprime",
       "Famille": "fichiers",
+      "Groupe": "fichiers-perdu",
       "Titre": "Un fichier supprimé par erreur",
       "Phrase": "Une photo, un document ou un dossier disparu",
       "Mots": [
@@ -25155,6 +25499,7 @@
     {
       "Id": "recupfichiers",
       "Famille": "fichiers",
+      "Groupe": "fichiers-perdu",
       "Titre": "Récupérer mes fichiers d'un PC qui ne démarre plus",
       "Phrase": "Le PC ne démarre plus, et mes photos ou documents sont dedans",
       "Mots": [
@@ -25178,6 +25523,7 @@
     {
       "Id": "fichierintrouvable",
       "Famille": "fichiers",
+      "Groupe": "fichiers-perdu",
       "Titre": "Je ne retrouve plus un fichier enregistré",
       "Phrase": "Il a été enregistré, mais il n'est plus là où on pensait",
       "Mots": [
@@ -25239,6 +25585,7 @@
     {
       "Id": "suppressionimpossible",
       "Famille": "fichiers",
+      "Groupe": "fichiers-bloque",
       "Titre": "Impossible de supprimer ou déplacer un fichier",
       "Phrase": "« Le fichier est ouvert dans un autre programme » ou « Accès refusé »",
       "Mots": [
@@ -25288,6 +25635,7 @@
     {
       "Id": "nomtroplong",
       "Famille": "fichiers",
+      "Groupe": "fichiers-bloque",
       "Titre": "« Le nom du fichier est trop long » (copie ou suppression impossible)",
       "Phrase": "Copier, déplacer ou supprimer s'arrête sur un nom trop long",
       "Mots": [
@@ -25313,6 +25661,7 @@
     {
       "Id": "enregistrerimpossible",
       "Famille": "fichiers",
+      "Groupe": "fichiers-bloque",
       "Titre": "« Impossible d'enregistrer » ou fichier en lecture seule",
       "Phrase": "Le fichier s'ouvre, mais refuse d'enregistrer les changements",
       "Mots": [
@@ -25361,6 +25710,7 @@
     {
       "Id": "disqueexterne",
       "Famille": "fichiers",
+      "Groupe": "fichiers-cle",
       "Titre": "Un disque externe n'est pas reconnu",
       "Phrase": "Le disque ne s'affiche pas, ou Windows propose de le formater",
       "Mots": [
@@ -25434,6 +25784,7 @@
     {
       "Id": "protegee",
       "Famille": "fichiers",
+      "Groupe": "fichiers-cle",
       "Titre": "La clé USB ou la carte SD est protégée en écriture",
       "Phrase": "« Le disque est protégé en écriture » : impossible d'y copier ou effacer",
       "Mots": [
@@ -25462,6 +25813,7 @@
     {
       "Id": "cleraccourcis",
       "Famille": "fichiers",
+      "Groupe": "fichiers-cle",
       "Titre": "Les fichiers de la clé USB ont disparu (remplacés par des raccourcis)",
       "Phrase": "La clé est pleine mais semble vide, ou ne montre que des raccourcis",
       "Mots": [
@@ -25489,6 +25841,7 @@
     {
       "Id": "clefausse",
       "Famille": "fichiers",
+      "Groupe": "fichiers-cle",
       "Titre": "Les fichiers copiés sur la clé sont illisibles ou ont disparu",
       "Phrase": "La copie semble réussir, mais les fichiers sont vides ou abîmés ensuite",
       "Mots": [
@@ -25518,6 +25871,7 @@
     {
       "Id": "trop4go",
       "Famille": "fichiers",
+      "Groupe": "fichiers-cle",
       "Titre": "« Le fichier est trop volumineux » pour la clé",
       "Phrase": "Impossible de copier un gros fichier, alors qu'il reste de la place",
       "Mots": [
@@ -25542,6 +25896,7 @@
     {
       "Id": "erreursdisque",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Le disque fait des erreurs",
       "Phrase": "Des messages d'erreur, une vérification au démarrage, des fichiers qui se perdent",
       "Mots": [
@@ -25592,6 +25947,7 @@
     {
       "Id": "fichiersnouvrent",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Des fichiers ne s'ouvrent plus",
       "Phrase": "Un message d'erreur, ou rien ne se passe en double-cliquant",
       "Mots": [
@@ -25722,6 +26078,7 @@
     {
       "Id": "office",
       "Famille": "fichiers",
+      "Groupe": "fichiers-word",
       "Titre": "Word ou Excel demande une activation (« Produit sans licence »)",
       "Phrase": "Office passe en lecture seule, ou demande d'acheter ou d'activer",
       "Mots": [
@@ -25749,6 +26106,7 @@
     {
       "Id": "pasdeword",
       "Famille": "fichiers",
+      "Groupe": "fichiers-word",
       "Titre": "Je n'ai pas Word (ou Excel) pour ouvrir un document",
       "Phrase": "Un .docx ou .xlsx reçu ne s'ouvre avec rien, ou Windows demande quel programme utiliser",
       "Mots": [
@@ -25789,6 +26147,7 @@
     {
       "Id": "wordperdu",
       "Famille": "fichiers",
+      "Groupe": "fichiers-word",
       "Titre": "J'ai fermé Word (ou Excel) sans enregistrer",
       "Phrase": "Le document n'a pas été enregistré, ou Word a planté",
       "Mots": [
@@ -25820,6 +26179,7 @@
     {
       "Id": "wordendommage",
       "Famille": "fichiers",
+      "Groupe": "fichiers-word",
       "Titre": "Word ou Excel dit que le fichier est endommagé",
       "Phrase": "« Word a rencontré une erreur », « le fichier est endommagé », caractères bizarres",
       "Mots": [
@@ -25847,6 +26207,7 @@
     {
       "Id": "zip",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Une archive (ZIP, RAR, 7z) ne s'ouvre pas",
       "Phrase": "« Le dossier compressé n'est pas valide », ou un .rar que Windows ne connaît pas",
       "Mots": [
@@ -25872,6 +26233,7 @@
     {
       "Id": "pdf",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Un PDF ne s'ouvre pas, ou s'affiche vide",
       "Phrase": "Page blanche, « impossible d'afficher », ou un formulaire qu'on ne peut pas remplir",
       "Mots": [
@@ -25900,6 +26262,7 @@
     {
       "Id": "mauvaisprogramme",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Les fichiers s'ouvrent avec le mauvais programme",
       "Phrase": "Les PDF s'ouvrent dans le navigateur, les photos dans un programme bizarre...",
       "Mots": [
@@ -25927,6 +26290,7 @@
     {
       "Id": "extensionsfichiers",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Je ne vois pas le type des fichiers (.pdf, .jpg)",
       "Phrase": "Les noms n'ont pas leur fin, impossible de savoir si c'est une photo, un PDF...",
       "Mots": [
@@ -25954,6 +26318,7 @@
     {
       "Id": "fichierbloque",
       "Famille": "fichiers",
+      "Groupe": "fichiers-bloque",
       "Titre": "Un fichier téléchargé est bloqué ou en « mode protégé »",
       "Phrase": "« Ce fichier provient d'un autre ordinateur », bandeau jaune ou rouge dans Word ou Excel",
       "Mots": [
@@ -25978,6 +26343,7 @@
     {
       "Id": "heic",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Les photos de l'iPhone ne s'ouvrent pas (fichiers HEIC)",
       "Phrase": "Les photos copiées depuis un iPhone sont illisibles sur le PC",
       "Mots": [
@@ -26002,6 +26368,7 @@
     {
       "Id": "video",
       "Famille": "fichiers",
+      "Groupe": "fichiers-ouvre",
       "Titre": "Une vidéo ne se lit pas (ou sans image, ou sans son)",
       "Phrase": "« Format non pris en charge », écran noir, ou son absent dans une vidéo",
       "Mots": [
@@ -26029,6 +26396,7 @@
     {
       "Id": "disquedisparait",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Un disque qui disparaît par moments",
       "Phrase": "Le disque (ou la clé) se déconnecte puis revient",
       "Mots": [
@@ -26072,6 +26440,7 @@
     {
       "Id": "disquedisparu",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Un disque (D:, E:) a disparu de « Ce PC »",
       "Phrase": "Un deuxième disque interne n'apparaît plus dans l'Explorateur",
       "Mots": [
@@ -26104,6 +26473,7 @@
     {
       "Id": "disqueneuf",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "Un disque neuf (SSD, disque dur) n'apparaît pas",
       "Phrase": "Il vient d'être installé, mais pas de nouvelle lettre dans « Ce PC »",
       "Mots": [
@@ -26135,6 +26505,7 @@
     {
       "Id": "onedrive",
       "Famille": "fichiers",
+      "Groupe": "fichiers-disques",
       "Titre": "OneDrive est plein, ou des fichiers y partent tout seuls",
       "Phrase": "Message « stockage OneDrive plein », fichiers déplacés dans OneDrive, nuages rouges",
       "Mots": [
@@ -26160,6 +26531,7 @@
     {
       "Id": "iconesfichiers",
       "Famille": "fichiers",
+      "Groupe": "fichiers-bloque",
       "Titre": "Des nuages, des croix rouges ou des cadenas sur mes fichiers",
       "Phrase": "De petites icônes apparaissent sur les fichiers et dossiers",
       "Mots": [
@@ -26188,6 +26560,7 @@
     {
       "Id": "heurefausse",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "L'heure ou la date est fausse",
       "Phrase": "Elle se décale, ou revient à une vieille date au démarrage",
       "Mots": [
@@ -26221,6 +26594,7 @@
     {
       "Id": "langue",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "Windows est en anglais (ou dans une autre langue)",
       "Phrase": "Les menus et les messages ne sont plus en français",
       "Mots": [
@@ -26244,6 +26618,7 @@
     {
       "Id": "narrateur",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "Une voix lit tout ce qui est à l'écran",
       "Phrase": "Un cadre bleu autour de ce qu'on touche, et une voix qui lit tout",
       "Mots": [
@@ -26269,6 +26644,7 @@
     {
       "Id": "touchesremanentes",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "Un bip et un message « touches rémanentes » quand j'appuie sur Maj",
       "Phrase": "Appuyer plusieurs fois sur Maj (en jeu) fait biper et ouvre une fenêtre",
       "Mots": [
@@ -26296,6 +26672,7 @@
     {
       "Id": "claviertactile",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "Le clavier à l'écran apparaît tout le temps",
       "Phrase": "Un clavier s'affiche en bas dès qu'on clique pour écrire",
       "Mots": [
@@ -26318,6 +26695,7 @@
     {
       "Id": "fondnoir",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "Le fond d'écran est devenu noir (ou ne se change plus)",
       "Phrase": "Le Bureau est noir, et les réglages de personnalisation sont grisés",
       "Mots": [
@@ -26341,6 +26719,7 @@
     {
       "Id": "mdpoublie",
       "Famille": "windows",
+      "Groupe": "windows-compte",
       "Titre": "Mot de passe ou code PIN oublié",
       "Phrase": "Impossible d'ouvrir sa session Windows",
       "Mots": [
@@ -26376,6 +26755,7 @@
     {
       "Id": "mdpincorrect",
       "Famille": "windows",
+      "Groupe": "windows-compte",
       "Titre": "« Mot de passe incorrect » alors que je tape le bon",
       "Phrase": "Windows refuse un mot de passe ou un code PIN que je connais",
       "Mots": [
@@ -26402,6 +26782,7 @@
     {
       "Id": "pinindisponible",
       "Famille": "windows",
+      "Groupe": "windows-compte",
       "Titre": "« Votre code PIN n'est plus disponible »",
       "Phrase": "« Quelque chose s'est produit et votre code PIN n'est pas disponible »",
       "Mots": [
@@ -26424,6 +26805,7 @@
     {
       "Id": "hello",
       "Famille": "windows",
+      "Groupe": "windows-compte",
       "Titre": "Windows Hello (visage ou empreinte) ne marche plus",
       "Phrase": "La connexion par le visage ou le doigt ne reconnaît plus, ou n'est plus proposée",
       "Mots": [
@@ -26451,6 +26833,8 @@
     {
       "Id": "perdu",
       "Famille": "windows",
+      "Groupe": "windows-compte",
+      "PourPc": { "Type": "portable" },
       "Titre": "J'ai perdu mon portable (ou on me l'a volé)",
       "Phrase": "Je ne retrouve plus le portable, ou il a été volé",
       "Mots": [
@@ -26491,6 +26875,7 @@
     {
       "Id": "barretaches",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "La barre des tâches ou le menu Démarrer ne répond plus",
       "Phrase": "Clic sans effet, icônes figées, menu qui ne s'ouvre pas",
       "Mots": [
@@ -26559,6 +26944,7 @@
     {
       "Id": "barredisparue",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "La barre des tâches a disparu ou a changé de place",
       "Phrase": "Plus de barre en bas, elle est sur un côté, ou ses icônes ont bougé",
       "Mots": [
@@ -26587,6 +26973,7 @@
     {
       "Id": "fenetresalignent",
       "Famille": "windows",
+      "Groupe": "windows-reglage",
       "Titre": "Les fenêtres s'agrandissent ou se rangent toutes seules",
       "Phrase": "En déplaçant une fenêtre, elle prend tout l'écran ou la moitié",
       "Mots": [
@@ -26614,6 +27001,7 @@
     {
       "Id": "notifications",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "Les notifications ne s'affichent plus",
       "Phrase": "Plus aucune notification en bas à droite (messages, mails, rappels)",
       "Mots": [
@@ -26640,6 +27028,7 @@
     {
       "Id": "verrouillage",
       "Famille": "windows",
+      "Groupe": "windows-compte",
       "Titre": "Le PC se verrouille trop vite (ou ne se verrouille jamais)",
       "Phrase": "Il faut retaper le mot de passe sans arrêt, ou il reste ouvert",
       "Mots": [
@@ -26666,6 +27055,7 @@
     {
       "Id": "demarrageprogs",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "Des programmes s'ouvrent tout seuls au démarrage",
       "Phrase": "Spotify, Discord, Teams, Edge... s'ouvrent à chaque démarrage",
       "Mots": [
@@ -26693,6 +27083,7 @@
     {
       "Id": "pubswindows",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "Des applis ou des pubs apparaissent dans le menu Démarrer",
       "Phrase": "Candy Crush, TikTok ou des « suggestions » s'installent ou s'affichent tout seuls",
       "Mots": [
@@ -26720,6 +27111,7 @@
     {
       "Id": "iconesbureau",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "Les icônes du Bureau ont disparu",
       "Phrase": "Le Bureau est vide : plus de raccourcis ni de fichiers",
       "Mots": [
@@ -26747,6 +27139,7 @@
     {
       "Id": "iconesblanches",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "Des icônes blanches ou vides (Bureau, barre des tâches)",
       "Phrase": "Des icônes sont devenues des pages blanches, ou n'ont plus d'image",
       "Mots": [
@@ -26773,6 +27166,7 @@
     {
       "Id": "corbeillecachee",
       "Famille": "windows",
+      "Groupe": "windows-bureau",
       "Titre": "La corbeille (ou « Ce PC ») a disparu du Bureau",
       "Phrase": "Plus d'icône de corbeille sur le Bureau",
       "Mots": [
@@ -26798,6 +27192,7 @@
     {
       "Id": "copiercoller",
       "Famille": "windows",
+      "Groupe": "windows-outils",
       "Titre": "Le copier-coller ne marche plus",
       "Phrase": "Ctrl + C puis Ctrl + V ne collent rien, ou collent autre chose",
       "Mots": [
@@ -26857,6 +27252,7 @@
     {
       "Id": "captureecran",
       "Famille": "windows",
+      "Groupe": "windows-outils",
       "Titre": "Je n'arrive pas à faire une capture d'écran",
       "Phrase": "Impr écran ne fait rien, ou je ne retrouve pas la capture",
       "Mots": [
@@ -26911,6 +27307,7 @@
     {
       "Id": "clicdroitw11",
       "Famille": "windows",
+      "Groupe": "windows-outils",
       "Titre": "Il manque des options dans le clic droit (Windows 11)",
       "Phrase": "Les options de 7-Zip, de WinRAR ou de l'antivirus ont disparu du clic droit",
       "Mots": [
@@ -26962,6 +27359,7 @@
     {
       "Id": "majerreur",
       "Famille": "windows",
+      "Groupe": "windows-maj",
       "Titre": "Les mises à jour de Windows échouent",
       "Phrase": "Une erreur, ou ça bloque au même pourcentage",
       "Mots": [
@@ -27016,6 +27414,7 @@
     {
       "Id": "majredemarre",
       "Famille": "windows",
+      "Groupe": "windows-maj",
       "Titre": "Windows redémarre tout seul pour les mises à jour",
       "Phrase": "Il redémarre pendant que je travaille, ou la nuit en perdant mon travail",
       "Mots": [
@@ -27039,6 +27438,7 @@
     {
       "Id": "activation",
       "Famille": "windows",
+      "Groupe": "windows-maj",
       "Titre": "Windows n'est pas activé",
       "Phrase": "« Activer Windows » s'affiche en bas de l'écran",
       "Mots": [
@@ -27070,6 +27470,7 @@
     {
       "Id": "windows11",
       "Famille": "windows",
+      "Groupe": "windows-maj",
       "Titre": "Impossible de passer à Windows 11",
       "Phrase": "« Ce PC ne répond pas à la configuration requise », ou la mise à niveau n'est pas proposée",
       "Mots": [
@@ -27100,6 +27501,7 @@
     {
       "Id": "reinitialiser",
       "Famille": "windows",
+      "Groupe": "windows-maj",
       "Titre": "Je veux remettre Windows à zéro (réinitialiser le PC)",
       "Phrase": "Tout va mal, ou le PC va être donné ou vendu",
       "Mots": [
@@ -27141,6 +27543,7 @@
     {
       "Id": "store",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "Le Microsoft Store ne marche pas",
       "Phrase": "Il ne s'ouvre pas, ou les téléchargements restent bloqués",
       "Mots": [
@@ -27209,6 +27612,7 @@
     {
       "Id": "parametres",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "Les Paramètres de Windows ne s'ouvrent pas",
       "Phrase": "Touche Windows + I ne fait rien, ou les Paramètres se ferment tout de suite",
       "Mots": [
@@ -27236,6 +27640,7 @@
     {
       "Id": "recherchewin",
       "Famille": "windows",
+      "Groupe": "windows-outils",
       "Titre": "La recherche de Windows ne trouve plus rien",
       "Phrase": "Taper dans la recherche ne donne rien, ou elle ne s'ouvre pas",
       "Mots": [
@@ -27284,6 +27689,7 @@
     {
       "Id": "miniatures",
       "Famille": "windows",
+      "Groupe": "windows-outils",
       "Titre": "Les photos n'ont plus d'aperçu dans les dossiers",
       "Phrase": "On ne voit plus les images en petit, seulement des icônes",
       "Mots": [
@@ -27314,6 +27720,7 @@
     {
       "Id": "installation",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "Un programme ne s'installe pas",
       "Phrase": "L'installation ne se lance pas, ou s'arrête sur une erreur",
       "Mots": [
@@ -27358,6 +27765,7 @@
     {
       "Id": "desinstaller",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "Impossible de désinstaller un programme",
       "Phrase": "La désinstallation échoue, ou le programme revient",
       "Mots": [
@@ -27387,6 +27795,7 @@
     {
       "Id": "accesrefuse",
       "Famille": "windows",
+      "Groupe": "windows-programmes",
       "Titre": "« Accès refusé » ou « Tu as besoin de l'autorisation d'un administrateur »",
       "Phrase": "Impossible d'installer, de supprimer ou de modifier quelque chose",
       "Mots": [
@@ -27412,6 +27821,7 @@
     {
       "Id": "saccades",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "Les jeux saccadent (peu d'images par seconde)",
       "Phrase": "Le jeu n'est pas fluide, l'image saute",
       "Mots": [
@@ -27555,6 +27965,7 @@
     {
       "Id": "jeu",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "Ça plante seulement en jeu",
       "Phrase": "Tout va bien, sauf quand le PC force",
       "Mots": [
@@ -27664,6 +28075,7 @@
     {
       "Id": "jeunelancepas",
       "Famille": "jeux",
+      "Groupe": "jeux-lancement",
       "Titre": "Un jeu ne se lance pas",
       "Phrase": "Rien ne se passe, il se ferme tout de suite, ou un message d'erreur",
       "Mots": [
@@ -27701,6 +28113,7 @@
     {
       "Id": "anticheat",
       "Famille": "jeux",
+      "Groupe": "jeux-lancement",
       "Titre": "Erreur de l'anti-triche (EasyAntiCheat, BattlEye, Vanguard)",
       "Phrase": "Le jeu refuse de démarrer à cause de l'anti-triche",
       "Mots": [
@@ -27738,6 +28151,7 @@
     {
       "Id": "laggame",
       "Famille": "jeux",
+      "Groupe": "jeux-enligne",
       "Titre": "Ça lague en ligne (ping élevé, coupures en partie)",
       "Phrase": "Le jeu saute, les personnages se téléportent, le ping monte",
       "Mots": [
@@ -27777,6 +28191,7 @@
     {
       "Id": "steamlent",
       "Famille": "jeux",
+      "Groupe": "jeux-steam",
       "Titre": "Steam (ou un autre lanceur) télécharge très lentement",
       "Phrase": "Le téléchargement d'un jeu ou d'une mise à jour n'avance pas",
       "Mots": [
@@ -27859,6 +28274,7 @@
     {
       "Id": "ecrannoirjeu",
       "Famille": "jeux",
+      "Groupe": "jeux-lancement",
       "Titre": "Écran noir au lancement d'un jeu (le son marche)",
       "Phrase": "On entend le jeu, mais l'écran reste noir",
       "Mots": [
@@ -27889,6 +28305,7 @@
     {
       "Id": "memoirevideojeu",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "« Out of video memory » ou le jeu manque de mémoire vidéo",
       "Phrase": "Le jeu plante en parlant de mémoire vidéo (VRAM), ou saccade fort en Ultra",
       "Mots": [
@@ -27921,6 +28338,7 @@
     {
       "Id": "dx12",
       "Famille": "jeux",
+      "Groupe": "jeux-lancement",
       "Titre": "« DirectX 12 n'est pas pris en charge » ou « pilote graphique trop ancien »",
       "Phrase": "Le jeu refuse de démarrer à cause de DirectX ou du pilote graphique",
       "Mots": [
@@ -27957,6 +28375,7 @@
     {
       "Id": "steamerreur",
       "Famille": "jeux",
+      "Groupe": "jeux-steam",
       "Titre": "Erreur Steam pendant une mise à jour (« contenu verrouillé », « erreur d'écriture »)",
       "Phrase": "La mise à jour d'un jeu s'arrête sur une erreur de Steam",
       "Mots": [
@@ -27989,6 +28408,7 @@
     {
       "Id": "inputlag",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "La souris ou la manette réagit en retard dans les jeux",
       "Phrase": "Un petit retard entre le geste et l'image, la visée paraît molle",
       "Mots": [
@@ -28027,6 +28447,7 @@
     {
       "Id": "saccadesdebut",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "Le jeu saccade au début, puis ça va mieux",
       "Phrase": "Gros ralentissements les premières minutes, ou à chaque nouvel endroit",
       "Mots": [
@@ -28057,6 +28478,7 @@
     {
       "Id": "gamepass",
       "Famille": "jeux",
+      "Groupe": "jeux-lancement",
       "Titre": "Un jeu Game Pass (appli Xbox) ne s'installe pas ou ne se lance pas",
       "Phrase": "L'appli Xbox bloque l'installation, ou affiche une erreur (0x80...)",
       "Mots": [
@@ -28106,6 +28528,7 @@
     {
       "Id": "natstrict",
       "Famille": "jeux",
+      "Groupe": "jeux-enligne",
       "Titre": "NAT strict, impossible de rejoindre des amis en ligne",
       "Phrase": "Le jeu dit « NAT strict » ou « type de NAT : 3 », on ne peut pas se rejoindre ou s'entendre",
       "Mots": [
@@ -28138,6 +28561,7 @@
     {
       "Id": "sourissortjeu",
       "Famille": "jeux",
+      "Groupe": "jeux-partie",
       "Titre": "En jeu, la souris sort sur l'autre écran",
       "Phrase": "Avec deux écrans, la souris quitte le jeu et clique sur l'autre écran",
       "Mots": [

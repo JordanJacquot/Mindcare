@@ -43,7 +43,19 @@ pub mod ids {
     pub const BUREAU: &str = "bureau";
     /// « Copier le rapport »
     pub const COPIER: &str = "copier";
+    /// La pastille « Ton PC » de la barre du haut
+    pub const TON_PC: &str = "ton-pc";
+    /// « Tout afficher » dans la bande « Adapté à ton PC »
+    pub const TOUT_AFFICHER: &str = "tout-afficher";
+    /// Construction d'essai seulement : montrer une pastille « Ton PC » et une bande « Adapté à ton PC » (valeur :
+    /// `{ pc, adapte }`), pour les captures, avant que la détection du PC ne les donne
+    #[cfg(feature = "essai")]
+    pub const ESSAI_PC: &str = "essai-pc";
 }
+
+/// Les lignes du journal de « Ton PC » et de « Tout afficher » (rien d'autre pour l'instant).
+pub const JOURNAL_TON_PC: &str = "Ton PC : pastille choisie (rien d'autre pour l'instant)";
+pub const JOURNAL_TOUT_AFFICHER: &str = "Adapté à ton PC : « Tout afficher » choisi (rien d'autre pour l'instant)";
 
 /// Le message en bulle quand un test est remis à plus tard.
 pub const PLUS_TARD_MESSAGE: &str = "Mindcare s'en souviendra : l'enquête t'attend à l'accueil.";
@@ -137,6 +149,15 @@ impl Etat {
             },
             ia::AUCUNE => self.pour_etre_sur_choisi(cat, -1, nouvel_id),
             REPRENDRE | DERNIERE => self.reprendre(cat),
+            ids::TON_PC => vec![Effet::Journal(JOURNAL_TON_PC.into())],
+            ids::TOUT_AFFICHER => vec![Effet::Journal(JOURNAL_TOUT_AFFICHER.into())],
+            #[cfg(feature = "essai")]
+            ids::ESSAI_PC => {
+                let lire = |c: &str| Some(texte(champ_v(valeur, c))).filter(|x| !x.is_empty());
+                self.ton_pc = lire("pc");
+                self.adapte_au_pc = lire("adapte");
+                vec![Effet::rafraichir()]
+            }
             ids::REP | ids::NSP => {
                 let n = if id == ids::NSP { Some(-1) } else { entier(valeur) };
                 let Some(Vue::Etape(e)) = self.vue(cat) else { return vec![Effet::rafraichir()] };

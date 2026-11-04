@@ -1,4 +1,5 @@
-/* Le style des applis de la suite, DA « console d'un futur lointain » (validée par Jordan le 2026-10-21) :
+/* Le style des applis de la suite, DA « console d'un futur lointain » (validée par Jordan le 2026-10-21), et pour les
+   pages de Mindcare le design « A2 » (validé le 2026-11-04, en fin de fichier) :
    l'accueil en tuiles 3D à bord de plasma (plasma.js), les pages en « module déplié » (le module à gauche avec son
    anneau de plasma, le contenu à droite), des bords de plasma qui tournent et s'allument au passage de la souris,
    des sous-onglets en pastilles. Les couleurs viennent du thème de la suite (data-theme sur <body>).
@@ -412,6 +413,246 @@ body.avec-3d .anneau { background: none; }
 #questionM .details .q { padding: 10px 14px; font-size: 14.5px; }
 #questionM .details p { max-height: 34vh; overflow-y: auto; padding: 0 16px 14px; color: var(--doux); font-size: 13px; line-height: 1.5; }
 #questionM .btn:focus { box-shadow: 0 0 0 2px var(--fond), 0 0 0 4px var(--S); }
+/* ================================================================ les pages, design « A2 » (validé par Jordan le
+   2026-11-04) : la mise en page sobre des maquettes (des listes groupées, la hiérarchie par la taille et la graisse,
+   des titres serrés), avec les effets de la DA de la suite gardés dans tous les thèmes (maquette D-app) : les cartes
+   du thème (--carte, --ligne : celles d'un thème perso aussi, son fond se voit dessous), le bord de plasma qui tourne
+   sur les réponses, la carte de la réponse et la carte dépliée, les boutons en dégradé, les pastilles teintées.
+   L'accueil (les tuiles qu'on fait défiler) n'en change pas. */
+body {
+  --surface: var(--carte);
+  --surface2: var(--carte2);
+  --bord: var(--ligne);
+  --bord-fort: color-mix(in srgb, var(--ligne) 65%, var(--doux));
+  --sep: color-mix(in srgb, var(--ligne) 70%, transparent);
+  --accent-doux: color-mix(in srgb, var(--P) 14%, transparent);
+  --accent-ligne: color-mix(in srgb, var(--P) 55%, transparent);
+  --encre: #0B0820;
+  --serre: -0.02em; --serre2: -0.015em;
+}
+/* (une police à chasse fixe ne se serre pas) */
+body[data-theme="terminal"] { --serre: 0; --serre2: 0; }
+
+/* La pastille « Ton PC » du haut */
+.onglet.pc { display: inline-flex; align-items: center; gap: 8px; color: var(--texte); }
+.onglet.pc svg { width: 16px; height: 16px; color: var(--P); flex: none; }
+.onglet.pc span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.ronds-haut { align-items: center; }
+
+/* La page : une colonne au milieu, le fil d'Ariane, le titre */
+.page .defile { padding: 0; }
+.colonne { max-width: 1040px; margin: 0 auto; padding: 24px 48px 30px; box-sizing: border-box; }
+.page .tete { display: flex; flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 20px; }
+.fil { display: flex; align-items: center; gap: 10px; min-height: 34px; font-size: 14px; color: var(--doux); }
+.fil > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fil .ici { color: var(--texte); }
+.fil .sep { flex: none; }
+.fil .etape-p { margin-left: auto; flex: none; font-variant-numeric: tabular-nums; }
+.page .retour { width: 34px; height: 34px; background: color-mix(in srgb, var(--fond2) 70%, transparent); }
+.page .retour svg { width: 16px; height: 16px; }
+.titre-l { display: flex; align-items: center; gap: 14px; }
+.titre-l .titres { flex: 1; }
+.page .titres h1 { margin: 0; font-size: 30px; line-height: 1.15; letter-spacing: var(--serre); font-weight: 800; }
+.page .titres p { margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: var(--doux); max-width: 70ch; }
+.page .tete .actions { flex: none; margin-left: auto; align-self: flex-end; }
+.ic-titre { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-doux); color: var(--P); }
+.ic-titre svg { width: 22px; height: 22px; display: block; }
+/* (le titre est la question : en grand sur toute la largeur) */
+.page.forme-question .titres h1 { font-size: 28px; line-height: 1.25; letter-spacing: var(--serre2); max-width: 880px; margin-top: 4px; }
+/* (pas de grand titre : la première carte en tient lieu ; le titre reste pour la lecture d'écran) */
+.page.forme-carte .titre-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.page.forme-carte .tete { margin-bottom: 18px; }
+
+/* Le contenu : des blocs les uns sous les autres, un même espace entre eux */
+.page .contenu { display: flex; flex-direction: column; gap: 14px; }
+.page .contenu > *, .page .col > *, .page .corps-r > * { margin-top: 0; margin-bottom: 0; }
+.page .titre-bloc { margin: 8px 4px -4px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--doux); }
+.page .contenu > .titre-bloc:first-child { margin-top: 0; }
+.page .titre-bloc .droite { font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--doux); }
+.page .texte { color: var(--doux); font-size: 15px; line-height: 1.5; }
+.page .note { padding: 12px 16px; border-radius: 14px; border: 1px dashed var(--ligne); font-size: 13.5px; }
+.page .ligne-petite { margin: 4px 0 0; padding: 0 4px; font-size: 12.5px; line-height: 1.45; color: var(--doux); }
+.page .image img { border-radius: 14px; }
+
+/* La liste groupée : des lignes dans une même carte, séparées par un trait (pas de bord de plasma par ligne) */
+.groupe { border-radius: 16px; background: var(--surface); border: 1px solid var(--bord); overflow: hidden; }
+.groupe .plaque::before, .groupe .plaque::after, .page .faq .plaque::before, .page .faq .plaque::after { display: none; }
+.groupe > .ligne, .groupe > .rang-g { margin: 0; border: 0; border-radius: 0; background: transparent; border-bottom: 1px solid var(--sep); min-height: 62px; padding: 10px 16px; gap: 14px; transition: background 150ms ease; }
+.groupe > :last-child { border-bottom: 0; }
+.groupe .ligne .txt b { font-size: 15px; font-weight: 700; line-height: 1.35; }
+.groupe .ligne .n, .rang-g .n { font-size: 13px; line-height: 1.4; color: var(--doux); margin-top: 2px; }
+.groupe .ligne.nav .n, .rang-g .n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.groupe .ligne .v { font-size: 14px; font-weight: 700; }
+.rang-g { display: flex; align-items: center; width: 100%; box-sizing: border-box; text-align: left; font-size: 15px; color: var(--texte); }
+.rang-g .txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.rang-g .txt b { font-weight: 700; }
+.rang-g .n { margin-top: 0; }
+/* (l'icône : 20 px dans une pastille teintée de 36, centrée) */
+.page .ic { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: color-mix(in srgb, var(--a) 14%, transparent); }
+.page .ic svg { width: 20px; height: 20px; display: block; }
+.page .ic.img img { width: 22px; height: 22px; }
+.page .chev { color: var(--pale); flex: none; } .page .chev svg { width: 16px; height: 16px; display: block; }
+.page .etiquette { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 10px; background: var(--surface2); color: var(--doux); }
+/* (le passage, le clavier et la manette : la ligne s'éclaire, un trait de plasma à gauche) */
+.groupe > .f:hover, .groupe > .f:focus, .groupe > .f.appui { background: color-mix(in srgb, var(--P) 9%, transparent); box-shadow: inset 3px 0 0 var(--P); }
+.groupe > .f.appui { background: color-mix(in srgb, var(--P) 18%, transparent); }
+.groupes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.groupes.deux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.groupe .case { width: 24px; height: 24px; border-radius: 7px; }
+.groupe > [data-case] .txt b { font-weight: 500; }
+/* (au clavier, dans une carte qui coupe ce qui dépasse : le trait de plasma à gauche plutôt qu'un anneau autour) */
+.page .groupe .f:focus-visible, .page .faq .q:focus-visible, .page .tete-r:focus-visible, .page .tete-d:focus-visible, .page .panne-d:focus-visible { box-shadow: inset 3px 0 0 var(--P); }
+
+/* Les boutons : le principal en dégradé (la DA de la suite), les autres discrets ; l'appui se voit tout de suite */
+.page .boutons, #questionM .boutons { gap: 10px; align-items: center; margin: 0; }
+.page .btn { height: 44px; box-shadow: 0 0 16px color-mix(in srgb, var(--S) 40%, transparent); transition: transform 120ms ease-out, filter 150ms ease, background 150ms ease; }
+.page .btn:hover, .page .btn:focus { transform: none; filter: brightness(1.1); }
+.btn.appui, .carte-choix.appui, .tete-r.appui, .tete-d.appui, .panne-d.appui { transform: scale(0.97); }
+.page .btn.second, .page .btn.lien, .page .btn.discret, .page .btn.doux, .page .btn.petit-doux, .page .btn.dans-champ { box-shadow: none; }
+.page .btn.second { font-weight: 700; }
+.btn.lien, .btn.discret { height: 32px; padding: 0 2px; border-radius: 8px; background: transparent; color: var(--P); font-size: 14px; font-weight: 700; }
+.btn.discret { color: var(--doux); }
+.btn.lien:hover, .btn.lien:focus, .btn.discret:hover, .btn.discret:focus { filter: none; text-decoration: underline; text-underline-offset: 3px; }
+.btn.doux, .btn.petit-doux { height: 36px; padding: 0 14px; border-radius: 18px; background: var(--accent-doux); color: var(--texte); font-size: 14px; font-weight: 700; }
+.btn.doux svg { color: var(--P); width: 16px; height: 16px; }
+.btn.petit-doux { height: 32px; border-radius: 16px; padding: 0 14px; font-size: 13px; background: var(--surface2); border: 1px solid var(--ligne); flex: none; }
+.btn.doux:hover, .btn.doux:focus, .btn.petit-doux:hover, .btn.petit-doux:focus { filter: none; background: color-mix(in srgb, var(--P) 24%, transparent); }
+.page .boutons:has(.lien, .discret) { gap: 22px; }
+.page .boutons:has(.btn:not(.lien):not(.discret)) .lien, .page .boutons:has(.btn:not(.lien):not(.discret)) .discret { margin-left: 4px; }
+.page .btn.petit { height: 32px; padding: 0 14px; font-size: 13.5px; box-shadow: none; }
+
+/* Les réponses d'une étape : de grands boutons à bord de plasma, deux par ligne */
+.page .cartes-choix { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.page .carte-choix { display: flex; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 12px 20px; box-sizing: border-box; border-radius: 14px; transition: transform 120ms ease-out; }
+.page .carte-choix b { font-size: 17px; font-weight: 700; line-height: 1.3; }
+.page .carte-choix span { font-size: 13.5px; line-height: 1.4; }
+.page .carte-choix span:empty { display: none; }
+
+/* L'avancée en segments */
+.segments { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 4px; }
+.segments i { height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--ligne) 60%, var(--fond2)); }
+.segments i.oui { background: linear-gradient(90deg, var(--P), var(--S)); }
+
+/* Les suspects : une rangée de petites cartes, juste sous la question */
+.suspects { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.tete-s { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin: 0 4px; }
+.tete-s h2 { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--doux); letter-spacing: 0.08em; text-transform: uppercase; }
+.tete-s span { font-size: 13px; color: var(--doux); }
+.cartes-s { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.suspect { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--bord); min-height: 72px; box-sizing: border-box; }
+.suspect b { font-size: 13.5px; font-weight: 700; line-height: 1.3; }
+.suspect span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--doux); }
+.suspect i { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--pale); }
+.suspect i.ok { background: var(--vert); }
+.suspect.ecarte b { color: var(--doux); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--doux) 60%, transparent); }
+
+/* La carte de la réponse (bord de plasma) */
+.verdict { --a: var(--P); display: flex; align-items: center; gap: 20px; padding: 22px 24px; border-radius: 20px; }
+.pastille-v { width: 64px; height: 64px; flex: 0 0 64px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--a) 16%, transparent); border: 1px solid color-mix(in srgb, var(--a) 40%, transparent); color: var(--a); box-shadow: 0 0 24px color-mix(in srgb, var(--a) 25%, transparent); box-sizing: border-box; }
+.pastille-v svg { width: 32px; height: 32px; display: block; }
+.txt-v { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.verdict .sur { font-size: 12.5px; font-weight: 800; color: var(--a); letter-spacing: 0.08em; text-transform: uppercase; }
+.verdict .titre-v { font-size: 25px; line-height: 1.2; font-weight: 800; letter-spacing: var(--serre2); }
+.verdict .expl { font-size: 14px; line-height: 1.45; color: var(--doux); }
+.verdict .petit-v { font-size: 13px; color: var(--doux); }
+.droite-v { flex: none; max-width: 200px; text-align: right; font-size: 13px; line-height: 1.4; color: var(--doux); }
+.verdict.compact { gap: 16px; padding: 16px 20px; border-radius: 16px; }
+.verdict.compact .pastille-v { width: 44px; height: 44px; flex-basis: 44px; box-shadow: none; }
+.verdict.compact .pastille-v svg { width: 22px; height: 22px; }
+.verdict.compact .titre-v { font-size: 17px; line-height: 1.3; letter-spacing: 0; }
+
+/* La liste numérotée (ce qu'il faut faire), dans une carte ; la dernière ligne : le conseil pour le réparateur */
+.page .etapes { margin: 0; padding: 0; list-style: none; border-radius: 16px; background: var(--surface); border: 1px solid var(--bord); overflow: hidden; }
+.page .etapes li { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--sep); font-size: 15px; line-height: 1.45; color: var(--texte); }
+.page .etapes li:last-child { border-bottom: 0; }
+.page .etapes li::before { content: none; }
+.page .etapes .num { width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; background: linear-gradient(135deg, var(--P), var(--S)); color: var(--encre); display: grid; place-items: center; font-size: 13px; font-weight: 800; margin-top: -1px; }
+.page .etapes .ic-e { width: 26px; flex: 0 0 26px; display: grid; place-items: center; color: var(--P); }
+.page .etapes .ic-e svg { width: 22px; height: 22px; display: block; }
+.page .etapes li.conseil { background: color-mix(in srgb, var(--P) 6%, transparent); }
+.page .etapes strong { font-weight: 700; }
+
+/* Une partie repliée (« Comment Mindcare le sait ») : une ligne avec son résumé, qui s'ouvre */
+.repli { border-radius: 14px; background: var(--surface); border: 1px solid var(--bord); overflow: hidden; }
+.tete-r { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 18px; box-sizing: border-box; font-size: 15px; text-align: left; transition: background 150ms ease, transform 120ms ease-out; }
+.tete-r .t { flex: 1; min-width: 0; }
+.resume-r { font-size: 13px; color: var(--doux); }
+.tete-r .chev { transition: transform 200ms ease; }
+.tete-r:hover, .tete-r:focus { background: color-mix(in srgb, var(--P) 9%, transparent); }
+.repli.ouvert .tete-r .chev { transform: rotate(180deg); }
+.corps-r { display: none; padding: 4px 18px 16px; flex-direction: column; gap: 12px; }
+.repli.ouvert .corps-r { display: flex; }
+.corps-r .puces { margin: 0; }
+.corps-r .groupe { background: transparent; }
+
+/* Les cartes de lignes (pour le réparateur) */
+.rangs { display: flex; flex-direction: column; gap: 8px; }
+.rangs .titre-bloc { margin: 0 4px; }
+.carte-r { border-radius: 16px; background: var(--surface); border: 1px solid var(--bord); overflow: hidden; }
+.rg { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--sep); font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.rg:last-child { border-bottom: 0; }
+.rg strong { font-weight: 700; }
+.rg.qr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 160px); gap: 16px; }
+.rg.qr b { font-weight: 700; }
+.rg.kv { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; }
+.rg.kv .k { color: var(--doux); }
+.rg.vide { color: var(--doux); }
+.puce { flex: 0 0 18px; margin-top: 1px; color: var(--a); } .puce svg { width: 18px; height: 18px; display: block; }
+.puce-point { width: 8px; height: 8px; flex: 0 0 8px; margin: 6px 5px 0; border-radius: 50%; background: var(--orange); }
+.colonnes { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+/* Les cartes dépliables d'une famille : deux colonnes indépendantes, le bord de plasma sur la carte ouverte */
+.depliables { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+.depliables.deux { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.col-d { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.depliable { border-radius: 18px; }
+.tete-d { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 14px; box-sizing: border-box; border-radius: 18px; text-align: left; transition: background 150ms ease, transform 120ms ease-out; }
+.tete-d .ic { width: 34px; height: 34px; flex-basis: 34px; --a: var(--P); }
+.tete-d .ic svg { width: 19px; height: 19px; }
+.tete-d .txt { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.tete-d .txt b { font-size: 15.5px; font-weight: 700; }
+.tete-d .n { font-size: 12.5px; color: var(--doux); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tete-d .nombre { min-width: 24px; height: 24px; padding: 0 7px; box-sizing: border-box; border-radius: 12px; background: var(--surface2); color: var(--doux); font-size: 12.5px; font-weight: 700; display: grid; place-items: center; flex: none; }
+.tete-d .chev { color: var(--P); transition: transform 200ms ease; } .tete-d .chev svg { width: 18px; height: 18px; }
+.depliable.ouvert .tete-d .chev { transform: rotate(180deg); }
+.tete-d:hover, .tete-d:focus { background: color-mix(in srgb, var(--P) 9%, transparent); }
+.pannes-d { display: none; padding: 0 0 6px; }
+.depliable.ouvert .pannes-d { display: block; }
+.panne-d { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 9px 16px; box-sizing: border-box; border-top: 1px solid var(--sep); font-size: 14px; line-height: 1.35; text-align: left; color: var(--texte); transition: background 150ms ease, transform 120ms ease-out; }
+.panne-d span { flex: 1; min-width: 0; }
+.panne-d svg { width: 14px; height: 14px; flex: none; color: var(--P); }
+.panne-d:hover, .panne-d:focus { background: color-mix(in srgb, var(--P) 9%, transparent); box-shadow: inset 3px 0 0 var(--P); }
+.depliable:has(.f:focus)::before, .depliable:hover::before { opacity: 1; }
+
+/* La bande « Adapté à ton PC », la citation */
+.bande { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-radius: 14px; background: color-mix(in srgb, var(--P) 12%, transparent); border: 1px solid color-mix(in srgb, var(--P) 30%, transparent); font-size: 14px; line-height: 1.4; }
+.bande > span { flex: 1; min-width: 0; }
+.citation { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--bord); }
+.citation span { font-size: 12.5px; font-weight: 700; color: var(--doux); letter-spacing: 0.08em; text-transform: uppercase; }
+.citation b { font-size: 17px; font-weight: 700; line-height: 1.4; }
+
+/* Le champ de recherche (bord de plasma), avec son bouton (Parler) à droite */
+.page .champ-grand { display: flex; align-items: center; gap: 12px; height: 54px; padding: 0 7px 0 18px; border-radius: 16px; margin: 0; }
+.page .champ-grand label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; height: 100%; }
+.page .champ-grand svg { width: 20px; height: 20px; }
+.btn.dans-champ { height: 40px; padding: 0 14px; border-radius: 12px; background: var(--surface2); color: var(--texte); font-size: 14px; font-weight: 700; flex: none; }
+.btn.dans-champ svg { color: var(--P); width: 18px; height: 18px; }
+.btn.dans-champ:hover, .btn.dans-champ:focus { filter: none; background: color-mix(in srgb, var(--P) 22%, var(--surface2)); }
+
+/* Les questions qui s'ouvrent (Comment ça marche), dans une carte */
+.page .faq { border-radius: 16px; background: var(--surface); border: 1px solid var(--bord); overflow: hidden; }
+.page .faq .question-r { margin: 0; border-radius: 0; background: transparent; border-bottom: 1px solid var(--sep); }
+.page .faq .question-r:last-child { border-bottom: 0; }
+.page .faq .q { padding: 12px 16px; font-size: 15px; border-radius: 0; }
+.page .faq .q:hover, .page .faq .q:focus { background: color-mix(in srgb, var(--P) 9%, transparent); }
+.page .faq p { padding: 0 18px 16px 66px; font-size: 14.5px; }
+
+@media (max-width: 900px) {
+  .colonne { padding: 18px 20px 28px; }
+  .groupes.deux, .colonnes, .depliables.deux { grid-template-columns: minmax(0, 1fr); }
+  .titre-l { flex-wrap: wrap; }
+}
 @media (max-width: 980px) { .onglets { display: none; } }
 @media (max-width: 900px) { .deplie { grid-template-columns: 1fr; } .module { position: static; } .defile { padding: 16px 16px 28px; } .pastilles-o { margin-left: 0; } .tete { flex-wrap: wrap; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

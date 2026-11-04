@@ -19,6 +19,8 @@
 //                 ronds: [{ id, nom, icone, couleur }] }
 //               Les tuiles sont aussi les onglets du haut ; les ronds, les petites icônes à droite du haut.
 //               Une tuile ou un rond ouvre la page du même id si elle existe ; sinon il envoie son action.
+//   pc        : { id, texte, icone }                  la pastille « Ton PC » du haut (« Portable HP »), à droite avant
+//                                                    les ronds ; un clic envoie l'action id. Absente : pas de pastille
 //   pages     : { id: page }
 //     page    : { titre, sous, icone, couleur, parent, actions: [bouton], module, onglets | sections | blocs }
 //               parent : la page d'où l'on vient (le retour y ramène, son onglet reste allumé, « Parent › Titre »)
@@ -30,6 +32,12 @@
 //                         un onglet qui a son module remplace celui de la page tant qu'il est choisi
 //               sections : l'ancien format ({ nom, blocs }), montré en sous-onglets
 //               retour: 'appli' : B est envoyé à l'appli (action 'retour') au lieu de revenir en arrière
+//               chemin : [textes] le fil d'Ariane au-dessus du titre (« Plantages › Il redémarre tout seul ») ; sans
+//                        chemin, une page avec un parent montre « Parent › Titre » ; etape : le texte à droite du fil
+//                        (« Étape 2 sur 5 ») ; forme : 'question' (le titre est la question, en grand sur toute la
+//                        largeur) | 'carte' (pas de grand titre : la première carte de la page en tient lieu) ;
+//                        focus : le data-k de l'élément choisi à l'ouverture de la page (sinon le premier) ;
+//                        icone : une pastille avec cette icône devant le titre
 //            ou { titre, question: { etape, texte, choix: [{ id, texte }] } } une question à la fois
 //            ou { titre, resultat: { etape, titre, badge, nom, texte, boutons: [bouton] } }
 //     bloc    : { type: 'titre', texte, droite, direct }      un titre de bloc (direct : la pastille « En direct »)
@@ -62,7 +70,31 @@
 //               { type: 'reseau', centre, appareils: [{ nom, icone, couleur, ping, attention, nouveau }] }   le système
 //                 solaire : la box au centre, les appareils en orbite d'autant plus proche qu'ils répondent vite
 //               { type: 'apercu', coin, style, fps, id }   l'aperçu de l'overlay ; un clic sur un coin envoie id avec le coin
-//               { type: 'etapes', elements: [{ texte, fait }] }
+//               { type: 'etapes', elements: [{ texte, fait, titre, icone }] }   une liste numérotée dans une carte ;
+//                 un élément avec une icône (le conseil pour le réparateur...) la montre à la place du numéro
+//               Les lignes, cases et bascules qui se suivent sont rangées dans une même carte (une liste groupée).
+//               { type: 'groupe', colonnes: 1 | 2, elements: [{ id, titre, texte, icone, couleur, etiquette }] }
+//                 une liste groupée de choix (icône dans une pastille, titre, phrase sur une ligne, chevron) ; en
+//                 deux colonnes, la première moitié à gauche
+//               { type: 'bande', texte, bouton: { id, texte } }    une bande d'information discrète, avec son bouton
+//               { type: 'segments', valeur, sur }                  l'avancée en segments (2 sur 5)
+//               { type: 'suspects', titre, droite, elements: [{ nom, etat, ton }] }   une rangée de petites cartes
+//               { type: 'verdict', icone, couleur, surtitre, titre, texte, petit, droite, compact }   la carte d'une
+//                 réponse : une pastille ronde avec son icône, un sur-titre en capitales, la conclusion, une explication
+//               { type: 'repli', titre, resume, blocs }            une partie repliée (une ligne avec son résumé)
+//               { type: 'rangs', titre, forme: 'liste' | 'qr' | 'kv', rangs: [{ puce, gras, texte, cle, valeur }],
+//                 note }   une carte de lignes : puce 'coche' | 'croix' | 'point' | 'alerte' | 'ok' ; qr : une question
+//                 et sa réponse ; kv : un nom et sa valeur ; note : la phrase montrée quand il n'y a aucune ligne
+//               { type: 'colonnes', elements: [{ blocs }, { blocs }] }   deux colonnes de blocs (la gauche plus large)
+//               { type: 'citation', titre, texte }                 ce que la personne a écrit, dans une carte
+//               { type: 'petit', texte }                           une petite ligne discrète (une consigne)
+//               { type: 'depliables', id, elements: [{ id, titre, texte, icone, secours, nombre, ouvert,
+//                 pannes: [{ id, texte }] }] }   des cartes qui se déplient, en deux colonnes indépendantes (une carte
+//                 dépliée n'allonge que sa colonne) ; plusieurs peuvent être ouvertes (ouvert : au départ) ; une ligne
+//                 d'une carte envoie son action. Icône inconnue du kit : celle de « secours ».
+//               champ : bouton { id, texte, icone } dans le champ, à droite (le bouton Parler)
+//               bouton : style 'second' | 'danger' | 'lien' (un lien) | 'discret' (un lien gris) | 'doux' (une
+//                 pastille douce) | 'principal'
 //   Images : un fichier du dossier ui, https://images.local/<fichier>, ou https://fichier.local/<jeton> (Get-ImageVue)
 //   ecran     : id d'une page pour y aller tout de suite (ou 'accueil')
 //   focus     : l'élément à choisir (« t:<id> » une tuile, « l:<id> » une ligne...), par exemple au retour
@@ -160,6 +192,18 @@
     retour: '<path d="M15 5l-7 7 7 7"/>',
     croix: '<path d="M6 6l12 12M18 6 6 18"/>',
     coche: '<path d="M5 12l5 5 9-10"/>',
+    // (les familles de pannes et les pages de l'enquête)
+    voyants: '<rect x="4" y="7" width="16" height="10" rx="1.5"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>',
+    demarrage: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M9 20h6M12 16v4M9 10.5l2 2 4-4"/>',
+    moniteur: '<rect x="3" y="5" width="18" height="12" rx="1.5"/><path d="M8 21h8M12 17v4"/>',
+    thermo: '<path d="M10 14V5a2 2 0 1 1 4 0v9a4 4 0 1 1-4 0z"/>',
+    batterie: '<rect x="3" y="8" width="15" height="8" rx="1.5"/><path d="M21 11v2M6.5 11v2"/>',
+    souris: '<rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v4"/>',
+    cle: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+    etincelle: '<path d="M12 3l1.8 4.7L18 9.5l-4.2 1.8L12 16l-1.8-4.7L6 9.5l4.2-1.8z"/>',
+    micro: '<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    question: '<path d="M9.2 9a3 3 0 0 1 5.6 1c0 2-3 2.5-3 4.5M12 18h.01"/>',
+    bas: '<path d="M6 9l6 6 6-6"/>',
   };
   window.kitIcones = I;   // (plasma.js dessine les icônes des tuiles avec)
   const ico = (n, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || I.etoile}</svg>`;
@@ -176,7 +220,7 @@
   const borne = (v, a, b) => Math.max(a, Math.min(b, v));
   // Une liste d'un seul élément envoyée par PowerShell arrive souvent sans ses crochets (un objet seul) : tout champ qui
   // doit être une liste est remis en liste, à tous les niveaux, dès l'arrivée de l'état
-  const LISTES = new Set(['tuiles', 'ronds', 'blocs', 'onglets', 'sections', 'elements', 'rangs', 'boutons', 'resume', 'options', 'appareils', 'actions', 'choix', 'points', 'bascules', 'touches', 'quand']);
+  const LISTES = new Set(['tuiles', 'ronds', 'blocs', 'onglets', 'sections', 'elements', 'rangs', 'boutons', 'resume', 'options', 'appareils', 'actions', 'choix', 'points', 'bascules', 'touches', 'quand', 'chemin']);
   function normaliser(o) {
     if (Array.isArray(o)) { o.forEach(normaliser); return o; }
     if (!o || typeof o !== 'object') return o;
@@ -234,7 +278,7 @@
   // ---------------------------------------------------------------- l'état
   const ecran = document.getElementById('ecran'), haut = document.getElementById('haut');
   let E = { app: { nom: '' }, accueil: { tuiles: [], ronds: [] }, pages: {} };
-  const nav = { ecran: 'accueil', onglets: {}, sel: 0 };   // onglets : les pastilles choisies, par page
+  const nav = { ecran: 'accueil', onglets: {}, sel: 0, deplies: {} };   // deplies : les cartes ouvertes, par page   // onglets : les pastilles choisies, par page
   let enAttente = false;    // un nouvel état arrivé pendant qu'on tape dans un champ
   const plasma = () => (window.kitPlasma?.ok ? window.kitPlasma : null);
 
@@ -286,7 +330,7 @@
     else {
       if (!st) { st = document.createElement('style'); st.id = 'policePack'; document.head.appendChild(st); }
       st.textContent = `@font-face { font-family: "PolicePack"; src: url('${pu}'); }
-        ${p.police.partout ? 'body' : '.marque, .nom-sel, h1, h3, .module .grand, .question h2'} { font-family: "PolicePack", var(--police-app); }`;
+        ${p.police.partout ? 'body' : '.marque, .nom-sel, h1, h3, .module .grand, .question h2, .verdict .titre-v'} { font-family: "PolicePack", var(--police-app); }`;
     }
     const c = p.console || null, mc = urlSure(c?.mascotte?.url);
     // Nouvelle interface : la mascotte quitte le haut pour un coin de l'accueil ; sinon elle reste (ou revient) en haut
@@ -345,11 +389,14 @@
     // (pas de phrase d'accueil à côté du nom : la barre garde sa place pour les onglets)
     document.getElementById('titreTexte').innerHTML = esc(a.nom);
     const r = racine(nav.ecran), t = E.accueil?.tuiles || [], ronds = E.accueil?.ronds || [];
-    const cle = JSON.stringify([t.map((x) => [x.id, x.nom, x.alerte]), ronds.map((x) => [x.id, x.nom, x.icone]), r]);
+    const pc = E.pc && E.pc.texte && E.pc.id ? E.pc : null;
+    const cle = JSON.stringify([t.map((x) => [x.id, x.nom, x.alerte]), ronds.map((x) => [x.id, x.nom, x.icone]), r, pc && [pc.id, pc.texte, pc.icone]]);
     if (haut.dataset.cle !== cle) {
       haut.dataset.cle = cle;
       document.getElementById('onglets').innerHTML = t.map((x, i) => `<button type="button" class="onglet f${x.id === r ? ' actif' : ''}" data-k="h:${esc(x.id)}" data-tuile="${i}">${esc(x.nom)}${x.alerte ? '<i class="point"></i>' : ''}</button>`).join('');
-      document.getElementById('rondsHaut').innerHTML = ronds.map((x, i) => `<button type="button" class="rond f${x.id === r ? ' actif' : ''}" data-k="r:${esc(x.id)}" data-rond="${i}" title="${esc(x.nom)}" aria-label="${esc(x.nom)}" style="--a:${couleur(x.couleur)}">${ico(x.icone, 1.8)}</button>`).join('');
+      // (« Ton PC » : une pastille avant les ronds, qui envoie son action)
+      const pastillePc = pc ? `<button type="button" class="onglet pc f" data-k="pc" data-action="${esc(pc.id)}" title="Ton PC">${ico(I[pc.icone] ? pc.icone : 'pc', 2)}<span>${esc(pc.texte)}</span></button>` : '';
+      document.getElementById('rondsHaut').innerHTML = pastillePc + ronds.map((x, i) => `<button type="button" class="rond f${x.id === r ? ' actif' : ''}" data-k="r:${esc(x.id)}" data-rond="${i}" title="${esc(x.nom)}" aria-label="${esc(x.nom)}" style="--a:${couleur(x.couleur)}">${ico(x.icone, 1.8)}</button>`).join('');
     }
     const cnx = E.connexion && CONNEXIONS[E.connexion] ? `<span class="cnx" title="${CONNEXIONS[E.connexion]}">${ico(E.connexion)}</span>` : '';
     document.getElementById('etatHaut').innerHTML = `${cnx}<span class="hh">${heure()}</span>`;
@@ -402,7 +449,10 @@
   const fleche = () => `<span class="chev">${ico('fleche', 2)}</span>`;
   const icone = (n, c) => (n ? `<span class="ic" style="--a:${couleur(c)}">${ico(n, 1.7)}</span>` : '');
   const etiq = (t, ton) => (t ? `<span class="etiquette${ton ? ` ${esc(ton)}` : ''}">${esc(t)}</span>` : '');
-  const btn = (b, cls = '') => `<button type="button" class="btn f${b.style ? ` ${esc(b.style)}` : ''}${cls}" data-k="o:${esc(b.id)}" data-action="${esc(b.id)}"${b.valeur != null ? ` data-valeur="${esc(b.valeur)}"` : ''}>${b.icone ? ico(b.icone) : ''}${esc(b.texte)}</button>`;
+  const btn = (b, cls = '') => `<button type="button" class="btn f${b.style ? ` ${esc(b.style)}` : ''}${cls}" data-k="o:${esc(b.id)}${b.valeur != null ? `:${esc(b.valeur)}` : ''}" data-action="${esc(b.id)}"${b.valeur != null ? ` data-valeur="${esc(b.valeur)}"` : ''}>${b.icone ? ico(b.icone) : ''}${esc(b.texte)}</button>`;
+  // Les puces des cartes de lignes (rangs) : une coche, une croix, un point, une alerte
+  const PUCES = { coche: ['coche', 'vert'], croix: ['croix', 'doux'], alerte: ['alerte', 'orange'], ok: ['ok', 'vert'] };
+  const puce = (p) => (p === 'point' ? '<span class="puce-point"></span>' : PUCES[p] ? `<span class="puce" style="--a:var(--${PUCES[p][1]})">${ico(PUCES[p][0], 2.2)}</span>` : '');
   const bascule = (id, oui) => `<button type="button" class="bascule f${oui ? ' oui' : ''}" data-k="b:${esc(id)}" data-bascule="${esc(id)}" role="switch" aria-checked="${!!oui}"></button>`;
   const caseC = (id, oui, valeur) => `<button type="button" class="case f${oui ? ' oui' : ''}" data-k="x:${esc(id)}:${esc(valeur ?? '')}" data-case="${esc(id)}"${valeur != null ? ` data-valeur="${esc(valeur)}"` : ''} role="checkbox" aria-checked="${!!oui}">${ico('coche', 3)}</button>`;
   const barre = (v, ton) => `<span class="flux${ton ? ` ${esc(ton)}` : ''}"><i style="width:${borne(+v || 0, 0, 100)}%"></i></span>`;
@@ -456,7 +506,7 @@
         const debut = `${b.case ? caseC(b.case.id, b.case.oui, b.case.valeur) : ''}${b.quand ? `<span class="quand"><b>${esc(b.quand[0])}</b>${esc(b.quand[1] || '')}</span>` : ''}${img}`;
         const milieu = `<span class="txt"><b${b.brut ? ' data-brut="1"' : ''}>${esc(b.texte)}</b>${note}</span>`;
         const fin = `${b.barre != null ? barre(b.barre, b.ton) : ''}${etiq(b.etiquette, b.ton)}${b.valeur != null && b.valeur !== '' ? `<span class="v${b.ton ? ` ${esc(b.ton)}` : ''}">${esc(b.valeur)}</span>` : ''}${b.bascule ? bascule(b.bascule.id, b.bascule.oui) : ''}${(b.bascules || []).map((x) => `<span class="bascule-l">${esc(x.texte)}${bascule(x.id, x.oui)}</span>`).join('')}${b.bouton ? btn(b.bouton, ' petit') : ''}`;
-        const cls = `ligne plaque${b.fait ? ' fait' : ''}${b.boutons?.length ? ' avec-btns' : ''}`;
+        const cls = `ligne plaque${b.fait ? ' fait' : ''}${b.boutons?.length ? ' avec-btns' : ''}${b.id && !interne ? ' nav' : ''}`;
         if (b.id && !interne) return `<button type="button" class="${cls} f" data-k="l:${esc(b.id)}" data-action="${esc(b.id)}">${debut}${milieu}<span class="fin">${fin}${fleche()}</span></button>`;
         // (boutons : une rangée de petits boutons sous le texte, dans la même carte)
         const btns = b.boutons?.length ? `<span class="btns">${b.boutons.map((x) => btn(x, ' petit')).join('')}</span>` : '';
@@ -466,7 +516,7 @@
       case 'case': return `<button type="button" class="ligne plaque f" data-k="x:${esc(b.id)}:${esc(b.valeur ?? '')}" data-case="${esc(b.id)}"${b.valeur != null ? ` data-valeur="${esc(b.valeur)}"` : ''} role="checkbox" aria-checked="${!!b.oui}"><span class="case${b.oui ? ' oui' : ''}">${ico('coche', 3)}</span><span class="txt"><b>${esc(b.texte)}</b>${note}</span>${b.droite ? `<span class="fin"><span class="v">${esc(b.droite)}</span></span>` : ''}</button>`;
       case 'bouton': return btn(b);
       case 'champ': return b.recherche
-        ? `<label class="champ-grand plaque">${ico('loupe')}<input class="champ f" data-k="c:${esc(b.id)}" data-champ="${esc(b.id)}" data-direct="1" value="${esc(b.valeur)}" placeholder="${esc(b.indice || b.texte)}"></label>`
+        ? `<div class="champ-grand plaque"><label>${ico('loupe')}<input class="champ f" data-k="c:${esc(b.id)}" data-champ="${esc(b.id)}" data-direct="1" value="${esc(b.valeur)}" placeholder="${esc(b.indice || b.texte)}" aria-label="${esc(b.texte || b.indice)}"></label>${b.bouton ? btn(b.bouton, ' dans-champ') : ''}</div>`
         : `<label class="ligne plaque"><span class="txt"><b>${esc(b.texte)}</b>${note}</span><input class="champ f" data-k="c:${esc(b.id)}" data-champ="${esc(b.id)}" value="${esc(b.valeur)}" placeholder="${esc(b.indice)}"></label>`;
       case 'choix': return `<div class="choix-p" role="radiogroup">${(b.options || []).map((o) => `<button type="button" class="f${o.id === b.valeur ? ' oui' : ''}" data-k="p:${esc(b.id)}:${esc(o.id)}" data-action="${esc(b.id)}" data-valeur="${esc(o.id)}" data-choix="1" role="radio" aria-checked="${o.id === b.valeur}">${esc(o.texte)}</button>`).join('')}</div>`;
       case 'cartes': return `<div class="cartes-choix">${(b.options || []).map((o) => `<button type="button" class="carte-choix plaque f${o.id === b.valeur ? ' oui' : ''}" data-k="p:${esc(b.id)}:${esc(o.id)}" data-action="${esc(b.id)}" data-valeur="${esc(o.id)}" data-choix="1"><b>${esc(o.titre)}</b><span>${esc(o.texte)}</span></button>`).join('')}</div>`;
@@ -525,7 +575,59 @@
         const coins = ['haut-gauche', 'haut-droite', 'bas-gauche', 'bas-droite'];
         return `<div class="apercu"><div class="scene-jeu">${coins.map((c) => `<button type="button" class="coin f ${c}${c === b.coin ? ' choisi' : ''}" data-k="c:${c}" data-action="${esc(b.id)}" data-valeur="${c}" aria-label="Mettre le compteur ${c.replace('-', ' à ')}">${c === b.coin ? `<span class="compteur ${esc(b.style || 'complet')}"><b>${esc(b.fps ?? 144)}<small>FPS</small></b>${b.style === 'discret' || !b.detail ? '' : `<i>${esc(b.detail)}</i>`}</span>` : '<span class="placer">Placer ici</span>'}</button>`).join('')}</div>${b.legende ? `<p class="legende">${esc(b.legende)}</p>` : ''}</div>`;
       }
-      case 'etapes': return `<ol class="etapes">${(b.elements || []).map((x) => `<li class="${x.fait ? 'fait' : ''}">${esc(x.texte)}</li>`).join('')}</ol>`;
+      case 'etapes': {
+        let n = 0;
+        return `<ol class="etapes">${(b.elements || []).map((x) => {
+          const debut = x.icone ? `<span class="ic-e">${ico(x.icone, 2)}</span>` : `<span class="num">${++n}</span>`;
+          return `<li class="${x.fait ? 'fait' : ''}${x.icone ? ' conseil' : ''}">${debut}<span>${x.titre ? `<strong>${esc(x.titre)}</strong> ` : ''}${esc(x.texte)}</span></li>`;
+        }).join('')}</ol>`;
+      }
+      case 'groupe': {
+        const l = b.elements || [], deux = b.colonnes === 2 && l.length > 1, moitie = deux ? Math.ceil(l.length / 2) : l.length;
+        const rang = (x) => `<button type="button" class="rang-g f" data-k="l:${esc(x.id)}" data-action="${esc(x.id)}">${x.icone ? `<span class="ic" style="--a:${couleur(x.couleur)}">${ico(x.icone, 2)}</span>` : ''}<span class="txt"><b>${esc(x.titre)}</b>${x.texte ? `<span class="n">${esc(x.texte)}</span>` : ''}</span>${etiq(x.etiquette)}${fleche()}</button>`;
+        const carte = (xs) => `<div class="groupe">${xs.map(rang).join('')}</div>`;
+        return `<div class="groupes${deux ? ' deux' : ''}">${carte(l.slice(0, moitie))}${deux ? carte(l.slice(moitie)) : ''}</div>`;
+      }
+      case 'bande': return `<div class="bande"><span>${esc(b.texte)}</span>${b.bouton ? btn({ ...b.bouton, style: 'petit-doux' }) : ''}</div>`;
+      case 'segments': {
+        const sur = borne(Math.round(+b.sur) || 1, 1, 60), v = borne(Math.round(+b.valeur) || 0, 0, sur);
+        return `<div class="segments" role="progressbar" aria-valuemin="0" aria-valuemax="${sur}" aria-valuenow="${v}" style="--n:${sur}">${Array.from({ length: sur }, (_, i) => `<i${i < v ? ' class="oui"' : ''}></i>`).join('')}</div>`;
+      }
+      case 'suspects': return `<section class="suspects"><div class="tete-s"><h2>${esc(b.titre)}</h2>${b.droite ? `<span>${esc(b.droite)}</span>` : ''}</div>
+        <div class="cartes-s">${(b.elements || []).map((x) => `<div class="suspect${x.ton === 'ok' ? ' ecarte' : ''}"><b>${esc(x.nom)}</b><span><i class="${x.ton ? esc(x.ton) : ''}"></i>${esc(x.etat)}</span></div>`).join('')}</div></section>`;
+      case 'verdict': return `<section class="verdict plasma-bord${b.compact ? ' compact' : ' fort'}" style="--a:${couleur(b.couleur)}"><span class="pastille-v">${ico(I[b.icone] ? b.icone : 'ok', 2)}</span>
+        <span class="txt-v">${b.petit ? `<span class="petit-v">${esc(b.petit)}</span>` : ''}${b.surtitre ? `<span class="sur">${esc(b.surtitre)}</span>` : ''}<span class="titre-v">${esc(b.titre)}</span>${b.texte ? `<span class="expl">${esc(b.texte)}</span>` : ''}</span>
+        ${b.droite ? `<span class="droite-v">${esc(b.droite)}</span>` : ''}</section>`;
+      case 'repli': return `<div class="repli"><button type="button" class="tete-r f" data-k="r:${esc(b.titre)}" data-ouvrir="1" aria-expanded="false"><span class="t">${esc(b.titre)}</span>${b.resume ? `<span class="resume-r">${esc(b.resume)}</span>` : ''}<span class="chev">${ico('bas', 2)}</span></button><div class="corps-r">${blocs(b.blocs)}</div></div>`;
+      case 'rangs': {
+        const forme = b.forme === 'qr' || b.forme === 'kv' ? b.forme : 'liste';
+        const rangs = (b.rangs || []).map((x) => {
+          if (forme === 'qr') return `<div class="rg qr"><span>${esc(x.texte)}</span><b>${esc(x.valeur)}</b></div>`;
+          if (forme === 'kv') return `<div class="rg kv"><span class="k">${esc(x.cle)}</span><span>${esc(x.valeur)}</span></div>`;
+          const t = x.gras ? `<strong>${esc(x.gras)}</strong>${x.texte ? ` : ${esc(x.texte)}` : ''}` : esc(x.texte);
+          return `<div class="rg">${puce(x.puce)}<span>${t}</span></div>`;
+        }).join('');
+        return `<section class="rangs">${b.titre ? `<h2 class="titre-bloc">${esc(b.titre)}</h2>` : ''}<div class="carte-r">${rangs || `<div class="rg vide">${esc(b.note)}</div>`}</div></section>`;
+      }
+      case 'colonnes': return `<div class="colonnes">${(b.elements || []).slice(0, 2).map((c) => `<div class="col">${blocs(c.blocs)}</div>`).join('')}</div>`;
+      case 'citation': return `<div class="citation">${b.titre ? `<span>${esc(b.titre)}</span>` : ''}<b>${esc(b.texte)}</b></div>`;
+      case 'petit': return `<p class="ligne-petite">${esc(b.texte)}</p>`;
+      case 'depliables': {
+        // (ouvertes : celles choisies sur cette page ; à la première vue, celles que l'appli dit ouvertes)
+        const cle = `${nav.ecran}:${b.id || ''}`, l = b.elements || [];
+        const ouv = nav.deplies[cle] || (nav.deplies[cle] = new Set(l.filter((x) => x.ouvert).map((x) => String(x.id))));
+        const carte = (x) => {
+          const o = ouv.has(String(x.id)), icone = I[x.icone] ? x.icone : I[x.secours] ? x.secours : 'liste';
+          return `<section class="depliable plaque${o ? ' oui ouvert' : ''}" data-carte="${esc(x.id)}">
+            <button type="button" class="tete-d f" data-k="d:${esc(x.id)}" data-deplier="${esc(cle)}" data-carte-id="${esc(x.id)}" aria-expanded="${o}">
+              <span class="ic">${ico(icone, 2)}</span><span class="txt"><b>${esc(x.titre)}</b>${x.texte ? `<span class="n">${esc(x.texte)}</span>` : ''}</span>
+              ${x.nombre != null ? `<span class="nombre">${esc(x.nombre)}</span>` : ''}<span class="chev">${ico('bas', 2)}</span></button>
+            <div class="pannes-d">${(x.pannes || []).map((p) => `<button type="button" class="panne-d f" data-k="l:${esc(p.id)}" data-action="${esc(p.id)}"><span>${esc(p.texte)}</span>${ico('fleche', 2.2)}</button>`).join('')}</div></section>`;
+        };
+        // (deux colonnes indépendantes : une carte sur deux à gauche, les autres à droite)
+        const cols = [l.filter((_, i) => i % 2 === 0), l.filter((_, i) => i % 2 === 1)].filter((c) => c.length);
+        return `<div class="depliables${cols.length > 1 ? ' deux' : ''}">${cols.map((c) => `<div class="col-d">${c.map(carte).join('')}</div>`).join('')}</div>`;
+      }
       case 'mois': {
         const a = b.annee | 0, m = b.mois | 0; if (!a || m < 1 || m > 12) return '';
         const premier = (new Date(a, m - 1, 1).getDay() + 6) % 7, n = new Date(a, m, 0).getDate(), j0 = new Date();
@@ -542,15 +644,24 @@
       default: return '';
     }
   }
-  function blocs(liste) {   // les boutons qui se suivent sont rangés sur une même ligne
-    let h = '', bt = '';
+  // Les boutons qui se suivent sont rangés sur une même ligne ; les lignes, cases et bascules qui se suivent, dans une
+  // même carte (une liste groupée)
+  const EN_GROUPE = new Set(['ligne', 'case', 'bascule']);
+  function blocs(liste) {
+    let h = '', bt = '', gr = '';
+    const fermer = () => {
+      if (bt) { h += `<div class="boutons">${bt}</div>`; bt = ''; }
+      if (gr) { h += `<div class="groupe">${gr}</div>`; gr = ''; }
+    };
     for (const b of liste || []) {
       if (!b) continue;
-      if (b.type === 'bouton') { bt += bloc(b); continue; }
-      if (bt) { h += `<div class="boutons">${bt}</div>`; bt = ''; }
+      if (b.type === 'bouton') { if (gr) fermer(); bt += bloc(b); continue; }
+      if (EN_GROUPE.has(b.type)) { if (bt) fermer(); gr += bloc(b); continue; }
+      fermer();
       h += bloc(b);
     }
-    return h + (bt ? `<div class="boutons">${bt}</div>` : '');
+    fermer();
+    return h;
   }
 
   // ---------------------------------------------------------------- une page : en-tête, pastilles, module déplié
@@ -589,22 +700,32 @@
     enTete();
     if (p.question || p.resultat) { question(p, focus); return; }
     const garde = !premiere && ecran.querySelector('.page')?.dataset.id === nav.ecran ? ecran.querySelector('.defile')?.scrollTop : 0;
+    if (premiere) for (const k of Object.keys(nav.deplies)) if (k.startsWith(`${nav.ecran}:`)) delete nav.deplies[k];
     const parent = p.parent && E.pages?.[p.parent];
     // (la même page redessinée : ses barres glissent de leur largeur d'avant vers la nouvelle, au lieu de sauter)
     const largeurs = !premiere && ecran.querySelector('.page')?.dataset.id === nav.ecran ? [...ecran.querySelectorAll('.flux i')].map((x) => x.style.width) : null;
-    ecran.innerHTML = `<div class="page${premiere ? ' entree' : ''}" data-id="${esc(nav.ecran)}"><div class="defile">
-      <div class="tete"><button type="button" class="retour f" data-k="retour" data-retour="1" title="Retour" aria-label="Retour">${ico('retour', 2.2)}</button>
-        ${p.icone ? `<span class="ic-page plasma-bord fort" style="--a:${couleur(p.couleur)}">${ico(p.icone, 1.6)}</span>` : ''}
-        <div class="titres">${parent ? `<div class="chemin">${esc(parent.titre)} › <b>${esc(p.titre)}</b></div>` : ''}<h1>${esc(p.titre)}</h1>${p.sous ? `<p>${esc(p.sous)}</p>` : ''}</div>
-        <div class="actions">${(p.actions || []).map((b) => btn({ ...b, style: b.style || 'second' })).join('')}</div></div>
-      <div id="corps"></div></div></div>`;
+    // Le fil d'Ariane (avec le bouton Retour) : le chemin de la page, ou « Parent › Titre » ; rien pour une page du haut
+    const chemin = p.chemin?.length ? p.chemin : parent ? [parent.titre, p.titre] : null;
+    const avecFil = !!(chemin || p.retour || p.etape);
+    const fil = avecFil ? `<div class="fil"><button type="button" class="retour f" data-k="retour" data-retour="1" title="Retour" aria-label="Retour">${ico('retour', 2.2)}</button>
+        ${(chemin || []).map((c, i, l) => `<span class="${i === l.length - 1 ? 'ici' : ''}">${esc(c)}</span>`).join('<span class="sep" aria-hidden="true">›</span>')}
+        ${p.etape ? `<span class="etape-p">${esc(p.etape)}</span>` : ''}</div>` : '';
+    const forme = p.forme === 'question' || p.forme === 'carte' ? p.forme : '';
+    const actions = (p.actions || []).map((b) => btn({ ...b, style: b.style || 'second' })).join('');
+    // (l'avancée en segments, quand la page commence par elle : entre le fil et le titre)
+    const avancee = p.blocs?.[0]?.type === 'segments' && !ongletsDe(p) ? bloc(p.blocs[0]) : '';
+    ecran.innerHTML = `<div class="page${premiere ? ' entree' : ''}${forme ? ` forme-${forme}` : ''}" data-id="${esc(nav.ecran)}"><div class="defile"><div class="colonne">
+      <div class="tete">${fil}${avancee}
+        <div class="titre-l">${p.icone && forme !== 'question' ? `<span class="ic-titre">${ico(I[p.icone] ? p.icone : 'liste', 2)}</span>` : ''}<div class="titres"><h1>${esc(p.titre)}</h1>${p.sous ? `<p>${esc(p.sous)}</p>` : ''}</div>
+        ${actions ? `<div class="actions">${actions}</div>` : ''}</div></div>
+      <div id="corps"></div></div></div></div>`;
     corps();
     if (largeurs) ecran.querySelectorAll('.flux i').forEach((x, k) => {
       const fin = x.style.width; if (largeurs[k] == null || largeurs[k] === fin) return;
       x.style.transition = 'none'; x.style.width = largeurs[k]; void x.offsetWidth; x.style.transition = ''; x.style.width = fin;
     });
     if (garde) { const c = ecran.querySelector('.defile'); if (c) c.scrollTop = garde; }
-    const cible = (focus && ecran.querySelector(`[data-k="${CSS.escape(focus)}"]`)) || (premiere ? ecran.querySelector('.pastilles-o .oui, .module .btn, #corps .f') : null);
+    const cible = (focus && ecran.querySelector(`[data-k="${CSS.escape(focus)}"]`)) || (premiere ? (p.focus && ecran.querySelector(`[data-k="${CSS.escape(String(p.focus))}"]`)) || ecran.querySelector('.pastilles-o .oui, .module .btn, #corps .f') : null);
     cible?.focus({ preventScroll: true });
   }
   function corps() {
@@ -620,7 +741,10 @@
         tete2 = `${o.texte ? `<p class="texte">${esc(o.texte)}</p>` : ''}${pastilles(o.onglets, ch[1], 1)}`;
         contenu = [...(o.onglets[ch[1]].blocs || [])]; propre = o.onglets[ch[1]].module || o.module;
       } else { contenu = [...(o.blocs || [])]; propre = o.module; }
-    } else contenu = [...(p.blocs || p.sections?.[0]?.blocs || [])];
+    } else {
+      contenu = [...(p.blocs || p.sections?.[0]?.blocs || [])];
+      if (contenu[0]?.type === 'segments') contenu.shift();   // (dans l'en-tête de la page)
+    }
     const m = propre || moduleDe(p, contenu);
     el.innerHTML = `${tete}<div class="deplie${m ? '' : ' sans-module'}">${m ? module(m) : ''}<section class="contenu">${tete2}${blocs(contenu)}</section></div>`;
   }
@@ -677,7 +801,13 @@
       son.tic(); ch[n] = i; if (n === 0) ch[1] = 0;
       corps(); document.querySelector(`[data-onglet="${n}:${i}"]`)?.focus({ preventScroll: true }); return;
     }
-    if (d.ouvrir) { el.parentElement.classList.toggle('ouvert'); son.tic(); return; }
+    if (d.deplier) {
+      const s = el.closest('.depliable'), o = !s.classList.contains('ouvert'), ens = nav.deplies[d.deplier] || (nav.deplies[d.deplier] = new Set());
+      s.classList.toggle('ouvert', o); s.classList.toggle('oui', o); el.setAttribute('aria-expanded', String(o));
+      if (o) ens.add(d.carteId); else ens.delete(d.carteId);
+      son.tic(); return;
+    }
+    if (d.ouvrir) { const o = el.parentElement.classList.toggle('ouvert'); el.setAttribute('aria-expanded', String(o)); son.tic(); return; }
     if (d.bascule) {   // on bascule tout de suite à l'écran, l'appli confirme avec son prochain état
       const b = el.classList.contains('bascule') ? el : el.querySelector('.bascule'), oui = !b.classList.contains('oui');
       b.classList.toggle('oui', oui); el.setAttribute('aria-checked', String(oui)); son.bascule(); action(d.bascule, oui); return;
@@ -714,6 +844,13 @@
   ecran.addEventListener('input', (e) => { const el = e.target; if (!el.dataset?.direct) return; clearTimeout(tape); tape = setTimeout(() => { el.defaultValue = el.value; action(el.dataset.champ, el.value); }, 280); });
   document.addEventListener('pointerover', (e) => { const el = e.target.closest?.('#ecran .f, #haut .f'); if (el && el !== document.activeElement && el.tagName !== 'INPUT' && document.activeElement?.tagName !== 'INPUT') el.focus({ preventScroll: true }); });
   document.addEventListener('click', (e) => { const el = e.target.closest?.('#ecran .f, #haut .f'); if (el && el.tagName !== 'INPUT') valider(el); });
+  // (l'appui se voit tout de suite, avant le relâchement : la classe « appui » le temps du geste)
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest?.('#ecran .f, #haut .f'); if (!el) return;
+    el.classList.add('appui');
+    const fin = () => { el.classList.remove('appui'); removeEventListener('pointerup', fin, true); removeEventListener('pointercancel', fin, true); };
+    addEventListener('pointerup', fin, true); addEventListener('pointercancel', fin, true);
+  });
   document.getElementById('aideA').addEventListener('click', () => { if (nav.ecran === 'accueil' && plasma()) ouvrirTuile(nav.sel); else valider(document.activeElement?.closest?.('.f')); });
   document.getElementById('aideB').addEventListener('click', retour);
   // Le logo et le nom ramènent à l'accueil, de n'importe quelle page
@@ -727,7 +864,11 @@
       if (e === cur) continue;
       const b = e.getBoundingClientRect(), dx = b.left + b.width / 2 - ax, dy = b.top + b.height / 2 - ay;
       if ((dir === 'd' && dx <= 6) || (dir === 'g' && dx >= -6) || (dir === 'b' && dy <= 6) || (dir === 'h' && dy >= -6)) continue;
-      const horiz = dir === 'd' || dir === 'g', d = (horiz ? Math.abs(dx) : Math.abs(dy)) + (horiz ? Math.abs(dy) : Math.abs(dx)) * 2.5;
+      const horiz = dir === 'd' || dir === 'g';
+      // (d'abord ce qui est sur la même ligne, ou la même colonne : « Non » à droite de « Oui » plutôt que le lien
+      // en dessous, la carte du dessous dans la même colonne)
+      const aligne = horiz ? b.top < a.bottom - 2 && b.bottom > a.top + 2 : b.left < a.right - 2 && b.right > a.left + 2;
+      const d = (horiz ? Math.abs(dx) : Math.abs(dy)) + (horiz ? Math.abs(dy) : Math.abs(dx)) * 2.5 + (aligne ? 0 : 100000);
       if (d < bd) { bd = d; best = e; }
     }
     if (best) { best.focus({ preventScroll: true }); best.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }

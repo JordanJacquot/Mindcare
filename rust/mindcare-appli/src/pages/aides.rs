@@ -232,18 +232,20 @@ pub fn ligne_assistant(a: &Aides) -> Option<Value> {
     Some(ligne("aide", "T", x::LIGNE_ASSISTANT, note, bouton.map(|b| (ids::INSTALLER_IA, b)), barre))
 }
 
-/// Le bouton Parler, en haut à droite de « Raconte ton problème » (seulement avec la dictée).
-pub fn actions(a: &Aides) -> Option<Value> {
+/// Le bouton Parler, dans le champ de « Raconte ton problème », à droite (seulement avec la dictée).
+pub fn bouton_parler(a: &Aides) -> Option<Value> {
     a.installation_dictee.as_ref()?;
     let texte = if a.dictee_ecoute() { textes::ARRETER } else { textes::PARLER };
-    Some(json!([{ "id": ids::PARLER, "texte": texte, "icone": "son" }]))
+    Some(json!({ "id": ids::PARLER, "texte": texte, "icone": "micro" }))
 }
 
 /// « Demander à l'assistant » : il est installé, il y a une phrase, et il n'en lit pas déjà une.
 pub fn bouton_demander(etat: &Etat) -> Option<Value> {
     let a = &etat.aides;
-    (a.assistant_installe() && !a.lit && !etat.recherche.trim().is_empty())
-        .then(|| json!({ "type": "bouton", "id": ids::DEMANDER, "texte": textes::DEMANDER }))
+    (a.assistant_installe() && !a.lit && !etat.recherche.trim().is_empty()).then(|| {
+        json!({ "type": "bouton", "id": ids::DEMANDER, "texte": textes::DEMANDER, "icone": "etincelle",
+                         "style": "doux" })
+    })
 }
 
 /// La page « Pour être sûr » (`Show-PourEtreSur`) : ce qu'on a écrit, puis une question sur ce qu'on voit (le titre et la
@@ -261,9 +263,8 @@ pub fn page_pour_etre_sur(p: &PourEtreSur) -> Value {
         "parent": super::ecrans::RACONTE,
         // (la maquette validée ; le PowerShell : « Plusieurs pannes y ressemblent... », sous la phrase)
         "sous": "Plusieurs pannes ressemblent à ta phrase : une question pour choisir la bonne enquête.",
-        "icone": "aide", "couleur": "T",
-        "module": { "icone": "aide", "couleur": "T", "titre": pes::CE_QUE_TU_AS_ECRIT, "texte": format!("« {} »", p.phrase) },
         "blocs": [
+            { "type": "citation", "titre": pes::CE_QUE_TU_AS_ECRIT, "texte": format!("« {} »", p.phrase) },
             { "type": "titre", "texte": pes::QUESTION },
             { "type": "cartes", "id": ids::IDEE, "options": options },
             { "type": "bouton", "id": ids::AUCUNE, "texte": pes::AUCUNE, "style": "second" },

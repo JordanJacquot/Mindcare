@@ -53,10 +53,12 @@ pub fn page_aide() -> Value {
     json!({
         "titre": "Comment ça marche",
         "sous": "Mindcare trouve pourquoi ton PC est en panne, en répondant à quelques questions simples.",
-        "icone": "aide", "couleur": "T",
-        "module": { "icone": "aide", "couleur": "T", "titre": "Une enquête",
-                    "texte": "Une question à la fois : chaque réponse écarte des suspects, jusqu'à la bonne piste." },
-        "blocs": [{ "type": "faq", "elements": [
+        "blocs": [
+            { "type": "verdict", "icone": "loupe", "couleur": "P", "surtitre": "Une enquête",
+              "titre": "Une question à la fois",
+              "texte": "Chaque réponse écarte des suspects, jusqu'à la bonne piste." },
+            { "type": "titre", "texte": "Les questions qu'on se pose" },
+            { "type": "faq", "elements": [
             { "question": "Est-ce que Mindcare répare mon PC ?",
               "reponse": "Non. Elle t'explique quoi faire, montre les commandes à taper avec un bouton Copier, mais ne lance jamais rien toute seule.",
               "icone": "bouclier" },

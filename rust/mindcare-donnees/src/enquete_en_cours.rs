@@ -12,7 +12,7 @@ use serde_json::Value;
 use crate::donnees::Donnees;
 use crate::historique::{Enregistrement, IndicesGardes, Paire, convertir_indices, paires};
 use crate::moment::Moment;
-use crate::rapport::{SurLePc, texte_rapport};
+use crate::rapport::{PcDuRapport, SurLePc, texte_rapport, texte_rapport_pc};
 use crate::valeurs::entier;
 use mindcare_moteur::ps::{champ, champ_v, egal, parcours, tableau, texte, vrai};
 use mindcare_moteur::verdict::minuscule;
@@ -467,5 +467,18 @@ impl EnqueteEnCours {
     pub fn rapport(&self, cat: &Catalogue, maintenant: &Moment, pc: &SurLePc, version: &str) -> Option<String> {
         let r = self.resume_de.as_ref()?;
         Some(texte_rapport(cat, &r.panne, &r.enquete, &r.titre, maintenant, pc, version))
+    }
+
+    /// Le rapport, avec ce qu'on sait du PC en plus (sa fiche, ou le PC choisi pour un autre : [`PcDuRapport`]).
+    pub fn rapport_pc(
+        &self,
+        cat: &Catalogue,
+        maintenant: &Moment,
+        pc: &SurLePc,
+        detail: &PcDuRapport,
+        version: &str,
+    ) -> Option<String> {
+        let r = self.resume_de.as_ref()?;
+        Some(texte_rapport_pc(cat, &r.panne, &r.enquete, &r.titre, maintenant, pc, detail, version))
     }
 }

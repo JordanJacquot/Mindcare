@@ -12,6 +12,7 @@
 //! - [`source`] : ce que la lecture demande à Windows ([`SourceWindows`], [`Horloge`]) ;
 //! - [`indices`] : les règles (Get-IndicesWindows, Select-ErreursDisque, Get-Barrettes) ;
 //! - [`lecture`] : la lecture en arrière-plan (Start-LectureJournaux... Stop-LectureJournaux) ;
+//! - [`pc`] : le PC reconnu (portable ou fixe, marque, carte mère...), pour ne montrer que ses pannes ;
 //! - [`motifs`] : les expressions régulières et les conversions de PowerShell reproduites.
 //!
 //! Les différences voulues avec PowerShell (constats 20 et 21) sont écrites dans tests\juges\windows-divergences.json.
@@ -20,6 +21,7 @@ pub mod indices;
 pub mod lecture;
 pub mod moment;
 pub mod motifs;
+pub mod pc;
 pub mod source;
 #[cfg(windows)]
 pub mod windows;
@@ -27,6 +29,7 @@ pub mod windows;
 pub use indices::{IndiceWindows, IndicesWindows, JOURS, barrettes, erreurs_disque, indices_windows, vers_moteur};
 pub use lecture::{LectureJournaux, RELIRE_APRES_MINUTES, a_relire};
 pub use moment::Moment;
+pub use pc::{DisqueBrut, PcBrut, PcDetecte, detecter, marque_simple};
 pub use source::{
     Barrette, Batterie, Disque, DisquePhysique, Evenement, Filtre, Horloge, InfosPc, Mesure, Partition, Place,
     SourceWindows,

@@ -1,5 +1,8 @@
-//! La réponse finale (Show-Verdict) : trouvée, tout le reste écarté, urgente, ou ce qui reste pour le réparateur ;
-//! comment on le sait, ce qui est écarté, ce qu'il faut faire, la garantie avant d'acheter une pièce, la sécurité.
+//! La réponse finale (Show-Verdict) : trouvée, tout le reste écarté, urgente, ou ce qui reste pour le réparateur.
+//! Le design A2 (Jordan trouvait l'ancienne trop chargée) : en haut la carte « verdict » (la pastille et la couleur du
+//! cas, le sur-titre, la conclusion en une phrase, une ligne d'explication) ; puis « Ce qu'il faut faire » en liste
+//! numérotée, avec en dernier le conseil pour le réparateur (et la garantie avant d'acheter une pièce) ; « Comment
+//! Mindcare le sait » replié (une ligne avec son résumé) ; les boutons ; la sécurité en une petite ligne en bas.
 
 use serde_json::{Value, json};
 
@@ -10,7 +13,7 @@ use mindcare_moteur::{Catalogue, Enquete, TypeVerdict};
 
 use super::Etat;
 use super::actions::ids;
-use super::outils::{t, textes, titre_suspect, urgent};
+use super::outils::{nombre, t, textes, titre_suspect, urgent};
 
 /// Le badge de la réponse, sa couleur et son icône.
 pub struct Badge {
@@ -19,16 +22,16 @@ pub struct Badge {
     pub icone: &'static str,
 }
 
-/// Le badge de la réponse (les étiquettes de Show-Verdict).
+/// Le badge de la réponse (les étiquettes de Show-Verdict) : jamais une coche sur « Urgent ».
 pub fn badge(genre: TypeVerdict, urgent: bool, supposee: bool) -> Badge {
     let b = |texte, couleur, icone| Badge { texte, couleur, icone };
     match genre {
         TypeVerdict::Trouve if urgent => b("Urgent", "rouge", "alerte"),
         TypeVerdict::Trouve => b("Trouvé", "vert", "coche"),
-        TypeVerdict::Elimination if supposee => b("La piste la plus probable", "orange", "aide"),
+        TypeVerdict::Elimination if supposee => b("La piste la plus probable", "orange", "question"),
         TypeVerdict::Elimination => b("Tout le reste est écarté", "vert", "coche"),
-        TypeVerdict::Reparateur => b("À faire vérifier par un réparateur", "orange", "aide"),
-        TypeVerdict::Rien => b("Aucune piste ne correspond", "orange", "aide"),
+        TypeVerdict::Reparateur => b("À faire vérifier par un réparateur", "orange", "question"),
+        TypeVerdict::Rien => b("Aucune piste ne correspond", "orange", "question"),
     }
 }
 
@@ -37,33 +40,101 @@ pub const PIECE_TITRE: &str = "Avant d'acheter une pièce";
 pub const PIECE_SUPPOSEE: &str = "Mindcare n'a pas pu tester cette pièce : elle reste parce que tout le reste est écarté. Avant d'en acheter une neuve, fais-la vérifier par un réparateur, ou essaie avec celle d'un proche.";
 pub const PIECE_GARANTIE: &str = "Si le PC a moins de 2 ans, il est encore sous garantie : contacte d'abord le magasin ou le fabricant, la réparation peut être gratuite. Dans le doute, un réparateur peut confirmer avant que tu achètes.";
 
+/// Les textes de la page.
+pub mod textes_reponse {
+    pub const A_FAIRE: &str = "Ce qu'il faut faire";
+    pub const CHEZ_REPARATEUR: &str = "Ensuite, chez un réparateur :";
+    pub const COMMENT: &str = "Comment Mindcare le sait";
+    pub const RESTE: &str = "Ce qui reste à vérifier";
+    pub const RIEN_ECARTE: &str = "Tes réponses ne permettaient pas d'écarter de piste.";
+    pub const ACCUEIL: &str = "Retour à l'accueil";
+    pub const REPARATEUR: &str = "Pour le réparateur";
+    pub const CHANGER: &str = "Changer ma dernière réponse";
+    /// L'explication sous la conclusion, sans suspect trouvé
+    pub const EXPLICATION_REPARATEUR: &str = "Ces pistes se départagent avec un outil de réparateur.";
+    pub const EXPLICATION_RIEN: &str = "Aucun suspect ne tient après tes réponses : la panne est peut-être ailleurs.";
+    pub const CONSEIL_REPARATEUR: &str =
+        "montre-lui le rapport (bouton « Pour le réparateur ») : il saura par où commencer.";
+    pub const AUTRE_PANNE: &str = "Essaie une autre panne qui ressemble à ce qui se passe.";
+    pub const CONSEIL_RIEN: &str = "montre-lui le rapport (bouton « Pour le réparateur »).";
+}
+use textes_reponse as x;
+
 pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
-    let panne = etat.en_cours.panne.as_ref().map(|p| t(p, "Titre")).unwrap_or_default();
+    let p = etat.en_cours.panne.as_ref();
+    let panne = p.map(|p| t(p, "Titre")).unwrap_or_default();
     let Some(v) = e.verdict.as_ref() else {
-        return super::enquete::page_attente(etat);
+        return super::enquete::page_attente(etat, cat);
     };
     let TitreReponse { titre, piece, supposee } = titre_reponse(cat, e);
     let suspect = v.suspect.as_deref().and_then(|s| cat.suspect(s));
     let est_urgent = suspect.is_some_and(|s| vrai(champ(s, "Urgent")));
     let b = badge(v.genre, est_urgent, supposee);
 
-    let mut blocs = Vec::new();
-    if piece {
-        blocs.push(json!({ "type": "titre", "texte": PIECE_TITRE }));
-        blocs.push(json!({ "type": "note", "texte": if supposee { PIECE_SUPPOSEE } else { PIECE_GARANTIE } }));
+    // L'explication sous la conclusion : pourquoi ce suspect, ou ce que veut dire la réponse
+    let explication = match suspect {
+        Some(s) => t(s, "Pourquoi"),
+        None if v.genre == TypeVerdict::Reparateur => x::EXPLICATION_REPARATEUR.to_string(),
+        None => x::EXPLICATION_RIEN.to_string(),
+    };
+    let mut verdict = json!({ "type": "verdict", "icone": b.icone, "couleur": b.couleur, "surtitre": b.texte,
+                              "titre": titre });
+    if !explication.is_empty() {
+        verdict["texte"] = json!(explication);
+    }
+    let mut blocs = vec![verdict];
+
+    // Ce qui reste à vérifier (sans suspect trouvé, pour le réparateur)
+    if suspect.is_none() && v.genre == TypeVerdict::Reparateur && !v.restants.is_empty() {
+        blocs.push(json!({ "type": "titre", "texte": x::RESTE }));
+        for id in &v.restants {
+            let r = cat.suspect(id);
+            blocs.push(json!({ "type": "ligne", "icone": "aide", "couleur": "orange",
+                               "texte": r.map(|r| t(r, "Titre")).unwrap_or_else(|| id.clone()),
+                               "note": r.map(|r| t(r, "Pourquoi")).unwrap_or_default() }));
+        }
     }
 
-    // Comment on le sait : les preuves, ce que Windows a noté, ce qui est écarté
-    blocs.push(json!({ "type": "titre", "texte": "Comment on le sait" }));
-    if !e.preuves.is_empty() {
-        blocs.push(json!({ "type": "liste", "ton": "ok", "elements": e.preuves }));
+    // Ce qu'il faut faire : la liste numérotée, puis le conseil pour le réparateur (et avant d'acheter une pièce)
+    let mut a_faire: Vec<Value> = Vec::new();
+    if let Some(s) = suspect {
+        a_faire.extend(textes(s, "AFaire").into_iter().map(|x| json!({ "texte": x })));
+        let cepc = e.notes.iter().any(|n| egal(n, "cepc"));
+        if v.suspect.as_deref().is_some_and(|x| egal(x, "memoire")) && cepc && !etat.barrettes.is_empty() {
+            a_faire.push(json!({ "icone": "memoire",
+                "texte": format!("Mindcare a lu les barrettes de ce PC : {}.", etat.barrettes.join(" ; ")) }));
+        }
+        let pro = t(s, "Pro");
+        if !pro.is_empty() {
+            a_faire.push(json!({ "icone": "cle", "titre": x::CHEZ_REPARATEUR, "texte": pro }));
+        }
+    } else if v.genre == TypeVerdict::Reparateur {
+        a_faire.push(json!({ "icone": "cle", "titre": x::CHEZ_REPARATEUR, "texte": x::CONSEIL_REPARATEUR }));
+    } else {
+        a_faire.push(json!({ "texte": x::AUTRE_PANNE }));
+        a_faire.push(json!({ "icone": "cle", "titre": x::CHEZ_REPARATEUR, "texte": x::CONSEIL_RIEN }));
     }
-    for a in e.auto.iter().filter(|a| !e.preuves.iter().any(|p| p == &a.texte)) {
-        blocs.push(json!({ "type": "ligne", "icone": if a.vu { "alerte" } else { "ok" },
-                           "couleur": if a.vu { "orange" } else { "vert" }, "texte": a.texte }));
+    if piece {
+        a_faire.push(json!({ "icone": "euro", "titre": format!("{PIECE_TITRE} :"),
+                             "texte": if supposee { PIECE_SUPPOSEE } else { PIECE_GARANTIE } }));
+    }
+    if !a_faire.is_empty() {
+        blocs.push(json!({ "type": "titre", "texte": x::A_FAIRE }));
+        blocs.push(json!({ "type": "etapes", "elements": a_faire }));
+    }
+
+    // Comment Mindcare le sait, replié : les preuves, ce que Windows a noté, ce qui est écarté
+    let mut preuves = Vec::new();
+    if !e.preuves.is_empty() {
+        preuves.push(json!({ "type": "liste", "ton": "ok", "elements": e.preuves }));
+    }
+    let autres: Vec<_> = e.auto.iter().filter(|a| !e.preuves.iter().any(|p| p == &a.texte)).collect();
+    for a in &autres {
+        preuves.push(json!({ "type": "ligne", "icone": if a.vu { "alerte" } else { "ok" },
+                             "couleur": if a.vu { "orange" } else { "vert" }, "texte": a.texte }));
     }
     if e.preuves.is_empty() && e.auto.is_empty() {
-        blocs.push(json!({ "type": "texte", "texte": "Tes réponses ne permettaient pas d'écarter de piste." }));
+        preuves.push(json!({ "type": "texte", "texte": x::RIEN_ECARTE }));
     }
     let mut ecartes: Vec<String> = Vec::new();
     for x in e.ecartes.iter().filter(|x| !urgent(cat, &x.id)) {
@@ -73,62 +144,40 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
         }
     }
     if !ecartes.is_empty() {
-        blocs.push(json!({ "type": "texte", "texte": format!("Écartés : {}.", ecartes.join(", ")) }));
+        preuves.push(json!({ "type": "texte", "texte": format!("Écartés : {}.", ecartes.join(", ")) }));
     }
+    let indices = e.preuves.len() + autres.iter().filter(|a| a.vu).count();
+    let mut resume = Vec::new();
+    if indices > 0 {
+        resume.push(nombre(indices, "indice", "indices"));
+    }
+    if !ecartes.is_empty() {
+        resume.push(nombre(ecartes.len(), "piste écartée", "pistes écartées"));
+    }
+    let resume = if resume.is_empty() { "Rien d'écarté".to_string() } else { resume.join(", ") };
+    blocs.push(json!({ "type": "repli", "titre": x::COMMENT, "resume": resume, "blocs": preuves }));
 
-    // Ce qu'il faut faire
-    blocs.push(json!({ "type": "titre", "texte": "Ce qu'il faut faire" }));
-    if let Some(s) = suspect {
-        let pourquoi = t(s, "Pourquoi");
-        if !pourquoi.is_empty() {
-            blocs.push(json!({ "type": "texte", "texte": pourquoi }));
-        }
-        let a_faire: Vec<Value> = textes(s, "AFaire").into_iter().map(|x| json!({ "texte": x })).collect();
-        if !a_faire.is_empty() {
-            blocs.push(json!({ "type": "etapes", "elements": a_faire }));
-        }
-        let cepc = e.notes.iter().any(|n| egal(n, "cepc"));
-        if v.suspect.as_deref().is_some_and(|x| egal(x, "memoire")) && cepc && !etat.barrettes.is_empty() {
-            blocs.push(json!({ "type": "texte",
-                               "texte": format!("Mindcare a lu les barrettes de ce PC : {}.", etat.barrettes.join(" ; ")) }));
-        }
-        let pro = t(s, "Pro");
-        if !pro.is_empty() {
-            blocs.push(json!({ "type": "titre", "texte": "Quand aller chez un réparateur" }));
-            blocs.push(json!({ "type": "texte", "texte": pro }));
-        }
-    } else if v.genre == TypeVerdict::Reparateur {
-        blocs.push(json!({ "type": "texte",
-            "texte": "Ces pistes se départagent avec un outil de réparateur. Montre-lui le rapport (bouton « Pour le réparateur ») : il saura par où commencer." }));
-        for id in &v.restants {
-            let r = cat.suspect(id);
-            blocs.push(json!({ "type": "ligne", "icone": "aide", "couleur": "orange",
-                               "texte": r.map(|r| t(r, "Titre")).unwrap_or_else(|| id.clone()),
-                               "note": r.map(|r| t(r, "Pourquoi")).unwrap_or_default() }));
-        }
-    } else {
-        blocs.push(json!({ "type": "texte",
-            "texte": "Aucun suspect ne tient après tes réponses. La panne est peut-être ailleurs : essaie une autre panne qui ressemble, ou montre le rapport à un réparateur." }));
-    }
+    // Les boutons : l'accueil d'abord (choisi à l'ouverture), le rapport, changer la dernière réponse
+    blocs.push(json!({ "type": "bouton", "id": ids::ACCUEIL, "texte": x::ACCUEIL }));
+    blocs.push(
+        json!({ "type": "bouton", "id": ids::REPARATEUR, "texte": x::REPARATEUR, "icone": "rapport", "style": "second" }),
+    );
+    blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": x::CHANGER, "style": "discret" }));
+
     let securite: Vec<String> =
         parcours(cat.json().get("Securite")).into_iter().map(|x| texte(Some(x))).filter(|x| !x.is_empty()).collect();
     if !securite.is_empty() {
-        blocs.push(json!({ "type": "note", "texte": securite.join(" ") }));
+        blocs.push(json!({ "type": "petit", "texte": securite.join(" ") }));
     }
 
+    let chemin: Vec<&str> = [panne.as_str(), "La réponse"].into_iter().filter(|c| !c.is_empty()).collect();
     json!({
         "titre": panne,
         "sous": "La réponse de Mindcare",
-        // (l'icône du badge : jamais une coche sur « Urgent »)
-        "icone": b.icone,
-        "couleur": b.couleur,
+        "forme": "carte",
+        "chemin": chemin,
         "retour": "appli",
-        "actions": [
-            { "id": ids::PRECEDENT, "texte": "Changer ma dernière réponse" },
-            { "id": ids::REPARATEUR, "texte": "Pour le réparateur", "icone": "rapport" },
-        ],
-        "module": { "icone": b.icone, "couleur": b.couleur, "titre": b.texte, "texte": titre,
-                    "boutons": [{ "id": ids::ACCUEIL, "texte": "Retour à l'accueil" }] },
+        "focus": format!("o:{}", ids::ACCUEIL),
         "blocs": blocs,
     })
 }

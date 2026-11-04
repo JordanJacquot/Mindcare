@@ -7,6 +7,7 @@
 //! distinguent d'une mesure qui n'a rien trouvé.
 
 use crate::moment::Moment;
+use crate::pc::PcBrut;
 
 /// Une mesure : la valeur lue, ou la raison de l'échec.
 pub type Mesure<T> = Result<T, String>;
@@ -126,6 +127,12 @@ pub trait SourceWindows: Send + Sync {
     fn barrettes(&self) -> Mesure<Vec<Barrette>>;
     /// Le modèle du PC et la version de Windows (Win32_ComputerSystem, Win32_OperatingSystem).
     fn infos_pc(&self) -> Mesure<InfosPc>;
+    /// Ce qu'il faut pour reconnaître le PC (portable ou fixe, marque, carte mère, processeur, mémoire, disque,
+    /// version de Windows) : voir [`crate::pc`]. Par défaut (les faux Windows des tests qui ne le donnent pas) : pas lu,
+    /// le PC reste inconnu et toutes les pannes sont montrées.
+    fn materiel(&self) -> Mesure<PcBrut> {
+        Err("matériel non lu".to_string())
+    }
 }
 
 /// L'heure locale du PC (Get-Date). Les tests en donnent une fausse.

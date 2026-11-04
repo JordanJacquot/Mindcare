@@ -5,7 +5,30 @@ use std::path::Path;
 
 use serde_json::Value;
 
+use crate::pc::{ProfilPc, Tri, trier};
 use crate::ps::{Objet, champ, egal, mettre, parcours, texte, vrai};
+
+/// Un groupe de pannes d'une famille (une carte dépliable de l'écran de la famille) : « Il ne s'allume pas »...
+#[derive(Debug, Clone, PartialEq)]
+pub struct Groupe<'a> {
+    pub id: String,
+    /// Le nom court (« Il ne s'allume pas »).
+    pub nom: String,
+    /// Une phrase d'exemple (« Rien ne se passe, ou juste une lumière »).
+    pub exemple: String,
+    /// Le nom d'une image de Mindcare\fichiers\images, sans « .svg ».
+    pub icone: String,
+    /// Ses pannes, dans l'ordre du fichier.
+    pub pannes: Vec<&'a Objet>,
+}
+
+/// Les groupes d'une famille pour un PC : les groupes qui gardent au moins une panne, et combien de pannes de la
+/// famille sont cachées.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct GroupesFamille<'a> {
+    pub groupes: Vec<Groupe<'a>>,
+    pub cachees: usize,
+}
 
 /// Le catalogue lu. Il ne change jamais une fois lu.
 #[derive(Debug, Clone)]
@@ -62,6 +85,74 @@ impl Catalogue {
     /// Une famille par son Id (Get-Famille).
     pub fn famille(&self, id: &str) -> Option<&Objet> {
         self.familles.iter().find(|f| champ(f, "Id").is_some_and(|v| !v.is_null() && egal(&texte(Some(v)), id)))
+    }
+
+    /// Les pannes d'une famille (son Id, sans tenir compte des majuscules), dans l'ordre du fichier.
+    pub fn pannes_famille(&self, famille: &str) -> Vec<&Objet> {
+        self.pannes.iter().filter(|p| egal(&texte(champ(p, "Famille")), famille)).collect()
+    }
+
+    /// Les pannes d'une famille qui concernent ce PC, et combien sont cachées (« PourPc », voir [`crate::pc`]).
+    pub fn pannes_famille_pour(&self, famille: &str, profil: &ProfilPc) -> Tri<'_> {
+        trier(self.pannes_famille(famille), profil)
+    }
+
+    /// Toutes les pannes qui concernent ce PC, et combien sont cachées.
+    pub fn pannes_pour(&self, profil: &ProfilPc) -> Tri<'_> {
+        trier(&self.pannes, profil)
+    }
+
+    /// Les groupes d'une famille (son champ « Groupes »), dans l'ordre du fichier, chacun avec ses pannes (celles dont
+    /// le champ « Groupe » le cite, dans l'ordre du fichier). Une panne sans groupe connu (refusé par la validation)
+    /// n'est jamais perdue : elle va dans un dernier groupe « Autres pannes » (Id vide). Une famille sans groupes : un
+    /// seul groupe « Autres pannes » avec toutes ses pannes.
+    pub fn groupes(&self, famille: &str) -> Vec<Groupe<'_>> {
+        self.groupes_de(self.pannes_famille(famille), famille)
+    }
+
+    /// Les groupes d'une famille après le filtre du profil (« PourPc ») : un groupe vidé par le filtre disparaît, et
+    /// `cachees` dit combien de pannes de la famille sont cachées.
+    pub fn groupes_pour(&self, famille: &str, profil: &ProfilPc) -> GroupesFamille<'_> {
+        let tri = self.pannes_famille_pour(famille, profil);
+        let groupes = self.groupes_de(tri.visibles, famille).into_iter().filter(|g| !g.pannes.is_empty()).collect();
+        GroupesFamille { groupes, cachees: tri.cachees }
+    }
+
+    fn groupes_de<'a>(&'a self, pannes: Vec<&'a Objet>, famille: &str) -> Vec<Groupe<'a>> {
+        let t = |o: &Objet, c: &str| texte(champ(o, c));
+        let mut groupes: Vec<Groupe<'a>> = self
+            .famille(famille)
+            .map(|f| parcours(champ(f, "Groupes")))
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(Value::as_object)
+            .map(|g| Groupe {
+                id: t(g, "Id"),
+                nom: t(g, "Nom"),
+                exemple: t(g, "Exemple"),
+                icone: t(g, "Icone"),
+                pannes: Vec::new(),
+            })
+            .filter(|g| !g.id.is_empty())
+            .collect();
+        let mut autres = Vec::new();
+        for p in pannes {
+            let id = t(p, "Groupe");
+            match groupes.iter_mut().find(|g| !id.is_empty() && egal(&g.id, &id)) {
+                Some(g) => g.pannes.push(p),
+                None => autres.push(p),
+            }
+        }
+        if !autres.is_empty() {
+            groupes.push(Groupe {
+                id: String::new(),
+                nom: "Autres pannes".to_string(),
+                exemple: String::new(),
+                icone: self.famille(famille).map(|f| t(f, "Icone")).unwrap_or_default(),
+                pannes: autres,
+            });
+        }
+        groupes
     }
 
     /// Tous les suspects (nom, valeur), dans l'ordre du fichier.

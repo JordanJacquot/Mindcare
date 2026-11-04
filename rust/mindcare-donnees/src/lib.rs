@@ -19,6 +19,7 @@
 //! - [`historique`] : diagnostics.json (Read-Historique, Save-Diagnostic, Get-Paires, ConvertTo-Indices,
 //!   Get-DiagnosticInfo) ;
 //! - [`carte`] : la carte de Mindset (Get-Court, Get-PhraseCarte, Get-EtatCarte, Write-EtatMindset) ;
+//! - [`choix_pc`] : le PC dont on regarde les pannes (« mon PC » ou un autre choisi à la main) ;
 //! - [`rapport`] : le rapport pour le réparateur (Get-InfosPC, Get-ResumeTexte, Save-Resume, ses textes) ;
 //! - [`enquete_en_cours`] : l'enquête en cours et sa reprise (New-DiagId, Open-Diagnostic, Show-Etape,
 //!   Get-PairesEnAttente...) ;
@@ -27,6 +28,7 @@
 //! - [`valeurs`] : les règles de PowerShell en plus de celles du moteur.
 
 pub mod carte;
+pub mod choix_pc;
 pub mod donnees;
 pub mod dossier;
 pub mod enquete_en_cours;
@@ -39,6 +41,7 @@ pub mod reglages;
 pub mod valeurs;
 
 pub use carte::{Carte, EtatMindset, court, etat_carte, phrase_carte};
+pub use choix_pc::ChoixPc;
 pub use donnees::Donnees;
 pub use enquete_en_cours::{
     Affichage, Avance, EnqueteEnCours, PreRempli, Reprise, TitreReponse, nouvel_id, titre_reponse,
@@ -47,5 +50,5 @@ pub use fichiers::{FichierRelu, Fichiers};
 pub use historique::{Enregistrement, Historique, IndiceGarde, IndicesGardes, Paire, info_diagnostic, paires};
 pub use journal::{Horloge, Journal, horloge_figee};
 pub use moment::{Moment, format_date};
-pub use rapport::{LecturePc, SurLePc, infos_pc, texte_rapport};
+pub use rapport::{LecturePc, PcDuRapport, SurLePc, infos_pc, lignes_fiche, texte_rapport, texte_rapport_pc};
 pub use reglages::Reglages;

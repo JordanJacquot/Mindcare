@@ -171,6 +171,13 @@ pub struct Etat {
     pub ecran: String,
     /// L'assistant et la dictée (étape 6.4) : leur photo, prise par effets.rs
     pub aides: Aides,
+    /// La pastille « Ton PC » de la barre du haut : le libellé court du PC (« Portable HP ») ; `None` : pas de
+    /// pastille. Un clic envoie l'action [`ids::TON_PC`] (pour l'instant : une ligne au journal).
+    pub ton_pc: Option<String>,
+    /// La bande « Adapté à ton PC » en haut de « Ça concerne quoi ? » : sa phrase entière (« Adapté à ton PC portable
+    /// HP : 6 pannes de tour de bureau sont cachées. ») ; `None` : pas de bande. Son bouton « Tout afficher » envoie
+    /// l'action [`ids::TOUT_AFFICHER`] (pour l'instant : une ligne au journal).
+    pub adapte_au_pc: Option<String>,
 }
 
 /// Où en est l'enquête montrée.
@@ -199,20 +206,20 @@ impl Etat {
     pub fn etat_kit(&self, cat: &Catalogue, ecran: Option<&str>) -> Value {
         let mut pages = Map::new();
         pages.insert(ecrans::RACONTE.into(), raconte::page(self, cat));
-        pages.insert(ecrans::FAMILLES.into(), familles::page_familles(cat));
+        pages.insert(ecrans::FAMILLES.into(), familles::page_familles(self, cat));
         if let Some(p) = self.famille.as_deref().and_then(|f| familles::page_famille(cat, f)) {
             pages.insert(ecrans::FAMILLE.into(), p);
         }
         match self.vue(cat) {
             Some(Vue::Attente) => {
-                pages.insert(ecrans::ENQUETE.into(), enquete::page_attente(self));
+                pages.insert(ecrans::ENQUETE.into(), enquete::page_attente(self, cat));
             }
             Some(Vue::Etape(e)) => {
                 pages.insert(ecrans::ENQUETE.into(), enquete::page(self, cat, &e));
             }
             Some(Vue::Reponse(e)) => {
                 pages.insert(ecrans::ENQUETE.into(), reponse::page(self, cat, &e));
-                pages.insert(ecrans::REPARATEUR.into(), reparateur::page(self));
+                pages.insert(ecrans::REPARATEUR.into(), reparateur::page(self, cat));
             }
             None => {}
         }
@@ -231,6 +238,9 @@ impl Etat {
                 if !o.contains_key(k) {
                     o.insert(k.clone(), v.clone());
                 }
+            }
+            if let Some(pc) = self.ton_pc.as_deref().map(str::trim).filter(|p| !p.is_empty()) {
+                o.insert("pc".into(), pastille_pc(pc));
             }
             if let Some(e) = ecran {
                 o.insert("ecran".into(), json!(e));
@@ -375,6 +385,12 @@ impl Etat {
     }
 }
 
+/// La pastille « Ton PC » (`pc` de kit.js) : son action, son libellé, et l'icône d'un portable ou d'un PC de bureau.
+fn pastille_pc(libelle: &str) -> Value {
+    let icone = if libelle.to_lowercase().contains("portable") { "portable" } else { "pc" };
+    json!({ "id": ids::TON_PC, "texte": libelle, "icone": icone })
+}
+
 /// L'état du kit quand le catalogue des pannes est illisible (« Mindcare n'a pas pu lire ses enquêtes »).
 pub fn etat_sans_catalogue(version: &str, theme: &str) -> Value {
     json!({
@@ -387,8 +403,11 @@ pub fn etat_sans_catalogue(version: &str, theme: &str) -> Value {
         },
         "pages": {
             ecrans::PROBLEME: {
-                "titre": "Mindcare n'a pas pu lire ses enquêtes", "icone": "alerte", "couleur": "rouge",
-                "blocs": [{ "type": "texte", "texte": "Son fichier est absent ou abîmé. Réinstalle Mindcare depuis Mindset." }],
+                "titre": "Mindcare n'a pas pu lire ses enquêtes",
+                "blocs": [
+                    { "type": "verdict", "icone": "alerte", "couleur": "rouge", "surtitre": "Un fichier manque",
+                      "titre": "Son fichier est absent ou abîmé.", "texte": "Réinstalle Mindcare depuis Mindset." },
+                ],
             },
         },
     })

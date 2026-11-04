@@ -203,3 +203,20 @@ fn vrai_windows_comme_powershell() {
     assert!(ecarts.is_empty(), "{} écart(s) avec PowerShell :\n{}", ecarts.len(), ecarts.join("\n"));
     println!("Tout est pareil.");
 }
+
+#[test]
+#[ignore = "lit le vrai Windows de ce PC (lecture seule, WMI) : -- --ignored vrai_pc"]
+fn vrai_pc_reconnu() {
+    // Seulement des requêtes WMI en lecture : rien n'est écrit, aucun programme n'est lancé
+    let source = WindowsReel::default();
+    let debut = Instant::now();
+    let (pc, erreur) = mindcare_windows::detecter(&source);
+    let duree = debut.elapsed();
+    println!("Le PC reconnu en {} ms : {}", duree.as_millis(), pc.libelle_court());
+    println!("  {pc:?}");
+    println!("  {:?}", pc.fiche());
+    assert_eq!(erreur, None, "lecture du matériel ratée");
+    assert!(duree.as_secs() < 5, "trop lent ({} ms)", duree.as_millis());
+    assert!(pc.windows.as_deref().is_some_and(|w| w.starts_with("Windows")), "{:?}", pc.windows);
+    assert!(pc.memoire.is_some() && pc.processeur.is_some());
+}
