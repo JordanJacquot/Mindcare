@@ -167,6 +167,42 @@ fn la_fiche_du_pc_dans_le_rapport() {
 }
 
 #[test]
+fn un_pc_monte_sans_nom_n_ecrit_pas_de_ligne_ordinateur_vide() {
+    let cat = catalogue();
+    let juge = lire_juge("rapports.json");
+    let l = juge["Cas"].as_array().cloned().unwrap_or_default();
+    let f = fiche();
+    let mut essayes = 0;
+    for c in &l {
+        let p = cat.panne(s(&c["Panne"])).expect("panne");
+        let entree: Vec<i64> = c["Entree"].as_array().into_iter().flatten().filter_map(Value::as_i64).collect();
+        let ind = if c["Indices"].is_null() { None } else { Some(indices(&c["Indices"]).moteur()) };
+        let e = enquete(cat, p, &entree, ind.as_ref());
+        if !e.notes.iter().any(|n| n.eq_ignore_ascii_case("cepc")) {
+            continue;
+        }
+        essayes += 1;
+        let jour = indices(&c["IndicesJour"]);
+        let pc = SurLePc {
+            infos: "System manufacturer System Product Name, Windows 11 Famille",
+            barrettes: &[],
+            indices_du_jour: Some(&jour),
+        };
+        let rapport = |detail: &PcDuRapport| {
+            texte_rapport_pc(cat, p, &e, s(&c["Titre"]), &moment(s(&c["Maintenant"])), &pc, detail, s(&c["Version"]))
+        };
+        // Avec la fiche : la ligne sans nom part, et le modèle de la fiche est écrit à la place
+        let r = rapport(&PcDuRapport { fiche: Some(&f), choisi: None });
+        assert!(!r.contains("Ordinateur : "), "{r}");
+        assert!(r.contains("Modèle : HP Pavilion 15") && r.contains("Carte mère : HP 87B2"), "{r}");
+        // Sans fiche : rien d'autre à dire, la ligne reste comme dans PowerShell
+        let r = rapport(&PcDuRapport::default());
+        assert!(r.contains("Ordinateur : System manufacturer"), "{r}");
+    }
+    assert!(essayes >= 1, "aucun cas sur ce PC");
+}
+
+#[test]
 fn les_lignes_de_la_fiche() {
     assert_eq!(
         lignes_fiche(&fiche(), false),

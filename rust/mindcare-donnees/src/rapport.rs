@@ -79,6 +79,14 @@ pub struct PcDuRapport<'a> {
     pub choisi: Option<&'a ProfilPc>,
 }
 
+/// Les noms que Windows donne à un PC monté pièce par pièce, quand le fabricant n'a rien écrit.
+fn nom_vide(infos: &str) -> bool {
+    let bas = infos.to_lowercase();
+    ["system manufacturer", "system product name", "to be filled by o.e.m", "default string"]
+        .iter()
+        .any(|m| bas.contains(m))
+}
+
 /// Les lignes de la fiche du PC (« Type : Portable »...). `sans_modele` : le modèle est déjà écrit (« Ordinateur : »).
 pub fn lignes_fiche(f: &FichePc, sans_modele: bool) -> Vec<String> {
     let modele = if sans_modele { None } else { f.modele.as_ref() };
@@ -114,14 +122,17 @@ pub fn texte_rapport_pc(
     l.push(format!("Panne : {}", texte(champ(panne, "Titre"))));
     let cepc = e.notes.iter().any(|n| egal(n, "cepc"));
     if cepc {
-        if !pc.infos.is_empty() {
+        // Un PC monté pièce par pièce n'a pas de vrai nom : « System manufacturer System Product Name » n'apprend
+        // rien au réparateur. La ligne est alors laissée de côté quand la fiche dit mieux (type, carte mère...).
+        let infos_utiles = !pc.infos.is_empty() && !(detail.fiche.is_some() && nom_vide(pc.infos));
+        if infos_utiles {
             l.push(format!("Ordinateur : {}", pc.infos));
         }
         if liste_vraie(pc.barrettes) {
             l.push(format!("Mémoire : {}", pc.barrettes.join(" ; ")));
         }
         if let Some(f) = detail.fiche {
-            l.extend(lignes_fiche(f, !pc.infos.is_empty()));
+            l.extend(lignes_fiche(f, infos_utiles));
         }
     } else if let Some(p) = detail.choisi {
         l.push(format!("PC choisi : {}", p.libelle_court()));
