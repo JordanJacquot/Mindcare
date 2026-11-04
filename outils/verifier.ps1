@@ -12,7 +12,8 @@
 $ErrorActionPreference = 'Stop'
 $racine = Split-Path $PSScriptRoot -Parent
 $app = Join-Path $racine 'Mindcare'
-$exclus = '\\(\.git|_test|release|outils\\icones)\\'
+# (rust\target : les constructions Rust, des dizaines de milliers de fichiers qui ne sont pas les nôtres)
+$exclus = '\\(\.git|_test|release|outils\\icones|rust\\target)\\'
 $problemes = New-Object Collections.Generic.List[string]
 function Get-Relatif([string]$Chemin) { $Chemin.Substring($racine.Length).TrimStart('\') }
 

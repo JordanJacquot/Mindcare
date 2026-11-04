@@ -10,6 +10,10 @@
 #     fichiers\Mindcare.ps1, Mindcare.ico
 #     fichiers\cles-publiques\*.xml    <- les clés publiques de la suite (les mêmes que Mindset)
 #     fichiers\modules\                <- le code découpé par partie
+#
+# -CatalogueSeul : seulement release\catalogue.zip (publication de Mindcare en Rust, outils\publier.ps1 -Rust : le zip
+# de Mindcare vient alors de la construction GitHub, et rien de la version PowerShell n'est construit).
+param([switch]$CatalogueSeul)
 
 $ErrorActionPreference = 'Stop'
 $racine = Split-Path $PSScriptRoot -Parent
@@ -17,7 +21,10 @@ $app    = Join-Path $racine 'Mindcare'
 $fich   = Join-Path $app 'fichiers'
 $icones = Join-Path $PSScriptRoot 'icones'
 $csc    = Join-Path $env:windir 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+$release = Join-Path $racine 'release'
+New-Item -ItemType Directory -Force -Path $release | Out-Null
 
+if (-not $CatalogueSeul) {
 & (Join-Path $PSScriptRoot 'icone.ps1') -OutDir $icones | Out-Null
 Copy-Item (Join-Path $icones 'Mindcare.ico') (Join-Path $fich 'Mindcare.ico') -Force
 
@@ -30,11 +37,10 @@ $relais = Join-Path $app 'Mindcare.exe'
 if ($LASTEXITCODE) { throw "Échec de compilation de $relais" }
 
 # Le zip (release\ n'est pas suivi par git : publier.ps1 le signe et le joint à la Release GitHub, où Mindset le prend)
-$release = Join-Path $racine 'release'
-New-Item -ItemType Directory -Force -Path $release | Out-Null
 $zip = Join-Path $release 'Mindcare.zip'
 Compress-Archive -Path $app -DestinationPath $zip -Force
 "OK : $zip"
+}
 
 # Le catalogue pour Mindcare Mobile (joint à la Release par publier.ps1 ; le téléphone le télécharge) : enquetes.json et
 # images\*.svg seulement. Mindcare sur PC ne s'en sert pas : elle a déjà ces fichiers dans son dossier.
