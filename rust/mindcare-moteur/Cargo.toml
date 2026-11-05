@@ -16,3 +16,9 @@ unicode-normalization = "=0.1.24"
 
 [lints]
 workspace = true
+
+# La référence du test d'équivalence de Mindcare Mobile (lancée par son outils\exporter-reference.ps1). « test » : son
+# test du hasard de .NET passe avec les autres (cargo test).
+[[example]]
+name = "exporter_reference"
+test = true
