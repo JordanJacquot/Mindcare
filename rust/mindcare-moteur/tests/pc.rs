@@ -147,9 +147,15 @@ fn les_recherches_de_powershell_avec_je_ne_sais_pas() {
             .as_array()
             .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
             .unwrap_or_default();
+        // (depuis le 05/11/2026, l'ordre n'est plus celui de PowerShell, écart voulu : tests\divergences.rs ; les
+        // pannes trouvées restent les mêmes, toutes visibles, dans l'ordre de `chercher`)
         let t = chercher_pour(catalogue(), q, &ProfilPc::inconnu());
         let obtenu = ids(t.visibles);
-        if obtenu != attendu || t.cachees != 0 {
+        let mut memes = obtenu.clone();
+        memes.sort();
+        let mut attendues = attendu.clone();
+        attendues.sort();
+        if memes != attendues || obtenu != ids(chercher(catalogue(), q)) || t.cachees != 0 {
             ecarts.push(format!("« {q} » : PowerShell {attendu:?} / Rust {obtenu:?} ({} cachées)", t.cachees));
         }
     }

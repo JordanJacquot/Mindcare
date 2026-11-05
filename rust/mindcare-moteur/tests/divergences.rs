@@ -37,3 +37,33 @@ fn mesure_ratee_vaut_inconnu() {
     }
     verdict_final("divergences (constat 20)", cas.len(), &ecarts);
 }
+
+/// Écart voulu du 05/11/2026 : la recherche ne classe plus comme Find-Pannes (le PowerShell n'est plus livré, le
+/// moteur Rust fait foi). Les pannes trouvées restent exactement celles de PowerShell (tests\recherches.rs le vérifie
+/// sur les milliers de recherches du juge) ; seul leur ordre change. Avant, « il s'éteint tout seul » mettait « Il
+/// s'éteint d'un coup » 6e, derrière « L'écran s'éteint trop vite » (le mot « seul » de « écran noir tout seul »
+/// comptait autant que « éteint »). Les phrases de tous les jours qui mesurent ce changement : tests\phrases.rs.
+#[test]
+fn recherche_classee_autrement_que_powershell() {
+    let cat = catalogue();
+    let juge = lire_juge("recherches.json");
+    let ids = |l: Vec<&mindcare_moteur::Objet>| -> Vec<String> {
+        l.into_iter().map(|p| mindcare_moteur::ps::texte(mindcare_moteur::ps::champ(p, "Id"))).collect()
+    };
+    let q = "Il s'éteint tout seul";
+    let powershell = ids(mindcare_moteur::chercher_comme_powershell(cat, q));
+    let rust = ids(mindcare_moteur::chercher(cat, q));
+    assert_eq!(powershell.iter().position(|p| p == "seteint"), Some(5), "PowerShell : {powershell:?}");
+    assert_eq!(rust.first().map(String::as_str), Some("seteint"), "Rust : {rust:?}");
+    // Combien de recherches du juge n'ont plus la même panne en tête (pour garder la mesure sous les yeux)
+    let cas = juge["Recherches"].as_array().expect("Recherches");
+    let changees = cas
+        .iter()
+        .filter(|c| {
+            let q = c["Q"].as_str().unwrap_or_default();
+            ids(mindcare_moteur::chercher(cat, q)).first()
+                != c["P"].get(0).and_then(|x| x.as_str()).map(str::to_string).as_ref()
+        })
+        .count();
+    assert!(changees < cas.len() / 4, "{changees} recherches sur {} changent de panne en tête", cas.len());
+}

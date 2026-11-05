@@ -2,6 +2,7 @@
 //! Get-Panne, Get-Famille, Get-Suspect et Get-Etapes de modules\enquete.ps1.
 
 use std::path::Path;
+use std::sync::OnceLock;
 
 use serde_json::Value;
 
@@ -37,6 +38,8 @@ pub struct Catalogue {
     pannes: Vec<Objet>,
     familles: Vec<Objet>,
     vide: Objet,
+    /// Les pannes en texte simple pour la recherche, préparées à la première recherche.
+    fiches: OnceLock<Vec<crate::recherche::Fiche>>,
 }
 
 impl Catalogue {
@@ -53,7 +56,7 @@ impl Catalogue {
         };
         let pannes = objets("Pannes");
         let familles = objets("Familles");
-        Ok(Catalogue { racine, pannes, familles, vide: Objet::new() })
+        Ok(Catalogue { racine, pannes, familles, vide: Objet::new(), fiches: OnceLock::new() })
     }
 
     /// Lit enquetes.json sur le disque.
@@ -70,6 +73,11 @@ impl Catalogue {
     /// Les pannes, dans l'ordre du fichier.
     pub fn pannes(&self) -> &[Objet] {
         &self.pannes
+    }
+
+    /// Les pannes en texte simple pour la recherche (dans l'ordre du fichier), préparées une seule fois.
+    pub(crate) fn fiches(&self) -> &[crate::recherche::Fiche] {
+        self.fiches.get_or_init(|| crate::recherche::fiches(self))
     }
 
     /// Les familles, dans l'ordre du fichier.

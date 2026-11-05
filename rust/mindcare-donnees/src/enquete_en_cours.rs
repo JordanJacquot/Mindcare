@@ -16,7 +16,7 @@ use crate::rapport::{PcDuRapport, SurLePc, texte_rapport, texte_rapport_pc};
 use crate::valeurs::entier;
 use mindcare_moteur::ps::{champ, champ_v, egal, parcours, tableau, texte, vrai};
 use mindcare_moteur::verdict::minuscule;
-use mindcare_moteur::{Catalogue, Enquete, Objet, TypeVerdict, enquete, titre_verdict};
+use mindcare_moteur::{Catalogue, Enquete, Objet, TypeVerdict, enquete, titre_affiche, titre_verdict};
 
 /// `New-DiagId` : « 20261030-140500-0a1f » (la date, puis un nombre au hasard de 0 à 65535 en hexadécimal, donné par
 /// l'appelant).
@@ -99,11 +99,12 @@ pub struct TitreReponse {
     pub supposee: bool,
 }
 
-/// La phrase de la réponse finale (`Get-VerdictTitre`), sauf pour une pièce seulement restée par élimination : elle
-/// n'a pas été testée, « À vérifier : ... » (on ne fait pas acheter sur une supposition).
+/// La phrase de la réponse finale (`Get-VerdictTitre`, sans répéter le détail : `titre_affiche`), sauf pour une pièce
+/// seulement restée par élimination : elle n'a pas été testée, « À vérifier : ... » (on ne fait pas acheter sur une
+/// supposition).
 pub fn titre_reponse(cat: &Catalogue, e: &Enquete) -> TitreReponse {
     let v = e.verdict.as_ref();
-    let mut titre = titre_verdict(cat, v);
+    let mut titre = titre_affiche(cat, v);
     let suspect = v.and_then(|v| v.suspect.as_deref()).and_then(|s| cat.suspect(s));
     let piece = suspect.is_some_and(|s| vrai(champ(s, "Piece")));
     let supposee = piece && v.is_some_and(|v| v.genre == TypeVerdict::Elimination);
@@ -383,6 +384,23 @@ impl EnqueteEnCours {
         };
         let reponses = paires(&e);
         let choix = self.choix.clone();
+        // Une enquête finie gardée avant le 05/11/2026 avec le titre d'alors (« Trouve : Detail », titre_verdict), revue
+        // sans rien y changer : son titre gardé reste tel quel (elle n'est ni déplacée ni réécrite), seul l'écran
+        // montre la nouvelle phrase.
+        let ancien = if supposee { titre.clone() } else { titre_verdict(cat, v.as_ref()) };
+        let titre_garde = match donnees.historique.trouver(&self.diag_id) {
+            Some(d)
+                if ancien != titre
+                    && egal(&texte(champ(d, "Titre")), &ancien)
+                    && tableau(champ(d, "Choix"))
+                        .iter()
+                        .map(|x| entier(Some(x)))
+                        .eq(choix.iter().map(|c| Some(*c))) =>
+            {
+                ancien
+            }
+            _ => titre.clone(),
+        };
         donnees.sauver_diagnostic(
             Some(cat),
             &Enregistrement {
@@ -391,7 +409,7 @@ impl EnqueteEnCours {
                 choix: &choix,
                 fini: true,
                 suspect: suspect_id.as_deref(),
-                titre: &titre,
+                titre: &titre_garde,
                 reponses: &reponses,
                 indices: indices.as_ref(),
                 reprise: self.est_reprise(),

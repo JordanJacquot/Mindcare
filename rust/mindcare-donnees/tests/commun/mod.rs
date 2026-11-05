@@ -247,7 +247,18 @@ fn vu(a: &Affichage) -> Value {
             "Ecran": "etape",
             "Etape": e.etape.as_ref().map(|x| mindcare_moteur::ps::texte(mindcare_moteur::ps::champ(x, "Id"))).unwrap_or_default()
         }),
-        Affichage::Reponse(_, titre) => json!({ "Ecran": "reponse", "Titre": titre }),
+        Affichage::Reponse(e, titre) => {
+            // Écart voulu du 05/11/2026 (tests\divergences.rs du moteur, et titres.rs) : l'écran ne répète plus le
+            // détail (« La batterie lâche »). PowerShell montrait la phrase du moteur (« Trouve : Detail »,
+            // titre_verdict) : c'est elle qui est comparée.
+            let v = e.verdict.as_ref();
+            let montre = if *titre == mindcare_moteur::titre_affiche(catalogue(), v) {
+                mindcare_moteur::titre_verdict(catalogue(), v)
+            } else {
+                titre.clone()
+            };
+            json!({ "Ecran": "reponse", "Titre": montre })
+        }
     }
 }
 
