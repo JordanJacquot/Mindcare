@@ -145,9 +145,9 @@ pub fn texte_rapport_pc(
         l.extend(e.preuves.iter().map(|p| format!("- {p}")));
     }
     let suspect = |id: &str| cat.suspect(id);
+    // (sans ce qui n'a rien à voir avec ce PC : le bloc d'alimentation d'un portable n'est pas une piste écartée)
     let ecartes: Vec<String> = e
-        .ecartes
-        .iter()
+        .ecartes_montres(cat)
         .filter(|x| !suspect(&x.id).is_some_and(|s| vrai(champ(s, "Urgent"))))
         .map(|x| {
             let t = texte(suspect(&x.id).and_then(|s| champ(s, "Titre")));

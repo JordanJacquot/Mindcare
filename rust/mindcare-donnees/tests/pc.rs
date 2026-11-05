@@ -3,7 +3,7 @@
 
 mod commun;
 
-use commun::{DossierEssai, catalogue, indices, lire_juge, moment, s, verdict_final};
+use commun::{DossierEssai, catalogue, indices, lire_juge, moment, s, sans_hors_sujet, verdict_final};
 use mindcare_donnees::choix_pc::REGLAGE;
 use mindcare_donnees::{ChoixPc, Donnees, PcDuRapport, SurLePc, horloge_figee, lignes_fiche, texte_rapport_pc};
 use mindcare_moteur::pc::FichePc;
@@ -128,7 +128,8 @@ fn la_fiche_du_pc_dans_le_rapport() {
         let rapport = |detail: &PcDuRapport| {
             texte_rapport_pc(cat, p, &e, s(&c["Titre"]), &moment(s(&c["Maintenant"])), &pc, detail, s(&c["Version"]))
         };
-        let attendu = s(&c["R"]);
+        // (sans les écartés hors sujet : différence voulue, commun::sans_hors_sujet)
+        let attendu = sans_hors_sujet(s(&c["R"]));
         // Sans rien en plus : exactement PowerShell
         let r = rapport(&PcDuRapport::default());
         if r != attendu {

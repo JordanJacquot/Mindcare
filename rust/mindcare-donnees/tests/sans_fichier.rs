@@ -5,7 +5,7 @@
 
 mod commun;
 
-use commun::{DossierEssai, base64, catalogue, indices, lire_juge, moment, prendre, s, verdict_final};
+use commun::{DossierEssai, base64, catalogue, indices, lire_juge, moment, prendre, s, sans_hors_sujet, verdict_final};
 use mindcare_donnees::dossier::{Suite, chemin_normal, donnees_mindset, gere_par_mindset, lire_suite};
 use mindcare_donnees::enquete_en_cours::{EnqueteEnCours, PreRempli, Reprise, nouvel_id};
 use mindcare_donnees::historique::convertir_indices;
@@ -119,8 +119,10 @@ fn rapports() {
             c["Barrettes"].as_array().into_iter().flatten().map(|b| s(b).to_string()).collect();
         let pc = SurLePc { infos: s(&c["InfosPc"]), barrettes: &barrettes, indices_du_jour: Some(&jour) };
         let r = texte_rapport(cat, p, &e, s(&c["Titre"]), &moment(s(&c["Maintenant"])), &pc, s(&c["Version"]));
-        if r != s(&c["R"]) {
-            ecarts.push(format!("{} {:?} :\n--- PowerShell\n{}\n--- Rust\n{r}", s(&c["Panne"]), entree, s(&c["R"])));
+        // (sans les écartés hors sujet : différence voulue, commun::sans_hors_sujet)
+        let attendu = sans_hors_sujet(s(&c["R"]));
+        if r != attendu {
+            ecarts.push(format!("{} {:?} :\n--- PowerShell\n{attendu}\n--- Rust\n{r}", s(&c["Panne"]), entree));
         }
         let pr: Vec<Value> = paires(&e).iter().map(|x| json!([x.etape, x.reponse])).collect();
         if json!(pr) != c["Paires"] {

@@ -15,7 +15,7 @@ use serde_json::{Map, Value, json};
 use mindcare_donnees::rapport::{SurLePc, enregistrer_rapport, reparateur as textes_rapport};
 use mindcare_donnees::{Donnees, IndiceGarde, IndicesGardes, Moment, horloge_figee, titre_reponse};
 use mindcare_moteur::ps::{champ, champ_v, egal, parcours, tableau, texte, vrai};
-use mindcare_moteur::{Catalogue, Enquete, INDICES_CONNUS, Indices, Objet, TypeVerdict, chercher, enquete};
+use mindcare_moteur::{Catalogue, Enquete, HORS_SUJET, INDICES_CONNUS, Indices, Objet, TypeVerdict, chercher, enquete};
 
 use super::actions::{PLUS_TARD_MESSAGE, ids};
 
@@ -1384,12 +1384,12 @@ fn reponses_finales_de_chaque_genre() {
                 assert!(lignes.iter().any(|l| l["texte"] == t(cat().suspect(r).unwrap(), "Titre")), "{nom} : {r}");
             }
         }
-        // Les écartés (sans les dangers), en minuscule, une seule fois chacun
+        // Les écartés (sans les dangers, ni ce qui n'a rien à voir avec ce PC), en minuscule, une seule fois chacun
         let ecartes: Vec<&Value> = blocs(&page, "texte")
             .into_iter()
             .filter(|x| x["texte"].as_str().unwrap().starts_with("Écartés : "))
             .collect();
-        let montrer = e.ecartes.iter().any(|x| !cat().suspect(&x.id).is_some_and(|s| vrai(champ(s, "Urgent"))));
+        let montrer = e.ecartes_montres(cat()).any(|x| !cat().suspect(&x.id).is_some_and(|s| vrai(champ(s, "Urgent"))));
         assert_eq!(ecartes.len(), usize::from(montrer), "{nom}");
         assert!(toutes_acceptees(&b.etat, &b.json).is_empty());
         // Changer ma dernière réponse : l'étape d'avant
@@ -1604,6 +1604,94 @@ fn reparateur_sans_le_texte() {
     let faux = t.replace("Les réponses :", "Les réponses :\r\n- en trop");
     let r = std::panic::catch_unwind(|| assert_rapport_montre(&p, &faux));
     assert!(r.is_err(), "une ligne du fichier absente de la page doit se voir");
+    b.propre();
+}
+
+/// Un portable : le bloc d'alimentation (écarté d'office, il ne concerne pas ce type de PC) n'apparaît nulle part, ni
+/// dans les suspects de l'étape (ni barré ni compté), ni dans la réponse, ni dans le rapport ou sa page ; une piste
+/// écartée par une vraie réponse, elle, apparaît toujours.
+#[test]
+fn rien_de_hors_sujet_pour_un_portable() {
+    let alim = super::outils::titre_suspect(cat(), "alimentation");
+    let portable =
+        |e: &Enquete| e.notes.iter().any(|n| n == "portable") && e.ecartes.iter().any(|x| x.id == "alimentation");
+    // Pendant l'enquête : la carte des suspects
+    let (panne, choix) = chercher_parcours(|p, e| {
+        textes(p, "Suspects").iter().any(|s| s == "alimentation") && portable(e) && e.etape.is_some()
+    })
+    .expect("une enquête en cours sur un portable");
+    let mut b = Banc::nouveau(None);
+    b.commencer(&panne);
+    b.repondre(&choix);
+    let Some(Vue::Etape(e)) = b.vue() else { panic!("{panne} {choix:?} : pas d'étape montrée") };
+    assert!(e.hors_sujet(cat(), "alimentation"), "{panne} {choix:?}");
+    let carte = blocs(b.enquete(), "suspects");
+    let carte = carte.first().expect("la carte des suspects");
+    let elements = carte["elements"].as_array().unwrap();
+    assert!(elements.iter().all(|x| x["nom"] != alim.as_str()), "{panne} : {carte}");
+    let attendus: Vec<String> =
+        suspects_montres(cat(), cat().panne(&panne).unwrap()).into_iter().filter(|s| s != "alimentation").collect();
+    assert_eq!(elements.len(), attendus.len(), "{panne} : {carte}");
+    let barres = elements.iter().filter(|x| x["etat"] == super::enquete::textes::ECARTE).count();
+    let droite = texte(carte.get("droite"));
+    let compte = if barres <= 1 { format!("{barres} écarté,") } else { format!("{barres} écartés,") };
+    assert!(droite.starts_with(&compte), "{panne} : {droite} au lieu de {compte}");
+
+    // La réponse finale, avec une vraie piste écartée à côté
+    let (panne, choix) = chercher_parcours(|p, e| {
+        textes(p, "Suspects").iter().any(|s| s == "alimentation")
+            && portable(e)
+            && e.etape.is_none()
+            && e.verdict.is_some()
+            && e.ecartes_montres(cat()).any(|x| !x.raison.is_empty() && !super::outils::urgent(cat(), &x.id))
+    })
+    .expect("une réponse finale sur un portable avec une vraie piste écartée");
+    let mut b = Banc::nouveau(None);
+    b.commencer(&panne);
+    b.repondre(&choix);
+    let Some(Vue::Reponse(e)) = b.vue() else { panic!("{panne} {choix:?} : pas de réponse finale montrée") };
+    assert!(e.hors_sujet(cat(), "alimentation"), "{panne} {choix:?}");
+    let vraie = e
+        .ecartes_montres(cat())
+        .find(|x| !x.raison.is_empty() && !super::outils::urgent(cat(), &x.id))
+        .cloned()
+        .expect("une vraie piste écartée");
+    let vraie_nom = super::outils::titre_suspect(cat(), &vraie.id);
+    let page = b.enquete().clone();
+    let ecartes: Vec<String> = blocs(&page, "texte")
+        .into_iter()
+        .map(|x| texte(x.get("texte")))
+        .filter(|x| x.starts_with("Écartés : "))
+        .collect();
+    assert_eq!(ecartes.len(), 1, "{panne} {choix:?}");
+    assert!(!ecartes[0].contains(&alim.to_lowercase()), "{panne} : {}", ecartes[0]);
+    assert!(ecartes[0].contains(&vraie_nom.to_lowercase()), "{panne} : {}", ecartes[0]);
+    let resume = blocs(&page, "repli").iter().map(|r| texte(r.get("resume"))).collect::<Vec<_>>().join(" ");
+    let n = ecartes[0].matches(", ").count() + 1;
+    let piste = if n == 1 { "1 piste écartée".to_string() } else { format!("{n} pistes écartées") };
+    assert!(resume.contains(&piste), "{panne} : {resume} au lieu de {piste}");
+    // Le rapport et sa page
+    let rapport = b.rapport().unwrap();
+    assert!(!rapport.contains(HORS_SUJET), "{rapport}");
+    assert!(!rapport.lines().any(|l| l.starts_with(&format!("- {alim}"))), "{rapport}");
+    assert!(rapport.contains(&format!("- {vraie_nom} ({})", vraie.raison)), "{rapport}");
+    b.action(ids::REPARATEUR, Value::Null, ecrans::ENQUETE);
+    let page = b.page(ecrans::REPARATEUR).unwrap().clone();
+    assert_rapport_montre(&page, &rapport);
+    let gras: Vec<String> = blocs(&page, "rangs")
+        .into_iter()
+        .flat_map(|r| r["rangs"].as_array().cloned().unwrap_or_default())
+        .map(|r| texte(r.get("gras")))
+        .collect();
+    assert!(!gras.contains(&alim), "{panne} : {gras:?}");
+    assert!(gras.contains(&vraie_nom), "{panne} : {gras:?}");
+    // Un rapport écrit par une version d'avant (avec la ligne du bloc d'alimentation) : la page ne la montre pas
+    let ancien = rapport.replacen("Écartés :\r\n", &format!("Écartés :\r\n- {alim} ({HORS_SUJET})\r\n"), 1);
+    assert_ne!(ancien, rapport, "le rapport n'a pas de partie « Écartés »");
+    b.etat.rapport = Some(ancien);
+    let p = super::reparateur::page(&b.etat, cat());
+    assert!(!p.to_string().contains(HORS_SUJET), "{p}");
+    assert!(p.to_string().contains(&vraie_nom), "{p}");
     b.propre();
 }
 

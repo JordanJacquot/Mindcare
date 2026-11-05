@@ -26,7 +26,9 @@ pub mod validation;
 pub mod verdict;
 
 pub use catalogue::{Catalogue, Groupe, GroupesFamille};
-pub use enquete::{Auto, Ecarte, Enquete, Fait, INDICES_CONNUS, Indice, Indices, TypeVerdict, Verdict, enquete};
+pub use enquete::{
+    Auto, Ecarte, Enquete, Fait, HORS_SUJET, INDICES_CONNUS, Indice, Indices, TypeVerdict, Verdict, enquete,
+};
 pub use garde_fou::pre_rempli;
 pub use pc::{MARQUES, ProfilPc, Tri, TypePc, concerne};
 pub use ps::Objet;

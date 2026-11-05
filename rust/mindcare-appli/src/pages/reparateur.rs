@@ -13,7 +13,7 @@ use serde_json::{Value, json};
 use mindcare_donnees::rapport::reparateur as textes;
 use mindcare_donnees::titre_reponse;
 use mindcare_moteur::ps::{champ, vrai};
-use mindcare_moteur::{Catalogue, Enquete, TypeVerdict};
+use mindcare_moteur::{Catalogue, Enquete, HORS_SUJET, TypeVerdict};
 
 use super::actions::ids;
 use super::outils::{t, titre_suspect, urgent};
@@ -209,19 +209,30 @@ pub fn blocs_du_rapport(rapport: &str, cat: &Catalogue, enquete: Option<&Enquete
     blocs.push(haut);
 
     // Les noms des écartés (avec leur raison) et de ce qui reste, d'après l'enquête gardée
+    let ligne_ecarte = |id: &str, raison: &str| {
+        let nom = titre_suspect(cat, id);
+        let ligne = if raison.is_empty() { nom.clone() } else { format!("{nom} ({raison})") };
+        (ligne, nom)
+    };
     let ecartes_connus: Vec<(String, String, String)> = enquete
         .map(|e| {
-            e.ecartes
-                .iter()
+            e.ecartes_montres(cat)
                 .filter(|x| !urgent(cat, &x.id))
                 .map(|x| {
-                    let nom = titre_suspect(cat, &x.id);
-                    let ligne = if x.raison.is_empty() { nom.clone() } else { format!("{nom} ({})", x.raison) };
+                    let (ligne, nom) = ligne_ecarte(&x.id, &x.raison);
                     (ligne, nom, x.raison.clone())
                 })
                 .collect()
         })
         .unwrap_or_default();
+    // Ce qui n'a rien à voir avec ce PC (le bloc d'alimentation d'un portable) n'est pas montré, même dans un rapport
+    // écrit par une version d'avant qui le mettait dans « Écartés »
+    let hors_sujet: Vec<String> = enquete
+        .map(|e| {
+            e.ecartes.iter().filter(|x| e.hors_sujet(cat, &x.id)).map(|x| ligne_ecarte(&x.id, &x.raison).0).collect()
+        })
+        .unwrap_or_default();
+    let a_montrer = |l: &&String| !hors_sujet.contains(l) && !l.ends_with(&format!("({HORS_SUJET})"));
     let restants: Vec<String> = enquete
         .and_then(|e| e.verdict.as_ref())
         .filter(|v| v.genre == TypeVerdict::Reparateur)
@@ -234,6 +245,7 @@ pub fn blocs_du_rapport(rapport: &str, cat: &Catalogue, enquete: Option<&Enquete
     let ecartes = lu
         .ecartes
         .iter()
+        .filter(a_montrer)
         .map(|l| match ecartes_connus.iter().find(|(ligne, _, _)| ligne == l) {
             Some((_, nom, raison)) => json!({ "puce": "croix", "gras": nom, "texte": raison }),
             None => json!({ "puce": "croix", "texte": l }),

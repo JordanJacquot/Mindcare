@@ -485,8 +485,41 @@ fn abimes(v: &Value) -> Vec<(String, Value)> {
     l
 }
 
-/// Ce qui diffère entre ce que le juge attend et ce que le Rust a obtenu, ou rien.
+/// Un rapport de PowerShell tel que le Rust l'écrit maintenant : sans les écartés qui n'ont rien à voir avec ce PC (le
+/// bloc d'alimentation d'un portable, « (Ne concerne pas ce type de PC) »), et sans la partie « Écartés » si elle n'a
+/// plus rien. Différence voulue (version 0.91.1) : l'enquête, elle, est la même ; seul ce qu'on montre change.
+pub fn sans_hors_sujet(rapport: &str) -> String {
+    let fin = format!(" ({})", mindcare_moteur::HORS_SUJET);
+    if !rapport.contains(&fin) {
+        return rapport.to_string();
+    }
+    let parties: Vec<String> = rapport
+        .split("\r\n\r\n")
+        .filter_map(|p| {
+            if !p.starts_with("Écartés :") {
+                return Some(p.to_string());
+            }
+            let lignes: Vec<&str> = p.split("\r\n").filter(|l| !(l.starts_with("- ") && l.ends_with(&fin))).collect();
+            (lignes.len() > 1).then(|| lignes.join("\r\n"))
+        })
+        .collect();
+    parties.join("\r\n\r\n")
+}
+
+/// [`sans_hors_sujet`] sur chaque texte d'une valeur (les résultats et les fichiers d'un scénario).
+pub fn valeur_sans_hors_sujet(v: &Value) -> Value {
+    match v {
+        Value::String(t) => Value::String(sans_hors_sujet(t)),
+        Value::Array(a) => Value::Array(a.iter().map(valeur_sans_hors_sujet).collect()),
+        Value::Object(o) => Value::Object(o.iter().map(|(k, x)| (k.clone(), valeur_sans_hors_sujet(x))).collect()),
+        autre => autre.clone(),
+    }
+}
+
+/// Ce qui diffère entre ce que le juge attend et ce que le Rust a obtenu, ou rien. (Les rapports attendus sont lus sans
+/// les écartés hors sujet : [`sans_hors_sujet`].)
 pub fn ecart(attendu: &Value, obtenu: &Value) -> Option<String> {
+    let attendu = &valeur_sans_hors_sujet(attendu);
     let mut d = Vec::new();
     let ra = attendu["Resultats"].as_array().cloned().unwrap_or_default();
     let ro = obtenu["Resultats"].as_array().cloned().unwrap_or_default();

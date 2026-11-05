@@ -30,9 +30,10 @@ pub fn fil_panne(cat: &Catalogue, panne: &Objet) -> Vec<String> {
 }
 
 /// Les suspects (Add-AnneauSuspects) : une petite carte par suspect à montrer, « À vérifier » ou « Écarté », avec le
-/// compte (« 1 écarté, encore 5 à vérifier ») ; rien quand la panne n'en montre aucun.
+/// compte (« 1 écarté, encore 5 à vérifier ») ; rien quand la panne n'en montre aucun. Un suspect qui n'a rien à voir
+/// avec ce PC (le bloc d'alimentation d'un portable) n'y est pas du tout, ni barré ni compté.
 pub fn bloc_suspects(cat: &Catalogue, panne: &Objet, e: &Enquete) -> Option<Value> {
-    let tous = suspects_montres(cat, panne);
+    let tous: Vec<String> = suspects_montres(cat, panne).into_iter().filter(|s| !e.hors_sujet(cat, s)).collect();
     if tous.is_empty() {
         return None;
     }

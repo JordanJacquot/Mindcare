@@ -49,11 +49,21 @@ pub struct Indice {
 /// Les indices de Windows, par nom (la table de journaux.ps1). Les noms se lisent sans tenir compte des majuscules.
 pub type Indices = HashMap<String, Indice>;
 
-/// Un suspect écarté, et pourquoi (la preuve de la réponse, ou « Ne concerne pas ce type de PC »).
+/// Un suspect écarté, et pourquoi (la preuve de la réponse, ou [`HORS_SUJET`]).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ecarte {
     pub id: String,
     pub raison: String,
+}
+
+/// La raison d'un suspect écarté d'office parce qu'il ne concerne pas ce type de PC (un portable n'a pas de bloc
+/// d'alimentation).
+pub const HORS_SUJET: &str = "Ne concerne pas ce type de PC";
+
+/// Ce suspect ne concerne-t-il pas ce PC ? Son « Sauf » contient un des mots retenus (« portable », « fixe »...).
+fn sauf_note(cat: &Catalogue, notes: &[String], id: &str) -> bool {
+    let sauf = cat.suspect(id).and_then(|s| champ(s, "Sauf"));
+    parcours(sauf).iter().any(|x| vrai(Some(x)) && contient(notes, x))
 }
 
 /// Une réponse donnée : l'étape, la réponse (son texte, ou « Je ne sais pas »), et les textes de l'étape.
@@ -125,6 +135,22 @@ pub struct Enquete {
     pub verdict: Option<Verdict>,
     /// Les étapes qui peuvent encore venir après celle-ci (au plus) : pour « Étape 2 sur 5 ».
     pub a_venir: usize,
+}
+
+impl Enquete {
+    /// Ce suspect est-il écarté parce qu'il n'a rien à voir avec ce PC (son « Sauf » contient un des mots retenus :
+    /// le bloc d'alimentation d'un portable) ? Ce n'est pas une piste vérifiée : l'affichage (pages, rapport) ne le
+    /// montre nulle part, ni barré ni compté. La règle est celle de l'enquête elle-même, pas le texte de la raison :
+    /// un suspect écarté par une vraie preuve, puis devenu hors sujet, ne concerne pas ce PC non plus. Un suspect qui
+    /// reste n'est jamais hors sujet (il est dans « Il reste »). L'enquête, elle, ne change pas.
+    pub fn hors_sujet(&self, cat: &Catalogue, id: &str) -> bool {
+        !self.restants.iter().any(|r| r == id) && sauf_note(cat, &self.notes, id)
+    }
+
+    /// Les écartés à montrer : tous, sauf ceux qui sont hors sujet ([`Enquete::hors_sujet`]).
+    pub fn ecartes_montres<'a>(&'a self, cat: &'a Catalogue) -> impl Iterator<Item = &'a Ecarte> + 'a {
+        self.ecartes.iter().filter(move |x| !self.hors_sujet(cat, &x.id))
+    }
 }
 
 /// L'état d'une enquête en cours de route.
@@ -242,10 +268,9 @@ pub fn enquete(cat: &Catalogue, panne: &Objet, choix: &[i64], indices: Option<&I
     while st.confirme.is_none() {
         // Les suspects qui ne concernent pas ce PC (un portable n'a pas de bloc d'alimentation...)
         for id in st.restants.clone() {
-            let sauf = cat.suspect(&id).and_then(|s| champ(s, "Sauf"));
-            if parcours(sauf).iter().any(|x| vrai(Some(x)) && contient(&st.notes, x)) {
+            if sauf_note(cat, &st.notes, &id) {
                 st.retire(&id);
-                st.ecartes.push(Ecarte { id, raison: "Ne concerne pas ce type de PC".to_string() });
+                st.ecartes.push(Ecarte { id, raison: HORS_SUJET.to_string() });
             }
         }
         let Some(et) = etapes.iter().find(|x| !faites.contains(&cle(&texte(champ(x, "Id")))) && st.possible(x)) else {

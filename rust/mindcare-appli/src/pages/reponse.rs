@@ -138,7 +138,8 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
         preuves.push(json!({ "type": "texte", "texte": x::RIEN_ECARTE }));
     }
     let mut ecartes: Vec<String> = Vec::new();
-    for x in e.ecartes.iter().filter(|x| !urgent(cat, &x.id)) {
+    // (sans ce qui n'a rien à voir avec ce PC : le bloc d'alimentation d'un portable n'est pas une piste écartée)
+    for x in e.ecartes_montres(cat).filter(|x| !urgent(cat, &x.id)) {
         let nom = minuscule(&titre_suspect(cat, &x.id));
         if !ecartes.contains(&nom) {
             ecartes.push(nom);
