@@ -351,11 +351,12 @@ pub fn lancer() -> ! {
         })
         .on_window_event(evenement_fenetre);
     match constructeur.build(crate::contexte()) {
-        Ok(app) => {
+        Ok(app) => boucle_protegee(&journal, move || {
             let _ = app.run_return(|_, _| {});
-        }
+        }),
         Err(e) => journal.ecrire(&format!("Écran : Tauri n'a pas pu démarrer ({e})")),
     }
+    // (dans tous les cas, même après un plantage sur le fil de la fenêtre : llama-server, whisper et le micro arrêtés)
     finir()
 }
 
@@ -594,6 +595,21 @@ fn capture_demandee(etat: &Etat) {
             Err(e) => etat.journal.ecrire(&format!("Essai : capture non écrite ({e})")),
         },
         None => etat.journal.ecrire("Essai : capture impossible"),
+    }
+}
+
+/// La boucle de la fenêtre (`run_return`), protégée : tao attrape une panique d'un rappel de la fenêtre (une page, un
+/// effet, une commande) et la relance à la sortie de sa boucle. Sans cette garde, elle remonterait hors de
+/// `lancer()` et sauterait la fin propre ([`finir`]) : llama-server et whisper resteraient en mémoire tant que le
+/// processus vit. Ici, elle est notée au journal et la fin propre suit.
+pub fn boucle_protegee(journal: &Journal, boucle: impl FnOnce()) {
+    if let Err(p) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(boucle)) {
+        let raison = p
+            .downcast_ref::<&str>()
+            .map(|s| s.to_string())
+            .or_else(|| p.downcast_ref::<String>().cloned())
+            .unwrap_or_else(|| "raison inconnue".to_string());
+        journal.ecrire(&format!("Fermeture : plantage ({raison})"));
     }
 }
 
