@@ -161,6 +161,10 @@ pub struct Etat {
     pub commande: Option<(usize, bool)>,
     /// Ce que Windows a noté aujourd'hui (`None` : pas encore lu)
     pub indices_du_jour: Option<IndicesGardes>,
+    /// Ce que Windows a noté date de plus de 10 minutes et aucune lecture n'est attendue (constat 21) : posé par
+    /// effets.rs avant chaque message et chaque réponse de l'assistant. Une enquête neuve (commencée ou reprise)
+    /// oublie alors `indices_du_jour` et redemande la lecture.
+    pub indices_perimes: bool,
     /// La lecture de Windows est demandée (effet [`Effet::LireWindows`] déjà rendu)
     pub windows_demande: bool,
     /// Les barrettes de mémoire de ce PC (« 8 Go Kingston... »), lues avec Windows

@@ -236,6 +236,7 @@ impl Etat {
             return vec![Effet::afficher(ecrans::ACCUEIL)];
         }
         let diag_id = nouvel_id();
+        self.oublier_indices_perimes();
         self.nouvelle_page_enquete();
         let Some(ligne) = self.en_cours.preparer(cat, panne, pre_rempli, diag_id) else {
             self.retour_accueil();
@@ -246,10 +247,20 @@ impl Etat {
         effets
     }
 
+    /// Constat 21 : au départ de toute enquête neuve (par mots, par familles, par l'assistant, « Pour être sûr »,
+    /// « Reprendre »), ce que Windows a noté il y a plus de 10 minutes est oublié : l'enquête le redemande.
+    fn oublier_indices_perimes(&mut self) {
+        if std::mem::take(&mut self.indices_perimes) {
+            self.indices_du_jour = None;
+        }
+    }
+
     /// `Open-Diagnostic` : la dernière enquête gardée, là où on en était (son étape, ou sa réponse).
     fn reprendre(&mut self, cat: &Catalogue) -> Vec<Effet> {
         let d = self.historique.first().cloned();
         let id = d.as_ref().map(|d| texte(champ(d, "Id"))).unwrap_or_default();
+        // (une enquête finie revue garde ses propres indices : seule une enquête pas finie relit Windows)
+        self.oublier_indices_perimes();
         self.nouvelle_page_enquete();
         match self.en_cours.preparer_reprise(cat, &id, d.as_ref()) {
             Ok(ligne) => {

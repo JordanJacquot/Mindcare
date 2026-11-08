@@ -462,14 +462,7 @@ impl Branchement {
             self.executer(effets, monde);
             return;
         };
-        // Constat 21 : une nouvelle enquête relit ce que Windows a noté s'il date de plus de 10 minutes
-        if let MessagePage::Action { id, .. } = m
-            && id.starts_with(pages::PANNE)
-            && self.windows.perimee()
-            && !self.windows.attendue()
-        {
-            self.pages.indices_du_jour = None;
-        }
+        self.noter_indices_perimes();
         let message = message_kit(m);
         let journal = monde.donnees.journal().clone();
         let mut graine = self.hasard;
@@ -478,6 +471,29 @@ impl Branchement {
             .agir(&cat, &message, &mut || mindcare_donnees::nouvel_id(&journal.maintenant(), hasard(&mut graine)));
         self.hasard = graine;
         self.executer(effets, monde);
+    }
+
+    /// Constat 21 : les pages savent, avant chaque message et chaque réponse de l'assistant, si ce que Windows a
+    /// noté date de plus de 10 minutes (sans lecture attendue). Toute enquête neuve qui part de là (commencée par
+    /// mots, par familles, par l'assistant, par « Pour être sûr », ou reprise) le redemande alors.
+    fn noter_indices_perimes(&mut self) {
+        self.pages.indices_perimes = self.windows.perimee() && !self.windows.attendue();
+    }
+
+    /// La réponse de l'assistant, décidée, donnée aux pages (l'enquête peut commencer tout de suite).
+    fn decision_assistant(
+        &mut self,
+        cat: &Catalogue,
+        d: mindcare_assistant::Decision,
+        journal: &mindcare_donnees::Journal,
+    ) -> Vec<Effet> {
+        self.noter_indices_perimes();
+        let mut graine = self.hasard;
+        let effets = self.pages.decision_assistant(cat, d, &mut || {
+            mindcare_donnees::nouvel_id(&journal.maintenant(), hasard(&mut graine))
+        });
+        self.hasard = graine;
+        effets
     }
 
     /// Le pas de la minuterie : une lecture de Windows attendue et finie (ou trop longue) fait avancer l'enquête ;
@@ -549,11 +565,7 @@ impl Branchement {
             o.question = None;
             monde.page.ordre(json!({ "kit": "occupe", "texte": "" }));
             let d = decider(&cat, &phrase, &r, &|l| journal.ecrire(l));
-            let mut graine = self.hasard;
-            effets.extend(self.pages.decision_assistant(&cat, d, &mut || {
-                mindcare_donnees::nouvel_id(&journal.maintenant(), hasard(&mut graine))
-            }));
-            self.hasard = graine;
+            effets.extend(self.decision_assistant(&cat, d, &journal));
         }
         let Some(o) = self.outils.as_mut() else { return effets };
         // (la photo touche au disque : tous les 5 pas, ou tout de suite quand quelque chose bouge)

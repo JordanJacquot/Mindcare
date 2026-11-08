@@ -4,7 +4,7 @@
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicI64, AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -112,11 +112,21 @@ impl SourceWindows for FauxWindows {
     }
 }
 
-struct FausseHorloge;
+/// L'horloge de la lecture de Windows : arrêtée, sauf quand un essai l'avance (en minutes).
+#[derive(Default)]
+struct FausseHorloge {
+    minutes: AtomicI64,
+}
+
+impl FausseHorloge {
+    fn avancer(&self, minutes: i64) {
+        self.minutes.fetch_add(minutes, Ordering::SeqCst);
+    }
+}
 
 impl Horloge for FausseHorloge {
     fn maintenant(&self) -> Moment {
-        maintenant_windows()
+        maintenant_windows().plus_minutes(self.minutes.load(Ordering::SeqCst))
     }
 }
 
@@ -182,6 +192,8 @@ struct Banc {
     copies: Rc<RefCell<Vec<String>>>,
     windows: Arc<FauxWindows>,
     menus: usize,
+    /// L'horloge de la lecture de Windows (avancée par un essai)
+    horloge: Arc<FausseHorloge>,
     /// Effacer le dossier d'essai à la fin (pas avant une relance)
     effacer: bool,
 }
@@ -213,16 +225,17 @@ impl Banc {
         let mut donnees = Donnees::ouvrir(&racine.join("Donnees"), horloge_figee(moment()), true);
         donnees.lire_historique();
         let windows = FauxWindows::avec(lent, materiel);
+        let horloge = Arc::new(FausseHorloge::default());
         let mut lecture = LectureWindows::nouvelle(
             Arc::clone(&windows) as Arc<dyn SourceWindows>,
-            Arc::new(FausseHorloge),
+            Arc::clone(&horloge) as Arc<dyn Horloge>,
             ATTENTE_WINDOWS_MAX,
         );
         lecture.lancer();
         let copies = Rc::new(RefCell::new(Vec::new()));
         let exterieur = FauxExterieur { bureau: Some(bureau), copies: Rc::clone(&copies), copie_possible };
         let b = Branchement::nouveau("0.1.0", "neon", cat, &donnees, lecture, Box::new(exterieur));
-        Banc { b, donnees, page: FaussePage::default(), racine, copies, windows, menus: 0, effacer: true }
+        Banc { b, donnees, page: FaussePage::default(), racine, copies, windows, horloge, menus: 0, effacer: true }
     }
 
     fn envoyer(&mut self, m: MessagePage) {
@@ -453,6 +466,79 @@ fn windows_rapide() {
     let rapport = b.copies.borrow().first().cloned().expect("rapport copié");
     assert!(rapport.contains("Ordinateur : Dell XPS 13, Windows 11 Famille"), "{rapport}");
     assert!(rapport.contains("Mémoire : 8 Go Kingston KF3200 (DIMM1)"), "{rapport}");
+}
+
+/// Jusqu'à « Sur ce PC ? », oui, puis : Windows est relu (`relu`, une lecture de plus) ou pas (les indices gardés).
+fn cepc_et_lecture(b: &mut Banc, relu: bool, quoi: &str) {
+    let avant = b.windows.lectures.load(Ordering::SeqCst);
+    b.jusqu_a_cepc();
+    b.action(ids::REP, json!("0"), ecrans::ENQUETE);
+    assert_eq!(b.b.windows.attendue(), relu, "{quoi} : lecture de Windows attendue ?");
+    attendre_windows(b);
+    assert_eq!(b.windows.lectures.load(Ordering::SeqCst), avant + usize::from(relu), "{quoi} : lectures de Windows");
+    assert!(!matches!(b.vue(), Some(Vue::Attente) | None), "{quoi}");
+}
+
+/// Constat 21 (M13 de l'audit Rust) : Mindcare reste ouverte. Plus de 10 minutes après la dernière lecture de ce que
+/// Windows a noté, toute enquête neuve la relance, quelle que soit la façon dont elle part : par mots, par
+/// l'assistant sûr de lui, par « Pour être sûr », par « Reprendre l'enquête ». Avant 10 minutes : rien de relu.
+#[test]
+fn indices_relus_pour_toute_enquete_neuve() {
+    use crate::pages::ids_aides;
+    use mindcare_assistant::{Choix, Decision};
+    let mut b = Banc::nouveau(Ok(cat()), false);
+    b.envoyer(MessagePage::Pret);
+    let journal = b.donnees.journal().clone();
+    // Le matin : l'enquête par mots se sert de la lecture du lancement
+    b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
+    b.jusqu_a_cepc();
+    b.action(ids::REP, json!("0"), ecrans::ENQUETE);
+    attendre_windows(&mut b);
+    assert!(b.b.pages.indices_du_jour.is_some());
+    assert_eq!(b.windows.lectures.load(Ordering::SeqCst), 1);
+    // 5 minutes plus tard : rien de relu
+    b.horloge.avancer(5);
+    b.action("panne:ecranbleu", Value::Null, ecrans::RACONTE);
+    cepc_et_lecture(&mut b, false, "par mots, 5 minutes après");
+    // Par l'assistant, sûr de lui, 11 minutes plus tard
+    b.horloge.avancer(11);
+    b.action(ids::ACCUEIL, Value::Null, ecrans::ENQUETE);
+    b.b.pages.aides.lit = true;
+    let d = Decision::Enquete { panne: "ecranbleu".into(), reponses: Vec::new() };
+    let e = b.b.decision_assistant(&cat(), d, &journal);
+    b.executer(e);
+    assert_eq!(b.dernier_ecran().as_deref(), Some(ecrans::ENQUETE));
+    cepc_et_lecture(&mut b, true, "par l'assistant");
+    // Par « Pour être sûr », 11 minutes plus tard
+    b.horloge.avancer(11);
+    b.action(ids::ACCUEIL, Value::Null, ecrans::ENQUETE);
+    b.b.pages.aides.lit = true;
+    let p = cat().panne("ecranbleu").unwrap().clone();
+    let choix = Choix {
+        panne: "ecranbleu".into(),
+        titre: texte(champ(&p, "Titre")),
+        phrase: texte(champ(&p, "Phrase")),
+        reponses: Vec::new(),
+    };
+    let d = Decision::PourEtreSur { phrase: "mon écran devient bleu".into(), choix: vec![choix] };
+    let e = b.b.decision_assistant(&cat(), d, &journal);
+    b.executer(e);
+    b.action(ids_aides::IDEE, json!("0"), crate::pages::POUR_ETRE_SUR);
+    assert_eq!(b.dernier_ecran().as_deref(), Some(ecrans::ENQUETE));
+    cepc_et_lecture(&mut b, true, "par « Pour être sûr »");
+    // « Reprendre l'enquête » (pas finie, « Sur ce PC ? » déjà répondu), 11 minutes plus tard : relue avant de
+    // continuer
+    b.action(ids::PLUS_TARD, Value::Null, ecrans::ENQUETE);
+    b.horloge.avancer(11);
+    let avant = b.windows.lectures.load(Ordering::SeqCst);
+    b.action(crate::pages::REPRENDRE, Value::Null, ecrans::ACCUEIL);
+    assert!(b.b.windows.attendue(), "« Reprendre » : lecture de Windows attendue");
+    attendre_windows(&mut b);
+    assert_eq!(b.windows.lectures.load(Ordering::SeqCst), avant + 1, "« Reprendre » : lectures de Windows");
+    assert!(!matches!(b.vue(), Some(Vue::Attente) | None));
+    // (une réponse dans l'enquête reprise ne relit rien de plus)
+    b.action(ids::NSP, Value::Null, ecrans::ENQUETE);
+    assert_eq!(b.windows.lectures.load(Ordering::SeqCst), avant + 1);
 }
 
 /// Sur le PC en panne, Windows lent : la page attend sans jamais bloquer, puis l'enquête continue sans lui au bout
