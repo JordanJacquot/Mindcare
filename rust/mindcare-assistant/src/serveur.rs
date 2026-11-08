@@ -255,6 +255,9 @@ struct Interne {
     copie_vue: Option<(u64, Option<SystemTime>)>,
     empreintes: usize,
     veilleur: bool,
+    /// Le dernier lancement impossible (bloqué par un antivirus, fichier abîmé, pas de port...) : pas de nouvel essai
+    /// avant une minute, sauf après un arrêt par Mindcare (une installation neuve)
+    echec_lancement: Option<Instant>,
 }
 
 struct Partage {
@@ -307,6 +310,7 @@ impl Assistant {
             copie_vue: None,
             empreintes: 0,
             veilleur: false,
+            echec_lancement: None,
         };
         Assistant { partage: Arc::new(Partage { reglages, lanceur, horloge, journal, interne: Mutex::new(interne) }) }
     }
@@ -450,11 +454,17 @@ fn demarrer(p: &Arc<Partage>) {
             return;
         }
     }
+    // Lancement impossible il y a moins d'une minute : pas de nouvel essai (sinon un llama-server bloqué par
+    // l'antivirus serait relancé, sur le fil de la fenêtre, à chaque pause de frappe et à chaque phrase dictée)
+    if i.echec_lancement.is_some_and(|t| maintenant.saturating_duration_since(t) < p.reglages.delais.relance) {
+        return;
+    }
     if !p.reglages.paquet.installe() {
         return;
     }
     match lancer(p, &mut i) {
         Ok((port, modele, programme, avertissement)) => {
+            i.echec_lancement = None;
             i.lance = maintenant;
             drop(i);
             if let Some(a) = avertissement {
@@ -466,6 +476,7 @@ fn demarrer(p: &Arc<Partage>) {
         }
         Err(e) => {
             i.processus = None;
+            i.echec_lancement = Some(maintenant);
             i.erreur = Some(format!("lancement impossible ({e})"));
             drop(i);
             p.noter(&format!("Assistant : lancement impossible ({e})"));
@@ -749,8 +760,9 @@ fn arreter_si_inutile(p: &Arc<Partage>, maintenant: Instant) -> bool {
 
 fn arreter_serveur(p: &Partage) {
     let mut i = p.verrou();
-    // (arrêté par Mindcare : relancé dès la prochaine question)
+    // (arrêté par Mindcare : relancé dès la prochaine question, même après un lancement impossible)
     i.arrete = true;
+    i.echec_lancement = None;
     i.pret = false;
     i.generation += 1;
     let pr = i.processus.take();

@@ -386,6 +386,45 @@ fn assistant_qui_plante() {
     assert_ne!(b.lanceur.dernier_ordre().variable("LLAMA_API_KEY").unwrap(), cle);
 }
 
+/// Audit Rust (petit de Mindcare) : llama-server qui ne peut même pas être lancé (bloqué par l'antivirus, fichier
+/// abîmé) n'est pas relancé à chaque pause de frappe, mais une fois par minute au plus ; une installation neuve
+/// (l'assistant arrêté par Mindcare) le relance tout de suite.
+#[test]
+fn lancement_impossible_pas_relance_a_chaque_lettre() {
+    let b = Banc::nouveau("bloque", Scenario::PasUnProgramme, delais_courts());
+    for _ in 0..6 {
+        b.assistant.demarrer(); // (six pauses de frappe)
+    }
+    let j = b.journal.texte();
+    assert_eq!(b.lanceur.nb_lancements(), 1, "{j}");
+    assert_eq!(b.journal.compte("Assistant : lancement impossible"), 1, "{j}");
+    // il ne démarre pas : la page le dit, avec la vraie cause, sans nouvel essai
+    let q = b.assistant.poser("mon pc fait du bruit", &permises());
+    assert!(matches!(q, Question::NeDemarrePas { ref cause } if cause.contains("lancement impossible")));
+    assert_eq!(b.lanceur.nb_lancements(), 1);
+    assert_eq!(b.assistant.etat(), Etat::Erreur { message: MESSAGE_ECHEC.to_string() });
+    // 59 secondes plus tard : toujours rien
+    b.horloge.avancer(Duration::from_secs(59));
+    b.assistant.demarrer();
+    assert_eq!(b.lanceur.nb_lancements(), 1);
+    // une minute plus tard : un nouvel essai, qui marche (l'antivirus l'a laissé passer)
+    *b.lanceur.scenario.lock().unwrap() = Scenario::Normal(comportement_bruit());
+    b.horloge.avancer(Duration::from_secs(2));
+    b.assistant.demarrer();
+    assert_eq!(b.lanceur.nb_lancements(), 2);
+    assert!(b.assistant.lance());
+    // de nouveau bloqué après un arrêt par Mindcare (une installation neuve) : essayé tout de suite, puis attente
+    b.assistant.arreter_serveur();
+    *b.lanceur.scenario.lock().unwrap() = Scenario::PasUnProgramme;
+    b.assistant.demarrer();
+    assert_eq!(b.lanceur.nb_lancements(), 3);
+    b.assistant.demarrer();
+    assert_eq!(b.lanceur.nb_lancements(), 3);
+    b.assistant.arreter_serveur();
+    b.assistant.demarrer();
+    assert_eq!(b.lanceur.nb_lancements(), 4);
+}
+
 // -----------------------------------------------------------------------------------------------------------------
 // La décision (Request-Ia, Show-PourEtreSur) avec le vrai catalogue
 // -----------------------------------------------------------------------------------------------------------------
