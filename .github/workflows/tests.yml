@@ -18,7 +18,7 @@ jobs:
         shell: powershell
     steps:
       - name: "Récupérer le dépôt"
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: "Analyse du code (PSScriptAnalyzer, erreurs seulement)"
         run: |
@@ -179,6 +179,20 @@ jobs:
           # propre fenêtre (sur le PC, il ouvrirait le vrai Mindset : ce cas ne se lance que sur GitHub).
           & ..\_mindset\outils\tester-contrat.ps1 -AppliConstruite (Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare') -EntreeApps ..\outils\entree-apps-rust.json
           # (le code du test, jamais un code hérité d'une commande d'avant)
+          if ($LASTEXITCODE -eq 0) { exit 0 }
+          exit 1
+
+      # Comme le job « Mise à jour depuis la version PowerShell » de Mindset et l'étape « Mise à jour depuis 1.15.6 » de
+      # Nevermind : la dernière version PowerShell publiée (0.15.3), puis Mindcare en Rust construit plus haut.
+      - name: "Mise à jour depuis la version PowerShell (0.15.3 -> Rust, rien de perdu : reglages.json, diagnostics.json, fichiers de l'utilisateur, même dossier de données ; outils\\tester-maj-rust.ps1)"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $d = Join-Path $env:RUNNER_TEMP 'mindcare-0.15.3'
+          gh release download v0.15.3 --repo JordanJacquot/Mindcare --pattern 'Mindcare.zip' --dir $d
+          if ($LASTEXITCODE) { exit 1 }
+          Write-Host "Mindcare.zip de 0.15.3 : SHA-256 $((Get-FileHash -LiteralPath (Join-Path $d 'Mindcare.zip') -Algorithm SHA256).Hash)"
+          & ..\outils\tester-maj-rust.ps1 -Ancienne (Join-Path $d 'Mindcare.zip') -Nouvelle (Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare')
           if ($LASTEXITCODE -eq 0) { exit 0 }
           exit 1
 
