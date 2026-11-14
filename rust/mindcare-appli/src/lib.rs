@@ -8,6 +8,7 @@
 //! - [`pages`] et [`effets`] : les pages de Mindcare pour le kit d'écrans, et leurs effets exécutés (enquête gardée,
 //!   rapport, presse-papiers, lecture de Windows) ;
 //! - [`reparer`] : « Le faire pour moi », les programmes de la liste fermée et leur travail de fond ;
+//! - [`ouvrir`] : « Ouvrir Nevermind », la demande écrite pour Mindset et attendue sur un fil à part ;
 //! - [`pack`] : la réponse du protocole `pack` (les images et polices du thème, règle 6), par suite-commun ;
 //! - [`preparer`] et [`contexte`] : ce que le programme et les tests donnent à Tauri ;
 //! - `programme` : le programme Mindset.exe tout branché (étape 4.4 : démarrage, verrou, fenêtre, surveillances) ;
@@ -24,6 +25,7 @@ pub mod effets;
 #[cfg(feature = "essai")]
 pub mod essai;
 pub mod fenetre;
+pub mod ouvrir;
 pub mod pack;
 pub mod pages;
 #[cfg(any(feature = "essai", test))]

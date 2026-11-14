@@ -33,6 +33,7 @@ use mindcare_telechargement::{Disque, Etat as EtatInstallation, Fin, Installatio
 use mindcare_windows::{Horloge, IndicesWindows, LectureJournaux, PcDetecte, SourceWindows, a_relire, barrettes};
 use serde_json::{Value, json};
 
+use crate::ouvrir;
 use crate::pages::{self, Effet};
 use crate::pont::{self, MessagePage};
 use crate::reparer::{AideAdmin, EnFond, Executeur, SansAide, SansExecuteur};
@@ -381,6 +382,17 @@ pub struct Branchement {
     /// L'Aide est-elle là ? Lu une fois sur un fil à part (schtasks peut prendre un moment), recopié dans les pages au
     /// pas suivant de la minuterie (`None` : pas encore lu)
     aide_presente: Arc<Mutex<Option<bool>>>,
+    /// « Ouvrir Nevermind » : où Mindset lit la demande (seulement pour une copie gérée, [`Branchement::brancher_mindset`] ;
+    /// sans lui, jamais de bouton)
+    mindset: Option<ouvrir::Suite>,
+    /// Le temps laissé à Mindset pour lire la demande (3 s)
+    attente_ouvrir: Duration,
+    /// Nevermind est-il installé ? Regardé sur un fil à part, de temps en temps, tant que Mindcare est dans Mindset
+    installee: ouvrir::Installee,
+    /// La demande en cours (une seule à la fois)
+    demande: Option<ouvrir::Demande>,
+    /// Mindcare vient d'entrer dans Mindset ou d'en sortir : la page est à redessiner au pas suivant
+    mindset_change: bool,
 }
 
 /// Le catalogue des enquêtes, lu dans ce fichier (`Read-Enquetes`) : enquetes.json à côté du programme.
@@ -444,7 +456,60 @@ impl Branchement {
             reparation: None,
             aide: Arc::new(SansAide),
             aide_presente: Arc::new(Mutex::new(None)),
+            mindset: None,
+            attente_ouvrir: ouvrir::ATTENTE,
+            installee: ouvrir::Installee::default(),
+            demande: None,
+            mindset_change: false,
         }
+    }
+
+    /// « Ouvrir Nevermind », pour une copie gérée par Mindset : son dossier de données (où Mindset lit
+    /// `ouvrir.demande`) et suite.json (où il dit ce qui est installé). `attente` : 3 s ([`ouvrir::ATTENTE`]).
+    pub fn brancher_mindset(&mut self, suite: ouvrir::Suite, attente: Duration) {
+        self.mindset = Some(suite);
+        self.attente_ouvrir = attente;
+    }
+
+    /// Mindcare est affiché dans Mindset (fenêtre accrochée), ou ne l'est plus : dit par le programme à chaque pas.
+    /// Jamais vrai sans copie gérée.
+    pub fn noter_dans_mindset(&mut self, oui: bool) {
+        let oui = oui && self.mindset.is_some();
+        self.mindset_change |= self.pages.noter_dans_mindset(oui);
+    }
+
+    /// Le pas de la minuterie pour « Ouvrir Nevermind » : Nevermind installé ou pas (regardé de nouveau de temps en
+    /// temps), puis la fin de la demande (une ligne au journal, et la bulle si Mindset ne l'a pas lue).
+    fn tour_ouvrir(&mut self, maintenant: Instant, journal: &mindcare_donnees::Journal) -> Vec<Effet> {
+        let mut redessiner = std::mem::take(&mut self.mindset_change);
+        if let Some(s) = &self.mindset
+            && self.pages.dans_mindset
+        {
+            self.installee.relire_si_besoin(&s.fichier_suite, ouvrir::Appli::Nevermind, maintenant);
+        }
+        if let Some(oui) = self.installee.lu() {
+            if self.pages.nevermind_installe != Some(oui) {
+                journal.ecrire(if oui { "Nevermind : installé par Mindset" } else { "Nevermind : pas installé" });
+            }
+            redessiner |= self.pages.noter_nevermind(oui);
+        }
+        let mut effets = Vec::new();
+        if let Some(fin) = self.demande.as_ref().and_then(ouvrir::Demande::fin) {
+            let nom = self.demande.take().map(|d| d.appli.nom()).unwrap_or_default();
+            journal.ecrire(&match &fin {
+                ouvrir::Fin::Lue => format!("Ouvrir {nom} : demande lue par Mindset"),
+                ouvrir::Fin::Reprise => format!(
+                    "Ouvrir {nom} : demande pas lue en {} s, reprise (Mindset trop ancien ?)",
+                    self.attente_ouvrir.as_secs_f64()
+                ),
+                ouvrir::Fin::Ratee(e) => format!("Ouvrir {nom} : demande pas écrite ({e})"),
+            });
+            effets.extend(self.pages.ouverture_finie(&fin));
+        }
+        if redessiner {
+            effets.push(Effet::Afficher { ecran: None });
+        }
+        effets
     }
 
     /// Ce qui lance les programmes de « Le faire pour moi » : le vrai dans l'exe livré, un faux ailleurs.
@@ -594,6 +659,10 @@ impl Branchement {
         }
         let journal = monde.donnees.journal().clone();
         let effets = self.tour_reparation(&journal);
+        if !effets.is_empty() {
+            self.executer(effets, monde);
+        }
+        let effets = self.tour_ouvrir(maintenant, &journal);
         if !effets.is_empty() {
             self.executer(effets, monde);
         }
@@ -889,6 +958,19 @@ impl Branchement {
             Effet::OuvrirWindowsUpdate => {
                 let r = self.exterieur.ouvrir_windows_update();
                 self.pages.windows_update_ouvert(r)
+            }
+            Effet::OuvrirAppli(a) => {
+                // (une seule demande à la fois : les pages ne la font qu'une fois, ceci en plus)
+                if self.demande.is_some() {
+                    return Vec::new();
+                }
+                let Some(s) = &self.mindset else {
+                    let fin = ouvrir::Fin::Ratee("Mindcare n'est pas géré par Mindset".into());
+                    journal.ecrire(&format!("Ouvrir {} : rien demandé, Mindcare n'est pas géré par Mindset", a.nom()));
+                    return self.pages.ouverture_finie(&fin);
+                };
+                self.demande = Some(ouvrir::Demande::lancer(s.dossier_donnees.clone(), a, self.attente_ouvrir));
+                Vec::new()
             }
         }
     }

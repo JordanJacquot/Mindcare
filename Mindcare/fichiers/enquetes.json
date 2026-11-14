@@ -15649,6 +15649,7 @@
     },
     {
       "Id": "processeurbride",
+      "Appli": "nevermind",
       "Famille": "lenteur",
       "Groupe": "lenteur-afond",
       "Titre": "Le processeur reste bloqué à basse vitesse",
@@ -19901,6 +19902,7 @@
     },
     {
       "Id": "frequence",
+      "Appli": "nevermind",
       "Famille": "ecran",
       "Groupe": "ecran-reglages",
       "Titre": "L'écran reste à 60 Hz au lieu de 144 Hz (ou plus)",
@@ -27830,6 +27832,7 @@
     },
     {
       "Id": "saccades",
+      "Appli": "nevermind",
       "Famille": "jeux",
       "Groupe": "jeux-partie",
       "Titre": "Les jeux saccadent (peu d'images par seconde)",
@@ -28160,6 +28163,7 @@
     },
     {
       "Id": "laggame",
+      "Appli": "nevermind",
       "Famille": "jeux",
       "Groupe": "jeux-enligne",
       "Titre": "Ça lague en ligne (ping élevé, coupures en partie)",
@@ -28417,6 +28421,7 @@
     },
     {
       "Id": "inputlag",
+      "Appli": "nevermind",
       "Famille": "jeux",
       "Groupe": "jeux-partie",
       "Titre": "La souris ou la manette réagit en retard dans les jeux",
@@ -28456,6 +28461,7 @@
     },
     {
       "Id": "saccadesdebut",
+      "Appli": "nevermind",
       "Famille": "jeux",
       "Groupe": "jeux-partie",
       "Titre": "Le jeu saccade au début, puis ça va mieux",

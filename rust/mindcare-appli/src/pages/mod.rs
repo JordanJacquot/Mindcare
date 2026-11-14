@@ -28,6 +28,7 @@ mod familles;
 #[cfg(test)]
 mod juges;
 mod outils;
+mod ouvrir;
 mod raconte;
 mod reparateur;
 mod reparer;
@@ -41,6 +42,8 @@ pub use accueil::{DERNIERE, REPRENDRE};
 pub use actions::{PLUS_TARD_MESSAGE, ids};
 /// L'assistant et la dictée dans les pages (étape 6.4) : leur photo, leurs ids d'action, leurs textes.
 pub use aides::{Aides, POUR_ETRE_SUR, PourEtreSur, ids as ids_aides, textes as textes_aides};
+/// « Ouvrir Nevermind » : les textes de sa ligne dans la réponse.
+pub use ouvrir::textes as textes_ouvrir;
 /// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
 pub use raconte::PANNE;
 /// « Le faire pour moi » : où en est l'action lancée, et ses textes.
@@ -127,6 +130,9 @@ pub enum Effet {
     Reparer(crate::reparer::Reparation),
     /// « Ouvrir Windows Update » (la page des Paramètres) ; puis [`Etat::windows_update_ouvert`].
     OuvrirWindowsUpdate,
+    /// « Ouvrir Nevermind » (dans Mindset seulement) : la demande écrite pour Mindset et attendue, sur un fil à part
+    /// (jamais deux à la fois) ; puis [`Etat::ouverture_finie`].
+    OuvrirAppli(mindcare_moteur::Appli),
 }
 
 impl Effet {
@@ -207,6 +213,13 @@ pub struct Etat {
     /// L'Aide de Mindcare est là (sa tâche SYSTEM et MindcareAide.exe, lus par effets.rs) : les 4 actions qui demandent
     /// les droits administrateur ont alors leur bouton. Non au départ.
     pub aide_admin: bool,
+    /// Mindcare est affiché dans Mindset (copie gérée, fenêtre accrochée) : recopié par effets.rs à chaque pas
+    pub dans_mindset: bool,
+    /// Nevermind est installé par Mindset (suite.json et son programme, lus par effets.rs) ; `None` : pas encore lu,
+    /// ou Mindcare n'est pas géré par Mindset (pas de bouton « Ouvrir Nevermind »)
+    pub nevermind_installe: Option<bool>,
+    /// « Ouvrir Nevermind » : la demande en cours (une seule à la fois), gardée jusqu'à sa fin
+    pub ouverture: Option<mindcare_moteur::Appli>,
 }
 
 /// Où en est l'enquête montrée.

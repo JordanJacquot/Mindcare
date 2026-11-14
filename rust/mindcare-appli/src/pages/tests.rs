@@ -21,6 +21,8 @@ use super::actions::{PLUS_TARD_MESSAGE, ids};
 
 /// Les pages de l'assistant et de la dictée (étape 6.4).
 mod aides;
+/// « Ouvrir Nevermind » : la ligne de la réponse des pannes de jeu, dans Mindset seulement.
+mod ouvrir;
 /// Le PC dans les pages (étape 8) : le tri, la bande, « Ton PC ».
 mod pc;
 /// « Le faire pour moi » : le bouton, l'attente, fini ou raté.
@@ -116,6 +118,8 @@ struct Banc {
     /// Update »
     reparations: Vec<crate::reparer::Reparation>,
     windows_update: usize,
+    /// « Ouvrir Nevermind » demandé (jamais rien d'écrit ici : la fin est donnée par le test)
+    ouvertures: Vec<mindcare_moteur::Appli>,
 }
 
 impl Banc {
@@ -144,6 +148,7 @@ impl Banc {
             aides: Vec::new(),
             reparations: Vec::new(),
             windows_update: 0,
+            ouvertures: Vec::new(),
         }
     }
 
@@ -219,6 +224,7 @@ impl Banc {
                 Effet::ChoisirPc(c) => self.donnees.choisir_pc(&c),
                 Effet::Reparer(r) => self.reparations.push(r),
                 Effet::OuvrirWindowsUpdate => self.windows_update += 1,
+                Effet::OuvrirAppli(a) => self.ouvertures.push(a),
             }
         }
     }

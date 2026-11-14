@@ -119,8 +119,13 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
         a_faire.push(json!({ "icone": "euro", "titre": format!("{PIECE_TITRE} :"),
                              "texte": if supposee { PIECE_SUPPOSEE } else { PIECE_GARANTIE } }));
     }
-    if !a_faire.is_empty() {
+    // (une panne de jeu, dans Mindset : Nevermind règle ça, en premier)
+    let nevermind = super::ouvrir::ligne(etat);
+    if !a_faire.is_empty() || nevermind.is_some() {
         blocs.push(json!({ "type": "titre", "texte": x::A_FAIRE }));
+    }
+    blocs.extend(nevermind);
+    if !a_faire.is_empty() {
         blocs.push(json!({ "type": "etapes", "elements": a_faire }));
     }
 

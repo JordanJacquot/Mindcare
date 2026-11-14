@@ -335,6 +335,13 @@ pub fn lancer() -> ! {
     );
     lecture.lancer();
     let mut pages = Branchement::nouveau(VERSION, theme.theme_ecran(), catalogue, &d, lecture, exterieur);
+    // « Ouvrir Nevermind » : seulement pour une copie gérée (Mindset lit la demande dans son dossier de données ; la
+    // construction d'essai n'a que son dossier d'essai)
+    if l.gere {
+        let suite =
+            crate::ouvrir::Suite { dossier_donnees: l.dossier_donnees.clone(), fichier_suite: l.fichier_suite.clone() };
+        pages.brancher_mindset(suite, crate::ouvrir::ATTENTE);
+    }
     // L'assistant et la dictée (étape 6.4) : rien n'est lancé avant qu'on écrive ou qu'on appuie sur Parler
     #[cfg(not(feature = "essai"))]
     pages.brancher(outils(&l.dossier_donnees, &l.fichier_suite, &journal));
@@ -549,7 +556,12 @@ impl Etat {
 
     /// Le pas de la minuterie pour les pages (la lecture de Windows attendue).
     fn tour_pages(&mut self) {
-        self.avec_pages(|pages, monde| pages.tour(Instant::now(), monde));
+        // (« Ouvrir Nevermind » n'a de sens que si Mindcare est affiché dans Mindset)
+        let dans = self.vie.dans_mindset();
+        self.avec_pages(|pages, monde| {
+            pages.noter_dans_mindset(dans);
+            pages.tour(Instant::now(), monde);
+        });
     }
 }
 

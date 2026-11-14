@@ -1,12 +1,13 @@
 //! Ce qui ne va pas dans le catalogue (Test-Enquetes) : une liste vide, tout est bon. Les messages sont exactement ceux
 //! de PowerShell, dans le même ordre. En plus (PowerShell ne les lit pas) : un « PourPc » mal écrit ([`crate::pc`]), et
 //! les groupes des familles ([`verifier_groupes`]), et le champ « Reparer » des tests ([`verifier_reparer`], dans
-//! [`crate::reparer`]).
+//! [`crate::reparer`]), et le champ « Appli » des pannes ([`verifier_appli`], dans [`crate::appli`]).
 
 use std::collections::HashSet;
 
 use serde_json::Value;
 
+pub use crate::appli::verifier_appli;
 use crate::catalogue::Catalogue;
 use crate::enquete::INDICES_CONNUS;
 use crate::pc::{CHAMP, problemes};

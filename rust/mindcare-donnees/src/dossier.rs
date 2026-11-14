@@ -152,6 +152,22 @@ pub fn lire_suite(fichier: Option<&Path>, essais: u32) -> Suite {
     s
 }
 
+/// Le dossier d'une autre appli de la suite selon suite.json (`applis.<id>`, écrit par Mindset à l'installation et
+/// retiré à la désinstallation), lu une seule fois, sans attendre : rien si suite.json manque, est pris, illisible, ou
+/// ne la connaît pas. Le dossier est seulement regardé (son programme existe-t-il ?), jamais lancé.
+pub fn dossier_appli_suite(fichier: &Path, id: &str) -> Option<String> {
+    let octets = std::fs::read(fichier).ok()?;
+    let j: Value = serde_json::from_str(&texte_du_fichier(&octets)).ok()?;
+    let applis = membre(Some(&j), "applis");
+    if !vrai(applis.as_ref()) {
+        return None;
+    }
+    match membre(applis.as_ref(), id) {
+        Some(Value::String(d)) => chemin_normal(&d),
+        _ => None,
+    }
+}
+
 /// `Test-GereeParMindset` : suite.json le dit ; encore pris après 3 secondes (démarrage de Windows), une copie dans un
 /// dossier de programmes de Mindset (`<X>:\Mindset\Programmes`, ou `Program Files\Mindset`) est gérée.
 /// `programmes` : ProgramFiles et ProgramW6432.

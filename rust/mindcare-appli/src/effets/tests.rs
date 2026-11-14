@@ -21,6 +21,8 @@ use serde_json::{Value, json};
 use super::*;
 use crate::pages::{Vue, ecrans, ids};
 
+/// « Ouvrir Nevermind » exécuté, dans un dossier d'essai (jamais le vrai dossier de Mindset).
+mod ouvrir;
 /// « Le faire pour moi » exécuté, avec un faux exécuteur (jamais rien de lancé).
 mod reparer;
 

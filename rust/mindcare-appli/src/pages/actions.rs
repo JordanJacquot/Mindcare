@@ -35,6 +35,8 @@ pub mod ids {
     pub const FAIRE: &str = "faire-pour-moi";
     /// « Ouvrir Windows Update », une fois les mises à jour mises de côté
     pub const WINDOWS_UPDATE: &str = "windows-update";
+    /// « Ouvrir Nevermind », « L'installer avec Mindset » (la réponse d'une panne de jeu, dans Mindset)
+    pub const OUVRIR: &str = "ouvrir-appli";
     /// « Je le ferai plus tard »
     pub const PLUS_TARD: &str = "plus-tard";
     /// « Accueil », « Retour à l'accueil »
@@ -207,6 +209,7 @@ impl Etat {
                 let Some(Vue::Etape(e)) = self.vue(cat) else { return vec![Effet::rafraichir()] };
                 if id == ids::FAIRE { self.faire_pour_moi(&e) } else { self.ouvrir_windows_update(&e) }
             }
+            ids::OUVRIR => self.ouvrir_appli(cat),
             ids::PLUS_TARD => {
                 self.retour_accueil();
                 vec![

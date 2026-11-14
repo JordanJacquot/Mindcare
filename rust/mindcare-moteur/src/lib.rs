@@ -13,11 +13,13 @@
 //! - [`recherche`] : la recherche par mots (les pannes de Find-Pannes, mieux classées) ;
 //! - [`garde_fou`] : le garde-fou de l'assistant (Select-PreRempli) ;
 //! - [`validation`] : ce qui ne va pas dans le catalogue (Test-Enquetes) ;
+//! - [`appli`] : « Ouvrir Nevermind », les pannes dont la réponse propose une autre appli de la suite ;
 //! - [`reparer`] : « Le faire pour moi », la liste fermée des actions que Mindcare PC fait à la place de la personne ;
 //! - [`pc`] : les pannes qui concernent ce PC (le champ « PourPc », le profil du PC) ;
 //! - [`identifiables`] : chaque suspect peut-il être la réponse ?
 //! - [`ps`] : les règles de PowerShell que tout cela reproduit (majuscules, vrai ou faux, listes).
 
+pub mod appli;
 pub mod catalogue;
 pub mod enquete;
 pub mod garde_fou;
@@ -29,6 +31,7 @@ pub mod reparer;
 pub mod validation;
 pub mod verdict;
 
+pub use appli::Appli;
 pub use catalogue::{Catalogue, Groupe, GroupesFamille};
 pub use enquete::{
     Auto, Ecarte, Enquete, Fait, HORS_SUJET, INDICES_CONNUS, Indice, Indices, TypeVerdict, Verdict, enquete,
@@ -38,5 +41,5 @@ pub use pc::{MARQUES, ProfilPc, Tri, TypePc, concerne};
 pub use ps::Objet;
 pub use recherche::{chercher, chercher_comme_powershell, chercher_pour, simple};
 pub use reparer::Reparation;
-pub use validation::{verifier, verifier_groupes, verifier_reparer};
+pub use validation::{verifier, verifier_appli, verifier_groupes, verifier_reparer};
 pub use verdict::{titre_affiche, titre_avec_detail, titre_verdict};
