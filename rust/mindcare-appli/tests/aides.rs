@@ -138,6 +138,9 @@ impl Exterieur for SansExterieur {
     fn copier(&mut self, _: &str) -> Result<(), String> {
         Err("pas de presse-papiers dans ce test".into())
     }
+    fn ouvrir_windows_update(&mut self) -> Result<(), String> {
+        Err("pas de Paramètres dans ce test".into())
+    }
 }
 
 // ------------------------------------------------------------------------------------------------ le faux micro

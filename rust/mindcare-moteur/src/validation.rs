@@ -1,6 +1,7 @@
 //! Ce qui ne va pas dans le catalogue (Test-Enquetes) : une liste vide, tout est bon. Les messages sont exactement ceux
 //! de PowerShell, dans le même ordre. En plus (PowerShell ne les lit pas) : un « PourPc » mal écrit ([`crate::pc`]), et
-//! les groupes des familles ([`verifier_groupes`]).
+//! les groupes des familles ([`verifier_groupes`]), et le champ « Reparer » des tests ([`verifier_reparer`], dans
+//! [`crate::reparer`]).
 
 use std::collections::HashSet;
 
@@ -12,6 +13,7 @@ use crate::pc::{CHAMP, problemes};
 use crate::ps::{
     champ, champ_v, cle, contient, contient_valeur, egal, egal_valeurs, parcours, tableau, texte, vrai, vrai_liste,
 };
+pub use crate::reparer::verifier_reparer;
 
 /// Les guillemets qui cassent une commande copiée dans Windows.
 const GUILLEMETS: [char; 6] = ['\u{ab}', '\u{bb}', '\u{201c}', '\u{201d}', '\u{2018}', '\u{2019}'];

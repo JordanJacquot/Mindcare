@@ -61,7 +61,7 @@ pub fn page_aide() -> Value {
             { "type": "titre", "texte": "Les questions qu'on se pose" },
             { "type": "faq", "elements": [
             { "question": "Est-ce que Mindcare répare mon PC ?",
-              "reponse": "Non. Elle t'explique quoi faire, montre les commandes à taper avec un bouton Copier, mais ne lance jamais rien toute seule.",
+              "reponse": "Elle t'explique quoi faire, et ne lance rien sans que tu cliques. Pour quelques réglages simples de Windows, un bouton « Le faire pour moi » le fait à ta place, sur le PC qui a le problème.",
               "icone": "bouclier" },
             { "question": "Qu'est-ce que Mindcare lit sur mon PC ?",
               "reponse": "Si tu dis que c'est ce PC-là qui a le problème : ce que Windows a noté (coupures, écrans bleus, erreurs du disque), sans rien modifier et sans droits administrateur.",

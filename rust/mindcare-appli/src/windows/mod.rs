@@ -14,10 +14,12 @@
 //! - [`presse_papiers`] : le presse-papiers (`OpenClipboard`, `SetClipboardData`) et le Bureau
 //!   (`SHGetKnownFolderPath`), pour le rapport (exe livré seulement : jamais dans la construction d'essai) ;
 //! - [`message`] : la boîte « Mindcare s'utilise avec Mindset » (`MessageBoxW`) ;
+//! - [`reparer`] : « Le faire pour moi » (exe livré seulement) : les programmes de la liste fermée lancés sans fenêtre,
+//!   et la page Windows Update des Paramètres (`ShellExecuteW`) ;
 //! - `capture` (construction d'essai seulement) : l'image de la fenêtre (`PrintWindow`).
 //!
 //! Rien ici n'écrit dans le registre, ne touche aux fenêtres d'un autre programme ni ne lance quoi que ce soit sans
-//! qu'on le lui demande.
+//! qu'on le lui demande (« Le faire pour moi » : seulement après le clic de la personne).
 
 #![allow(unsafe_code)]
 
@@ -30,6 +32,8 @@ pub mod message;
 #[cfg(not(feature = "essai"))]
 pub mod presse_papiers;
 pub mod registre;
+#[cfg(not(feature = "essai"))]
+pub mod reparer;
 pub mod synchro;
 pub mod systeme;
 pub mod webview2;

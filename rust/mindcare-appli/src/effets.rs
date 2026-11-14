@@ -35,6 +35,7 @@ use serde_json::{Value, json};
 
 use crate::pages::{self, Effet};
 use crate::pont::{self, MessagePage};
+use crate::reparer::{EnFond, Executeur, SansExecuteur};
 
 /// La photo des aides est reprise tous les 5 pas de la minuterie (500 ms, comme `Start-SuiviIa`) ; la dictée et la
 /// phrase posée sont suivies à chaque pas pendant qu'elles travaillent.
@@ -148,12 +149,14 @@ impl VersLaPage for crate::Page {
     }
 }
 
-/// Ce qui sort de l'appli : le Bureau (pour le rapport) et le presse-papiers.
+/// Ce qui sort de l'appli : le Bureau (pour le rapport), le presse-papiers, et la page Windows Update des Paramètres.
 pub trait Exterieur {
     /// Le dossier du Bureau de la personne (`[Environment]::GetFolderPath('Desktop')`).
     fn bureau(&self) -> Result<PathBuf, String>;
     /// Met ce texte dans le presse-papiers (`[System.Windows.Clipboard]::SetText`).
     fn copier(&mut self, texte: &str) -> Result<(), String>;
+    /// Ouvre la page Windows Update des Paramètres (`ms-settings:windowsupdate`), après le clic de la personne.
+    fn ouvrir_windows_update(&mut self) -> Result<(), String>;
 }
 
 /// `Get-Indices` : les indices de Windows tels que l'enquête et l'historique les gardent.
@@ -367,6 +370,11 @@ pub struct Branchement {
     hasard: u64,
     /// Le PC reconnu est déjà donné aux pages (une seule fois)
     pc_donne: bool,
+    /// Ce qui lance les programmes de « Le faire pour moi » ([`Branchement::brancher_executeur`] ; sans lui, chaque
+    /// action rate proprement)
+    executeur: Arc<dyn Executeur>,
+    /// L'action de « Le faire pour moi » qui tourne (une seule à la fois)
+    reparation: Option<EnFond>,
 }
 
 /// Le catalogue des enquêtes, lu dans ce fichier (`Read-Enquetes`) : enquetes.json à côté du programme.
@@ -418,7 +426,39 @@ impl Branchement {
         let mut pages = pages::Etat::nouveau(version, theme, donnees.historique.liste.clone());
         // (le PC choisi, gardé dans les réglages : « mon PC » ou un autre)
         pages.choix_pc = donnees.choix_pc();
-        Branchement { pages, cat: cat.ok(), windows, exterieur, outils: None, hasard: graine | 1, pc_donne: false }
+        Branchement {
+            pages,
+            cat: cat.ok(),
+            windows,
+            exterieur,
+            outils: None,
+            hasard: graine | 1,
+            pc_donne: false,
+            executeur: Arc::new(SansExecuteur),
+            reparation: None,
+        }
+    }
+
+    /// Ce qui lance les programmes de « Le faire pour moi » : le vrai dans l'exe livré, un faux ailleurs.
+    pub fn brancher_executeur(&mut self, executeur: Arc<dyn Executeur>) {
+        self.executeur = executeur;
+    }
+
+    /// Le pas de la minuterie pour « Le faire pour moi » : le journal de l'action, ses étapes faites, sa fin.
+    fn tour_reparation(&mut self, journal: &mindcare_donnees::Journal) -> Vec<Effet> {
+        let Some(f) = self.reparation.as_mut() else { return Vec::new() };
+        let n = f.nouvelles();
+        for l in &n.journal {
+            journal.ecrire(l);
+        }
+        if let Some(fin) = n.fin {
+            self.reparation = None;
+            return self.pages.reparation_finie(fin);
+        }
+        match n.faits {
+            Some(faits) => self.pages.reparation_avance(faits),
+            None => Vec::new(),
+        }
     }
 
     /// L'assistant et la dictée rejoignent les pages (avec un catalogue lisible seulement : sans lui, la page du
@@ -512,6 +552,11 @@ impl Branchement {
             self.pages.barrettes = b;
         }
         let effets = self.tour_aides(monde);
+        if !effets.is_empty() {
+            self.executer(effets, monde);
+        }
+        let journal = monde.donnees.journal().clone();
+        let effets = self.tour_reparation(&journal);
         if !effets.is_empty() {
             self.executer(effets, monde);
         }
@@ -789,6 +834,22 @@ impl Branchement {
             Effet::ChoisirPc(choix) => {
                 monde.donnees.choisir_pc(&choix);
                 Vec::new()
+            }
+            Effet::Reparer(r) => {
+                // (une seule action à la fois : les pages ne la demandent qu'une fois, ceci en plus)
+                match &self.reparation {
+                    Some(f) => journal.ecrire(&format!(
+                        "Le faire pour moi : {} pas lancé, {} tourne encore",
+                        r.id(),
+                        f.action.id()
+                    )),
+                    None => self.reparation = Some(EnFond::lancer(r, Arc::clone(&self.executeur))),
+                }
+                Vec::new()
+            }
+            Effet::OuvrirWindowsUpdate => {
+                let r = self.exterieur.ouvrir_windows_update();
+                self.pages.windows_update_ouvert(r)
             }
         }
     }

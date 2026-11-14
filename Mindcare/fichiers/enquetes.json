@@ -6307,6 +6307,7 @@
     },
     "test-profil-wifi": {
       "Type": "test",
+      "Reparer": "profil-wifi",
       "Court": "Le Wi-Fi enregistré",
       "Pour": [
         "profilwifi"
@@ -6343,6 +6344,7 @@
     },
     "test-dns": {
       "Type": "test",
+      "Reparer": "dns",
       "Court": "Le carnet d'adresses",
       "Pour": [
         "dns"
@@ -6750,6 +6752,7 @@
     },
     "test-depanneur-maj": {
       "Type": "test",
+      "Reparer": "mises-a-jour",
       "Court": "La réparation des mises à jour",
       "Pour": [
         "cachemaj"
@@ -6872,6 +6875,7 @@
     },
     "test-wsreset": {
       "Type": "test",
+      "Reparer": "cache-store",
       "Court": "Vider le cache du Store",
       "Pour": [
         "cachestore"
@@ -7041,6 +7045,7 @@
     },
     "test-alim-defaut": {
       "Type": "test",
+      "Reparer": "alimentation",
       "Court": "Les réglages d'origine",
       "Pour": [
         "reglagesalim"
@@ -8603,6 +8608,7 @@
     },
     "test-vcredist": {
       "Type": "test",
+      "Reparer": "visual-cpp",
       "Court": "Les fichiers Visual C++",
       "Pour": [
         "vcredist"
@@ -10561,6 +10567,7 @@
     },
     "test-reset-parametres": {
       "Type": "test",
+      "Reparer": "parametres",
       "Court": "Remettre les Paramètres à zéro",
       "Pour": [
         "appparametres"
@@ -10811,6 +10818,7 @@
     },
     "test-java": {
       "Type": "test",
+      "Reparer": "java",
       "Court": "Installer Java",
       "Pour": [
         "javamanquant"
@@ -10901,6 +10909,7 @@
     },
     "test-ipconfig": {
       "Type": "test",
+      "Reparer": "adresse-ip",
       "Court": "Redemander une adresse",
       "Pour": [
         "bailip"
@@ -14023,6 +14032,7 @@
     },
     "test-cache-icones": {
       "Type": "test",
+      "Reparer": "cache-icones",
       "Court": "Les icônes",
       "Pour": [
         "cacheicones"

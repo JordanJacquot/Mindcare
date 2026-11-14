@@ -21,6 +21,9 @@ use serde_json::{Value, json};
 use super::*;
 use crate::pages::{Vue, ecrans, ids};
 
+/// « Le faire pour moi » exécuté, avec un faux exécuteur (jamais rien de lancé).
+mod reparer;
+
 // ------------------------------------------------------------------------------------------------ le catalogue
 
 fn fichier_catalogue() -> PathBuf {
@@ -169,6 +172,11 @@ impl Exterieur for FauxExterieur {
         }
         self.copies.borrow_mut().push(texte.to_string());
         Ok(())
+    }
+    /// (jamais les vrais Paramètres : un fichier à côté du faux Bureau)
+    fn ouvrir_windows_update(&mut self) -> Result<(), String> {
+        let b = self.bureau.as_ref().and_then(|b| b.parent()).ok_or("pas de dossier d'essai")?;
+        std::fs::write(b.join("windows-update.txt"), "ms-settings:windowsupdate").map_err(|e| e.to_string())
     }
 }
 

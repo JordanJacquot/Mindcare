@@ -13,6 +13,7 @@
 //! - [`recherche`] : la recherche par mots (les pannes de Find-Pannes, mieux classées) ;
 //! - [`garde_fou`] : le garde-fou de l'assistant (Select-PreRempli) ;
 //! - [`validation`] : ce qui ne va pas dans le catalogue (Test-Enquetes) ;
+//! - [`reparer`] : « Le faire pour moi », la liste fermée des actions que Mindcare PC fait à la place de la personne ;
 //! - [`pc`] : les pannes qui concernent ce PC (le champ « PourPc », le profil du PC) ;
 //! - [`identifiables`] : chaque suspect peut-il être la réponse ?
 //! - [`ps`] : les règles de PowerShell que tout cela reproduit (majuscules, vrai ou faux, listes).
@@ -24,6 +25,7 @@ pub mod identifiables;
 pub mod pc;
 pub mod ps;
 pub mod recherche;
+pub mod reparer;
 pub mod validation;
 pub mod verdict;
 
@@ -35,5 +37,6 @@ pub use garde_fou::pre_rempli;
 pub use pc::{MARQUES, ProfilPc, Tri, TypePc, concerne};
 pub use ps::Objet;
 pub use recherche::{chercher, chercher_comme_powershell, chercher_pour, simple};
-pub use validation::{verifier, verifier_groupes};
+pub use reparer::Reparation;
+pub use validation::{verifier, verifier_groupes, verifier_reparer};
 pub use verdict::{titre_affiche, titre_avec_detail, titre_verdict};

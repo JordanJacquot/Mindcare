@@ -7,6 +7,7 @@
 //!   déclarées dans build.rs et autorisées à la seule fenêtre « principale » (capabilities\principale.json) ;
 //! - [`pages`] et [`effets`] : les pages de Mindcare pour le kit d'écrans, et leurs effets exécutés (enquête gardée,
 //!   rapport, presse-papiers, lecture de Windows) ;
+//! - [`reparer`] : « Le faire pour moi », les programmes de la liste fermée et leur travail de fond ;
 //! - [`pack`] : la réponse du protocole `pack` (les images et polices du thème, règle 6), par suite-commun ;
 //! - [`preparer`] et [`contexte`] : ce que le programme et les tests donnent à Tauri ;
 //! - `programme` : le programme Mindset.exe tout branché (étape 4.4 : démarrage, verrou, fenêtre, surveillances) ;
@@ -30,6 +31,7 @@ pub mod png;
 pub mod pont;
 #[cfg(windows)]
 pub mod programme;
+pub mod reparer;
 #[cfg(windows)]
 pub mod windows;
 

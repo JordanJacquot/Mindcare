@@ -23,6 +23,8 @@ use super::actions::{PLUS_TARD_MESSAGE, ids};
 mod aides;
 /// Le PC dans les pages (étape 8) : le tri, la bande, « Ton PC ».
 mod pc;
+/// « Le faire pour moi » : le bouton, l'attente, fini ou raté.
+mod reparer;
 use super::outils::{gestes_materiel, suspects_montres, t, textes};
 use super::{Effet, Etat, Vue, ecrans, etat_sans_catalogue};
 
@@ -110,6 +112,10 @@ struct Banc {
     erreurs_kit: Vec<String>,
     /// Les effets de l'assistant et de la dictée demandés (exécutés par effets.rs, testés dans effets\aides.rs)
     aides: Vec<Effet>,
+    /// « Le faire pour moi » demandé (jamais rien de lancé ici : la fin est donnée par le test), et « Ouvrir Windows
+    /// Update »
+    reparations: Vec<crate::reparer::Reparation>,
+    windows_update: usize,
 }
 
 impl Banc {
@@ -136,6 +142,8 @@ impl Banc {
             inconnues: Vec::new(),
             erreurs_kit: Vec::new(),
             aides: Vec::new(),
+            reparations: Vec::new(),
+            windows_update: 0,
         }
     }
 
@@ -209,6 +217,8 @@ impl Banc {
                 | Effet::AnnulerDictee
                 | Effet::EffacerMessageDictee => self.aides.push(e),
                 Effet::ChoisirPc(c) => self.donnees.choisir_pc(&c),
+                Effet::Reparer(r) => self.reparations.push(r),
+                Effet::OuvrirWindowsUpdate => self.windows_update += 1,
             }
         }
     }
@@ -1267,8 +1277,12 @@ fn etape_a_faire_gestes_et_securite() {
 
 #[test]
 fn commande_a_copier() {
-    let (panne, choix) = chercher_parcours(|_, e| e.etape.as_ref().is_some_and(|et| champ(et, "Commande").is_some()))
-        .expect("une étape avec une commande");
+    // (une commande sans « Le faire pour moi » : ses lignes sont montrées dépliées, comme avant ; avec le bouton, elles
+    // sont repliées dessous, voir tests/reparer.rs)
+    let (panne, choix) = chercher_parcours(|_, e| {
+        e.etape.as_ref().is_some_and(|et| champ(et, "Commande").is_some() && champ(et, "Reparer").is_none())
+    })
+    .expect("une étape avec une commande");
     let mut b = Banc::nouveau(Some(IndicesGardes::default()));
     b.commencer(&panne);
     b.repondre(&choix);

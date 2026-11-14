@@ -137,6 +137,9 @@ impl Exterieur for ExterieurWindows {
     fn copier(&mut self, texte: &str) -> Result<(), String> {
         crate::windows::presse_papiers::copier(texte)
     }
+    fn ouvrir_windows_update(&mut self) -> Result<(), String> {
+        crate::windows::reparer::ouvrir_windows_update()
+    }
 }
 
 /// Construction d'essai : un faux Bureau (`<local d'essai>\Bureau`) et un faux presse-papiers
@@ -155,6 +158,25 @@ impl Exterieur for ExterieurEssai {
     }
     fn copier(&mut self, texte: &str) -> Result<(), String> {
         std::fs::write(self.local.join("presse-papiers.txt"), texte).map_err(|e| e.to_string())
+    }
+    /// (jamais les vrais Paramètres : une ligne dans `<local d'essai>\windows-update.txt`)
+    fn ouvrir_windows_update(&mut self) -> Result<(), String> {
+        std::fs::write(self.local.join("windows-update.txt"), "ms-settings:windowsupdate").map_err(|e| e.to_string())
+    }
+}
+
+/// Construction d'essai : « Le faire pour moi » ne lance jamais rien. Chaque geste attend un peu (pour voir la jauge),
+/// puis réussit ; il rate si le fichier `<local d'essai>\reparer-rate.txt` existe.
+#[cfg(feature = "essai")]
+struct ExecuteurEssai {
+    local: PathBuf,
+}
+
+#[cfg(feature = "essai")]
+impl crate::reparer::Executeur for ExecuteurEssai {
+    fn lancer(&self, _: &crate::reparer::Geste) -> Result<i32, String> {
+        std::thread::sleep(Duration::from_millis(1500));
+        if self.local.join("reparer-rate.txt").exists() { Ok(1) } else { Ok(0) }
     }
 }
 
@@ -294,6 +316,11 @@ pub fn lancer() -> ! {
     pages.brancher(outils(&l.dossier_donnees, &l.fichier_suite, &journal));
     #[cfg(feature = "essai")]
     pages.brancher(crate::essai::outils(&l.dossier_donnees, &l.fichier_suite, Path::new(&essai.local), &journal));
+    // « Le faire pour moi » : rien n'est lancé avant le clic de la personne (la construction d'essai ne lance rien)
+    #[cfg(not(feature = "essai"))]
+    pages.brancher_executeur(Arc::new(crate::windows::reparer::ExecuteurWindows));
+    #[cfg(feature = "essai")]
+    pages.brancher_executeur(Arc::new(ExecuteurEssai { local: PathBuf::from(&essai.local) }));
     *donnees.borrow_mut() = Some(d);
 
     let pour_page = journal.clone();

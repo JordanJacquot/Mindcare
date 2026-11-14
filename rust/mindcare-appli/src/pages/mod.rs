@@ -30,6 +30,7 @@ mod juges;
 mod outils;
 mod raconte;
 mod reparateur;
+mod reparer;
 mod reponse;
 #[cfg(test)]
 mod tests;
@@ -42,6 +43,11 @@ pub use actions::{PLUS_TARD_MESSAGE, ids};
 pub use aides::{Aides, POUR_ETRE_SUR, PourEtreSur, ids as ids_aides, textes as textes_aides};
 /// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
 pub use raconte::PANNE;
+/// « Le faire pour moi » : où en est l'action lancée, ses textes, et l'Aide administrateur (pas encore là).
+pub use reparer::{
+    EtatReparation, Reste, SuiviReparation, TextesAction, aide_administrateur_la, textes as textes_reparer,
+    textes_action,
+};
 /// Le PC reconnu, et les textes de l'écran « Ton PC ».
 pub use ton_pc::{PcReconnu, textes as textes_pc};
 
@@ -119,6 +125,11 @@ pub enum Effet {
     EffacerMessageDictee,
     /// Garder le PC choisi dans les réglages (`Donnees::choisir_pc` : un autre PC, ou « Revenir à mon PC »).
     ChoisirPc(ChoixPc),
+    /// « Le faire pour moi » : l'action de la liste fermée, déroulée sur un fil à part (jamais deux à la fois) ; à
+    /// chaque étape faite, [`Etat::reparation_avance`], puis à la fin [`Etat::reparation_finie`].
+    Reparer(crate::reparer::Reparation),
+    /// « Ouvrir Windows Update » (la page des Paramètres) ; puis [`Etat::windows_update_ouvert`].
+    OuvrirWindowsUpdate,
 }
 
 impl Effet {
@@ -194,6 +205,8 @@ pub struct Etat {
     pub genre_choisi: Option<Option<TypePc>>,
     /// L'écran d'où « Ton PC » a été ouvert (Retour y ramène)
     pub avant_pc: Option<String>,
+    /// « Le faire pour moi » : l'action lancée (une seule à la fois), gardée tant qu'elle tourne
+    pub reparation: Option<SuiviReparation>,
 }
 
 /// Où en est l'enquête montrée.
@@ -304,6 +317,7 @@ impl Etat {
     fn nouvelle_page_enquete(&mut self) {
         self.gestes.clear();
         self.commande = None;
+        self.oublier_reparation_finie();
         self.nouveau_rapport();
     }
 

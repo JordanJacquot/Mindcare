@@ -31,6 +31,10 @@ pub mod ids {
     pub const GESTE: &str = "geste";
     /// Copier une commande (valeur : son numéro)
     pub const COMMANDE: &str = "commande";
+    /// « Le faire pour moi »
+    pub const FAIRE: &str = "faire-pour-moi";
+    /// « Ouvrir Windows Update », une fois les mises à jour mises de côté
+    pub const WINDOWS_UPDATE: &str = "windows-update";
     /// « Je le ferai plus tard »
     pub const PLUS_TARD: &str = "plus-tard";
     /// « Accueil », « Retour à l'accueil »
@@ -151,6 +155,10 @@ impl Etat {
             ids::REP | ids::NSP => {
                 let n = if id == ids::NSP { Some(-1) } else { entier(valeur) };
                 let Some(Vue::Etape(e)) = self.vue(cat) else { return vec![Effet::rafraichir()] };
+                // (les réponses attendent la fin de « Le faire pour moi »)
+                if self.reponses_en_attente(&e) {
+                    return vec![Effet::rafraichir()];
+                }
                 let nb = e.etape.as_ref().map(|et| tableau(champ(et, "Reponses")).len()).unwrap_or(0) as i64;
                 match n {
                     Some(n) if n == -1 || (0..nb).contains(&n) => {
@@ -194,6 +202,10 @@ impl Etat {
                     Some(k) => vec![Effet::CopierCommande { numero: k, texte: lignes[k].clone() }],
                     None => vec![Effet::rafraichir()],
                 }
+            }
+            ids::FAIRE | ids::WINDOWS_UPDATE => {
+                let Some(Vue::Etape(e)) = self.vue(cat) else { return vec![Effet::rafraichir()] };
+                if id == ids::FAIRE { self.faire_pour_moi(&e) } else { self.ouvrir_windows_update(&e) }
             }
             ids::PLUS_TARD => {
                 self.retour_accueil();

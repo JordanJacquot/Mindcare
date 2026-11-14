@@ -1,7 +1,8 @@
 //! Une étape de l'enquête (Show-EtapeEnquete et Add-PanneauEnquete), et l'attente de ce que Windows a noté
 //! (Wait-Journaux). Le design A2 : le fil d'Ariane (famille › panne) avec « Étape X sur N », l'avancée en segments, la
 //! question en grand sur toute la largeur, les réponses en grands boutons, « Je ne sais pas » et « Étape précédente »
-//! en liens, puis les suspects juste en dessous (ils suivent la hauteur de la question).
+//! en liens, puis les suspects juste en dessous (ils suivent la hauteur de la question). Un test que Mindcare peut
+//! faire à la place de la personne montre d'abord « Le faire pour moi » ([`super::reparer`]).
 
 use serde_json::{Value, json};
 
@@ -100,29 +101,37 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
     if !img.is_empty() {
         blocs.push(json!({ "type": "image", "url": image(&img), "hauteur": 160 }));
     }
+    // (« Le faire pour moi » en cours : les réponses attendent la fin)
+    let mut reponses = true;
     if test {
         let gestes = textes(et, "Gestes");
         let commande = champ(et, "Commande").and_then(Value::as_object).filter(|c| vrai(champ(c, "Lignes")));
         let mut posee = false;
-        blocs.push(json!({ "type": "titre", "texte": "Coche chaque geste une fois fait" }));
+        // (les gestes et les commandes d'aujourd'hui : seuls, repliés sous « Le faire pour moi », ou dépliés s'il a
+        // raté)
+        let mut manuels = Vec::new();
         for (k, g) in gestes.iter().enumerate() {
             let oui = etat.gestes.iter().any(|(id, x)| *x == k && egal(id, &id_etape));
-            blocs.push(json!({ "type": "case", "id": ids::GESTE, "valeur": k.to_string(),
-                               "texte": format!("{}. {g}", k + 1), "oui": oui }));
+            manuels.push(json!({ "type": "case", "id": ids::GESTE, "valeur": k.to_string(),
+                                 "texte": format!("{}. {g}", k + 1), "oui": oui }));
             // (la commande juste sous le geste qui dit de la copier)
             if let Some(c) = commande
                 && !posee
                 && g.to_lowercase().contains("copier")
             {
-                blocs.extend(commandes(etat, c));
+                manuels.extend(commandes(etat, c));
                 posee = true;
             }
         }
         if let Some(c) = commande
             && !posee
         {
-            blocs.extend(commandes(etat, c));
+            manuels.extend(commandes(etat, c));
         }
+        let (milieu, montrer) =
+            super::reparer::blocs_test(etat.reparation_possible(e), etat.suivi_ici(e), manuels, gestes.len());
+        blocs.extend(milieu);
+        reponses = montrer;
         // (la consigne de sécurité seulement pour les gestes sur le matériel, pas pour une manipulation dans Windows)
         if gestes_materiel(&gestes) {
             let securite = texte(cat.json().get("Securite").and_then(|s| s.as_array()).and_then(|a| a.first()));
@@ -130,22 +139,26 @@ pub fn page(etat: &Etat, cat: &Catalogue, e: &Enquete) -> Value {
                 blocs.push(json!({ "type": "note", "texte": securite }));
             }
         }
-        blocs.push(json!({ "type": "titre", "texte": "Ensuite, dis à Mindcare ce que ça a donné" }));
+        if reponses {
+            blocs.push(json!({ "type": "titre", "texte": "Ensuite, dis à Mindcare ce que ça a donné" }));
+        }
     }
-    let options: Vec<Value> = tableau(champ(et, "Reponses"))
-        .into_iter()
-        .enumerate()
-        .map(|(k, r)| json!({ "id": k.to_string(), "titre": texte(champ_v(Some(r), "Texte")), "texte": "" }))
-        .collect();
-    blocs.push(json!({ "type": "cartes", "id": ids::REP, "options": options }));
-    // (les liens sous les réponses : « Je ne sais pas » en couleur, les autres en gris)
-    blocs.push(json!({ "type": "bouton", "id": ids::NSP, "texte": textes::NSP, "style": "lien" }));
-    blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": textes::PRECEDENT, "style": "discret" }));
-    blocs.push(if test {
-        json!({ "type": "bouton", "id": ids::PLUS_TARD, "texte": textes::PLUS_TARD, "style": "discret" })
-    } else {
-        json!({ "type": "bouton", "id": ids::ACCUEIL, "texte": textes::ACCUEIL, "style": "discret" })
-    });
+    if reponses {
+        let options: Vec<Value> = tableau(champ(et, "Reponses"))
+            .into_iter()
+            .enumerate()
+            .map(|(k, r)| json!({ "id": k.to_string(), "titre": texte(champ_v(Some(r), "Texte")), "texte": "" }))
+            .collect();
+        blocs.push(json!({ "type": "cartes", "id": ids::REP, "options": options }));
+        // (les liens sous les réponses : « Je ne sais pas » en couleur, les autres en gris)
+        blocs.push(json!({ "type": "bouton", "id": ids::NSP, "texte": textes::NSP, "style": "lien" }));
+        blocs.push(json!({ "type": "bouton", "id": ids::PRECEDENT, "texte": textes::PRECEDENT, "style": "discret" }));
+        blocs.push(if test {
+            json!({ "type": "bouton", "id": ids::PLUS_TARD, "texte": textes::PLUS_TARD, "style": "discret" })
+        } else {
+            json!({ "type": "bouton", "id": ids::ACCUEIL, "texte": textes::ACCUEIL, "style": "discret" })
+        });
+    }
     blocs.extend(bloc_suspects(cat, panne, e));
     if !e.auto.is_empty() {
         blocs.push(json!({ "type": "titre", "texte": "Ce que Mindcare a vérifié" }));
