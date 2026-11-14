@@ -523,6 +523,22 @@ mod essais {
         });
         let exe = r"C:\Mindset\Programmes\Mindcare\MindcareAide.exe";
         let r = appeler(&nom, exe, r#"{"a":"aide.bonjour"}"#, 2000, 2000);
+        // (si Mindcare n'a pas ouvert le canal, le fil attend encore un client sans fin : le test s'y connecte pour
+        // le libérer. Sur GitHub, en administrateur, il restait bloqué des heures.)
+        // SAFETY : un nom terminé par un zéro ; la poignée obtenue est aussitôt refermée
+        if let Ok(c) = unsafe {
+            CreateFileW(
+                &chemin_canal(&nom),
+                (GENERIC_READ | GENERIC_WRITE).0,
+                FILE_SHARE_NONE,
+                None,
+                OPEN_EXISTING,
+                FILE_FLAGS_AND_ATTRIBUTES(0),
+                None,
+            )
+        } {
+            drop(Poignee(c));
+        }
         let _ = fil.join();
         drop(serveur);
         match r {
