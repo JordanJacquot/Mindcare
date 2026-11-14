@@ -17,7 +17,7 @@
 #   2. son Mindset.exe trouve la tâche (presente), la réveille, et « aide.bonjour » répond : SYSTEM, session 0, une
 #      seule Aide, qui s'arrête seule une fois Mindcare fermé
 #   3. un autre compte (Bruno) : ni la tâche ni le canal ; un autre programme d'Élodie : refusé, noté au journal
-#   4. energie.par-defaut : un mode d'alimentation ajouté avant a disparu après, « Utilisation normale » actif
+#   4. energie.par-defaut : un mode d'alimentation ajouté avant a disparu après, un mode d'origine de Windows actif
 #   5. maj.vider deux fois (la seconde avec un .old déjà là) : dossier mis de côté, services comme avant
 #   6. wifi.oublier sur une machine sans Wi-Fi : réponse propre
 #   7. ip.renouveler (en dernier dans le workflow : la machine perd le réseau un instant) : nouvelle adresse, réseau revenu
@@ -47,6 +47,9 @@ $ProgrammesC = Join-Path $env:ProgramFiles 'Mindset'
 $MindcareC = Join-Path $ProgrammesC 'Mindcare'
 $ClientAilleurs = Join-Path $Racine 'appli\client_aide.exe'  # le même client, hors du dossier de Mindcare
 $Equilibre = '381b4222-f694-41f0-9685-ff5bb260df2e'          # « Utilisation normale », le mode d'origine de Windows
+# Les modes d'origine de Windows. Après « powercfg -restoredefaultschemes », le mode actif est celui de l'édition :
+# « Utilisation normale » sur un PC, « Performances élevées » sur Windows Server (les machines de GitHub).
+$ModesOrigine = @($Equilibre, '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c', 'a1841308-3541-4fab-bc81-f71556f20b4a')
 $Windows = [Environment]::GetFolderPath('Windows')
 
 $script:Reussis = 0
@@ -338,7 +341,7 @@ function Test-Cas3 {
     $s = Invoke-Client $e @('brut', $canal, '{"a":"aide.bonjour"}') -Exe $ClientAilleurs
     Test-Cas 'un autre programme d''Élodie (hors du dossier de Mindcare) ouvre le canal, mais n''a aucune réponse' { $s -and $s.ouvert -eq $true -and -not [string]$s.reponse }
     $s = Invoke-Client $e @('brut', $canal, '{"a":"maj.vider","p":{"Dossier":"C:\\Users"}}')
-    Test-Cas 'contre-épreuve : Mindset.exe d''Élodie a une réponse, et une action avec un paramètre est refusée' { $s.ouvert -eq $true -and [string]$s.reponse -match '"ok":false' -and [string]$s.reponse -match 'aucun param' }
+    Test-Cas 'contre-épreuve : Mindset.exe d''Élodie a une réponse, et une action avec un paramètre est refusée' { $s.ouvert -eq $true -and [string]$s.reponse -match '"ok":false' -and [string]$s.reponse -match 'refus' }
     $s = Invoke-Client $e @('actions', 'aide.journal')
     $j = @((Get-Reponse $s 'aide.journal').r) + @($s.journal)
     Test-Cas 'le refus de l''autre programme est noté au journal de l''Aide' { @($j | Where-Object { $_ -like "*Refusé : demande venant de $ClientAilleurs*" }).Count -gt 0 }
@@ -359,10 +362,11 @@ function Test-Cas4 {
     Test-Cas "un mode ajouté pour l'essai ($perso), actif" { $perso -and ((& $Powercfg -getactivescheme) -join ' ') -match $perso }
     $s = Invoke-Client $e @('actions', 'energie.par-defaut')
     $r = Get-Reponse $s 'energie.par-defaut'
-    Test-Cas 'l''Aide répond : fait, powercfg code 0, « Utilisation normale » actif' { $r.ok -eq $true -and [int]$r.r.code -eq 0 -and [string]$r.r.actif_apres -eq $Equilibre }
-    Test-Cas 'le mode ajouté a disparu, « Utilisation normale » est actif' {
+    Test-Cas 'l''Aide répond : fait, powercfg code 0, un mode d''origine de Windows actif' { $r.ok -eq $true -and [int]$r.r.code -eq 0 -and $ModesOrigine -contains [string]$r.r.actif_apres }
+    Test-Cas 'le mode ajouté a disparu, un mode d''origine de Windows est actif' {
         $liste = (& $Powercfg -list) -join ' '
-        $liste -notmatch $perso -and ((& $Powercfg -getactivescheme) -join ' ') -match $Equilibre
+        $actif = (& $Powercfg -getactivescheme) -join ' '
+        $liste -notmatch $perso -and @($ModesOrigine | Where-Object { $actif -match $_ }).Count -eq 1
     }
 }
 
