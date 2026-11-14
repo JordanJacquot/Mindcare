@@ -224,7 +224,10 @@ function Initialize-Essai {
     Copy-Item -LiteralPath (Join-Path $Racine 'cle\publique-test.xml') -Destination (Join-Path $MindsetDepot 'Mindset\fichiers\cles-publiques\essai-test.xml')
     $fa = Join-Path $MindsetDepot 'Mindset\fichiers\apps.json'
     $texte = [IO.File]::ReadAllText($fa, [Text.Encoding]::UTF8)
-    $applis = @($texte.TrimStart([char]0xFEFF) | ConvertFrom-Json)
+    # (en deux temps : sous PowerShell 5.1, ConvertFrom-Json rend le tableau en un seul objet ; mis directement dans
+    # @(...), il resterait un tableau d'un élément, et le filtre sur « mindcare » prendrait toute la liste)
+    $applis = $texte.TrimStart([char]0xFEFF) | ConvertFrom-Json
+    $applis = @($applis | ForEach-Object { $_ })
     $mc = @($applis | Where-Object { $_.id -eq 'mindcare' })
     if ($mc.Count -ne 1) { throw 'Mindcare introuvable dans apps.json de Mindset.' }
     foreach ($c in @(@('aide', $NomTache), @('aide_exe', 'MindcareAide.exe'))) {
