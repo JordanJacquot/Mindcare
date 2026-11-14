@@ -7,7 +7,8 @@
 #                                                                        d'essai » de Mindcare dans Mindset la reçoivent
 #
 # Mindcare en Rust (rust\mindcare-appli) :
-#   .\outils\publier.ps1 -Rust -Preversion -Version 0.90.0 -Notes "..."   publie Mindcare en Rust en version d'essai
+#   .\outils\publier.ps1 -Rust -Version 0.92.0 -Notes "..."               publie Mindcare en Rust pour tout le monde
+#   .\outils\publier.ps1 -Rust -Preversion -Version 0.92.0 -Notes "..."   en version d'essai (préversion GitHub)
 #   .\outils\publier.ps1 -Rust -Essai                                     essai à blanc : rien n'est modifié, envoyé ni
 #                                                                        publié (voir plus bas)
 #
@@ -24,8 +25,8 @@
 # commit) ; outils\verifier-zip-rust.ps1 revérifie son contenu (fichiers exacts, version.json, fiches de version, pas de
 # construction d'essai, aucun runtime C à part). Ensuite seulement : signature, tag, préversion avec catalogue.zip
 # (inchangé, pour Mindcare Mobile, qui ne prend jamais une préversion). Mindcare.ps1 n'est pas touché : la version
-# PowerShell reste celle publiée pour tout le monde. -Rust demande -Preversion : Mindcare en Rust ne va pas encore à tout
-# le monde (après le point d'arrêt mesuré et l'essai de Jordan seulement).
+# PowerShell n'est plus publiée. Sans -Preversion, la version va à tout le monde (décision de Jordan du 07/11 : à 4
+# utilisateurs, pas de version d'essai ; Mindcare en Rust est pour tout le monde depuis la 0.90.0, le 04/11).
 #
 # -Essai (avec -Rust) : les mêmes vérifications, sans rien écrire dans le dépôt ni rien envoyer sur GitHub. Le zip est
 # celui que GitHub a déjà construit pour le commit en cours (seulement lu), ou -ZipLocal <Mindcare.zip> (un zip fait sur
@@ -54,7 +55,6 @@ $cargoLock  = Join-Path $racine 'rust\Cargo.lock'
 
 if ($Essai -and -not $Rust) { throw 'L''essai à blanc (-Essai) n''existe qu''avec -Rust.' }
 if ($ZipLocal -and -not $Essai) { throw '-ZipLocal ne sert qu''à un essai (-Rust -Essai) : une vraie publication prend toujours le zip construit par GitHub.' }
-if ($Rust -and -not $Essai -and -not $Preversion) { throw 'Mindcare en Rust ne se publie pour l''instant qu''en version d''essai : ajoute -Preversion.' }
 if ($Rust -and -not (Test-Path -LiteralPath $cargoAppli)) { throw "Mindcare en Rust introuvable : $cargoAppli" }
 
 # La version du Cargo.toml de mindcare-appli (ligne « version = "x.y.z" » de sa section [package])
@@ -139,7 +139,7 @@ if ($Rust) {
         & git -C $racine diff --quiet -- $cargoAppli $cargoLock
         if ($LASTEXITCODE) {
             Invoke-Native git @('-C', $racine, 'add', '--', $cargoAppli, $cargoLock)
-            Invoke-Native git @('-C', $racine, 'commit', '-m', "Mindcare $Version (Rust, version d'essai)")
+            Invoke-Native git @('-C', $racine, 'commit', '-m', "Mindcare $Version (Rust$(if ($Preversion) { ', version d''essai' }))")
         }
         Invoke-Native git @('-C', $racine, 'push', 'origin', 'HEAD')
     } elseif ((Get-VersionCargo) -cne $Version) {
@@ -193,9 +193,9 @@ if ($Rust) {
     try {
         Invoke-Native git @('tag', "v$Version")
         Invoke-Native git @('push', 'origin', "v$Version")
-        Invoke-Native gh @('release', 'create', "v$Version", $zip, "$zip.sig", $catalogue, '--title', $titre, '--notes', $notesFinales, '--prerelease')
+        Invoke-Native gh (@('release', 'create', "v$Version", $zip, "$zip.sig", $catalogue, '--title', $titre, '--notes', $notesFinales) + $(if ($Preversion) { @('--prerelease') } else { @('--latest') }))
     } finally { Pop-Location }
-    "Mindcare $Version (Rust, version d'essai) publiée."
+    if ($Preversion) { "Mindcare $Version (Rust, version d'essai) publiée." } else { "Mindcare $Version (Rust) publiée pour tout le monde." }
     return
 }
 
