@@ -30,8 +30,8 @@ use windows::Win32::Security::{
     TOKEN_QUERY, TOKEN_USER, TokenUser,
 };
 use windows::Win32::Storage::FileSystem::{
-    CreateFileW, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_NONE, FlushFileBuffers, OPEN_EXISTING, ReadFile,
-    SECURITY_ANONYMOUS, SECURITY_SQOS_PRESENT, WriteFile,
+    CreateFileW, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_NONE, OPEN_EXISTING, ReadFile, SECURITY_ANONYMOUS,
+    SECURITY_SQOS_PRESENT, WriteFile,
 };
 use windows::Win32::System::IO::CancelIoEx;
 use windows::Win32::System::Pipes::{GetNamedPipeServerProcessId, WaitNamedPipeW};
@@ -331,8 +331,8 @@ fn ecrire_tout(h: HANDLE, o: &[u8]) -> Result<(), String> {
         }
         fait += n as usize;
     }
-    // SAFETY : notre poignée
-    let _ = unsafe { FlushFileBuffers(h) };
+    // (pas de FlushFileBuffers : il attend sans limite que l'autre ait tout lu. Un programme qui répond sans lire la
+    // demande bloquait Mindcare pour toujours, chacun attendant l'autre ; l'écrit est livré de toute façon.)
     Ok(())
 }
 
@@ -524,7 +524,8 @@ mod essais {
         let exe = r"C:\Mindset\Programmes\Mindcare\MindcareAide.exe";
         let r = appeler(&nom, exe, r#"{"a":"aide.bonjour"}"#, 2000, 2000);
         // (si Mindcare n'a pas ouvert le canal, le fil attend encore un client sans fin : le test s'y connecte pour
-        // le libérer. Sur GitHub, en administrateur, il restait bloqué des heures.)
+        // le libérer. Sur GitHub, en administrateur, il restait bloqué des heures : Mindcare, qui y accepte ce faux
+        // canal, attendait par FlushFileBuffers que le faux serveur lise sa demande, ce qu'il ne fait jamais.)
         // SAFETY : un nom terminé par un zéro ; la poignée obtenue est aussitôt refermée
         if let Ok(c) = unsafe {
             CreateFileW(
@@ -551,6 +552,45 @@ mod essais {
         let debut = Instant::now();
         assert!(appeler(&format!("{nom}-absent"), exe, "{}", 300, 300).is_err());
         assert!(debut.elapsed() < Duration::from_secs(5));
+    }
+
+    /// Écrire à un programme qui ne lit jamais rend la main tout de suite (avant : FlushFileBuffers attendait sans fin
+    /// qu'il lise, et le test d'au-dessus bloquait des heures sur GitHub en administrateur)
+    #[test]
+    fn ecrire_a_qui_ne_lit_pas_ne_bloque_pas() {
+        let nom = format!("Mindcare-Essai-Sourd-{}", std::process::id());
+        // SAFETY : un nom terminé par un zéro ; droits par défaut (ceux du compte qui fait le test)
+        let h = unsafe {
+            CreateNamedPipeW(
+                &chemin_canal(&nom),
+                PIPE_ACCESS_DUPLEX,
+                PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
+                1,
+                4096,
+                4096,
+                0,
+                None,
+            )
+        };
+        assert!(!h.is_invalid());
+        let serveur = Poignee(h);
+        let c = connecter(&nom, 2000).expect("canal du test joint");
+        let brute = Brute(c.0.0 as usize);
+        let (tx, rx) = mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = tx.send(ecrire_tout(HANDLE(brute.0 as *mut _), b"{\"a\":\"aide.bonjour\"}\r\n"));
+        });
+        let r = rx.recv_timeout(Duration::from_secs(5));
+        if r.is_err() {
+            // SAFETY : nos poignées ; débloque l'écriture restée en attente avant de les refermer
+            unsafe {
+                let _ = CancelIoEx(c.0, None);
+                let _ = windows::Win32::System::Pipes::DisconnectNamedPipe(serveur.0);
+            }
+        }
+        assert!(matches!(r, Ok(Ok(()))), "l'écriture est restée bloquée : {r:?}");
+        drop(c);
+        drop(serveur);
     }
 
     /// Ce test tourne-t-il en administrateur ?
