@@ -7,8 +7,10 @@
 //!
 //! Pas de bouton quand la personne a déjà dit que le problème n'est pas sur ce PC (la question « Sur ce PC ? » posée,
 //! et répondue sans la note « cepc »), quand « Ton PC » est réglé sur un autre PC, dans Mindcare Mobile, pour test-sfc
-//! et test-gaming-services, et pour une manipulation sur le matériel : rien ne change. Les 4 actions qui demandent les droits administrateur attendent l'Aide administrateur
-//! ([`aide_administrateur_la`]) : en attendant, leur page reste celle d'aujourd'hui.
+//! et test-gaming-services, et pour une manipulation sur le matériel : rien ne change. Les 4 actions qui demandent les
+//! droits administrateur ont leur bouton seulement quand l'Aide de Mindcare est là ([`Etat::aide_administrateur_la`] :
+//! sa tâche SYSTEM et MindcareAide.exe) ; sinon leur page reste celle d'aujourd'hui, avec les gestes à faire soi-même.
+//! Quand l'Aide n'a pas pu le faire, sa phrase est montrée telle quelle, au-dessus des gestes dépliés.
 
 use serde_json::{Value, json};
 
@@ -40,10 +42,13 @@ pub mod textes {
 }
 use textes as x;
 
-/// L'Aide administrateur est-elle là (les 4 actions qui demandent les droits administrateur) ? Pas encore : elle
-/// viendra à l'étape suivante. Tant qu'elle répond non, ces tests restent comme aujourd'hui, sans bouton.
-pub fn aide_administrateur_la() -> bool {
-    false
+impl Etat {
+    /// L'Aide de Mindcare est-elle là (les 4 actions qui demandent les droits administrateur) ? Sa tâche SYSTEM pour ce
+    /// compte et MindcareAide.exe, lus par effets.rs au démarrage. Tant qu'elle répond non, ces tests restent comme
+    /// aujourd'hui, sans bouton (jamais de demande de Windows à la place).
+    pub fn aide_administrateur_la(&self) -> bool {
+        self.aide_admin
+    }
 }
 
 /// Ce qui reste à faire pour la personne une fois l'action faite.
@@ -119,7 +124,7 @@ pub fn textes_action(r: Reparation) -> TextesAction {
             Reste::Geste("Redémarre le PC, puis ouvre les Paramètres (touche Windows + I)."),
         ),
         Reparation::ProfilWifi => t(
-            "Un clic. Le PC oublie les Wi-Fi enregistrés et se déconnecte : c'est normal.",
+            "Un clic. Le PC oublie les Wi-Fi enregistrés et se déconnecte : c'est normal. Il faudra retaper le mot de passe de ton Wi-Fi : prépare-le avant (il est souvent écrit sous ta box).",
             &["Oubli des Wi-Fi enregistrés"],
             "Le PC a oublié les Wi-Fi enregistrés",
             "Il est déconnecté : c'est normal.",
@@ -176,6 +181,8 @@ pub struct SuiviReparation {
     pub etape: String,
     pub action: Reparation,
     pub etat: EtatReparation,
+    /// Ratée par l'Aide de Mindcare : sa phrase, montrée telle quelle (les autres échecs vont seulement au journal)
+    pub message: Option<String>,
 }
 
 impl SuiviReparation {
@@ -200,7 +207,7 @@ impl Etat {
         if ailleurs || self.choix_pc.pour_un_autre() || gestes_materiel(&textes_de(et, "Gestes")) {
             return None;
         }
-        Reparation::de_l_etape(et).filter(|r| !r.admin() || aide_administrateur_la())
+        Reparation::de_l_etape(et).filter(|r| !r.admin() || self.aide_administrateur_la())
     }
 
     /// L'action lancée pour cette étape-ci de cette enquête-ci (rien pour une autre).
@@ -233,6 +240,7 @@ impl Etat {
             etape: etape.clone(),
             action: r,
             etat: EtatReparation::EnCours { faits: 0 },
+            message: None,
         });
         vec![
             Effet::Journal(format!("Le faire pour moi : {} ({etape})", r.id())),
@@ -270,6 +278,8 @@ impl Etat {
         if let Some(s) = self.reparation.as_mut().filter(|s| s.en_cours()) {
             let EtatReparation::EnCours { faits } = s.etat else { unreachable!() };
             s.etat = if resultat.is_ok() { EtatReparation::Faite } else { EtatReparation::Ratee { faits } };
+            // (la phrase de l'Aide est écrite pour la personne ; celle d'un programme lancé par Mindcare, non)
+            s.message = resultat.err().filter(|_| s.action.admin());
             effets.push(Effet::rafraichir());
         }
         effets
@@ -334,7 +344,12 @@ pub(super) fn blocs_test(
                     (blocs, true)
                 }
                 EtatReparation::Ratee { faits } => {
-                    let titre = if faits == 0 { x::RATE_RIEN } else { x::RATE_PARTIE };
+                    // (ratée par l'Aide : sa phrase, telle quelle, dit ce qui s'est passé et quoi faire)
+                    let titre = match &s.message {
+                        Some(m) => m.as_str(),
+                        None if faits == 0 => x::RATE_RIEN,
+                        None => x::RATE_PARTIE,
+                    };
                     let mut blocs = vec![
                         json!({ "type": "verdict", "compact": true, "icone": "alerte",
                                                  "couleur": "orange", "surtitre": x::RATE, "titre": titre,
@@ -377,6 +392,17 @@ mod tests {
             }
         }
         assert_eq!(textes_action(Reparation::MisesAJour).reste, Reste::WindowsUpdate);
-        assert!(!aide_administrateur_la(), "l'Aide administrateur n'est pas encore là");
+        // (sans Aide trouvée, au départ : non)
+        assert!(!Etat::default().aide_administrateur_la());
+        // Le Wi-Fi : la personne est prévenue AVANT qu'il faudra retaper le mot de passe (aucune copie n'est gardée)
+        let wifi = textes_action(Reparation::ProfilWifi);
+        assert!(wifi.note.contains("retaper le mot de passe de ton Wi-Fi") && wifi.note.contains("sous ta box"));
+        // Aucun tiret long dans les textes (règle de la suite)
+        for r in Reparation::TOUTES {
+            let t = textes_action(r);
+            for s in [t.note, t.fait, t.fait_texte].into_iter().chain(t.etapes.iter().copied()) {
+                assert!(!s.contains(['\u{2013}', '\u{2014}']), "{s}");
+            }
+        }
     }
 }

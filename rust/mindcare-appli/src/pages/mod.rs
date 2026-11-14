@@ -43,11 +43,8 @@ pub use actions::{PLUS_TARD_MESSAGE, ids};
 pub use aides::{Aides, POUR_ETRE_SUR, PourEtreSur, ids as ids_aides, textes as textes_aides};
 /// Le début de l'id d'une action qui commence une enquête (`panne:<id>`).
 pub use raconte::PANNE;
-/// « Le faire pour moi » : où en est l'action lancée, ses textes, et l'Aide administrateur (pas encore là).
-pub use reparer::{
-    EtatReparation, Reste, SuiviReparation, TextesAction, aide_administrateur_la, textes as textes_reparer,
-    textes_action,
-};
+/// « Le faire pour moi » : où en est l'action lancée, et ses textes.
+pub use reparer::{EtatReparation, Reste, SuiviReparation, TextesAction, textes as textes_reparer, textes_action};
 /// Le PC reconnu, et les textes de l'écran « Ton PC ».
 pub use ton_pc::{PcReconnu, textes as textes_pc};
 
@@ -207,6 +204,9 @@ pub struct Etat {
     pub avant_pc: Option<String>,
     /// « Le faire pour moi » : l'action lancée (une seule à la fois), gardée tant qu'elle tourne
     pub reparation: Option<SuiviReparation>,
+    /// L'Aide de Mindcare est là (sa tâche SYSTEM et MindcareAide.exe, lus par effets.rs) : les 4 actions qui demandent
+    /// les droits administrateur ont alors leur bouton. Non au départ.
+    pub aide_admin: bool,
 }
 
 /// Où en est l'enquête montrée.

@@ -1,8 +1,9 @@
 //! « Le faire pour moi » dans les pages : avec le vrai catalogue, le bouton (« Si le problème est sur ce PC, Mindcare
 //! peut le faire pour toi ») pour les 6 tests sans droits administrateur ; jamais quand la personne a répondu que le
 //! problème n'est pas sur ce PC, ni quand « Ton PC » vise un autre PC, ni pour test-sfc et test-gaming-services, ni
-//! (tant que l'Aide administrateur n'est pas là) pour les 4 tests qui demandent ces droits. Puis le parcours bouton,
-//! attente, fini ou raté, avec une FAUSSE exécution : les pages ne lancent rien, la fin est donnée ici à la main.
+//! (sans l'Aide de Mindcare) pour les 4 tests qui demandent ces droits, qui ont leur bouton quand elle est là. Puis
+//! le parcours bouton, attente, fini ou raté, avec une FAUSSE exécution : les pages ne lancent rien, la fin est donnée
+//! ici à la main.
 //!
 //! Le vrai catalogue ne pose la question « Sur ce PC ? » dans aucune des pannes de ces tests : le cas « Non, sur un
 //! autre appareil » prend une copie où ces pannes commencent par elle ([`crate::reparer::catalogue_avec_cepc`]).
@@ -457,6 +458,7 @@ fn ouvrir_windows_update_une_fois_les_mises_a_jour_mises_de_cote() {
         etape: "test-depanneur-maj".into(),
         action: Reparation::MisesAJour,
         etat: EtatReparation::Faite,
+        message: None,
     });
     b.executer(vec![Effet::Afficher { ecran: None }]);
     b.propre();
@@ -480,4 +482,103 @@ fn la_faq_dit_le_bouton() {
     assert!(reponse.contains("ne lance rien sans que tu cliques"), "{reponse}");
     assert!(reponse.contains("« Le faire pour moi »"), "{reponse}");
     assert!(!reponse.contains("ne lance jamais rien"));
+}
+
+/// Les 4 tests qui passent par l'Aide de Mindcare, et leur action
+const ADMIN_ACTIONS: [(&str, Reparation); 4] = [
+    ("test-profil-wifi", Reparation::ProfilWifi),
+    ("test-ipconfig", Reparation::AdresseIp),
+    ("test-alim-defaut", Reparation::Alimentation),
+    ("test-depanneur-maj", Reparation::MisesAJour),
+];
+
+/// Le banc arrivé sur ce test, l'Aide de Mindcare trouvée (comme effets.rs le fait au démarrage)
+fn banc_avec_aide(test: &str) -> Banc {
+    let mut b = banc_sur(test);
+    b.etat.aide_admin = true;
+    b.executer(vec![Effet::Afficher { ecran: None }]);
+    b
+}
+
+#[test]
+fn les_quatre_tests_admin_ont_le_bouton_quand_l_aide_est_la() {
+    assert_eq!(ADMIN_ACTIONS.map(|(t, _)| t), ADMIN);
+    for (test, r) in ADMIN_ACTIONS {
+        let b = banc_avec_aide(test);
+        b.propre();
+        let page = b.enquete().clone();
+        let l = bouton(&page).unwrap_or_else(|| panic!("{test} : pas de bouton avec l'Aide"));
+        assert_eq!(l["note"], textes_action(r).note);
+        assert!(blocs(&page, "repli").iter().any(|bl| bl["titre"] == x::SOI_MEME), "{test} : les gestes repliés");
+        assert!(a_les_reponses(&page));
+        assert!(b.toutes_acceptees().is_empty());
+        // Sans l'Aide (tâche absente) : la page d'aujourd'hui, aucun bouton, le clic ne lance rien
+        let mut b = banc_avec_aide(test);
+        b.etat.aide_admin = false;
+        b.executer(vec![Effet::Afficher { ecran: None }]);
+        sans_bouton(&mut b, test);
+    }
+    // Jamais pour test-sfc ni test-gaming-services, même avec l'Aide
+    for test in ["test-sfc", "test-gaming-services"] {
+        let mut b = banc_avec_aide(test);
+        sans_bouton(&mut b, test);
+    }
+    // (le Wi-Fi : prévenu avant qu'il faudra retaper le mot de passe)
+    let b = banc_avec_aide("test-profil-wifi");
+    assert!(bouton(b.enquete()).unwrap()["note"].as_str().unwrap().contains("retaper le mot de passe"));
+}
+
+#[test]
+fn avec_l_aide_attente_puis_fait() {
+    let mut b = banc_avec_aide("test-depanneur-maj");
+    let effets = b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    assert!(effets.contains(&Effet::Reparer(Reparation::MisesAJour)), "{effets:?}");
+    assert_eq!(b.reparations, [Reparation::MisesAJour]);
+    // Pendant : la jauge et les 3 étapes, pas de réponses ; un clic de plus ne relance rien
+    b.propre();
+    let page = b.enquete().clone();
+    assert_eq!(blocs(&page, "jauge")[0]["texte"], x::PENDANT);
+    assert_eq!(blocs(&page, "etapes")[0]["elements"].as_array().unwrap().len(), 3);
+    assert!(!a_les_reponses(&page) && bouton(&page).is_none());
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    assert_eq!(b.reparations, [Reparation::MisesAJour]);
+    // Fini : « Fait par Mindcare », puis « Ouvrir Windows Update » et les réponses
+    let effets = b.etat.reparation_finie(Ok(()));
+    b.executer(effets);
+    b.propre();
+    let page = b.enquete().clone();
+    assert_eq!(blocs(&page, "verdict")[0]["surtitre"], x::FAIT);
+    assert_eq!(blocs(&page, "verdict")[0]["titre"], textes_action(Reparation::MisesAJour).fait);
+    assert!(blocs(&page, "ligne").iter().any(|l| l["bouton"]["id"] == ids::WINDOWS_UPDATE));
+    assert!(a_les_reponses(&page));
+    assert_eq!(b.etat.reparation.as_ref().unwrap().message, None);
+}
+
+#[test]
+fn avec_l_aide_rate_sa_phrase_telle_quelle() {
+    let phrase =
+        "La box n'a pas donné de nouvelle adresse. Éteins ta box, attends une minute, rallume-la, puis réessaie.";
+    let mut b = banc_avec_aide("test-ipconfig");
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    assert_eq!(b.reparations, [Reparation::AdresseIp]);
+    let effets = b.etat.reparation_finie(Err(phrase.into()));
+    assert!(effets.contains(&Effet::Journal(format!("Le faire pour moi : raté ({phrase})"))));
+    b.executer(effets);
+    b.propre();
+    let page = b.enquete().clone();
+    let v = blocs(&page, "verdict");
+    assert_eq!((v[0]["surtitre"].clone(), v[0]["couleur"].clone()), (json!(x::RATE), json!("orange")));
+    assert_eq!(v[0]["titre"], phrase);
+    assert_eq!(v[0]["texte"], x::RATE_TEXTE);
+    // Les gestes dépliés pour le faire soi-même, et les réponses
+    assert!(types_du_haut(&page).contains(&"case".to_string()));
+    assert!(a_les_reponses(&page) && bouton(&page).is_none());
+    assert!(b.toutes_acceptees().is_empty());
+    // (la raison d'un programme lancé par Mindcare lui-même n'est jamais montrée : seulement au journal)
+    let mut b = banc_sur("test-dns");
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    let effets = b.etat.reparation_finie(Err("ipconfig.exe : code 1".into()));
+    b.executer(effets);
+    assert_eq!(blocs(b.enquete(), "verdict")[0]["titre"], x::RATE_RIEN);
+    assert_eq!(b.etat.reparation.as_ref().unwrap().message, None);
 }

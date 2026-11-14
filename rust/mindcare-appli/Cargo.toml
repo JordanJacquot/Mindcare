@@ -49,6 +49,9 @@ mindcare-windows = { path = "../mindcare-windows" }
 # montrent leurs lignes dans « Raconte ton problème » et la page « Pour être sûr » (src\pages\aides.rs)
 mindcare-telechargement = { path = "../mindcare-telechargement" }
 mindcare-assistant = { path = "../mindcare-assistant" }
+# L'Aide de Mindcare (14/11/2026) : ses règles, les mêmes que MindcareAide.exe (nom du canal, état de la tâche, liste
+# fermée des actions, qui répond sur le canal). Seulement serde_json, déjà là.
+mindcare-aide-regles = { path = "../mindcare-aide-regles" }
 mindcare-dictee = { path = "../mindcare-dictee" }
 
 # Ce qui parle à Windows (étape 4.4 : verrou, signaux, fenêtre, registre). La même version que wry, tao et
@@ -58,12 +61,17 @@ version = "=0.62.2"
 features = [
     "Win32_Foundation",
     "Win32_Graphics_Gdi",
+    "Win32_Globalization",
     "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
     "Win32_Storage_Xps",
     "Win32_System_Com",
     "Win32_System_DataExchange",
+    "Win32_System_IO",
     "Win32_System_Memory",
     "Win32_System_Ole",
+    "Win32_System_Pipes",
     "Win32_System_Registry",
     "Win32_System_StationsAndDesktops",
     "Win32_System_SystemInformation",

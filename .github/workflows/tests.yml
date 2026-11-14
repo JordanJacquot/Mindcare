@@ -118,12 +118,12 @@ jobs:
           & ..\_mindset\outils\verifier-tauri.ps1 -Projet mindcare-appli
           exit $LASTEXITCODE
 
-      - name: "Construction de publication et dossier de Mindcare en Rust (outils\\construire-rust.ps1 : Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt, enquetes.json)"
+      - name: "Construction de publication et dossier de Mindcare en Rust (outils\\construire-rust.ps1 : Mindset.exe, Mindcare.exe, MindcareAide.exe, version.json, LISEZMOI.txt, enquetes.json)"
         run: |
           & ..\outils\construire-rust.ps1 -Sortie (Join-Path $env:RUNNER_TEMP 'mindcare-rust')
           if (-not $?) { exit 1 }
 
-      - name: "Le dossier construit : fiches de version (Mindset pour l'hôte, Mindcare pour le relais), aucun runtime C à part (VCRUNTIME*, MSVCP*), version.json"
+      - name: "Le dossier construit : fiches de version (Mindset pour l'hôte, Mindcare pour le relais et l'Aide), aucun runtime C à part (VCRUNTIME*, MSVCP*), version.json"
         run: |
           $ErrorActionPreference = 'Stop'
           $d = Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare'
@@ -137,7 +137,7 @@ jobs:
           }
           Write-Host "Version de Mindcare (Cargo.toml) : $version"
           # Les fiches de version : la description est ce qu'affiche le Gestionnaire des tâches (contrat-appli, partie 4)
-          foreach ($e in @(@('Mindset.exe', 'Mindset'), @('Mindcare.exe', 'Mindcare'))) {
+          foreach ($e in @(@('Mindset.exe', 'Mindset'), @('Mindcare.exe', 'Mindcare'), @('MindcareAide.exe', 'Mindcare'))) {
             $f = Join-Path $d $e[0]
             if (-not (Test-Path -LiteralPath $f -PathType Leaf)) { $problemes += "$($e[0]) manque"; continue }
             $v = (Get-Item -LiteralPath $f).VersionInfo
@@ -149,7 +149,7 @@ jobs:
             if (($p -join '.') -ne ($a -join '.')) { $problemes += "$($e[0]) : version $($v.ProductVersion) au lieu de $version" }
           }
           # Aucun runtime C à installer à part (le contrôle de Mindset, lu dans la table des imports, sans rien lancer)
-          & ..\_mindset\outils\verifier-imports.ps1 -Fichiers (Join-Path $d 'Mindset.exe'), (Join-Path $d 'Mindcare.exe') -Liste
+          & ..\_mindset\outils\verifier-imports.ps1 -Fichiers (Join-Path $d 'Mindset.exe'), (Join-Path $d 'Mindcare.exe'), (Join-Path $d 'MindcareAide.exe') -Liste
           if ($LASTEXITCODE) { $problemes += 'un programme a besoin d''un runtime C à part' }
           # version.json : lu comme Mindset le lit (un objet JSON, UTF-8 sans marque)
           $o = [IO.File]::ReadAllBytes((Join-Path $d 'version.json'))
@@ -170,6 +170,8 @@ jobs:
       - name: "L'exe livré ne connaît pas la construction d'essai (MINDCARE_DONNEES, capture : seulement avec l'option cargo essai)"
         run: |
           & ..\outils\verifier-sans-essai.ps1 -Exe (Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare\Mindset.exe')
+          if ($LASTEXITCODE) { exit 1 }
+          & ..\outils\verifier-sans-essai.ps1 -Exe (Join-Path $env:RUNNER_TEMP 'mindcare-rust\Mindcare\MindcareAide.exe')
           exit $LASTEXITCODE
 
       - name: "Contrat de la suite avec le vrai Mindset (tester-contrat.ps1 -AppliConstruite : apps.json, version.json, installation signée par une clé de test, verrou, Mindset.exe, -Demarrage, accrochage, taille minimale, signal d'affichage, suite.json, WM_CLOSE, quitter.demande)"

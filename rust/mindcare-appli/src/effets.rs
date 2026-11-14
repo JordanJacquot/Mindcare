@@ -35,7 +35,7 @@ use serde_json::{Value, json};
 
 use crate::pages::{self, Effet};
 use crate::pont::{self, MessagePage};
-use crate::reparer::{EnFond, Executeur, SansExecuteur};
+use crate::reparer::{AideAdmin, EnFond, Executeur, SansAide, SansExecuteur};
 
 /// La photo des aides est reprise tous les 5 pas de la minuterie (500 ms, comme `Start-SuiviIa`) ; la dictée et la
 /// phrase posée sont suivies à chaque pas pendant qu'elles travaillent.
@@ -375,6 +375,12 @@ pub struct Branchement {
     executeur: Arc<dyn Executeur>,
     /// L'action de « Le faire pour moi » qui tourne (une seule à la fois)
     reparation: Option<EnFond>,
+    /// L'Aide de Mindcare, pour les 4 actions qui demandent les droits administrateur ([`Branchement::brancher_aide`] ;
+    /// sans elle, ces actions restent sans bouton)
+    aide: Arc<dyn AideAdmin>,
+    /// L'Aide est-elle là ? Lu une fois sur un fil à part (schtasks peut prendre un moment), recopié dans les pages au
+    /// pas suivant de la minuterie (`None` : pas encore lu)
+    aide_presente: Arc<Mutex<Option<bool>>>,
 }
 
 /// Le catalogue des enquêtes, lu dans ce fichier (`Read-Enquetes`) : enquetes.json à côté du programme.
@@ -436,6 +442,8 @@ impl Branchement {
             pc_donne: false,
             executeur: Arc::new(SansExecuteur),
             reparation: None,
+            aide: Arc::new(SansAide),
+            aide_presente: Arc::new(Mutex::new(None)),
         }
     }
 
@@ -444,8 +452,37 @@ impl Branchement {
         self.executeur = executeur;
     }
 
-    /// Le pas de la minuterie pour « Le faire pour moi » : le journal de l'action, ses étapes faites, sa fin.
+    /// L'Aide de Mindcare, pour les 4 actions qui demandent les droits administrateur : la vraie dans l'exe livré, une
+    /// fausse ailleurs. Sa présence (tâche SYSTEM et exe) est lue tout de suite sur un fil à part ; les pages ne
+    /// montrent le bouton de ces actions qu'une fois qu'elle a répondu oui.
+    pub fn brancher_aide(&mut self, aide: Arc<dyn AideAdmin>) {
+        self.aide = Arc::clone(&aide);
+        let presente = Arc::new(Mutex::new(None));
+        self.aide_presente = Arc::clone(&presente);
+        let fil = std::thread::Builder::new().name("mindcare-aide".into()).spawn(move || {
+            let oui = aide.presente();
+            *presente.lock().unwrap_or_else(|e| e.into_inner()) = Some(oui);
+        });
+        if fil.is_err() {
+            *self.aide_presente.lock().unwrap_or_else(|e| e.into_inner()) = Some(false);
+        }
+    }
+
+    /// Le pas de la minuterie pour « Le faire pour moi » : l'Aide trouvée (une fois), puis le journal de l'action, ses
+    /// étapes faites, sa fin.
     fn tour_reparation(&mut self, journal: &mindcare_donnees::Journal) -> Vec<Effet> {
+        let lue = self.aide_presente.lock().unwrap_or_else(|e| e.into_inner()).take();
+        if let Some(oui) = lue {
+            journal.ecrire(if oui {
+                "Aide de Mindcare : là (tâche de Mindset en SYSTEM), « Le faire pour moi » pour les 4 réglages administrateur"
+            } else {
+                "Aide de Mindcare : absente, les 4 réglages administrateur restent à faire soi-même"
+            });
+            if self.pages.aide_admin != oui {
+                self.pages.aide_admin = oui;
+                return vec![Effet::Afficher { ecran: None }];
+            }
+        }
         let Some(f) = self.reparation.as_mut() else { return Vec::new() };
         let n = f.nouvelles();
         for l in &n.journal {
@@ -843,7 +880,9 @@ impl Branchement {
                         r.id(),
                         f.action.id()
                     )),
-                    None => self.reparation = Some(EnFond::lancer(r, Arc::clone(&self.executeur))),
+                    None => {
+                        self.reparation = Some(EnFond::lancer(r, Arc::clone(&self.executeur), Arc::clone(&self.aide)))
+                    }
                 }
                 Vec::new()
             }

@@ -1,4 +1,4 @@
-﻿# Mindcare en Rust (étape 4.5) : construit les deux programmes en Rust et assemble le dossier de Mindcare prêt à
+﻿# Mindcare en Rust (étape 4.5) : construit les trois programmes en Rust et assemble le dossier de Mindcare prêt à
 # zipper. Rien ici n'est livré aux utilisateurs pour l'instant : Mindcare publiée reste celle en PowerShell
 # (construire.ps1). Lancé aussi par la CI de GitHub (.github\workflows\tests.yml).
 #
@@ -9,6 +9,9 @@
 #                          toute la suite, description « Mindset » : une seule ligne « Mindset » dans le Gestionnaire
 #                          des tâches (contrat-appli, partie 4)
 #     Mindcare.exe      <- le relais (rust\mindcare-relais), pour ce qui appelle encore Mindcare.exe
+#     MindcareAide.exe  <- l'Aide de Mindcare (rust\mindcare-aide) : la tâche SYSTEM « \Mindset\Mindcare (aide) », que
+#                          l'installateur de Mindset crée seulement si l'exe est dans le zip (champs « aide » et
+#                          « aide_exe » de apps.json), pour les 4 réglages qui demandent les droits administrateur
 #     version.json      <- { "appli": "mindcare", "version": <version du Cargo.toml de mindcare-appli>,
 #                            "mindset_min": "2.15.0" } (contrat-appli, partie 10 : une seule source pour la version)
 #     LISEZMOI.txt      <- le même que celui de Mindcare (Mindcare\LISEZMOI.txt)
@@ -45,7 +48,7 @@ if (-not $SansConstruire) {
     $ErrorActionPreference = 'Continue'
     Push-Location $rust
     try {
-        & cargo build --release --locked -p mindcare-appli -p mindcare-relais 2>&1 | ForEach-Object { "$_" }
+        & cargo build --release --locked -p mindcare-appli -p mindcare-relais -p mindcare-aide 2>&1 | ForEach-Object { "$_" }
         $code = $LASTEXITCODE
     } finally {
         Pop-Location
@@ -58,7 +61,7 @@ $construits = Join-Path $rust 'target\release'
 $dossier = Join-Path ([IO.Path]::GetFullPath($Sortie)) 'Mindcare'
 if (Test-Path -LiteralPath $dossier) { Remove-Item -LiteralPath $dossier -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $dossier | Out-Null
-foreach ($exe in 'Mindset.exe', 'Mindcare.exe') {
+foreach ($exe in 'Mindset.exe', 'Mindcare.exe', 'MindcareAide.exe') {
     $chemin = Join-Path $construits $exe
     if (-not (Test-Path -LiteralPath $chemin -PathType Leaf)) { throw "$exe introuvable dans $construits : la construction ne l'a pas fait." }
     Copy-Item -LiteralPath $chemin -Destination (Join-Path $dossier $exe)

@@ -1,0 +1,17 @@
+[package]
+name = "mindcare-aide-regles"
+version = "0.1.0"
+description = "Les règles de l'Aide de Mindcare : pour qui elle travaille, son canal, qui peut lui parler, la liste fermée de ses actions, l'état de sa tâche"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# Le cadre vient de l'Aide de Nevermind (D:\Projets\Nevermind\rust\aide-regles), copié et rebaptisé (plan de l'Aide de
+# Mindcare, 14/11/2026, partie A) : chaque fichier copié dit d'où il vient, pour y reporter une correction.
+
+[dependencies]
+# Version figée (« = ») : la même que le reste du dépôt, déjà dans Cargo.lock
+serde_json = "=1.0.154"
+
+[lints]
+workspace = true

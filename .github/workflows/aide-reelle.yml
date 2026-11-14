@@ -1,0 +1,153 @@
+# L'Aide de Mindcare (MindcareAide.exe, tâche SYSTEM « \Mindset\Mindcare (aide) ») essayée en vrai sur la machine jetable
+# de GitHub : vraies tâches planifiées, vrais comptes Windows, vraie installation par l'installateur de Mindset, vraies
+# réparations de Windows (jamais sur un vrai PC). Modèle : aide-reelle.yml de Nevermind. Lancée à la main seulement :
+#   gh workflow run aide-reelle.yml -f mindset=<branche ou version de Mindset> [--ref <branche de Mindcare>]
+# Tout le code est dans outils\essai-aide-reelle.ps1 (UTF-8 avec BOM : un nom accentué écrit ici arriverait abîmé).
+#
+# Construits ici : MindcareAide.exe et Mindcare.exe (le relais), et le client d'essai (le vrai client de Mindcare,
+# rust\mindcare-appli\examples\client_aide.rs), mis à la place de Mindset.exe dans le paquet d'essai ; puis
+# MindsetInstallateur.exe de la branche de Mindset choisie. 9 cas ; ip.renouveler en dernier (la machine perd le
+# réseau un instant), toléré en échec.
+name: Aide en vrai
+
+on:
+  workflow_dispatch:
+    inputs:
+      mindset:
+        description: "Branche (ou version) de Mindset dont l'installateur crée la tâche de l'Aide"
+        required: false
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  construire:
+    name: "MindcareAide.exe, le relais et le client d'essai"
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+        working-directory: rust
+    env:
+      CARGO_TERM_COLOR: never
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: "Rust, la version figée par rust/rust-toolchain.toml"
+        run: |
+          rustup toolchain install
+          if ($LASTEXITCODE) { rustup show; if ($LASTEXITCODE) { exit 1 } }
+          rustc --version
+
+      - name: "Construire MindcareAide.exe et Mindcare.exe (cargo build --release --locked)"
+        run: |
+          cargo build --release --locked -p mindcare-aide -p mindcare-relais
+          if ($LASTEXITCODE) { exit 1 }
+
+      # (le vrai client de Mindcare, windows\aide.rs, dans un petit programme d'essai : jamais livré)
+      - name: "Construire le client d'essai (cargo build --release --locked --example client_aide)"
+        run: |
+          cargo build --release --locked -p mindcare-appli --example client_aide
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: "Rassembler les programmes"
+        run: |
+          $d = Join-Path $env:GITHUB_WORKSPACE '_aide'
+          New-Item -ItemType Directory -Force -Path $d | Out-Null
+          foreach ($e in 'target\release\MindcareAide.exe', 'target\release\Mindcare.exe', 'target\release\examples\client_aide.exe') {
+            if (-not (Test-Path -LiteralPath $e -PathType Leaf)) { Write-Host "$e introuvable"; exit 1 }
+            Copy-Item -LiteralPath $e -Destination $d
+            Write-Host "$(Split-Path $e -Leaf) ($(git log --oneline -1)) : SHA-256 $((Get-FileHash -LiteralPath $e -Algorithm SHA256).Hash)"
+          }
+          $i = (Get-Item -LiteralPath (Join-Path $d 'MindcareAide.exe')).VersionInfo
+          Write-Host "MindcareAide.exe : description « $($i.FileDescription) », produit « $($i.ProductName) », version $($i.ProductVersion)"
+
+      - name: "Déposer les programmes pour les essais"
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: aide-mindcare
+          path: _aide/
+          if-no-files-found: error
+          retention-days: 7
+
+  essai:
+    name: "Aide de Mindcare en vrai"
+    needs: construire
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: "Récupérer les programmes (construits plus haut dans ce run)"
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: aide-mindcare
+          path: C:\essai-aide
+
+      - name: Récupérer Mindset
+        run: |
+          git clone --quiet https://github.com/JordanJacquot/Mindset.git C:\essai\mindset
+          git -C C:\essai\mindset checkout --quiet "${{ inputs.mindset }}"
+          if ($LASTEXITCODE) { exit 1 }
+          git -C C:\essai\mindset log --oneline -1
+
+      - name: "Construire MindsetInstallateur.exe (Rust de Mindset, bibliothèques figées par son Cargo.lock)"
+        working-directory: C:\essai\mindset\rust
+        env:
+          CARGO_TERM_COLOR: never
+        run: |
+          rustup toolchain install
+          if ($LASTEXITCODE) { rustup show; if ($LASTEXITCODE) { exit 1 } }
+          cargo build --release --locked -p mindset-installateur
+          if ($LASTEXITCODE) { exit 1 }
+          $exe = (Resolve-Path 'target\release\MindsetInstallateur.exe').Path
+          Write-Host "MindsetInstallateur.exe : SHA-256 $((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash)"
+          [IO.File]::AppendAllText($env:GITHUB_ENV, "MINDSET_INSTALLATEUR=$exe`n")
+
+      - name: "0. Préparation (copie d'essai de Mindset avec la clé de TEST et « aide » pour Mindcare, paquet d'essai signé)"
+        run: .\outils\essai-aide-reelle.ps1 -Cas 0 -Aide C:\essai-aide
+
+      - name: "1. Installation pour un compte standard : tâche de l'Aide en SYSTEM pour lui, -Sid, droits"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 1
+
+      - name: "2. Son Mindset.exe trouve la tâche, la réveille, aide.bonjour répond (SYSTEM, session 0, arrêt seule)"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 2
+
+      - name: "3. Un autre compte et un autre programme : refusés"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 3
+
+      - name: "4. energie.par-defaut : le mode ajouté avant a disparu"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 4
+
+      - name: "5. maj.vider deux fois (la seconde avec un .old déjà là), services comme avant"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 5
+
+      - name: "6. wifi.oublier sur une machine sans Wi-Fi : réponse propre"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 6
+
+      # (attend le correctif de Mindset : l'action « supprimer » doit retirer la tâche \Mindset\<aide> de l'appli)
+      - name: "8. Désinstallation par Mindset : plus de dossier, plus de tâche"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 8
+
+      - name: "9. La tâche SYSTEM ne voit pas l'environnement de l'utilisateur"
+        if: ${{ !cancelled() }}
+        run: .\outils\essai-aide-reelle.ps1 -Cas 9
+
+      # (en dernier : la machine perd sa connexion un instant ; toléré en échec, le réseau de GitHub peut ne pas revenir à temps)
+      - name: "7. ip.renouveler : nouvelle adresse, le réseau revient"
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: .\outils\essai-aide-reelle.ps1 -Cas 7

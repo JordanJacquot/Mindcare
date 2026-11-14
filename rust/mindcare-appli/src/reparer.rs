@@ -3,17 +3,68 @@
 //!
 //! - [`gestes`] : pour chaque action, les programmes lancés, toujours les mêmes, avec leurs arguments écrits ici et
 //!   nulle part ailleurs (aucun texte venu du catalogue ou de la page n'arrive jusqu'à un programme). Les 4 actions
-//!   qui demandent les droits administrateur n'ont encore aucun geste : elles attendent l'Aide administrateur ;
+//!   qui demandent les droits administrateur n'ont aucun geste : elles passent par l'Aide de Mindcare ;
 //! - [`Executeur`] : ce qui lance vraiment un programme. L'exe livré a le vrai (src\windows\reparer.rs : sans fenêtre,
 //!   chemin absolu, limite de temps, code de sortie lu) ; la construction d'essai et les tests ont des faux, qui ne
 //!   lancent jamais rien ;
+//! - [`AideAdmin`] : l'Aide de Mindcare (MindcareAide.exe, la tâche SYSTEM `\Mindset\Mindcare (aide)` créée par
+//!   l'installateur de Mindset), pour les 4 actions qui demandent les droits administrateur ([`action_aide`] : un nom
+//!   de la liste fermée de l'Aide, jamais un paramètre). L'exe livré a la vraie (src\windows\aide.rs : état de la tâche,
+//!   réveil par `schtasks /Run`, canal vérifié) ; la construction d'essai et les tests ont des fausses. Sans tâche,
+//!   pas d'Aide : jamais de demande de Windows (décision de Jordan du 14/11/2026), la page montre les gestes ;
 //! - [`EnFond`] : l'action déroulée sur un fil à part, jamais sur celui de la fenêtre ; le programme regarde où elle
 //!   en est à chaque pas de sa minuterie.
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use mindcare_aide_regles::demandes::Demande;
 pub use mindcare_moteur::Reparation;
+
+/// La demande faite à l'Aide pour une action qui demande les droits administrateur (aucune pour les autres).
+pub fn action_aide(r: Reparation) -> Option<Demande> {
+    match r {
+        Reparation::ProfilWifi => Some(Demande::WifiOublier),
+        Reparation::AdresseIp => Some(Demande::IpRenouveler),
+        Reparation::Alimentation => Some(Demande::EnergieParDefaut),
+        Reparation::MisesAJour => Some(Demande::MajVider),
+        _ => None,
+    }
+}
+
+/// Le temps laissé à l'Aide pour répondre à une action (après son réveil) : un peu plus que ce qu'elle se donne
+/// elle-même (ip.renouveler : 90 s au plus ; maj.vider : deux services de 60 s au plus, trois essais).
+pub fn delai_aide(d: Demande) -> Duration {
+    Duration::from_secs(match d {
+        Demande::WifiOublier => 15,
+        Demande::IpRenouveler => 120,
+        Demande::EnergieParDefaut => 20,
+        Demande::MajVider => 180,
+        Demande::Bonjour | Demande::Journal => 5,
+    })
+}
+
+/// L'Aide de Mindcare, vue de Mindcare.
+pub trait AideAdmin: Send + Sync {
+    /// Est-elle là ? Sa tâche SYSTEM pour ce compte (`mindcare_aide_regles::tache::etat` : « systeme ») et
+    /// MindcareAide.exe à côté de Mindset.exe. Peut prendre un moment (schtasks) : jamais sur le fil de la fenêtre.
+    fn presente(&self) -> bool;
+    /// Fait faire cette action à l'Aide (réveillée par sa tâche si besoin), en attendant sa réponse au plus `delai` :
+    /// son compte rendu, ou la phrase simple de l'échec. Rend aussi les lignes de son journal pas encore recopiées.
+    fn faire(&self, d: Demande, delai: Duration) -> (Result<serde_json::Value, String>, Vec<String>);
+}
+
+/// Pas d'Aide (tant que le programme n'en a pas branché une) : les 4 actions restent sans bouton.
+pub struct SansAide;
+
+impl AideAdmin for SansAide {
+    fn presente(&self) -> bool {
+        false
+    }
+    fn faire(&self, _: Demande, _: Duration) -> (Result<serde_json::Value, String>, Vec<String>) {
+        (Err("pas d'Aide de Mindcare sur ce PC".into()), Vec::new())
+    }
+}
 
 /// Un programme lancé : toujours un programme connu, à un emplacement fixe.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -137,11 +188,26 @@ fn noter(suivi: &Mutex<Avancement>, f: impl FnOnce(&mut Avancement)) {
     f(&mut suivi.lock().unwrap_or_else(|e| e.into_inner()));
 }
 
-/// Déroule l'action, geste après geste (le premier raté arrête tout). Tourne sur le fil de l'appelant.
-pub fn derouler(r: Reparation, executeur: &dyn Executeur, suivi: &Mutex<Avancement>) {
+/// Déroule l'action, geste après geste (le premier raté arrête tout), ou par l'Aide pour une action qui demande les
+/// droits administrateur. Tourne sur le fil de l'appelant.
+pub fn derouler(r: Reparation, executeur: &dyn Executeur, aide: &dyn AideAdmin, suivi: &Mutex<Avancement>) {
+    if let Some(d) = action_aide(r) {
+        let ligne = format!("Le faire pour moi ({}) : par l'Aide de Mindcare ({})", r.id(), d.nom());
+        noter(suivi, |a| a.journal.push(ligne.clone()));
+        let (resultat, journal_aide) = aide.faire(d, delai_aide(d));
+        noter(suivi, |a| {
+            a.journal.extend(journal_aide.into_iter().map(|l| format!("Aide : {l}")));
+            match &resultat {
+                Ok(r) => a.journal.push(format!("{ligne}, fini ({})", court(&r.to_string()))),
+                Err(e) => a.journal.push(format!("{ligne}, raté ({e})")),
+            }
+            a.fin = Some(resultat.map(|_| ()));
+        });
+        return;
+    }
     let liste = gestes(r);
     if liste.is_empty() {
-        noter(suivi, |a| a.fin = Some(Err("demande les droits administrateur".into())));
+        noter(suivi, |a| a.fin = Some(Err("aucun geste pour cette action".into())));
         return;
     }
     for (k, g) in liste.iter().enumerate() {
@@ -174,6 +240,15 @@ pub fn derouler(r: Reparation, executeur: &dyn Executeur, suivi: &Mutex<Avanceme
     noter(suivi, |a| a.fin = Some(Ok(())));
 }
 
+/// Un compte rendu de l'Aide, coupé pour le journal (300 caractères au plus).
+fn court(t: &str) -> String {
+    let mut c: String = t.chars().take(300).collect();
+    if c.len() < t.len() {
+        c.push_str("...");
+    }
+    c
+}
+
 /// Ce qui a changé depuis le dernier regard sur une action déroulée.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Nouvelles {
@@ -192,12 +267,12 @@ pub struct EnFond {
 
 impl EnFond {
     /// Lance l'action sur un fil à part. Un fil impossible à créer : l'action est ratée tout de suite.
-    pub fn lancer(action: Reparation, executeur: Arc<dyn Executeur>) -> EnFond {
+    pub fn lancer(action: Reparation, executeur: Arc<dyn Executeur>, aide: Arc<dyn AideAdmin>) -> EnFond {
         let suivi = Arc::new(Mutex::new(Avancement::default()));
         let pour_fil = Arc::clone(&suivi);
         let fil = std::thread::Builder::new()
             .name("mindcare-reparer".into())
-            .spawn(move || derouler(action, executeur.as_ref(), &pour_fil));
+            .spawn(move || derouler(action, executeur.as_ref(), aide.as_ref(), &pour_fil));
         if let Err(e) = fil {
             noter(&suivi, |a| a.fin = Some(Err(format!("travail de fond impossible ({e})"))));
         }
@@ -297,7 +372,7 @@ mod tests {
     fn deroule_jusqu_au_premier_rate() {
         let f = faux(vec![Ok(0), Ok(0)]);
         let s = Mutex::new(Avancement::default());
-        derouler(Reparation::VisualCpp, &f, &s);
+        derouler(Reparation::VisualCpp, &f, &SansAide, &s);
         let a = s.lock().unwrap().clone();
         assert_eq!((a.faits, a.fin), (2, Some(Ok(()))));
         assert_eq!(f.lances.lock().unwrap().len(), 2);
@@ -306,13 +381,13 @@ mod tests {
         // Déjà installé : c'est fait aussi
         let f = faux(vec![Ok(0x8A15_002B_u32 as i32)]);
         let s = Mutex::new(Avancement::default());
-        derouler(Reparation::Java, &f, &s);
+        derouler(Reparation::Java, &f, &SansAide, &s);
         assert_eq!(s.lock().unwrap().fin, Some(Ok(())));
 
         // Le premier raté arrête tout : le second n'est jamais lancé
         let f = faux(vec![Ok(1), Ok(0)]);
         let s = Mutex::new(Avancement::default());
-        derouler(Reparation::VisualCpp, &f, &s);
+        derouler(Reparation::VisualCpp, &f, &SansAide, &s);
         let a = s.lock().unwrap().clone();
         assert_eq!(a.faits, 0);
         assert_eq!(a.fin, Some(Err("winget.exe : code 1".into())));
@@ -321,20 +396,20 @@ mod tests {
         // winget absent : un échec propre
         let f = faux(vec![Err("winget.exe introuvable".into())]);
         let s = Mutex::new(Avancement::default());
-        derouler(Reparation::Java, &f, &s);
+        derouler(Reparation::Java, &f, &SansAide, &s);
         assert_eq!(s.lock().unwrap().fin, Some(Err("winget.exe : winget.exe introuvable".into())));
 
-        // Une action qui demande les droits administrateur : rien de lancé
+        // Une action qui demande les droits administrateur, sans Aide : rien de lancé, raté proprement
         let f = faux(vec![]);
         let s = Mutex::new(Avancement::default());
-        derouler(Reparation::MisesAJour, &f, &s);
-        assert_eq!(s.lock().unwrap().fin, Some(Err("demande les droits administrateur".into())));
+        derouler(Reparation::MisesAJour, &f, &SansAide, &s);
+        assert_eq!(s.lock().unwrap().fin, Some(Err("pas d'Aide de Mindcare sur ce PC".into())));
         assert!(f.lances.lock().unwrap().is_empty());
     }
 
     #[test]
     fn en_fond_rend_la_fin_une_seule_fois() {
-        let mut f = EnFond::lancer(Reparation::Dns, Arc::new(faux(vec![Ok(0)])));
+        let mut f = EnFond::lancer(Reparation::Dns, Arc::new(faux(vec![Ok(0)])), Arc::new(SansAide));
         let debut = std::time::Instant::now();
         let mut vu = Nouvelles::default();
         while vu.fin.is_none() && debut.elapsed() < Duration::from_secs(10) {
@@ -349,7 +424,7 @@ mod tests {
         assert_eq!(vu.journal.len(), 1);
         assert_eq!(f.nouvelles(), Nouvelles::default());
         // Sans exécuteur : raté proprement
-        let mut f = EnFond::lancer(Reparation::Dns, Arc::new(SansExecuteur));
+        let mut f = EnFond::lancer(Reparation::Dns, Arc::new(SansExecuteur), Arc::new(SansAide));
         let debut = std::time::Instant::now();
         let mut fin = None;
         while fin.is_none() && debut.elapsed() < Duration::from_secs(10) {
@@ -357,5 +432,68 @@ mod tests {
             std::thread::sleep(Duration::from_millis(5));
         }
         assert_eq!(fin, Some(Err("ipconfig.exe : rien pour lancer les gestes".into())));
+    }
+
+    /// Une fausse Aide : elle note les demandes et rend la réponse donnée, avec deux lignes de son journal (jamais
+    /// rien de lancé)
+    struct FausseAide {
+        demandes: Mutex<Vec<(Demande, Duration)>>,
+        reponse: Result<serde_json::Value, String>,
+    }
+
+    impl AideAdmin for FausseAide {
+        fn presente(&self) -> bool {
+            true
+        }
+        fn faire(&self, d: Demande, delai: Duration) -> (Result<serde_json::Value, String>, Vec<String>) {
+            self.demandes.lock().unwrap().push((d, delai));
+            (self.reponse.clone(), vec![format!("{} : commencé", d.nom()), format!("{} : fini", d.nom())])
+        }
+    }
+
+    #[test]
+    fn les_actions_admin_passent_par_l_aide() {
+        let attendu = [
+            (Reparation::ProfilWifi, Demande::WifiOublier, 15),
+            (Reparation::AdresseIp, Demande::IpRenouveler, 120),
+            (Reparation::Alimentation, Demande::EnergieParDefaut, 20),
+            (Reparation::MisesAJour, Demande::MajVider, 180),
+        ];
+        for r in Reparation::TOUTES {
+            assert_eq!(action_aide(r).is_some(), r.admin(), "{r:?}");
+        }
+        for (r, d, secondes) in attendu {
+            assert_eq!(action_aide(r), Some(d));
+            let aide = FausseAide { demandes: Mutex::new(Vec::new()), reponse: Ok(serde_json::json!({ "code": 0 })) };
+            let f = faux(vec![]);
+            let s = Mutex::new(Avancement::default());
+            derouler(r, &f, &aide, &s);
+            let a = s.lock().unwrap().clone();
+            assert_eq!(a.fin, Some(Ok(())), "{r:?}");
+            assert_eq!(*aide.demandes.lock().unwrap(), [(d, Duration::from_secs(secondes))]);
+            assert!(f.lances.lock().unwrap().is_empty(), "{r:?} : un programme lancé par Mindcare lui-même");
+            // Le journal de l'Aide recopié dans celui de Mindcare
+            let ligne = format!("Le faire pour moi ({}) : par l'Aide de Mindcare ({})", r.id(), d.nom());
+            assert_eq!(a.journal[0], ligne);
+            assert_eq!(a.journal[1], format!("Aide : {} : commencé", d.nom()));
+            assert_eq!(a.journal[2], format!("Aide : {} : fini", d.nom()));
+            assert_eq!(a.journal[3], format!("{ligne}, fini ({{\"code\":0}})"));
+        }
+        // Ratée : la phrase de l'Aide, telle quelle
+        let aide = FausseAide {
+            demandes: Mutex::new(Vec::new()),
+            reponse: Err("Ce PC n'a pas de Wi-Fi : il n'y a rien à oublier.".into()),
+        };
+        let s = Mutex::new(Avancement::default());
+        derouler(Reparation::ProfilWifi, &faux(vec![]), &aide, &s);
+        let a = s.lock().unwrap().clone();
+        assert_eq!(a.fin, Some(Err("Ce PC n'a pas de Wi-Fi : il n'y a rien à oublier.".into())));
+        assert!(a.journal.last().unwrap().ends_with(", raté (Ce PC n'a pas de Wi-Fi : il n'y a rien à oublier.)"));
+        // Les actions sans droits administrateur ne passent jamais par l'Aide
+        let aide = FausseAide { demandes: Mutex::new(Vec::new()), reponse: Ok(serde_json::Value::Null) };
+        let s = Mutex::new(Avancement::default());
+        derouler(Reparation::Dns, &faux(vec![Ok(0)]), &aide, &s);
+        assert!(aide.demandes.lock().unwrap().is_empty());
+        assert!(!SansAide.presente());
     }
 }

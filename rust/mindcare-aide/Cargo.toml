@@ -1,0 +1,53 @@
+[package]
+name = "mindcare-aide"
+version = "0.1.0"
+description = "MindcareAide.exe : la partie administrateur de Mindcare (tâche SYSTEM « \\Mindset\\Mindcare (aide) »), 4 réparations de Windows, rien d'autre"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+build = "build.rs"
+
+# Le cadre (canal, verrou, serveur, appelant vérifié, arrêt quand Mindcare est fermé) est copié de l'Aide de Nevermind
+# (D:\Projets\Nevermind\rust\nevermind-aide), préfixe « Mindcare » (plan de l'Aide de Mindcare, 14/11/2026, partie A) :
+# chaque fichier copié dit d'où il vient. Les actions sont propres à Mindcare (src\actions.rs) : une liste fermée,
+# sans aucun paramètre (mindcare-aide-regles, src\demandes.rs).
+[[bin]]
+name = "MindcareAide"
+path = "src/main.rs"
+
+[dependencies]
+mindcare-aide-regles = { path = "../mindcare-aide-regles" }
+# Versions figées (« = ») : les mêmes que le reste du dépôt, déjà dans Cargo.lock
+serde_json = "=1.0.154"
+
+[dependencies.windows]
+version = "=0.62.2"
+features = [
+    "Win32_Foundation",
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_NetworkManagement_Ndis",
+    "Win32_NetworkManagement_WiFi",
+    "Win32_Networking_WinSock",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_IO",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Pipes",
+    "Win32_System_Power",
+    "Win32_System_Registry",
+    "Win32_System_Services",
+    "Win32_System_SystemInformation",
+    "Win32_System_Threading",
+]
+
+# Pas `workspace = true` : le module Windows (src\windows) a besoin d'autoriser le code « unsafe », que le reste du
+# dépôt interdit tout à fait (forbid). Ici, il est refusé partout (deny), sauf dans src\windows qui l'autorise, comme
+# mindcare-windows.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }

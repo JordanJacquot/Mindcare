@@ -14,7 +14,7 @@ use serde_json::{Value, json};
 use super::{Banc, cat};
 use crate::pages::Effet;
 use crate::pages::{ecrans, ids, textes_reparer as x};
-use crate::reparer::{Executeur, Geste, Programme};
+use crate::reparer::{AideAdmin, Executeur, Geste, Programme};
 
 /// Le faux exécuteur : ce qu'on lui a demandé ; il attend d'être libéré (au plus 10 s), puis rend `code`.
 struct FauxExecuteur {
@@ -186,4 +186,113 @@ fn ouvrir_windows_update_par_le_faux_exterieur() {
     b.executer(vec![Effet::OuvrirWindowsUpdate]);
     assert!(b.racine.join("windows-update.txt").is_file());
     assert!(b.journal().contains("Windows Update ouvert"));
+}
+
+/// Une fausse Aide de Mindcare : présente ou non, elle note les demandes, attend d'être libérée (au plus 10 s), puis
+/// rend la réponse voulue avec une ligne de son journal (jamais rien de lancé, aucune vraie tâche ni vrai canal).
+struct FausseAide {
+    presente: bool,
+    demandes: Mutex<Vec<mindcare_aide_regles::demandes::Demande>>,
+    retenue: (Mutex<bool>, Condvar),
+    reponse: Result<Value, String>,
+}
+
+impl FausseAide {
+    fn nouvelle(presente: bool, reponse: Result<Value, String>) -> Arc<FausseAide> {
+        Arc::new(FausseAide {
+            presente,
+            demandes: Mutex::new(Vec::new()),
+            retenue: (Mutex::new(true), Condvar::new()),
+            reponse,
+        })
+    }
+    fn liberer(&self) {
+        *self.retenue.0.lock().unwrap() = false;
+        self.retenue.1.notify_all();
+    }
+}
+
+impl AideAdmin for FausseAide {
+    fn presente(&self) -> bool {
+        self.presente
+    }
+    fn faire(&self, d: mindcare_aide_regles::demandes::Demande, _: Duration) -> (Result<Value, String>, Vec<String>) {
+        self.demandes.lock().unwrap().push(d);
+        let garde = self.retenue.0.lock().unwrap();
+        let _ = self.retenue.1.wait_timeout_while(garde, Duration::from_secs(10), |r| *r);
+        (self.reponse.clone(), vec![format!("2026-11-14T10:00:00 {} : commencé", d.nom())])
+    }
+}
+
+/// Le banc sur ce test, avec cette fausse Aide branchée, une fois sa présence lue (comme au démarrage)
+fn banc_aide(test: &str, aide: &Arc<FausseAide>) -> Banc {
+    let mut b = banc_sur(test, Some(FauxExecuteur::nouveau(0)));
+    b.b.brancher_aide(Arc::clone(aide) as Arc<dyn AideAdmin>);
+    let debut = Instant::now();
+    while !b.journal().contains("Aide de Mindcare :") && debut.elapsed() < Duration::from_secs(5) {
+        std::thread::sleep(Duration::from_millis(5));
+        b.tour(Instant::now());
+    }
+    // (un pas de plus : la page redessinée)
+    b.tour(Instant::now());
+    b
+}
+
+#[test]
+fn avec_la_fausse_aide_le_bouton_puis_fait_par_l_aide() {
+    let aide = FausseAide::nouvelle(true, Ok(json!({ "supprimes": 2, "restes": [], "wifi": true })));
+    let mut b = banc_aide("test-profil-wifi", &aide);
+    assert!(b.b.pages.aide_admin);
+    assert!(b.journal().contains("Aide de Mindcare : là"), "{}", b.journal());
+    assert!(a(&page(&b), x::BOUTON), "pas de bouton avec l'Aide");
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    // Pendant : la jauge, pas de réponses ; un clic de plus ne relance rien
+    let debut = Instant::now();
+    while aide.demandes.lock().unwrap().is_empty() && debut.elapsed() < Duration::from_secs(5) {
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    assert_eq!(*aide.demandes.lock().unwrap(), [mindcare_aide_regles::demandes::Demande::WifiOublier]);
+    assert!(a(&page(&b), x::PENDANT) && !a(&page(&b), "\"cartes\""));
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    b.tour(Instant::now());
+    // Libérée : fait, le journal de l'Aide recopié dans celui de Mindcare
+    aide.liberer();
+    attendre_page(&mut b, x::FAIT);
+    assert!(a(&page(&b), "\"cartes\""));
+    assert_eq!(aide.demandes.lock().unwrap().len(), 1, "relancé");
+    let j = b.journal();
+    assert!(j.contains("Le faire pour moi (profil-wifi) : par l'Aide de Mindcare (wifi.oublier)"), "{j}");
+    assert!(j.contains("Aide : 2026-11-14T10:00:00 wifi.oublier : commencé"), "{j}");
+    assert!(j.contains("Le faire pour moi : fait"), "{j}");
+}
+
+#[test]
+fn avec_la_fausse_aide_rate_sa_phrase_et_les_gestes() {
+    let phrase = "Ce PC n'a pas de Wi-Fi : il n'y a rien à oublier.";
+    let aide = FausseAide::nouvelle(true, Err(phrase.into()));
+    aide.liberer();
+    let mut b = banc_aide("test-profil-wifi", &aide);
+    b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+    attendre_page(&mut b, x::RATE);
+    let p = page(&b);
+    assert!(a(&p, phrase) && a(&p, "\"case\"") && a(&p, "\"cartes\""), "{p}");
+    assert!(b.journal().contains(&format!("Le faire pour moi : raté ({phrase})")));
+}
+
+#[test]
+fn sans_aide_pas_de_bouton_pour_les_quatre() {
+    for test in ["test-profil-wifi", "test-ipconfig", "test-alim-defaut", "test-depanneur-maj"] {
+        let aide = FausseAide::nouvelle(false, Ok(Value::Null));
+        let mut b = banc_aide(test, &aide);
+        assert!(!b.b.pages.aide_admin);
+        assert!(b.journal().contains("Aide de Mindcare : absente"), "{test}");
+        assert!(!a(&page(&b), x::BOUTON), "{test} : un bouton sans l'Aide");
+        b.action(ids::FAIRE, Value::Null, ecrans::ENQUETE);
+        std::thread::sleep(Duration::from_millis(50));
+        b.tour(Instant::now());
+        assert!(aide.demandes.lock().unwrap().is_empty(), "{test}");
+    }
+    // (et sans rien de branché du tout : non plus)
+    let b = banc_sur("test-ipconfig", None);
+    assert!(!a(&page(&b), x::BOUTON));
 }

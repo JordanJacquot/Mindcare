@@ -13,7 +13,7 @@
 #      règles Tauri de la suite (verifier-tauri.ps1 du dépôt Mindset, épinglé), cargo deny, construction de publication
 #      (outils\construire-rust.ps1 : cargo build --release --locked, jamais l'option « essai »), puis Mindcare.zip au
 #      même format que les autres zips de la suite (outils\zip-rust.ps1, vérifié par outils\verifier-zip-rust.ps1 :
-#      exactement Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt et enquetes.json dans « Mindcare », fiches de
+#      exactement Mindset.exe, Mindcare.exe, MindcareAide.exe, version.json, LISEZMOI.txt et enquetes.json dans « Mindcare », fiches de
 #      version, aucune trace de la construction d'essai, aucun runtime C à part). Le zip est attesté (attestation
 #      GitHub : ce dépôt, ce fichier de construction, ce commit) et déposé comme artefact « Mindcare-rust ».
 #      outils\publier.ps1 -Rust le récupère et vérifie son attestation avant de le signer :
@@ -161,7 +161,7 @@ jobs:
           if ($LASTEXITCODE) { exit 1 }
           $h = (Get-FileHash -LiteralPath '_ci\rust-zip\Mindcare.zip' -Algorithm SHA256).Hash
           [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Mindcare.zip (Rust ${{ steps.rust.outputs.version }}, non signé, commit $env:GITHUB_SHA) : SHA-256 ``$h``" + "`n")
-          foreach ($e in 'Mindset.exe', 'Mindcare.exe') {
+          foreach ($e in 'Mindset.exe', 'Mindcare.exe', 'MindcareAide.exe') {
             [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "$e (Rust) : SHA-256 ``$((Get-FileHash -LiteralPath "_ci\rust\Mindcare\$e" -Algorithm SHA256).Hash)``" + "`n")
           }
 
@@ -347,7 +347,9 @@ jobs:
           foreach ($e in 'Mindset.exe', 'Mindcare.exe') { if (-not (Test-Path -LiteralPath "$racine\$e")) { throw "Dossier signé inattendu : $racine\$e absent" } }
           $problemes = @()
           # (Where-Object et pas -Include : avec -LiteralPath, PowerShell 5.1 ignore -Include et rend tous les fichiers)
-          $nos = @(Get-Item -LiteralPath "$racine\Mindset.exe", "$racine\Mindcare.exe") + @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.ps1', '.psm1', '.psd1' })
+          # (MindcareAide.exe, l'Aide de Mindcare : seulement dans la version Rust, signée comme les deux autres)
+          $aide = @(Get-Item -LiteralPath "$racine\MindcareAide.exe" -ErrorAction SilentlyContinue)
+          $nos = @(Get-Item -LiteralPath "$racine\Mindset.exe", "$racine\Mindcare.exe") + $aide + @(Get-ChildItem -LiteralPath $racine -Recurse -File | Where-Object { $_.Extension -in '.ps1', '.psm1', '.psd1' })
           foreach ($f in $nos) {
             $s = Get-AuthenticodeSignature -LiteralPath $f.FullName
             if ($s.Status -ne 'Valid' -or $s.SignerCertificate.Subject -notmatch 'SignPath Foundation') { $problemes += "$($f.FullName) : $($s.Status) $($s.SignerCertificate.Subject)" }

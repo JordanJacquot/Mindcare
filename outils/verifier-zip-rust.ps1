@@ -6,14 +6,16 @@
 #
 # Le zip doit être celui que Mindset attend pour une appli en Rust (docs\contrat-appli.md et docs\regles-tauri.md du
 # dépôt Mindset) :
-#   - exactement un dossier « Mindcare » et dedans exactement Mindset.exe, Mindcare.exe, version.json, LISEZMOI.txt et
+#   - exactement un dossier « Mindcare » et dedans exactement Mindset.exe, Mindcare.exe, MindcareAide.exe (l'Aide de
+#     Mindcare : sans elle, l'installateur de Mindset ne crée pas sa tâche), version.json, LISEZMOI.txt et
 #     enquetes.json (rien d'autre : ni script, ni DLL, ni fichier en plus, ni version.json à la racine du zip) ;
 #   - version.json en UTF-8 sans marque : appli « mindcare », version celle du Cargo.toml de mindcare-appli (ou
 #     -Version, qui doit alors être la même), mindset_min 2.15.0 ;
 #   - enquetes.json identique à Mindcare\fichiers\enquetes.json ;
 #   - fiches de version : Mindset.exe décrit « Mindset » (une seule ligne « Mindset » dans le Gestionnaire des tâches),
-#     Mindcare.exe décrit « Mindcare », produits « Mindset » et « Mindcare », version celle de version.json ;
-#   - l'exe livré ne connaît pas la construction d'essai (outils\verifier-sans-essai.ps1) ;
+#     Mindcare.exe et MindcareAide.exe décrivent « Mindcare », produits « Mindset » et « Mindcare », version celle de
+#     version.json ;
+#   - les exe livrés ne connaissent pas la construction d'essai (outils\verifier-sans-essai.ps1) ;
 #   - avec -VerifierImports (outils\verifier-imports.ps1 du dépôt Mindset) : aucun runtime C à installer à part.
 # Code de sortie 0 si tout va bien, 1 sinon (avec la liste des problèmes).
 param(
@@ -24,7 +26,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $racine = Split-Path $PSScriptRoot -Parent
 $MindsetMin = '2.15.0'
-$attendus = @('Mindcare\Mindset.exe', 'Mindcare\Mindcare.exe', 'Mindcare\version.json', 'Mindcare\LISEZMOI.txt', 'Mindcare\enquetes.json')
+$attendus = @('Mindcare\Mindset.exe', 'Mindcare\Mindcare.exe', 'Mindcare\MindcareAide.exe', 'Mindcare\version.json', 'Mindcare\LISEZMOI.txt', 'Mindcare\enquetes.json')
 $problemes = New-Object Collections.Generic.List[string]
 
 if (-not (Test-Path -LiteralPath $Zip -PathType Leaf)) { Write-Host "Zip introuvable : $Zip"; exit 1 }
@@ -93,7 +95,7 @@ try {
 
     # Les fiches de version des deux programmes
     $v4 = @($Version.Split('.')); while ($v4.Count -lt 4) { $v4 += '0' }; $v4 = $v4 -join '.'
-    foreach ($e in @(@('Mindset.exe', 'Mindset'), @('Mindcare.exe', 'Mindcare'))) {
+    foreach ($e in @(@('Mindset.exe', 'Mindset'), @('Mindcare.exe', 'Mindcare'), @('MindcareAide.exe', 'Mindcare'))) {
         $f = Join-Path $tmp $e[0]
         if (-not (Test-Path -LiteralPath $f)) { continue }
         $i = (Get-Item -LiteralPath $f).VersionInfo
@@ -109,7 +111,7 @@ try {
 
     # Aucun runtime C à installer à part (contrôle du dépôt Mindset, lu dans la table des imports, sans rien lancer)
     if ($VerifierImports) {
-        $exes = @('Mindset.exe', 'Mindcare.exe' | ForEach-Object { Join-Path $tmp $_ } | Where-Object { Test-Path -LiteralPath $_ })
+        $exes = @('Mindset.exe', 'Mindcare.exe', 'MindcareAide.exe' | ForEach-Object { Join-Path $tmp $_ } | Where-Object { Test-Path -LiteralPath $_ })
         if ($exes.Count) {
             & $VerifierImports -Fichiers $exes -Liste | Out-Host
             if ($LASTEXITCODE) { $problemes.Add('un programme du zip a besoin d''un runtime C à installer à part') }

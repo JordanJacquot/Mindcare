@@ -16,6 +16,8 @@
 //! - [`message`] : la boîte « Mindcare s'utilise avec Mindset » (`MessageBoxW`) ;
 //! - [`reparer`] : « Le faire pour moi » (exe livré seulement) : les programmes de la liste fermée lancés sans fenêtre,
 //!   et la page Windows Update des Paramètres (`ShellExecuteW`) ;
+//! - [`aide`] : l'Aide de Mindcare (exe livré seulement) : l'état de sa tâche (`schtasks /Query /XML`), son réveil
+//!   (`schtasks /Run`), sans fenêtre, et son canal nommé (`CreateFileW`, `WaitNamedPipeW`, propriétaire vérifié) ;
 //! - `capture` (construction d'essai seulement) : l'image de la fenêtre (`PrintWindow`).
 //!
 //! Rien ici n'écrit dans le registre, ne touche aux fenêtres d'un autre programme ni ne lance quoi que ce soit sans
@@ -23,6 +25,8 @@
 
 #![allow(unsafe_code)]
 
+#[cfg(not(feature = "essai"))]
+pub mod aide;
 #[cfg(feature = "essai")]
 pub mod capture;
 pub mod fenetre;

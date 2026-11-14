@@ -180,6 +180,30 @@ impl crate::reparer::Executeur for ExecuteurEssai {
     }
 }
 
+/// Construction d'essai : une fausse Aide de Mindcare, jamais la vraie tâche ni le vrai canal. Elle est « là » si le
+/// fichier `<local d'essai>\aide-la.txt` existe ; chaque action attend un peu (pour voir la jauge), puis réussit, ou
+/// rate si `<local d'essai>\reparer-rate.txt` existe.
+#[cfg(feature = "essai")]
+struct AideEssai {
+    local: PathBuf,
+}
+
+#[cfg(feature = "essai")]
+impl crate::reparer::AideAdmin for AideEssai {
+    fn presente(&self) -> bool {
+        self.local.join("aide-la.txt").exists()
+    }
+    fn faire(&self, d: mindcare_aide_regles::demandes::Demande, _: Duration) -> (Result<Value, String>, Vec<String>) {
+        std::thread::sleep(Duration::from_millis(1500));
+        let journal = vec![format!("{} : essai, rien de fait", d.nom())];
+        if self.local.join("reparer-rate.txt").exists() {
+            (Err("L'Aide d'essai n'a rien fait (reparer-rate.txt).".into()), journal)
+        } else {
+            (Ok(Value::Null), journal)
+        }
+    }
+}
+
 /// L'assistant et la dictée de Mindcare (l'exe livré) : le vrai llama-server et le vrai whisper (sans fenêtre, arrêtés
 /// avec Mindcare), le micro choisi dans Mindset, les vrais téléchargements (WinHTTP, avec le proxy du PC), dans le
 /// dossier de données de Mindcare.
@@ -321,6 +345,14 @@ pub fn lancer() -> ! {
     pages.brancher_executeur(Arc::new(crate::windows::reparer::ExecuteurWindows));
     #[cfg(feature = "essai")]
     pages.brancher_executeur(Arc::new(ExecuteurEssai { local: PathBuf::from(&essai.local) }));
+    // L'Aide de Mindcare (les 4 réglages administrateur) : sa tâche lue sur un fil à part, rien n'est lancé avant le
+    // clic de la personne (la construction d'essai ne lance rien, jamais la vraie tâche)
+    #[cfg(not(feature = "essai"))]
+    if let Some(aide) = dossier_programme().and_then(|d| crate::windows::aide::AideWindows::nouvelle(&d)) {
+        pages.brancher_aide(Arc::new(aide));
+    }
+    #[cfg(feature = "essai")]
+    pages.brancher_aide(Arc::new(AideEssai { local: PathBuf::from(&essai.local) }));
     *donnees.borrow_mut() = Some(d);
 
     let pour_page = journal.clone();

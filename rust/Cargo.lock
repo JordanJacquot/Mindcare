@@ -1705,10 +1705,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
+name = "mindcare-aide"
+version = "0.1.0"
+dependencies = [
+ "mindcare-aide-regles",
+ "serde_json",
+ "windows",
+]
+
+[[package]]
+name = "mindcare-aide-regles"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+]
+
+[[package]]
 name = "mindcare-appli"
 version = "0.91.2"
 dependencies = [
  "flate2",
+ "mindcare-aide-regles",
  "mindcare-assistant",
  "mindcare-dictee",
  "mindcare-donnees",
